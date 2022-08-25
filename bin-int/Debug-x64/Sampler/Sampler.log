@@ -1,3 +1,2 @@
-﻿  Application.cpp
-C:\Dev\BackBeat\Sampler\src\Application.cpp(9,1): warning C4326: return type of 'main' should be 'int' instead of 'void'
+﻿  SamplerApp.cpp
   Sampler.vcxproj -> C:\Dev\BackBeat\bin\Debug-x64\Sampler\Sampler.exe
