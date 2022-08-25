@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32819.101
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Sampler", "Sampler\Sampler.vcxproj", "{EE5F998A-4BE7-4B71-96A4-4B01E202355D}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BackBeat", "BackBeat\BackBeat.vcxproj", "{48C6F80F-7117-4EFA-AFD1-FECDE04CC7E3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{48C6F80F-7117-4EFA-AFD1-FECDE04CC7E3}.Debug|x64.ActiveCfg = Debug|x64
+		{48C6F80F-7117-4EFA-AFD1-FECDE04CC7E3}.Debug|x64.Build.0 = Debug|x64
+		{48C6F80F-7117-4EFA-AFD1-FECDE04CC7E3}.Release|x64.ActiveCfg = Release|x64
+		{48C6F80F-7117-4EFA-AFD1-FECDE04CC7E3}.Release|x64.Build.0 = Release|x64
+		{EE5F998A-4BE7-4B71-96A4-4B01E202355D}.Debug|x64.ActiveCfg = Debug|x64
+		{EE5F998A-4BE7-4B71-96A4-4B01E202355D}.Debug|x64.Build.0 = Debug|x64
+		{EE5F998A-4BE7-4B71-96A4-4B01E202355D}.Release|x64.ActiveCfg = Release|x64
+		{EE5F998A-4BE7-4B71-96A4-4B01E202355D}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {137E638A-B063-4DEE-ADB5-9E3790DFB122}
+	EndGlobalSection
+EndGlobal
