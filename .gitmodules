@@ -1,0 +1,3 @@
+[submodule "BackBeat/vendor/spdlog"]
+	path = BackBeat/vendor/spdlog
+	url = https://github.com/gabime/spdlog

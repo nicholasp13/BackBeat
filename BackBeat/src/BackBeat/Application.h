@@ -2,6 +2,8 @@
 
 #include "Core.h"
 
+//Application class for applications using the BackBeat engine
+
 namespace BackBeat {
 
 	class BACKBEAT_API Application
