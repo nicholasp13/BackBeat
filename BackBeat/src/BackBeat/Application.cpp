@@ -1,3 +1,4 @@
+#include "bbpch.h"
 #include "Application.h"
 
 namespace BackBeat {

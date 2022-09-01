@@ -20,6 +20,9 @@ project "BackBeat"
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
 
+	pchheader "bbpch.h"
+	pchsource "BackBeat/src/bbpch.cpp"
+
 	files
 	{
 		"%{prj.name}/src/**.h",

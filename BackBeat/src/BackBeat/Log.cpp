@@ -1,3 +1,4 @@
+#include "bbpch.h"
 #include "Log.h"
 
 namespace BackBeat {
