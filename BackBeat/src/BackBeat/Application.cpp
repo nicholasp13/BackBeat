@@ -11,6 +11,9 @@ namespace BackBeat {
 
 	void Application::Run()
 	{
+		WindowResizeEvent e(1200, 720);
+		BB_CLIENT_TRACE(e);
+
 		while (true);
 	}
 }

@@ -6,6 +6,7 @@
 #include "Core.h"
 #include "spdlog/spdlog.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
+#include "spdlog/fmt/ostr.h"
 
 // Log wrapper class for flexibility if needed for changing the logging API
 

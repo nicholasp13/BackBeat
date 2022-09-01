@@ -1,6 +1,8 @@
 #pragma once
 
 #include "Core.h"
+#include "Events/ApplicationEvent.h"
+#include "Log.h"
 
 //Application class for applications using the BackBeat engine
 
