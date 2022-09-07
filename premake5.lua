@@ -12,6 +12,11 @@ workspace "BackBeat"
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
+IncludeDir = {}
+IncludeDir["GLFW"] = "BackBeat/vendor/GLFW/include"
+
+include "BackBeat/vendor/GLFW"
+
 project "BackBeat"
 	location "BackBeat"
 	kind "SharedLib"
@@ -32,13 +37,20 @@ project "BackBeat"
 	includedirs
 	{
 		"%{prj.name}/src",
-		"%{prj.name}/vendor/spdlog/include"
+		"%{prj.name}/vendor/spdlog/include",
+		"%IncludeDir.GLFW"
+	}
+
+	links{
+		"GLFW",
+		"opengl32.lib"
 	}
 
 	filter "system:windows"
 		-- Might need to change C++ version --
 		cppdialect "C++20"
-		staticruntime "On"
+		staticruntime "Off"
+		runtime "Release"
 		systemversion "latest"
 
 		defines
@@ -93,7 +105,8 @@ project "Sampler"
 	filter "system:windows"
 		-- Might need to change C++ version --
 		cppdialect "C++20"
-		staticruntime "On"
+		staticruntime "Off"
+		runtime "Release"
 		systemversion "latest"
 
 		defines

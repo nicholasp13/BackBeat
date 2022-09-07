@@ -12,4 +12,14 @@
 	#error BackBeat only supports Windows
 #endif 
 
+#ifdef BB_ENABLE_ASSERTS
+	#define BB_CLIENT_ASSERTS(x, ...) { if(!(x)) {BB_CLIENT_ERROR("Assertion Failed: {0}", __VA_ARGS__); __debugbreak(); } }
+	#define BB_CORE_ASSERTS(x, ...) { if(!(x)) { BB_CORE_ERROR("Assertion Failed: {0}", __VA_ARGS__); __debugbreak(); } }
+#else
+	#define BB_CLIENT_ASSERTS(x, ...)
+	#define BB_CORE_ASSERTS(x, ...)
+#endif
+
 #define BIT(x) (1 << x)
+
+#include "Log.h"
