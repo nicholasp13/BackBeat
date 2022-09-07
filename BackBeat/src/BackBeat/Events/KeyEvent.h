@@ -18,10 +18,10 @@ namespace BackBeat {
 		int m_KeyCode;
 	};
 
-	class KeyEventPressed : public KeyEvent
+	class KeyPressedEvent : public KeyEvent
 	{
 	public:
-		KeyEventPressed(const int keycode, bool isRepeat = false)
+		KeyPressedEvent(const int keycode, bool isRepeat = false)
 			: KeyEvent(keycode), m_IsRepeat(isRepeat) {}
 
 		bool isRepeat() const { return m_IsRepeat; }
@@ -39,10 +39,10 @@ namespace BackBeat {
 		bool m_IsRepeat;
 	};
 
-	class KeyEventReleased : public KeyEvent
+	class KeyReleasedEvent : public KeyEvent
 	{
 	public:
-		KeyEventReleased(const int keycode)
+		KeyReleasedEvent(const int keycode)
 			: KeyEvent(keycode) {}
 
 		std::string ToString() const override
