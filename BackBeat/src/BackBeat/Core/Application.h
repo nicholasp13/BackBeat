@@ -2,8 +2,8 @@
 
 #include "Core.h"
 #include "LayerStack.h""
-#include "Events/Event.h"
-#include "Events/ApplicationEvent.h"
+#include "BackBeat/Events/Event.h"
+#include "BackBeat/Events/ApplicationEvent.h"
 #include "Window.h"
 
 //Application class for applications using the BackBeat engine

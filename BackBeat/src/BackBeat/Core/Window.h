@@ -2,7 +2,7 @@
 
 #include "bbpch.h"
 
-#include "BackBeat/Core.h"
+#include "Core.h"
 #include "BackBeat/Events/Event.h"
 
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "BackBeat/Window.h"
+#include "BackBeat/Core/Window.h"
 
 #include <GLFW/glfw3.h>
 

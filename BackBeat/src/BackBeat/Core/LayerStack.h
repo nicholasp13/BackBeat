@@ -1,10 +1,7 @@
 #pragma once
 
-#include "BackBeat/Core.h"
+#include "Core.h"
 #include "Layer.h"
-
-#include <vector>
-
 
 namespace BackBeat {
 

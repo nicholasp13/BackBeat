@@ -4,3 +4,6 @@
 [submodule "BackBeat/vandor/GLFW"]
 	path = BackBeat/vandor/GLFW
 	url = https://github.com/TheCherno/GLFW
+[submodule "BackBeat/vendor/imgui"]
+	path = BackBeat/vendor/imgui
+	url = https://github.com/ocornut/imgui

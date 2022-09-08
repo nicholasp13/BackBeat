@@ -1,6 +1,6 @@
 #pragma once
 
-#include "BackBeat/Core.h"
+#include "Core.h"
 #include "BackBeat/Events/Event.h"
 
 namespace BackBeat {
