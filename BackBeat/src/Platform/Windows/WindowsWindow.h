@@ -1,7 +1,8 @@
 #pragma once
 
 #include "BackBeat/Window.h"
-#include "../vendor/GLFW/include/GLFW/glfw3.h"
+
+#include <GLFW/glfw3.h>
 
 namespace BackBeat {
 

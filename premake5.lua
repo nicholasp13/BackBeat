@@ -12,10 +12,13 @@ workspace "BackBeat"
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
-IncludeDir = {}
-IncludeDir["GLFW"] = "BackBeat/vendor/GLFW/include"
+-- TO FIX --
+-- IncludeDir = {}
+-- IncludeDir["GLFW"] = "BackBeat/vendor/GLFW/include"
+-- IncludeDir["Glad"] = "BackBeat/vendor/Glad/include"
 
 include "BackBeat/vendor/GLFW"
+include "BackBeat/vendor/Glad"
 
 project "BackBeat"
 	location "BackBeat"
@@ -38,11 +41,17 @@ project "BackBeat"
 	{
 		"%{prj.name}/src",
 		"%{prj.name}/vendor/spdlog/include",
-		"%IncludeDir.GLFW"
+		-- CURRENT SOL
+		"%{prj.name}/vendor/GLFW/include",
+		"%{prj.name}/vendor/Glad/include"
+		--TO FIX --
+		-- "%IncludeDir.GLFW",
+		-- "%IncludeDir.Glad"
 	}
 
 	links{
 		"GLFW",
+		"Glad",
 		"opengl32.lib"
 	}
 
@@ -56,7 +65,8 @@ project "BackBeat"
 		defines
 		{
 			"BB_PLATFORM_WINDOWS",
-			"BB_BUILD_DLL"
+			"BB_BUILD_DLL",
+			"GLFW_INCLUDE_NONE"
 		}
 
 		postbuildcommands
