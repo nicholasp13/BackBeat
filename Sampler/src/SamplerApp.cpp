@@ -27,6 +27,7 @@ public:
 	Sampler()
 	{
 		PushLayer(new ExampleLayer());
+		PushOverlay(new BackBeat::ImGuiLayer());
 	}
 
 	~Sampler()
