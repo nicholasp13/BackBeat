@@ -26,7 +26,7 @@ class Sampler : public BackBeat::Application
 public:
 	Sampler()
 	{
-		PushLayer(new ExampleLayer());
+		// PushLayer(new ExampleLayer());
 		PushOverlay(new BackBeat::ImGuiLayer());
 	}
 

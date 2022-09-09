@@ -24,6 +24,8 @@ namespace BackBeat {
 
 		ImGuiIO& io = ImGui::GetIO(); (void)io;
 		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+		io.WantCaptureMouse = true;
+		io.WantCaptureKeyboard = true;
 
 		ImGui::StyleColorsDark();
 
@@ -31,10 +33,10 @@ namespace BackBeat {
 
 		SetDarkThemeColors();
 
-		// TODOL fix implementation for ImGui for GLFW
-		// Application& app = Application::Get();
-		// GLFWwindow& window = static_cast<GLFWwindow*>(app.GetWindow().GetNativeWindow());
-		// ImGui_ImplGlfw_InitForOpenGL(window, true);
+		// TODO fix implementation for ImGui for GLFW
+		Application& app = Application::Get();
+		GLFWwindow* window = (GLFWwindow*)app.GetWindow().GetNativeWindow();
+		ImGui_ImplGlfw_InitForOpenGL(window, true);
 		ImGui_ImplOpenGL3_Init("#version 410");
 	}
 
@@ -65,7 +67,12 @@ namespace BackBeat {
 
 	void ImGuiLayer::OnEvent(Event& event)
 	{
-
+		ImGuiIO& io = ImGui::GetIO();
+		if (!event.Handled)
+		{
+			event.Handled |= event.IsInCategory(EventCategoryMouse) & io.WantCaptureMouse;
+			event.Handled |= event.IsInCategory(EventCategoryKeyboard) & io.WantCaptureKeyboard;
+		}
 	}
 
 	// TODO: Create own color style
