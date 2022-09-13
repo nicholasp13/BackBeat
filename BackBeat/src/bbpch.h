@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <functional>
 #include <format>
+#include <vector>
 
 #ifdef BB_PLATFORM_WINDOWS
 	#include <Windows.h>

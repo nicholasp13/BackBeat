@@ -19,6 +19,7 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 include "BackBeat/vendor/GLFW"
 include "BackBeat/vendor/Glad"
+include "BackBeat/vendor/imgui"
 
 project "BackBeat"
 	location "BackBeat"
@@ -43,7 +44,8 @@ project "BackBeat"
 		"%{prj.name}/vendor/spdlog/include",
 		-- CURRENT SOL
 		"%{prj.name}/vendor/GLFW/include",
-		"%{prj.name}/vendor/Glad/include"
+		"%{prj.name}/vendor/Glad/include",
+		"%{prj.name}/vendor/imgui"
 		--TO FIX --
 		-- "%IncludeDir.GLFW",
 		-- "%IncludeDir.Glad"
@@ -52,6 +54,7 @@ project "BackBeat"
 	links{
 		"GLFW",
 		"Glad",
+		"imgui",
 		"opengl32.lib"
 	}
 

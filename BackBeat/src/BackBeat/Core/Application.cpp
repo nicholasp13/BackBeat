@@ -7,8 +7,12 @@ namespace BackBeat {
 
 #define BIND_EVENT_FN(x) std::bind(&Application::x, this, std::placeholders::_1)
 	
+	Application* Application::s_Instance = nullptr;
+	
 	Application::Application()
 	{
+		BB_CORE_ASSERTS(!s_Instance, "Application already exist!")
+		s_Instance = this;
 		m_Window = std::unique_ptr<Window>(Window::Create());
 		m_Window->SetEventCallback(BIND_EVENT_FN(OnEvent));
 	}
@@ -47,11 +51,13 @@ namespace BackBeat {
 	void Application::PushLayer(Layer* layer)
 	{
 		m_LayerStack.PushLayer(layer);
+		layer->OnAttach();
 	}
 
 	void Application::PushOverlay(Layer* layer)
 	{
 		m_LayerStack.PushOverlay(layer);
+		layer->OnAttach();
 	}
 
 

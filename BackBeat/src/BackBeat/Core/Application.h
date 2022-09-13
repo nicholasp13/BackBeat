@@ -2,8 +2,8 @@
 
 #include "Core.h"
 #include "LayerStack.h""
-#include "Events/Event.h"
-#include "Events/ApplicationEvent.h"
+#include "BackBeat/Events/Event.h"
+#include "BackBeat/Events/ApplicationEvent.h"
 #include "Window.h"
 
 //Application class for applications using the BackBeat engine
@@ -23,10 +23,13 @@ namespace BackBeat {
 		void PushLayer(Layer* layer);
 		void PushOverlay(Layer* layer);
 
+		static inline Application& Get() { return *s_Instance;  }
+		inline Window& GetWindow() { return *m_Window; }
 	private:
 		bool OnWindowClose(WindowCloseEvent& e);
 
 	private:
+		static Application* s_Instance;
 		std::unique_ptr<Window> m_Window;
 		bool m_Running = true;
 		LayerStack m_LayerStack;
