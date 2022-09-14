@@ -23,8 +23,10 @@ include "BackBeat/vendor/imgui"
 
 project "BackBeat"
 	location "BackBeat"
-	kind "SharedLib"
+	kind "StaticLib"
 	language "C++"
+	cppdialect "C++20"
+	staticruntime "on"
 
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
@@ -59,10 +61,6 @@ project "BackBeat"
 	}
 
 	filter "system:windows"
-		-- Might need to change C++ version --
-		cppdialect "C++20"
-		staticruntime "Off"
-		runtime "Release"
 		systemversion "latest"
 
 		defines
@@ -72,28 +70,25 @@ project "BackBeat"
 			"GLFW_INCLUDE_NONE"
 		}
 
-		postbuildcommands
-		{
-			("{COPY} %{cfg.buildtarget.relpath} ../bin/" .. outputdir .. "/Sampler")
-		}
-
 	filter "configurations:Debug"
 		defines "BB_DEBUG"
-		symbols "On"
+		symbols "on"
 
 	filter "configurations:RELEASE"
 		defines "BB_RELEASE"
-		optimize "On"
+		optimize "on"
 	
 	filter "configurations:Dist"
 		defines "BB_DIST"
-		optimize "On"
+		optimize "on"
 
 
 project "Sampler"
 	location "Sampler"
 	kind "ConsoleApp"
 	language "C++"
+	cppdialect "C++20"
+	staticruntime "on"
 
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
@@ -116,10 +111,6 @@ project "Sampler"
 	}
 
 	filter "system:windows"
-		-- Might need to change C++ version --
-		cppdialect "C++20"
-		staticruntime "Off"
-		runtime "Release"
 		systemversion "latest"
 
 		defines
@@ -129,12 +120,12 @@ project "Sampler"
 
 	filter "configurations:Debug"
 		defines "BB_DEBUG"
-		symbols "On"
+		symbols "on"
 
 	filter "configurations:RELEASE"
 		defines "BB_RELEASE"
-		optimize "On"
+		optimize "on"
 	
 	filter "configurations:Dist"
 		defines "BB_DIST"
-		optimize "On"
+		optimize "on"
