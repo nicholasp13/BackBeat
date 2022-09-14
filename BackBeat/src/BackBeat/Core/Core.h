@@ -1,16 +1,27 @@
 #pragma once
 
+
 // Makes sure that the platform the application is run is Windows
 
 #ifdef BB_PLATFORM_WINDOWS
-	#ifdef BB_BUILD_DLL
-		#define BACKBEAT_API _declspec(dllexport)
+
+	#if BB_DYNAMIC_LINK
+		#ifdef BB_BUILD_DLL
+			#define BACKBEAT_API _declspec(dllexport)
+		#else
+			#define BACKBEAT_API _declspec(dllimport)
+		#endif
 	#else
-		#define BACKBEAT_API _declspec(dllimport)
+		#define BACKBEAT_API
 	#endif
+
 #else
 	#error BackBeat only supports Windows
 #endif 
+
+#ifdef BB_DEBUG
+	#define BB_ENABLE_ASSERTS
+#endif
 
 #ifdef BB_ENABLE_ASSERTS
 	#define BB_CLIENT_ASSERTS(x, ...) { if(!(x)) {BB_CLIENT_ERROR("Assertion Failed: {0}", __VA_ARGS__); __debugbreak(); } }
