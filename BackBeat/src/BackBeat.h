@@ -11,5 +11,6 @@
 #include "BackBeat/Core/Log.h"
 #include "BackBeat/Core/Window.h"
 #include "BackBeat/ImGui/ImGuiLayer.h"
+#include "BackBeat/Audio/Player.h"
 
 #include "BackBeat/Core/EntryPoint.h"

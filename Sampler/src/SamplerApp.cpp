@@ -28,7 +28,7 @@ public:
 	{
 		PushLayer(new ExampleLayer());
 		PushOverlay(new BackBeat::ImGuiLayer());
-
+		BackBeat::Player player = BackBeat::Player();
 	}
 
 	~Sampler()
