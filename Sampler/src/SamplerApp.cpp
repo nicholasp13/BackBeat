@@ -26,9 +26,16 @@ class Sampler : public BackBeat::Application
 public:
 	Sampler()
 	{
-		PushLayer(new ExampleLayer());
-		PushOverlay(new BackBeat::ImGuiLayer());
-		BackBeat::Player player = BackBeat::Player();
+		// ----- LOGGING/DEBUGGING ----
+		// PushLayer(new ExampleLayer());
+		// PushOverlay(new BackBeat::ImGuiLayer());
+		// BackBeat::Player player = BackBeat::Player();
+		// std::string result1 = 
+		//	BackBeat::FileReader::ReadFile("assets/audio/LearnToFly.mp3" );
+		// BB_CLIENT_TRACE("{0}", result1);
+		// std::string result2 =
+		//	BackBeat::FileReader::ReadFile("assets/audio/Audio 1_39.wav");
+		// BB_CLIENT_TRACE("{0}", result2);
 	}
 
 	~Sampler()

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Audio.h"
+
 #include <mmdeviceapi.h>
 #include <Audioclient.h>
 
@@ -14,10 +16,17 @@ namespace BackBeat {
 		void Play();
 		void Pause();
 		void Stop();
+		void SetFile();
 
+		bool FileSelected = FALSE;
 	private:
+		UINT32 m_BufferSize;
+
 		IAudioClient* m_AudioClient;
 		IMMDeviceEnumerator* m_Enumerator;
-		IMMDevice* device;
+		IMMDevice* m_Device;
+		IAudioRenderClient* m_Renderer;
+
+		AudioProps m_FileProps;
 	};
 }
