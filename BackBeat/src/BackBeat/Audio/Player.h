@@ -1,7 +1,6 @@
 #pragma once
 
-#include "Audio.h"
-
+#include <string>
 #include <mmdeviceapi.h>
 #include <Audioclient.h>
 
@@ -10,23 +9,23 @@ namespace BackBeat {
 	class Player
 	{
 	public:
-		Player();
+		Player(std::string filePath);
 		virtual ~Player();
 
 		void Play();
 		void Pause();
 		void Stop();
-		void SetFile();
 
 		bool FileSelected = FALSE;
 	private:
-		UINT32 m_BufferSize;
+		void InitAudioClient();
+
+		std::string m_FilePath;
 
 		IAudioClient* m_AudioClient;
 		IMMDeviceEnumerator* m_Enumerator;
 		IMMDevice* m_Device;
 		IAudioRenderClient* m_Renderer;
-
-		AudioProps m_FileProps;
+		tWAVEFORMATEX* m_FileProps;
 	};
 }

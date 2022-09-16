@@ -9,65 +9,15 @@
 
 namespace BackBeat {
 
-	HRESULT hr = S_OK;
+#define CHECK_FAILURE( hr ) \
+	if (FAILED(hr)) \
+	{ BB_CORE_ERROR("{0} FAILED TO INITIALIZE AUDIOCLIENT", hr); return; }
 
-	Player::Player()
+	Player::Player(std::string filePath)
 	{
-		hr = CoInitializeEx(NULL, COINITBASE_MULTITHREADED);
-
-		const CLSID CLSID_MMDeviceEnumerator = __uuidof(MMDeviceEnumerator);
-		const IID IID_IMMDeviceEnumerator = __uuidof(IMMDeviceEnumerator);
-		hr = CoCreateInstance(
-			CLSID_MMDeviceEnumerator, NULL,
-			CLSCTX_ALL, IID_IMMDeviceEnumerator,
-			(void**)&m_Enumerator);
-
-		if (hr != S_OK) 
-		{
-			BB_CORE_ERROR("{0} FAILED TO GET ENUMERATOR", hr);
-		}
-		else { BB_CORE_TRACE("Successfully got ENUMERATOR!"); }
-
-		hr = m_Enumerator->GetDefaultAudioEndpoint(eRender, eMultimedia, &m_Device);
-		
-		if (hr != S_OK)
-		{
-			BB_CORE_ERROR("{0} FAILED TO GET DEVICE", hr);
-		}
-		else { BB_CORE_TRACE("Successfully got DEVICE!"); }
-		
-		const IID IID_IAudioClient = __uuidof(IAudioClient);
-		hr = m_Device->Activate(IID_IAudioClient, CLSCTX_ALL, NULL, (void**)&m_AudioClient);
-		
-		if (hr != S_OK) 
-		{
-			BB_CORE_ERROR("{0} FAILED TO GET AUDIOCLIENT", hr);
-		}
-		else { BB_CORE_TRACE("Successfully got AUDIOCLIENT!"); }
-		
-		hr = m_AudioClient->GetBufferSize(&m_BufferSize);
-
-		if (hr != S_OK)
-		{
-			BB_CORE_ERROR("{0} FAILED TO GET BUFFERSIZE", hr);
-		}
-		else { BB_CORE_TRACE("Successfully got BUFFERSIZE!"); }
-
-		/* TODO: CREATE INITIALIZE AFTER CREATING MP3 format reader
-		m_AudioClient->Initialize(
-			AUDCLNT_SHAREMODE_EXCLUSIVE, 0,
-
-			);
-
-		const REFIID IID_IAudioRenderClient = __uuidof(IAudioRenderClient);
-		hr = m_AudioClient->GetService(IID_IAudioRenderClient, (void**)&m_Renderer);
-		
-		if (hr != S_OK)
-		{
-			BB_CORE_ERROR("{0} FAILED TO GET AUDIO RENDERER", hr);
-		}
-		else { BB_CORE_TRACE("Successfully got AUDIOCLIENT!"); }
-		*/
+		m_FilePath = filePath;
+		FileSelected = true;
+		InitAudioClient();
 	}
 
 	Player::~Player()
@@ -90,8 +40,58 @@ namespace BackBeat {
 
 	}
 
-	void Player::SetFile()
-	{
+	void Player::InitAudioClient() {
+		HRESULT hr;
+		UINT32 bufferSize = 0;
+		REFERENCE_TIME bufferDuration = 0;
 
+		hr = CoInitializeEx(NULL, COINITBASE_MULTITHREADED);
+
+		CHECK_FAILURE(hr);
+
+		const CLSID CLSID_MMDeviceEnumerator = __uuidof(MMDeviceEnumerator);
+		const IID IID_IMMDeviceEnumerator = __uuidof(IMMDeviceEnumerator);
+		hr = CoCreateInstance(
+			CLSID_MMDeviceEnumerator, NULL,
+			CLSCTX_ALL, IID_IMMDeviceEnumerator,
+			(void**)&m_Enumerator);
+
+		CHECK_FAILURE(hr);
+
+		hr = m_Enumerator->GetDefaultAudioEndpoint(eRender, eMultimedia, &m_Device);
+
+		CHECK_FAILURE(hr);
+
+		const IID IID_IAudioClient = __uuidof(IAudioClient);
+		hr = m_Device->Activate(IID_IAudioClient, CLSCTX_ALL, NULL, (void**)&m_AudioClient);
+
+		CHECK_FAILURE(hr);
+
+		hr = m_AudioClient->GetDevicePeriod(NULL, &bufferDuration);
+
+		CHECK_FAILURE(hr);
+
+		FileReader::ReadFile(m_FilePath, m_FileProps);
+
+		/* TODO: CREATE INITIALIZE AFTER CREATING MP3 format reader */
+		hr = m_AudioClient->Initialize(
+			AUDCLNT_SHAREMODE_EXCLUSIVE,
+			AUDCLNT_STREAMFLAGS_EVENTCALLBACK,
+			bufferDuration,
+			bufferDuration,
+			m_FileProps,
+			NULL
+			);
+
+		if (hr == AUDCLNT_E_BUFFER_SIZE_NOT_ALIGNED)
+		{
+			BB_CORE_ERROR("AUDIO ENDPOINT BUFFER NOT ALIGNED");
+		}
+		CHECK_FAILURE(hr);
+
+		const REFIID IID_IAudioRenderClient = __uuidof(IAudioRenderClient);
+		hr = m_AudioClient->GetService(IID_IAudioRenderClient, (void**)&m_Renderer);
+
+		CHECK_FAILURE(hr);
 	}
 }

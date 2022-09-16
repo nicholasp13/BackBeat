@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Audio.h"
 namespace BackBeat {
 
 	class FileReader
@@ -9,6 +8,6 @@ namespace BackBeat {
 		FileReader() {};
 		~FileReader() {};
 
-		static std::string ReadFile(std::string fileName);
+		static bool ReadFile(std::string fileName, tWAVEFORMATEX* props);
 	};
 }
