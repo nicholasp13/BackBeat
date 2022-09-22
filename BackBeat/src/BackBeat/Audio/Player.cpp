@@ -23,7 +23,6 @@ namespace BackBeat {
 		IMMDeviceEnumerator* m_Enumerator = NULL;
 		IMMDevice* m_Device = NULL;
 		IAudioRenderClient* m_Renderer = NULL;
-		tWAVEFORMATEX* m_FileProps = NULL;
 		
 		InitAudioClient();
 	}
@@ -74,7 +73,7 @@ namespace BackBeat {
 
 		CHECK_FAILURE(hr);
 
-		hr = m_AudioClient->GetMixFormat(&m_FileProps);
+		hr = m_AudioClient->GetMixFormat(&m_DeviceProps);
 
 		CHECK_FAILURE(hr);
 		
@@ -88,19 +87,38 @@ namespace BackBeat {
 			0,
 			bufferDuration,
 			0,
-			m_FileProps,
+			m_DeviceProps,
 			NULL
 			);
 
-		if (hr == AUDCLNT_E_BUFFER_SIZE_NOT_ALIGNED)
-		{
-			BB_CORE_ERROR("AUDIO ENDPOINT BUFFER NOT ALIGNED");
-		}
 		CHECK_FAILURE(hr);
 
 		const REFIID IID_IAudioRenderClient = __uuidof(IAudioRenderClient);
 		hr = m_AudioClient->GetService(IID_IAudioRenderClient, (void**)&m_Renderer);
 
 		CHECK_FAILURE(hr);
+
+		BB_CORE_TRACE("DEVICE PROPERTIES");
+		BB_CORE_INFO("Audio Format: {0}", m_DeviceProps->wFormatTag);
+		BB_CORE_INFO("Number of Channels: {0}", m_DeviceProps->nChannels);
+		BB_CORE_INFO("Sample Rate: {0}", m_DeviceProps->nSamplesPerSec);
+		BB_CORE_INFO("Byte Rate: {0}", m_DeviceProps->nAvgBytesPerSec);
+		BB_CORE_INFO("Block Align: {0}", m_DeviceProps->nBlockAlign);
+		BB_CORE_INFO("Bits per Sample: {0}", m_DeviceProps->wBitsPerSample);
+		BB_CORE_INFO("File Size: {0}", m_DeviceProps->cbSize);
+
+		m_FileProps = new tWAVEFORMATEX;
+		hr = FileReader::GetHeader(m_FilePath, m_FileProps);
+
+		CHECK_FAILURE(hr);
+
+		BB_CORE_TRACE("FILE PROPERTIES");
+		BB_CORE_INFO("Audio Format: {0}", m_FileProps->wFormatTag);
+		BB_CORE_INFO("Number of Channels: {0}", m_FileProps->nChannels);
+		BB_CORE_INFO("Sample Rate: {0}", m_FileProps->nSamplesPerSec);
+		BB_CORE_INFO("Byte Rate: {0}", m_FileProps->nAvgBytesPerSec);
+		BB_CORE_INFO("Block Align: {0}", m_FileProps->nBlockAlign);
+		BB_CORE_INFO("Bits per Sample: {0}", m_FileProps->wBitsPerSample);
+		BB_CORE_INFO("File Size: {0}", m_FileProps->cbSize);
 	}
 }

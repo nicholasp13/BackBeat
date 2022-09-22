@@ -26,6 +26,7 @@ namespace BackBeat {
 		IMMDeviceEnumerator* m_Enumerator;
 		IMMDevice* m_Device;
 		IAudioRenderClient* m_Renderer;
+		tWAVEFORMATEX* m_DeviceProps;
 		tWAVEFORMATEX* m_FileProps;
 	};
 }

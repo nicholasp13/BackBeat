@@ -3,22 +3,23 @@
 #include "FileReader.h"
 #include "BackBeat/Core/Core.h"
 
-#include <mmreg.h>
 namespace BackBeat {
 
 #define MP3 "ID3"
 #define WAV "RIFF"
+#define BYTE 8
 
-	bool FileReader::ReadFile(std::string filePath, tWAVEFORMATEX* props) 
+	HRESULT FileReader::GetHeader(std::string filePath, tWAVEFORMATEX* props) 
 	{
-		char* header = new char[44];
+		int headerSize = 44;
+		char* header = new char[headerSize];
 		std::ifstream file;
 
 		// TODO: Implement Function to get mp3/wav file header info
 		file.open(filePath, std::ios::binary);
 		if (file.is_open())
 		{
-			file.read(header, 44);
+			file.read(header, headerSize);
 			file.close();
 
 			char temp1 = header[3];
@@ -31,23 +32,21 @@ namespace BackBeat {
 				header[3] = temp1;
 				header[4] = temp2;
 				BB_CORE_INFO("MP3 File opened");
-				BB_CORE_INFO("HEADER: {0}", header);
-				// ReadMP3Header(header, props);
-				return true;
+				ReadMP3Header(header, props);
+				return S_OK;
 			}
 			
 			header[3] = temp1;
 			if (std::strcmp(WAV, header) == 0)
 			{
 				header[4] = temp2;
-				BB_CORE_INFO("WAV File opened");
-				BB_CORE_INFO("HEADER: {0}", header);
+				BB_CORE_WARN("WAV File opened");
 				ReadWAVHeader(header, props);
-				return true;
+				return S_OK;
 			}
 		}
 		BB_CORE_ERROR("FILE FAILED TO LOAD");
-		return false;
+		return ERROR;
 	}
 
 
@@ -57,26 +56,50 @@ namespace BackBeat {
 	}
 
 	void FileReader::ReadWAVHeader(char* header, tWAVEFORMATEX* props) {
-		const int chunkID = 0;
-		const int chunkSize = 4;
-		const int format = 8;
-		const int subChunk1ID = 12;
-		const int subChunk1Size = 16;
+		
+		// Indices of relevant tWAVEFORMATEX properties in standard WAV file headers 
+		const int fileSize = 4;
 		const int audioFormat = 20;
 		const int numChannels = 22;
 		const int sampleRate = 24;
 		const int byteRate = 28;
 		const int blockAlign = 32;
 		const int bitsPerSample = 34;
-		const int subChunk2ID = 36;
-		const int subChunk2Size = 40;
 
-		props->wFormatTag = (WORD)header[audioFormat];
-		props->nChannels = (WORD)header[numChannels];
-		props->nSamplesPerSec = (DWORD)header[sampleRate];
-		props->nAvgBytesPerSec = (DWORD)header[byteRate];
-		props->nBlockAlign = (WORD)header[blockAlign];
-		props->wBitsPerSample = (WORD)header[bitsPerSample];
-		props->cbSize = (WORD)0;
+
+		// Rearranges bytes from little Endian to big Endian for c++ standard units
+		props->wFormatTag		= EndianConverterShort(header[audioFormat], header[audioFormat + 1]);
+		
+		props->nChannels		= EndianConverterShort(header[numChannels], header[numChannels + 1]);
+
+		props->nSamplesPerSec	= EndianConverterLong(header[sampleRate], header[sampleRate + 1],
+								header[sampleRate + 2], header[sampleRate + 3]);
+		
+		props->nAvgBytesPerSec	= EndianConverterLong(header[byteRate], header[byteRate + 1],
+								header[byteRate + 2], header[byteRate + 3]);
+		
+		props->nBlockAlign		= EndianConverterShort(header[blockAlign], header[blockAlign + 1]);
+		
+		props->wBitsPerSample	= EndianConverterShort(header[bitsPerSample], header[bitsPerSample + 1]);
+		
+		props->cbSize			= EndianConverterLong(header[fileSize], header[fileSize + 1],
+			header[fileSize + 2], header[fileSize + 3]);
+	}
+
+	unsigned short FileReader::EndianConverterShort(char num1, char num2)
+	{
+		unsigned short leftToRight = num1 & 0x00FF;
+		unsigned short rightToLeft = num2 & 0x00FF << BYTE;
+		return (leftToRight | rightToLeft);
+	}
+
+	unsigned long FileReader::EndianConverterLong(char num1, char num2,
+													char num3, char num4)
+	{
+		unsigned long leftMost  = num1 & 0x000000FF;
+		unsigned long left      = num2 & 0x000000FF << BYTE;
+		unsigned long right     = num3 & 0x000000FF << 2 * BYTE;
+		unsigned long rightMost = num4 & 0x000000FF << 3 * BYTE;
+		return (left | leftMost | right | rightMost);
 	}
 }
