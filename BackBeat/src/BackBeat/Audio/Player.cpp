@@ -6,6 +6,7 @@
 
 #include <mmdeviceapi.h>
 #include <Audioclient.h>
+#include <AudioSessionTypes.h>
 
 namespace BackBeat {
 
@@ -17,6 +18,13 @@ namespace BackBeat {
 	{
 		m_FilePath = filePath;
 		FileSelected = true;
+
+		IAudioClient* m_AudioClient = NULL;
+		IMMDeviceEnumerator* m_Enumerator = NULL;
+		IMMDevice* m_Device = NULL;
+		IAudioRenderClient* m_Renderer = NULL;
+		tWAVEFORMATEX* m_FileProps = NULL;
+		
 		InitAudioClient();
 	}
 
@@ -42,7 +50,6 @@ namespace BackBeat {
 
 	void Player::InitAudioClient() {
 		HRESULT hr;
-		UINT32 bufferSize = 0;
 		REFERENCE_TIME bufferDuration = 0;
 
 		hr = CoInitializeEx(NULL, COINITBASE_MULTITHREADED);
@@ -67,18 +74,20 @@ namespace BackBeat {
 
 		CHECK_FAILURE(hr);
 
+		hr = m_AudioClient->GetMixFormat(&m_FileProps);
+
+		CHECK_FAILURE(hr);
+		
 		hr = m_AudioClient->GetDevicePeriod(NULL, &bufferDuration);
 
 		CHECK_FAILURE(hr);
 
-		FileReader::ReadFile(m_FilePath, m_FileProps);
-
-		/* TODO: CREATE INITIALIZE AFTER CREATING MP3 format reader */
+		/* TODO: CREATE A FUNCTION TO ALLOW FOR EXCLUSIVE MODE IF POSSIBLE */
 		hr = m_AudioClient->Initialize(
-			AUDCLNT_SHAREMODE_EXCLUSIVE,
-			AUDCLNT_STREAMFLAGS_EVENTCALLBACK,
+			AUDCLNT_SHAREMODE_SHARED,
+			0,
 			bufferDuration,
-			bufferDuration,
+			0,
 			m_FileProps,
 			NULL
 			);
