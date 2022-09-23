@@ -1,7 +1,7 @@
 #include "bbpch.h"
 
-#include "FileReader.h"
 #include "BackBeat/Core/Core.h"
+#include "FileReader.h"
 
 namespace BackBeat {
 
@@ -9,8 +9,9 @@ namespace BackBeat {
 #define WAV "RIFF"
 #define BYTE 8
 
-	HRESULT FileReader::GetHeader(int* position,  std::string filePath, tWAVEFORMATEX* props)
+	HRESULT FileReader::CreateFile(std::string filePath, AudioData* audioData)
 	{
+		tWAVEFORMATEX props;
 		int headerSize = 44;
 		char* header = new char[headerSize];
 		std::ifstream file;
@@ -31,7 +32,7 @@ namespace BackBeat {
 			{
 				header[3] = temp1;
 				header[4] = temp2;
-				ReadMP3Header(header, props);
+				ReadMP3Header(header, &props);
 				BB_CORE_INFO("MP3 File opened");
 				return S_OK;
 			}
@@ -39,14 +40,15 @@ namespace BackBeat {
 			header[3] = temp1;
 			if (std::strcmp(WAV, header) == 0)
 			{
-				*position = 44;
 				header[4] = temp2;
-				ReadWAVHeader(header, props);
+				ReadWAVHeader(header, &props);
 				BB_CORE_INFO("WAV File opened");
+
+				audioData = new WAVData(filePath, &props);
+				BB_CORE_INFO("WAV File created");
 				return S_OK;
 			}
 		}
-		*position = 0;
 		BB_CORE_ERROR("FILE FAILED TO LOAD");
 		return ERROR;
 	}

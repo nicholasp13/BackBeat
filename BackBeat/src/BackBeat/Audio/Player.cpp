@@ -108,7 +108,6 @@ namespace BackBeat {
 		FILE_OPENED(FileOpened);
 
 		Playing = false;
-		m_Position = 0;
 		BB_CORE_INFO("AUDIO STOPPED. POSITION RESET TO 0");
 	}
 
@@ -180,8 +179,8 @@ namespace BackBeat {
 		BB_CORE_TRACE("Bits per Sample: {0}", m_DeviceProps->wBitsPerSample);
 		BB_CORE_TRACE("File Size: {0}", m_DeviceProps->cbSize);
 
-		m_FileProps = new tWAVEFORMATEX;
-		hr = FileReader::GetHeader(&m_Position, m_FilePath, m_FileProps);
+		// TODO: Chanfe to create file
+		// hr = FileReader::CreateFile(m_FilePath, m_FileProps);
 
 		CHECK_FAILURE(hr);
 

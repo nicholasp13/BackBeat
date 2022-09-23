@@ -1,5 +1,8 @@
 #pragma once
 
+#include "AudioData.h"
+#include "WAVData.h"
+
 namespace BackBeat {
 
 	class FileReader
@@ -8,7 +11,7 @@ namespace BackBeat {
 		FileReader() {};
 		~FileReader() {};
 
-		static HRESULT GetHeader(int* position, std::string fileName, tWAVEFORMATEX* props);
+		static HRESULT CreateFile(std::string fileName, AudioData* audioData);
 		
 	private:
 		static void ReadMP3Header(char* header, tWAVEFORMATEX* props);

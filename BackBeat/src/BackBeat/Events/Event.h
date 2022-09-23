@@ -39,7 +39,6 @@ namespace BackBeat {
 		friend class EventDispatcher;
 
 	public:
-
 		bool Handled = false;
 
 		virtual EventType GetEventType() const = 0;

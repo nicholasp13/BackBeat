@@ -32,7 +32,7 @@ public:
 		// BackBeat::FileReader::ReadFile("assets/audio/LearnToFly.mp3", nullptr);
 		// BackBeat::FileReader::ReadFile("assets/audio/LearnToFly.wav", nullptr);
 		 BackBeat::Player player = BackBeat::Player("assets/audio/LearnToFly.wav");
-		 player.Play();
+		// player.Play();
 		// BackBeat::Player player = BackBeat::Player("assets/audio/Audio 1_39.wav");
 	}
 

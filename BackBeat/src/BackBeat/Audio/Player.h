@@ -23,7 +23,6 @@ namespace BackBeat {
 
 		std::string m_FilePath;
 
-		int m_Position;
 		UINT32 m_BufferSize;
 		BYTE* m_Data;
 		REFERENCE_TIME m_ActualBufferDuration;
