@@ -16,11 +16,17 @@ namespace BackBeat {
 		void Pause();
 		void Stop();
 
-		bool FileSelected = FALSE;
+		bool FileOpened = false;
+		bool Playing = false;
 	private:
 		void InitAudioClient();
 
 		std::string m_FilePath;
+
+		int m_Position;
+		UINT32 m_BufferSize;
+		BYTE* m_Data;
+		REFERENCE_TIME m_ActualBufferDuration;
 
 		IAudioClient* m_AudioClient;
 		IMMDeviceEnumerator* m_Enumerator;

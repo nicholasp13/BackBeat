@@ -8,7 +8,7 @@ namespace BackBeat {
 		FileReader() {};
 		~FileReader() {};
 
-		static HRESULT GetHeader(std::string fileName, tWAVEFORMATEX* props);
+		static HRESULT GetHeader(int* position, std::string fileName, tWAVEFORMATEX* props);
 		
 	private:
 		static void ReadMP3Header(char* header, tWAVEFORMATEX* props);

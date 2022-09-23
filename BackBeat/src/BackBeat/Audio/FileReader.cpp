@@ -9,13 +9,13 @@ namespace BackBeat {
 #define WAV "RIFF"
 #define BYTE 8
 
-	HRESULT FileReader::GetHeader(std::string filePath, tWAVEFORMATEX* props) 
+	HRESULT FileReader::GetHeader(int* position,  std::string filePath, tWAVEFORMATEX* props)
 	{
 		int headerSize = 44;
 		char* header = new char[headerSize];
 		std::ifstream file;
 
-		// TODO: Implement Function to get mp3/wav file header info
+		// TODO: Implement Function to get mp3 file header info
 		file.open(filePath, std::ios::binary);
 		if (file.is_open())
 		{
@@ -31,20 +31,22 @@ namespace BackBeat {
 			{
 				header[3] = temp1;
 				header[4] = temp2;
-				BB_CORE_INFO("MP3 File opened");
 				ReadMP3Header(header, props);
+				BB_CORE_INFO("MP3 File opened");
 				return S_OK;
 			}
 			
 			header[3] = temp1;
 			if (std::strcmp(WAV, header) == 0)
 			{
+				*position = 44;
 				header[4] = temp2;
-				BB_CORE_WARN("WAV File opened");
 				ReadWAVHeader(header, props);
+				BB_CORE_INFO("WAV File opened");
 				return S_OK;
 			}
 		}
+		*position = 0;
 		BB_CORE_ERROR("FILE FAILED TO LOAD");
 		return ERROR;
 	}
@@ -73,17 +75,17 @@ namespace BackBeat {
 		props->nChannels		= EndianConverterShort(header[numChannels], header[numChannels + 1]);
 
 		props->nSamplesPerSec	= EndianConverterLong(header[sampleRate], header[sampleRate + 1],
-								header[sampleRate + 2], header[sampleRate + 3]);
+									header[sampleRate + 2], header[sampleRate + 3]);
 		
 		props->nAvgBytesPerSec	= EndianConverterLong(header[byteRate], header[byteRate + 1],
-								header[byteRate + 2], header[byteRate + 3]);
+									header[byteRate + 2], header[byteRate + 3]);
 		
 		props->nBlockAlign		= EndianConverterShort(header[blockAlign], header[blockAlign + 1]);
 		
 		props->wBitsPerSample	= EndianConverterShort(header[bitsPerSample], header[bitsPerSample + 1]);
 		
 		props->cbSize			= EndianConverterLong(header[fileSize], header[fileSize + 1],
-			header[fileSize + 2], header[fileSize + 3]);
+									header[fileSize + 2], header[fileSize + 3]);
 	}
 
 	unsigned short FileReader::EndianConverterShort(char num1, char num2)
