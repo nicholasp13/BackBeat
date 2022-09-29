@@ -25,27 +25,20 @@ namespace BackBeat {
 
 	}
 
-	HRESULT WAVData::FormatStream(tWAVEFORMATEX* deviceProps) 
-	{
-
-		return S_OK;
-	}
-
 	// TODO: CHANGE PARAMETERS OF FUNCTION TO ALLOW FOR ANOTHER CLASS TO CHANGE/FORMAT DATA TO BUFFER
-	HRESULT WAVData::LoadBuffer(UINT32 framesAvailable, BYTE* buffer, unsigned int* position, DWORD* flags) 
+	HRESULT WAVData::LoadBuffer(UINT32 framesAvailable, BYTE* buffer, UINT32* position) 
 	{
 		char data;
 		std::ifstream m_Data(m_FilePath, std::ios::binary);
 
 		// TODO: CHANGE IMPLEMENTATION TO MATCH ENDIANESS
-		for (int i = 0; i < (int)framesAvailable; i++)
+		for (UINT32 i = 0; i < framesAvailable; i++)
 		{
 			m_Data.seekg(*position + i);
 			m_Data.get(data);
 			buffer[framesAvailable - i - 1] = data;
 			if (*position + i >= m_Size)
 			{
-				*flags = AUDCLNT_BUFFERFLAGS_SILENT;
 				m_Data.close();
 				return S_OK;
 			}
@@ -56,5 +49,7 @@ namespace BackBeat {
 	}
 
 	FileType WAVData::GetFileType() { return FileType::WAV; }
+
+	tWAVEFORMATEX* WAVData::GetProperties() { return &m_Props;  }
 
 }

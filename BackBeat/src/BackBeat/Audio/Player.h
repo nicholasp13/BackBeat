@@ -24,7 +24,7 @@ namespace BackBeat {
 		void InitAudioClient();
 
 		std::string m_FilePath;
-		unsigned int m_Position;
+		UINT32 m_Position;
 		UINT32 m_BufferSize;
 		BYTE* m_Data;
 		REFERENCE_TIME m_ActualBufferDuration;

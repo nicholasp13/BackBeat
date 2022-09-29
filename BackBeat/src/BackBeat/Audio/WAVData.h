@@ -10,21 +10,15 @@ namespace BackBeat {
 		WAVData(std::string filePath,tWAVEFORMATEX* props,int size);
 		~WAVData();
 
-		virtual HRESULT FormatStream(tWAVEFORMATEX* deviceProps);
-		virtual HRESULT LoadBuffer(UINT32 framesAvailable, BYTE* buffer, unsigned int* position, DWORD* flag);
+		virtual HRESULT LoadBuffer(UINT32 framesAvailable, BYTE* buffer, UINT32* position);
 		virtual FileType GetFileType();
-
+		virtual tWAVEFORMATEX* GetProperties();
+		
 	private:
 		unsigned long m_Size = 0;
 		std::ifstream m_Data;
 		std::string m_FilePath = "";
 		tWAVEFORMATEX m_Props;
 
-		struct ConvertedProps
-		{
-			unsigned short	FormatTag, NumChannels, BlockAlign,
-							BitsPerSample, FileSize;
-			unsigned long	SamplesPerSec, BytesPerSec;
-		};
 	};
 }

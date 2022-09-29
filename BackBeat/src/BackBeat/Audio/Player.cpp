@@ -87,7 +87,7 @@ namespace BackBeat {
 
 			CHECK_FAILURE(hr);
 			
-			hr = m_File->LoadBuffer(framesAvailable, m_Data, &m_Position, &flags);
+			hr = m_File->LoadBuffer(framesAvailable, m_Data, &m_Position);
 
 			hr = m_Renderer->ReleaseBuffer(framesAvailable, flags);
 
@@ -170,13 +170,13 @@ namespace BackBeat {
 
 		BB_CORE_INFO("BUFFER SIZE: {0}", m_BufferSize);
 
-		const REFIID IID_IAudioRenderClient = __uuidof(IAudioRenderClient);
+		REFIID IID_IAudioRenderClient = __uuidof(IAudioRenderClient);
 		hr = m_AudioClient->GetService(IID_IAudioRenderClient, (void**)&m_Renderer);
 
 		CHECK_FAILURE(hr);
 
 		m_Data = new BYTE[m_BufferSize];
-		m_ActualBufferDuration = (double)REFTIMES_PER_SECOND * m_BufferSize
+		m_ActualBufferDuration = REFTIMES_PER_SECOND * m_BufferSize
 									/ m_DeviceProps->nSamplesPerSec;
 
 		BB_CORE_INFO("DEVICE PROPERTIES");
