@@ -7,15 +7,17 @@ namespace BackBeat {
 	class WAVData : public AudioData
 	{
 	public:
-		WAVData(std::string filePath, tWAVEFORMATEX* props);
+		WAVData(std::string filePath,tWAVEFORMATEX* props,int size);
 		~WAVData();
 
-	private:
-		HRESULT CreateFile();
+		virtual HRESULT FormatStream(tWAVEFORMATEX* deviceProps);
+		virtual HRESULT LoadBuffer(UINT32 framesAvailable, BYTE* buffer, unsigned int* position, DWORD* flag);
+		virtual FileType GetFileType();
 
-		BYTE* m_Data;
-		unsigned int m_FileSize;
-		std::string m_FilePath;
+	private:
+		unsigned long m_Size = 0;
+		std::ifstream m_Data;
+		std::string m_FilePath = "";
 		tWAVEFORMATEX m_Props;
 
 		struct ConvertedProps

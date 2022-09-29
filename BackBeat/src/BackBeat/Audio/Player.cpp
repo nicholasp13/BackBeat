@@ -3,6 +3,7 @@
 #include "Player.h"
 #include "BackBeat/Core/Core.h"
 #include "FileReader.h"
+#include "AudioData.h"
 
 #include <mmdeviceapi.h>
 #include <Audioclient.h>
@@ -30,11 +31,13 @@ namespace BackBeat {
 	{
 		m_FilePath = filePath;
 		FileOpened = true;
+		m_Position = 0;
 
-		IAudioClient* m_AudioClient = NULL;
-		IMMDeviceEnumerator* m_Enumerator = NULL;
-		IMMDevice* m_Device = NULL;
-		IAudioRenderClient* m_Renderer = NULL;
+		m_AudioClient = NULL;
+		m_Enumerator = NULL;
+		m_Device = NULL;
+		m_Renderer = NULL;
+		m_File = NULL;
 		
 		InitAudioClient();
 	}
@@ -68,8 +71,9 @@ namespace BackBeat {
 
 		CHECK_FAILURE(hr);
 
-		// Create File Reader for whole file
-		while (Playing && (flags != AUDCLNT_BUFFERFLAGS_SILENT))
+		BB_CORE_INFO("PLAYING STARTED");
+
+		while (Playing && (flags != AUDCLNT_BUFFERFLAGS_SILENT) )
 		{
 			Sleep(sleepTime);
 
@@ -83,7 +87,7 @@ namespace BackBeat {
 
 			CHECK_FAILURE(hr);
 			
-			// TODO: CREATE WAY TO GET/READ Audio files
+			hr = m_File->LoadBuffer(framesAvailable, m_Data, &m_Position, &flags);
 
 			hr = m_Renderer->ReleaseBuffer(framesAvailable, flags);
 
@@ -93,6 +97,8 @@ namespace BackBeat {
 
 		Playing = false;
 		file.close();
+
+		BB_CORE_INFO("PLAYING DONE");
 	}
 
 	void Player::Pause()
@@ -107,6 +113,7 @@ namespace BackBeat {
 	{
 		FILE_OPENED(FileOpened);
 
+		m_Position = 0;
 		Playing = false;
 		BB_CORE_INFO("AUDIO STOPPED. POSITION RESET TO 0");
 	}
@@ -161,6 +168,8 @@ namespace BackBeat {
 
 		CHECK_FAILURE(hr);
 
+		BB_CORE_INFO("BUFFER SIZE: {0}", m_BufferSize);
+
 		const REFIID IID_IAudioRenderClient = __uuidof(IAudioRenderClient);
 		hr = m_AudioClient->GetService(IID_IAudioRenderClient, (void**)&m_Renderer);
 
@@ -177,20 +186,9 @@ namespace BackBeat {
 		BB_CORE_TRACE("Byte Rate: {0}", m_DeviceProps->nAvgBytesPerSec);
 		BB_CORE_TRACE("Block Align: {0}", m_DeviceProps->nBlockAlign);
 		BB_CORE_TRACE("Bits per Sample: {0}", m_DeviceProps->wBitsPerSample);
-		BB_CORE_TRACE("File Size: {0}", m_DeviceProps->cbSize);
 
-		// TODO: Chanfe to create file
-		// hr = FileReader::CreateFile(m_FilePath, m_FileProps);
+		hr = FileReader::CreateFile(m_FilePath, &m_File);
 
 		CHECK_FAILURE(hr);
-
-		BB_CORE_INFO("FILE PROPERTIES");
-		BB_CORE_TRACE("Audio Format: {0}", m_FileProps->wFormatTag);
-		BB_CORE_TRACE("Number of Channels: {0}", m_FileProps->nChannels);
-		BB_CORE_TRACE("Sample Rate: {0}", m_FileProps->nSamplesPerSec);
-		BB_CORE_TRACE("Byte Rate: {0}", m_FileProps->nAvgBytesPerSec);
-		BB_CORE_TRACE("Block Align: {0}", m_FileProps->nBlockAlign);
-		BB_CORE_TRACE("Bits per Sample: {0}", m_FileProps->wBitsPerSample);
-		BB_CORE_TRACE("File Size: {0}", m_FileProps->cbSize);
 	}
 }

@@ -9,9 +9,10 @@ namespace BackBeat {
 #define WAV "RIFF"
 #define BYTE 8
 
-	HRESULT FileReader::CreateFile(std::string filePath, AudioData* audioData)
+	HRESULT FileReader::CreateFile(std::string filePath, AudioData** audioData)
 	{
 		tWAVEFORMATEX props;
+		unsigned long size = 0;
 		int headerSize = 44;
 		char* header = new char[headerSize];
 		std::ifstream file;
@@ -32,7 +33,7 @@ namespace BackBeat {
 			{
 				header[3] = temp1;
 				header[4] = temp2;
-				ReadMP3Header(header, &props);
+				ReadMP3Header(header, &props, &size);
 				BB_CORE_INFO("MP3 File opened");
 				return S_OK;
 			}
@@ -41,10 +42,10 @@ namespace BackBeat {
 			if (std::strcmp(WAV, header) == 0)
 			{
 				header[4] = temp2;
-				ReadWAVHeader(header, &props);
+				ReadWAVHeader(header, &props, &size);
 				BB_CORE_INFO("WAV File opened");
 
-				audioData = new WAVData(filePath, &props);
+				*audioData = new WAVData(filePath, &props, size);
 				BB_CORE_INFO("WAV File created");
 				return S_OK;
 			}
@@ -55,22 +56,25 @@ namespace BackBeat {
 
 
 	/* TODO: CREATE INITIALIZE AFTER CREATING MP3 format reader */
-	void FileReader::ReadMP3Header(char* header, tWAVEFORMATEX* props) {
+	void FileReader::ReadMP3Header(char* header, tWAVEFORMATEX* props, unsigned long* size) 
+	{
 
 	}
 
-	void FileReader::ReadWAVHeader(char* header, tWAVEFORMATEX* props) {
+	void FileReader::ReadWAVHeader(char* header, tWAVEFORMATEX* props, unsigned long* size) 
+	{
 		
 		// Indices of relevant tWAVEFORMATEX properties in standard WAV file headers 
-		const int fileSize = 4;
-		const int audioFormat = 20;
-		const int numChannels = 22;
-		const int sampleRate = 24;
-		const int byteRate = 28;
-		const int blockAlign = 32;
+		const int fileSize		= 4;
+		const int audioFormat	= 20;
+		const int numChannels	= 22;
+		const int sampleRate	= 24;
+		const int byteRate		= 28;
+		const int blockAlign	= 32;
 		const int bitsPerSample = 34;
 
 
+		// TODO: USE DIFFERENT STRUCT for file size/props
 		// Rearranges bytes from little Endian to big Endian for c++ standard units
 		props->wFormatTag		= EndianConverterShort(header[audioFormat], header[audioFormat + 1]);
 		
@@ -78,32 +82,30 @@ namespace BackBeat {
 
 		props->nSamplesPerSec	= EndianConverterLong(header[sampleRate], header[sampleRate + 1],
 									header[sampleRate + 2], header[sampleRate + 3]);
-		
 		props->nAvgBytesPerSec	= EndianConverterLong(header[byteRate], header[byteRate + 1],
 									header[byteRate + 2], header[byteRate + 3]);
 		
 		props->nBlockAlign		= EndianConverterShort(header[blockAlign], header[blockAlign + 1]);
 		
 		props->wBitsPerSample	= EndianConverterShort(header[bitsPerSample], header[bitsPerSample + 1]);
-		
-		props->cbSize			= EndianConverterLong(header[fileSize], header[fileSize + 1],
-									header[fileSize + 2], header[fileSize + 3]);
+
+		*size = EndianConverterLong(header[fileSize], header[fileSize + 1], header[fileSize + 2], header[fileSize + 3]);
 	}
 
 	unsigned short FileReader::EndianConverterShort(char num1, char num2)
 	{
-		unsigned short leftToRight = num1 & 0x00FF;
-		unsigned short rightToLeft = num2 & 0x00FF << BYTE;
+		unsigned short leftToRight = (num1 & 0x00FF);
+		unsigned short rightToLeft = (num2 & 0x00FF) << BYTE;
 		return (leftToRight | rightToLeft);
 	}
 
 	unsigned long FileReader::EndianConverterLong(char num1, char num2,
 													char num3, char num4)
 	{
-		unsigned long leftMost  = num1 & 0x000000FF;
-		unsigned long left      = num2 & 0x000000FF << BYTE;
-		unsigned long right     = num3 & 0x000000FF << 2 * BYTE;
-		unsigned long rightMost = num4 & 0x000000FF << 3 * BYTE;
+		unsigned long leftMost  = (num1 & 0x000000FF);
+		unsigned long left      = (num2 & 0x000000FF) << BYTE;
+		unsigned long right     = (num3 & 0x000000FF) << (2 * BYTE);
+		unsigned long rightMost = (num4 & 0x000000FF) << (3 * BYTE);
 		return (left | leftMost | right | rightMost);
 	}
 }

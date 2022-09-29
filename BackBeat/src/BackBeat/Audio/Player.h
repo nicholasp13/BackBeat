@@ -4,6 +4,8 @@
 #include <mmdeviceapi.h>
 #include <Audioclient.h>
 
+#include "AudioData.h"
+
 namespace BackBeat {
 
 	class Player
@@ -22,7 +24,7 @@ namespace BackBeat {
 		void InitAudioClient();
 
 		std::string m_FilePath;
-
+		unsigned int m_Position;
 		UINT32 m_BufferSize;
 		BYTE* m_Data;
 		REFERENCE_TIME m_ActualBufferDuration;
@@ -33,5 +35,7 @@ namespace BackBeat {
 		IAudioRenderClient* m_Renderer;
 		tWAVEFORMATEX* m_DeviceProps;
 		tWAVEFORMATEX* m_FileProps;
+
+		AudioData* m_File;
 	};
 }

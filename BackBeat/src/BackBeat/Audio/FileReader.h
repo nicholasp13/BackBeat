@@ -11,11 +11,11 @@ namespace BackBeat {
 		FileReader() {};
 		~FileReader() {};
 
-		static HRESULT CreateFile(std::string fileName, AudioData* audioData);
+		static HRESULT CreateFile(std::string fileName, AudioData** audioData);
 		
 	private:
-		static void ReadMP3Header(char* header, tWAVEFORMATEX* props);
-		static void ReadWAVHeader(char* header, tWAVEFORMATEX* props);
+		static void ReadMP3Header(char* header, tWAVEFORMATEX* props, unsigned long* size);
+		static void ReadWAVHeader(char* header, tWAVEFORMATEX* props, unsigned long* size);
 
 		static unsigned short EndianConverterShort(char num1, char num2);
 		static unsigned long EndianConverterLong(char num1, char num2,
