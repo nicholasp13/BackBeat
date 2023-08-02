@@ -26,7 +26,6 @@ namespace BackBeat {
 		std::string m_FilePath;
 		UINT32 m_Position;
 		UINT32 m_BufferSize;
-		BYTE* m_Data;
 		REFERENCE_TIME m_ActualBufferDuration;
 
 		IAudioClient* m_AudioClient;
@@ -34,7 +33,6 @@ namespace BackBeat {
 		IMMDevice* m_Device;
 		IAudioRenderClient* m_Renderer;
 		tWAVEFORMATEX* m_DeviceProps;
-		tWAVEFORMATEX* m_FileProps;
 
 		AudioData* m_File;
 	};

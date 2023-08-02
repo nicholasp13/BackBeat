@@ -16,9 +16,5 @@ namespace BackBeat {
 	private:
 		static void ReadMP3Header(char* header, tWAVEFORMATEX* props, unsigned long* size);
 		static void ReadWAVHeader(char* header, tWAVEFORMATEX* props, unsigned long* size);
-
-		static unsigned short EndianConverterShort(char num1, char num2);
-		static unsigned long EndianConverterLong(char num1, char num2,
-												char num3, char num4);
 	};
 }

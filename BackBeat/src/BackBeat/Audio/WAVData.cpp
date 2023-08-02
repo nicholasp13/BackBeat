@@ -1,9 +1,8 @@
 #include "bbpch.h"
 
+#include "Audio.h"
 #include "WAVData.h"
 #include "BackBeat/Core/Core.h"
-
-#include <Audioclient.h>
 
 namespace BackBeat {
 
@@ -25,31 +24,34 @@ namespace BackBeat {
 
 	}
 
-	// TODO: CHANGE PARAMETERS OF FUNCTION TO ALLOW FOR ANOTHER CLASS TO CHANGE/FORMAT DATA TO BUFFER
-	HRESULT WAVData::LoadBuffer(UINT32 framesAvailable, BYTE* buffer, UINT32* position) 
+	// README
+	// MIGHT NEED TO CREATE A CHECK/SEPERATE LOOP FOR DIFFERENT ENDIANNESS
+	HRESULT WAVData::LoadBuffer(UINT32 byteTotal, BYTE* buffer, UINT32* position) 
 	{
 		char data;
 		std::ifstream m_Data(m_FilePath, std::ios::binary);
 
-		// TODO: CHANGE IMPLEMENTATION TO MATCH ENDIANESS
-		for (UINT32 i = 0; i < framesAvailable; i++)
+		for (UINT32 i = 0; i < byteTotal; i++)
 		{
-			m_Data.seekg(*position + i);
-			m_Data.get(data);
-			buffer[framesAvailable - i - 1] = data;
 			if (*position + i >= m_Size)
 			{
 				m_Data.close();
+				*position = *position + i;
 				return S_OK;
 			}
+			m_Data.seekg(*position + i);
+			m_Data.get(data);
+			buffer[i] = data;	
 		}
 		m_Data.close();
-		*position = *position + framesAvailable;
+		*position = *position + byteTotal;
 		return S_OK;
 	}
 
-	FileType WAVData::GetFileType() { return FileType::WAV; }
+	FileType WAVData::GetFileType() { return FileType::WAV_FILE; }
 
 	tWAVEFORMATEX* WAVData::GetProperties() { return &m_Props;  }
+
+	UINT32 WAVData::GetSize() {	return m_Size; }
 
 }
