@@ -96,7 +96,9 @@ project "Sampler"
 	files
 	{
 		"%{prj.name}/src/**.h",
-		"%{prj.name}/src/**.cpp"
+		"%{prj.name}/src/**.cpp",
+		"%{prj.name}/assets/**.mp3",
+		"%{prj.name}/assets/**.wav"
 	}
 
 	includedirs

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <fstream>
 #include <memory>
 #include <utility>
 #include <string>
@@ -9,6 +10,7 @@
 #include <functional>
 #include <format>
 #include <vector>
+#include <thread>
 
 #ifdef BB_PLATFORM_WINDOWS
 	#include <Windows.h>
