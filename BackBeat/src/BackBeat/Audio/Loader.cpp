@@ -27,14 +27,14 @@ namespace BackBeat {
 	void Loader::Start()
 	{
 		m_Loading = true;
-		BB_CLIENT_INFO("LOADING STARTED");
+		BB_CORE_INFO("LOADING STARTED");
 		Load();
 	}
 
 	HRESULT Loader::Stop()
 	{
 		m_Loading = false;
-		BB_CLIENT_INFO("LOADING STOPPED");
+		BB_CORE_INFO("LOADING STOPPED");
 
 		return S_OK;
 	}
@@ -79,7 +79,7 @@ namespace BackBeat {
 			hr = LoadWAV(m_Data + samplePosition, bufferData, sampleBufferSize);
 			samplePosition += m_DeviceProps.nAvgBytesPerSec;
 		}
-		BB_CLIENT_INFO("LOADING DONE");
+		BB_CORE_INFO("LOADING DONE");
 
 	}
 
@@ -99,5 +99,4 @@ namespace BackBeat {
 		}
 		return S_OK;
 	}
-
 }

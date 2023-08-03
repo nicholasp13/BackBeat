@@ -51,7 +51,8 @@ namespace BackBeat {
 		DWORD flags = 0;
 		DWORD sleepTime = (DWORD)(m_ActualBufferDuration / REFTIMES_PER_MILLISEC / 2);
 		Loader loader = Loader(m_DeviceProps, m_File);
-		loader.Start();
+
+		std::thread worker(&Loader::Start, loader);
 		Playing = true;
 		framesAvailable = m_BufferSize;
 		
@@ -90,7 +91,7 @@ namespace BackBeat {
 		}
 		Sleep(sleepTime);
 		Playing = false;
-
+		worker.join();
 		hr = m_AudioClient->Stop();
 		CHECK_FAILURE(hr);
 
