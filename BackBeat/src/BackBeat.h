@@ -19,5 +19,4 @@
 #include "BackBeat/Audio/FileReader.h"
 #include "BackBeat/Audio/AudioData.h"
 #include "BackBeat/Audio/WAVData.h"
-#include "BackBeat/Audio/SinWaveData.h"
 #include "BackBeat/Audio/Loader.h"
