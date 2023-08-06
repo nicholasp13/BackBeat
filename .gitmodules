@@ -1,9 +1,9 @@
 [submodule "BackBeat/vendor/spdlog"]
 	path = BackBeat/vendor/spdlog
 	url = https://github.com/gabime/spdlog
-[submodule "BackBeat/vendor/imgui"]
-	path = BackBeat/vendor/imgui
-	url = https://github.com/ocornut/imgui
 [submodule "glfw"]
 	path = BackBeat/vendor/glfw
 	url = https://github.com/nicholasp13/glfw.git
+[submodule "imgui"]
+	path = imgui
+	url = https://github.com/nicholasp13/imgui.git
