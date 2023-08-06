@@ -8,7 +8,6 @@
 *			DIFFERENT SAMPLE RATES
 *			DIFFERENT BYTE/NUMBER FORMATS
 *			MP3 FORMAT
-*		ALLOW FOR MULTITHREADING
 */
 namespace BackBeat {
 
@@ -31,18 +30,15 @@ namespace BackBeat {
 		Load();
 	}
 
-	HRESULT Loader::Stop()
+	void Loader::Stop()
 	{
 		m_Loading = false;
 		BB_CORE_INFO("LOADING STOPPED");
-
-		return S_OK;
 	}
 
 	HRESULT Loader::GetData(UINT32 framesAvailable, BYTE* buffer,
 		UINT32* position, bool* playing)
 	{
-		HRESULT hr = S_OK;
 		UINT32 totalBytes = framesAvailable * m_DeviceProps.nBlockAlign;
 
 		if (totalBytes + *position >= m_DataSize) totalBytes = m_DataSize - *position;
@@ -54,7 +50,7 @@ namespace BackBeat {
 			*playing = FALSE;
 		}
 
-		return hr;
+		return S_OK;
 	}
 
 	void Loader::Load()
@@ -69,6 +65,7 @@ namespace BackBeat {
 		while (m_Loading) {
 
 			hr = m_DataSrc->LoadBuffer(bufferSize, bufferData, &bytePosition);
+			CHECK_FAILURE(hr);
 
 			if (bytePosition >= m_DataSrc->GetSize()) {
 				m_Loading = false;
@@ -76,7 +73,7 @@ namespace BackBeat {
 				if (leftover < sampleBufferSize) sampleBufferSize = leftover;
 			}
 
-			hr = LoadWAV(m_Data + samplePosition, bufferData, sampleBufferSize);
+			LoadWAV(m_Data + samplePosition, bufferData, sampleBufferSize);
 			samplePosition += m_DeviceProps.nAvgBytesPerSec;
 		}
 		BB_CORE_INFO("LOADING DONE");
@@ -84,7 +81,7 @@ namespace BackBeat {
 	}
 
 	// TODO: Create switch cases for all sample sizes and formats  
-	HRESULT Loader::LoadWAV(BYTE* bufferTarget, BYTE* bufferSrc, UINT32 totalSamples)
+	void Loader::LoadWAV(BYTE* bufferTarget, BYTE* bufferSrc, UINT32 totalSamples)
 	{
 		short int* srcBuffer = reinterpret_cast<short int*>(bufferSrc);
 		float* targetBuffer = reinterpret_cast<float*>(bufferTarget);
@@ -97,6 +94,5 @@ namespace BackBeat {
 				targetBuffer[i + j] = Audio::ConvertFloat(srcBuffer[i + j]) / SHORT_INT_MAX;
 			}
 		}
-		return S_OK;
 	}
 }

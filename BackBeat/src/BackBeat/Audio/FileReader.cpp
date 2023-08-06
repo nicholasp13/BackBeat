@@ -31,7 +31,7 @@ namespace BackBeat {
 				header[3] = temp1;
 				header[4] = temp2;
 				ReadMP3Header(header, &props, &size);
-				BB_CORE_INFO("MP3 File opened");
+				BB_CORE_INFO("MP3 File opened {0}", filePath);
 				return S_OK;
 			}
 			
@@ -40,15 +40,15 @@ namespace BackBeat {
 			{
 				header[4] = temp2;
 				ReadWAVHeader(header, &props, &size);
-				BB_CORE_INFO("WAV File opened");
+				BB_CORE_INFO("WAV File opened {0}", filePath);
+				if (props.nChannels > 2) return LOAD_FAILURE;
 
 				*audioData = new WAVData(filePath, &props, size);
-				BB_CORE_INFO("WAV File created");
+				BB_CORE_INFO("WAV File created {0}", filePath);
 				return S_OK;
 			}
 		}
-		BB_CORE_ERROR("FILE FAILED TO LOAD");
-		return ERROR;
+		return LOAD_FAILURE;
 	}
 
 

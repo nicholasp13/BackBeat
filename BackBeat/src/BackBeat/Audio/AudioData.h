@@ -10,8 +10,7 @@ namespace BackBeat {
 	{
 		None = 0,
 		WAV_FILE,
-		MP3_FILE,
-		GENERATOR_FILE
+		MP3_FILE
 	};
 
 	class AudioData

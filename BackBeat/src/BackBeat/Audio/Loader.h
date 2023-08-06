@@ -11,7 +11,7 @@ namespace BackBeat {
 		~Loader();
 
 		void Start();
-		HRESULT Stop();
+		void Stop();
 		HRESULT GetData(UINT32 framesAvailable, BYTE* buffer, UINT32* position, 
 							bool* playing);
 		
@@ -23,6 +23,6 @@ namespace BackBeat {
 		AudioData* m_DataSrc;
 
 		void Load();
-		HRESULT LoadWAV(BYTE* bufferTarget, BYTE* bufferSrc, UINT32 framesAvailable);
+		void LoadWAV(BYTE* bufferTarget, BYTE* bufferSrc, UINT32 framesAvailable);
 	};
 }

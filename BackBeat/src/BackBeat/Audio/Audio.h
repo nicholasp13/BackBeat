@@ -21,10 +21,20 @@ namespace BackBeat {
 #define REFTIMES_PER_SECOND 10000000
 #define REFTIMES_PER_MILLISEC 10000
 
-// 
+// HRESULT FAILURE CODES
+#define PLAY_FAILURE (HRESULT)1
+#define LOAD_FAILURE (HRESULT)2
+#define MIX_FAILURE  (HRESULT)3
+
 #define CHECK_FAILURE( hr ) \
-	if (FAILED(hr)) \
-	{ BB_CORE_ERROR("{0} FAILED TO INITIALIZE AUDIOCLIENT", hr); FileOpened = false; return; }
+	if (hr == PLAY_FAILURE) \
+	{ BB_CORE_ERROR("{0} FAILED TO PLAY", hr); return; } \
+	else if (hr == LOAD_FAILURE) \
+	{ BB_CORE_ERROR("{0} FAILED TO LOAD", hr); return; } \
+	else if (hr == MIX_FAILURE) \
+	{ BB_CORE_ERROR("{0} FAILED TO MIX", hr); return;} \
+	else if (FAILED(hr)) \
+	{ BB_CORE_ERROR("{0} WINDOWS WASAPI API FAILURE", hr); return; }
 
 #define FILE_OPENED( fileOpened ) \
 	if (!fileOpened) \

@@ -16,7 +16,6 @@ namespace BackBeat {
 	Player::Player(std::string filePath)
 	{
 		m_FilePath = filePath;
-		FileOpened = true;
 		m_Position = 0;
 
 		m_AudioClient = NULL;
@@ -36,7 +35,6 @@ namespace BackBeat {
 
 	void Player::Play()
 	{
-		FILE_OPENED(FileOpened);
 
 		if (Playing)
 		{
@@ -100,15 +98,12 @@ namespace BackBeat {
 
 	void Player::Pause()
 	{
-		FILE_OPENED(FileOpened);
 		Playing = false;
 		BB_CORE_INFO("AUDIO PAUSED");
 	}
 
 	void Player::Stop()
 	{
-		FILE_OPENED(FileOpened);
-
 		if (m_File->GetFileType() == FileType::WAV_FILE) m_Position = WAV_HEADER_SIZE;
 		else m_Position = 0;
 
