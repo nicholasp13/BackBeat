@@ -4,3 +4,6 @@
 [submodule "BackBeat/vendor/imgui"]
 	path = BackBeat/vendor/imgui
 	url = https://github.com/ocornut/imgui
+[submodule "glfw"]
+	path = BackBeat/vendor/glfw
+	url = https://github.com/nicholasp13/glfw.git

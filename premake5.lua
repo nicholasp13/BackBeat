@@ -17,7 +17,7 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 -- IncludeDir["GLFW"] = "BackBeat/vendor/GLFW/include"
 -- IncludeDir["Glad"] = "BackBeat/vendor/Glad/include"
 
-include "BackBeat/vendor/GLFW"
+include "BackBeat/vendor/glfw"
 include "BackBeat/vendor/Glad"
 include "BackBeat/vendor/imgui"
 
@@ -45,7 +45,7 @@ project "BackBeat"
 		"%{prj.name}/src",
 		"%{prj.name}/vendor/spdlog/include",
 		-- CURRENT SOL
-		"%{prj.name}/vendor/GLFW/include",
+		"%{prj.name}/vendor/glfw/include",
 		"%{prj.name}/vendor/Glad/include",
 		"%{prj.name}/vendor/imgui"
 		--TO FIX --
