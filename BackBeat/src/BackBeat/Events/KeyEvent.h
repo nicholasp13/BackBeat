@@ -9,6 +9,10 @@ namespace BackBeat {
 	public:
 		inline int GetKeyCode() const { return m_KeyCode; }
 
+		EventType GetEventType() const { return EventType::KeyPressed; }
+
+		const char* GetName() const { return "KeyPressed"; }
+
 		EVENT_CLASS_CATEGORY(EventCategoryKeyboard | EventCategoryInput)
 
 	protected:
@@ -33,7 +37,9 @@ namespace BackBeat {
 			return ss.str();
 		}
 
-		EVENT_CLASS_TYPE(KeyPressed);
+		EventType GetEventType() const { return EventType::KeyPressed; }
+
+		const char* GetName() const { return "KeyPressed"; }
 
 	private:
 		bool m_IsRepeat;
@@ -52,7 +58,9 @@ namespace BackBeat {
 			return ss.str();
 		}
 
-		EVENT_CLASS_TYPE(KeyReleased);
+		EventType GetEventType() const { return EventType::KeyReleased; }
+
+		const char* GetName() const { return "KeyReleased"; }
 	};
 
 }
