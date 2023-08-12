@@ -10,7 +10,7 @@
 #include "BackBeat/Core/LayerStack.h"
 #include "BackBeat/Core/Log.h"
 #include "BackBeat/Core/Window.h"
-#include "BackBeat/Core/EntryPoint.h"
+#include "BackBeat/Core/Input.h"
 
 #include "BackBeat/ImGui/ImGuiLayer.h"
 

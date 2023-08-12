@@ -19,6 +19,7 @@ namespace BackBeat {
 		void Stop();
 
 		bool Playing = false;
+
 	private:
 		void InitAudioClient();
 

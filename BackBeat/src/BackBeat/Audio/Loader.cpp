@@ -69,7 +69,7 @@ namespace BackBeat {
 
 			if (bytePosition >= m_DataSrc->GetSize()) {
 				m_Loading = false;
-				int leftover = (m_DataSize - samplePosition) / m_DeviceProps.nBlockAlign;
+				UINT32 leftover = (m_DataSize - samplePosition) / m_DeviceProps.nBlockAlign;
 				if (leftover < sampleBufferSize) sampleBufferSize = leftover;
 			}
 
