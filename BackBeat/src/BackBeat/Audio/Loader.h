@@ -15,9 +15,16 @@ namespace BackBeat {
 		HRESULT GetData(UINT32 framesAvailable, BYTE* buffer, UINT32* position, 
 							bool* playing);
 		
+		inline UINT32 GetBytePosition() { return m_BytePosition; }
+		inline UINT32 GetSamplePosition() { return m_SamplePosition;  }
+
+		bool Loading = false;
+		bool Loaded = false;
+
 	private:
-		boolean m_Loading;
 		UINT32 m_DataSize;
+		UINT32 m_BytePosition;
+		UINT32 m_SamplePosition;
 		BYTE* m_Data;
 		tWAVEFORMATEX m_DeviceProps;
 		AudioData* m_DataSrc;

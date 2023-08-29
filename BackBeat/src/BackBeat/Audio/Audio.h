@@ -22,18 +22,18 @@ namespace BackBeat {
 #define REFTIMES_PER_MILLISEC 10000
 
 // HRESULT FAILURE CODES
-#define PLAY_FAILURE (HRESULT)1
-#define LOAD_FAILURE (HRESULT)2
-#define MIX_FAILURE  (HRESULT)3
+#define PLAY_FAILURE (HRESULT)1001
+#define LOAD_FAILURE (HRESULT)1002
+#define MIX_FAILURE  (HRESULT)1003
 
 #define CHECK_FAILURE( hr ) \
 	if (hr == PLAY_FAILURE) \
-	{ BB_CORE_ERROR("{0} FAILED TO PLAY", hr); return; } \
+	{ BB_CORE_ERROR("{0} FAILED TO PLAY", hr);  return; } \
 	else if (hr == LOAD_FAILURE) \
 	{ BB_CORE_ERROR("{0} FAILED TO LOAD", hr); return; } \
 	else if (hr == MIX_FAILURE) \
 	{ BB_CORE_ERROR("{0} FAILED TO MIX", hr); return;} \
-	else if (FAILED(hr)) \
+	else if (FAILED(hr) != S_OK) \
 	{ BB_CORE_ERROR("{0} WINDOWS WASAPI API FAILURE", hr); return; }
 
 #define FILE_OPENED( fileOpened ) \

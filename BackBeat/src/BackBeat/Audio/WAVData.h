@@ -10,7 +10,7 @@ namespace BackBeat {
 		WAVData(std::string filePath,tWAVEFORMATEX* props,int size);
 		~WAVData();
 
-		virtual HRESULT LoadBuffer(UINT32 bufferSize, BYTE* buffer, UINT32* position);
+		virtual HRESULT LoadBuffer(UINT32 bufferSize, BYTE* buffer, UINT32* position, bool* loading);
 		virtual FileType GetFileType();
 		virtual tWAVEFORMATEX* GetProperties();
 		virtual UINT32 GetSize();
@@ -18,7 +18,6 @@ namespace BackBeat {
 		// TODO: GET OTHER DATA FROM SUBCHUNK I.E. artist and song name if available
 	private:
 		unsigned long m_Size = 0;
-		std::ifstream m_Data;
 		std::string m_FilePath = "";
 		tWAVEFORMATEX m_Props;
 

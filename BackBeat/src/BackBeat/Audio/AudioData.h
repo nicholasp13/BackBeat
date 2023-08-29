@@ -16,7 +16,7 @@ namespace BackBeat {
 	class AudioData
 	{
 	public:
-		virtual HRESULT LoadBuffer(UINT32 framesAvailable, BYTE* buffer, UINT32* position) { return S_OK; }
+		virtual HRESULT LoadBuffer(UINT32 framesAvailable, BYTE* buffer, UINT32* position, bool* loading) { return S_OK; }
 		virtual FileType GetFileType() { return FileType::None; }
 		virtual tWAVEFORMATEX* GetProperties() { return NULL; }
 		virtual UINT32 GetSize() { return 0;  }
