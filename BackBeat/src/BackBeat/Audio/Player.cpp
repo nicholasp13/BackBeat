@@ -1,43 +1,40 @@
 #include "bbpch.h"
 
-#include "Audio.h"
 #include "Player.h"
-#include "FileReader.h"
-#include "AudioData.h"
-#include "Loader.h"
-
-/* README - TODO: 
+/* TODO: 
 *		CREATE A FUNCTION TO ALLOW FOR EXCLUSIVE MODE IF POSSIBLE
-*		DELETE/FREE ALL POINTERS/HEAP DATA
-*		MULTITHREADING
+*		DELETE/FREE ALL POINTERS/HEAP DATA (CHECK IF NEEDED / IF THRERE ARE MEMORY LEAKS)
 */
 namespace BackBeat {
 
 	Player::Player(std::string filePath)
+		: 
+		m_FilePath(filePath),
+		m_Position(0),
+		m_Worker{},
+		m_AudioClient(NULL),
+		m_Enumerator(NULL),
+		m_Device(NULL),
+		m_Renderer(NULL),
+		m_File(NULL),
+		m_Loader(NULL)
 	{
-		m_FilePath = filePath;
-		m_Position = 0;
-
-		m_AudioClient = NULL;
-		m_Enumerator = NULL;
-		m_Device = NULL;
-		m_Renderer = NULL;
-		m_File = NULL;
-		
 		InitAudioClient();
 	}
 
 	// TODO: Create destructor to release all data
 	Player::~Player()
 	{
-
+		if (m_Loader->Loading)
+			m_Loader->Stop();
+		if (m_Worker.joinable())
+			m_Worker.join();
 	}
 
 	void Player::Play()
 	{
 
-		if (Playing)
-		{
+		if (Playing) {
 			BB_CORE_ERROR("ALREADY PLAYING");
 			return;
 		}
@@ -48,17 +45,23 @@ namespace BackBeat {
 		BYTE* data;
 		DWORD flags = 0;
 		DWORD sleepTime = (DWORD)(m_ActualBufferDuration / REFTIMES_PER_MILLISEC / 2);
-		Loader loader = Loader(m_DeviceProps, m_File);
 
-		std::thread worker(&Loader::Start, loader);
+		if (!m_Loader->Loading && !m_Loader->Loaded)
+			m_Worker = std::thread(&Loader::Start, m_Loader);
+
 		Playing = true;
 		framesAvailable = m_BufferSize;
-		
+
 		// Pre-call the buffer to avoid bugs on start
-		hr = m_Renderer->GetBuffer(framesAvailable, &data);
+		hr = m_AudioClient->GetCurrentPadding(&padding);
 		CHECK_FAILURE(hr);
 
-		hr = loader.GetData(framesAvailable, data, &m_Position, &Playing);
+		framesAvailable = m_BufferSize - padding;
+		hr = m_Renderer->GetBuffer(framesAvailable, &data);
+
+		CHECK_FAILURE(hr);
+
+		hr = m_Loader->GetData(framesAvailable, data, &m_Position, &Playing);
 		CHECK_FAILURE(hr);
 
 		hr = m_Renderer->ReleaseBuffer(framesAvailable, flags);
@@ -81,7 +84,7 @@ namespace BackBeat {
 			hr = m_Renderer->GetBuffer(framesAvailable, &data);
 			CHECK_FAILURE(hr);
 
-			hr = loader.GetData(framesAvailable, data, &m_Position, &Playing);
+			hr = m_Loader->GetData(framesAvailable, data, &m_Position, &Playing);
 			CHECK_FAILURE(hr);
 
 			hr = m_Renderer->ReleaseBuffer(framesAvailable, flags);
@@ -89,7 +92,85 @@ namespace BackBeat {
 		}
 		Sleep(sleepTime);
 		Playing = false;
-		worker.join();
+
+		hr = m_AudioClient->Stop();
+		CHECK_FAILURE(hr);
+
+		BB_CORE_INFO("PLAYING DONE");
+	}
+
+	void Player::PlaySamples(UINT32 samples) {
+		if (!Playing) {
+			BB_CORE_INFO("SET TO PLAY BEFORE CALL");
+			return;
+		}
+
+		if (samples < 1 || samples > m_File->GetSize() / m_DeviceProps->nBlockAlign) {
+			BB_CORE_ERROR("INVALID NUMBER OF SAMPLES");
+			return;
+		}
+
+		HRESULT hr;
+		UINT32 padding;
+		UINT32 framesAvailable;
+		BYTE* data;
+		DWORD flags = 0;
+		DWORD sleepTime = (DWORD)(m_ActualBufferDuration / REFTIMES_PER_MILLISEC / 2);
+
+		if (!m_Loader->Loading && !m_Loader->Loaded) {
+			std::thread worker(&Loader::Start, m_Loader);
+			worker.detach();
+		}
+
+		Playing = true;
+		framesAvailable = m_BufferSize;
+
+
+		// Pre-call the buffer to avoid bugs on start
+		hr = m_AudioClient->GetCurrentPadding(&padding);
+		CHECK_FAILURE(hr);
+
+		framesAvailable = m_BufferSize - padding;
+		hr = m_Renderer->GetBuffer(framesAvailable, &data);
+
+		CHECK_FAILURE(hr);
+
+		hr = m_Loader->GetData(framesAvailable, data, &m_Position, &Playing);
+		CHECK_FAILURE(hr);
+
+		hr = m_Renderer->ReleaseBuffer(framesAvailable, flags);
+		CHECK_FAILURE(hr);
+
+		hr = m_AudioClient->Start();
+		CHECK_FAILURE(hr);
+
+		BB_CORE_INFO("PLAYING SAMPLES");
+
+		for(int i = 1; i < samples; i++)
+		{
+			Sleep(sleepTime);
+
+			hr = m_AudioClient->GetCurrentPadding(&padding);
+			CHECK_FAILURE(hr);
+
+			framesAvailable = m_BufferSize - padding;
+
+			hr = m_Renderer->GetBuffer(framesAvailable, &data);
+			CHECK_FAILURE(hr);
+
+			hr = m_Loader->GetData(framesAvailable, data, &m_Position, &Playing);
+			CHECK_FAILURE(hr);
+
+			hr = m_Renderer->ReleaseBuffer(framesAvailable, flags);
+			CHECK_FAILURE(hr);
+
+			if (!Playing) {
+				break;
+			}
+		}
+		Sleep(sleepTime);
+		Playing = false;
+
 		hr = m_AudioClient->Stop();
 		CHECK_FAILURE(hr);
 
@@ -98,8 +179,11 @@ namespace BackBeat {
 
 	void Player::Pause()
 	{
+		HRESULT hr = m_AudioClient->Stop();
+		CHECK_FAILURE(hr);
+
 		Playing = false;
-		BB_CORE_INFO("AUDIO PAUSED");
+		BB_CORE_INFO("PLAYING PAUSED");
 	}
 
 	void Player::Stop()
@@ -108,7 +192,7 @@ namespace BackBeat {
 		else m_Position = 0;
 
 		Playing = false;
-		BB_CORE_INFO("AUDIO STOPPED. POSITION RESET TO 0");
+		BB_CORE_INFO("PLAYING STOPPED. POSITION RESET TO 0");
 	}
 
 	void Player::InitAudioClient() {
@@ -173,6 +257,8 @@ namespace BackBeat {
 
 		hr = FileReader::CreateFile(m_FilePath, &m_File);
 		CHECK_FAILURE(hr);
+
+		m_Loader = new Loader(m_DeviceProps, m_File);
 
 		if (m_File->GetFileType() == FileType::WAV_FILE) m_Position = WAV_HEADER_SIZE;
 	}

@@ -12,7 +12,11 @@
 namespace BackBeat {
 
 	Loader::Loader(tWAVEFORMATEX* deviceProps, AudioData* dataSrc)
-		: m_DeviceProps(*deviceProps), m_Loading(false), m_DataSrc(dataSrc)
+		: 
+		m_DeviceProps(*deviceProps),
+		m_BytePosition(WAV_HEADER_SIZE),
+		m_SamplePosition(WAV_HEADER_SIZE),
+		m_DataSrc(dataSrc)
 	{
 		m_DataSize = dataSrc->GetSize() * deviceProps->nBlockAlign / dataSrc->GetProperties()->nBlockAlign;
 		m_Data = new BYTE[m_DataSize];
@@ -20,19 +24,27 @@ namespace BackBeat {
 
 	Loader::~Loader()
 	{
-
 	}
 
 	void Loader::Start()
 	{
-		m_Loading = true;
+		if (Loading) {
+			BB_CORE_INFO("ALREADY LOADING");
+			return;
+		}
+		if (Loaded) {
+			BB_CORE_INFO("ALREADY LOADED");
+			return;
+		}
+
+		Loading = true;
 		BB_CORE_INFO("LOADING STARTED");
 		Load();
 	}
 
 	void Loader::Stop()
 	{
-		m_Loading = false;
+		Loading = false;
 		BB_CORE_INFO("LOADING STOPPED");
 	}
 
@@ -41,7 +53,8 @@ namespace BackBeat {
 	{
 		UINT32 totalBytes = framesAvailable * m_DeviceProps.nBlockAlign;
 
-		if (totalBytes + *position >= m_DataSize) totalBytes = m_DataSize - *position;
+		if (totalBytes + *position >= m_DataSize) 
+			totalBytes = m_DataSize - *position;
 		
 		memcpy(buffer, m_Data + *position, totalBytes);
 		*position += totalBytes;
@@ -55,29 +68,29 @@ namespace BackBeat {
 
 	void Loader::Load()
 	{	
+		if (Loaded) 
+			return;
+
 		HRESULT hr = S_OK;
-		UINT32 bytePosition = WAV_HEADER_SIZE;
-		UINT32 samplePosition = WAV_HEADER_SIZE;	
 		UINT32 bufferSize = m_DataSrc->GetProperties()->nAvgBytesPerSec;
 		UINT32 sampleBufferSize = m_DataSrc->GetProperties()->nSamplesPerSec * m_DataSrc->GetProperties()->nChannels;
 		BYTE* bufferData = new BYTE[bufferSize];
 
-		while (m_Loading) {
+		while (Loading) {
 
-			hr = m_DataSrc->LoadBuffer(bufferSize, bufferData, &bytePosition);
+			hr = m_DataSrc->LoadBuffer(bufferSize, bufferData, &m_BytePosition, &Loading);
 			CHECK_FAILURE(hr);
 
-			if (bytePosition >= m_DataSrc->GetSize()) {
-				m_Loading = false;
-				int leftover = (m_DataSize - samplePosition) / m_DeviceProps.nBlockAlign;
+			if (m_BytePosition >= m_DataSrc->GetSize()) {
+				Loading = false;
+				Loaded = true;
+				BB_CORE_INFO("LOADING DONE");
+				UINT32 leftover = (m_DataSize - m_SamplePosition) / m_DeviceProps.nBlockAlign;
 				if (leftover < sampleBufferSize) sampleBufferSize = leftover;
 			}
-
-			LoadWAV(m_Data + samplePosition, bufferData, sampleBufferSize);
-			samplePosition += m_DeviceProps.nAvgBytesPerSec;
+			LoadWAV(m_Data + m_SamplePosition, bufferData, sampleBufferSize);
+			m_SamplePosition += m_DeviceProps.nAvgBytesPerSec;
 		}
-		BB_CORE_INFO("LOADING DONE");
-
 	}
 
 	// TODO: Create switch cases for all sample sizes and formats  

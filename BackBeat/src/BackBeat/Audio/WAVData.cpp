@@ -21,29 +21,29 @@ namespace BackBeat {
 
 	WAVData::~WAVData()
 	{
-
+		BB_CORE_ERROR("DATA DELETED");
 	}
 
 	// README
 	// MIGHT NEED TO CREATE A CHECK/SEPERATE LOOP FOR DIFFERENT ENDIANNESS
-	HRESULT WAVData::LoadBuffer(UINT32 byteTotal, BYTE* buffer, UINT32* position) 
+	HRESULT WAVData::LoadBuffer(UINT32 byteTotal, BYTE* buffer, UINT32* position, bool* loading) 
 	{
 		char data;
-		std::ifstream m_Data(m_FilePath, std::ios::binary);
+		std::ifstream file(m_FilePath, std::ios::binary);
 
 		for (UINT32 i = 0; i < byteTotal; i++)
 		{
-			if (*position + i >= m_Size)
+			if (*position + i >= m_Size || !(*loading))
 			{
-				m_Data.close();
+				file.close();
 				*position = *position + i;
 				return S_OK;
 			}
-			m_Data.seekg(*position + i);
-			m_Data.get(data);
+			file.seekg(*position + i);
+			file.get(data);
 			buffer[i] = data;	
 		}
-		m_Data.close();
+		file.close();
 		*position = *position + byteTotal;
 		return S_OK;
 	}

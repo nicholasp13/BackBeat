@@ -4,9 +4,16 @@
 
 namespace BackBeat {
 
+	struct MousePos
+	{
+		float x;
+		float y;
+	};
+
 	class MouseMovedEvent : public Event
 	{
 	public:
+
 		MouseMovedEvent(const float x, const float y)
 			: m_MouseX(x), m_MouseY(y) {}
 
@@ -20,8 +27,9 @@ namespace BackBeat {
 			return ss.str();
 		}
 
-		EVENT_CLASS_TYPE(MouseMoved)
-			EVENT_CLASS_CATEGORY(EventCategoryMouse | EventCategoryInput)
+		EVENT_CLASS_TYPE(MouseMoved);
+		
+		EVENT_CLASS_CATEGORY(EventCategoryMouse | EventCategoryInput)
 
 	private:
 		float m_MouseX, m_MouseY;
@@ -43,8 +51,9 @@ namespace BackBeat {
 			return ss.str();
 		}
 
-		EVENT_CLASS_TYPE(MouseScrolled)
-			EVENT_CLASS_CATEGORY(EventCategoryMouse | EventCategoryInput)
+		EVENT_CLASS_TYPE(MouseScrolled);
+
+		EVENT_CLASS_CATEGORY(EventCategoryMouse | EventCategoryInput)
 
 	private:
 		float m_XOffset, m_YOffset;
@@ -77,7 +86,7 @@ namespace BackBeat {
 			return ss.str();
 		}
 
-		EVENT_CLASS_TYPE(MouseButtonPressed)
+		EVENT_CLASS_TYPE(MouseButtonPressed);
 	};
 
 	class MouseButtonReleasedEvent : public MouseButtonEvent
@@ -93,7 +102,7 @@ namespace BackBeat {
 			return ss.str();
 		}
 
-		EVENT_CLASS_TYPE(MouseButtonReleased)
+		EVENT_CLASS_TYPE(MouseButtonReleased);
 	};
 
 }

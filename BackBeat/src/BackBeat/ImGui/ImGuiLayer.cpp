@@ -1,6 +1,8 @@
 #include "bbpch.h"
 #include "ImGuiLayer.h"
 
+#include "BackBeat/Core/Application.h"
+
 #include <imgui.h>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -33,41 +35,42 @@ namespace BackBeat {
 
 		Application& app = Application::Get();
 		GLFWwindow* window = (GLFWwindow*)app.GetWindow().GetNativeWindow();
-		
+		io.DisplaySize = ImVec2((float)app.GetWindow().GetWidth(), (float)app.GetWindow().GetHeight());
+
 		ImGui_ImplGlfw_InitForOpenGL(window, true);
 		ImGui_ImplOpenGL3_Init("#version 410");
 	}
 
 	void ImGuiLayer::OnDetach()
 	{
-
-	}
-
-	void ImGuiLayer::OnUpdate()
-	{
-	
-		ImGuiIO& io = ImGui::GetIO();
-		Application& app = Application::Get();
-		io.DisplaySize = ImVec2((float)app.GetWindow().GetWidth(), (float)app.GetWindow().GetHeight());
-
-		float time = (float)glfwGetTime();
-		io.DeltaTime = m_Time > 0.0f ? (time - m_Time) : (1.0f / 60.0f);
-
-		ImGui_ImplOpenGL3_NewFrame();
-		ImGui::NewFrame();
-		
-		static bool show = true;
-		ImGui::ShowDemoWindow(&show);
-
-		ImGui::Render();
-		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+		ImGui_ImplOpenGL3_Shutdown();
+		ImGui_ImplGlfw_Shutdown();
+		ImGui::DestroyContext();
 	}
 
 	void ImGuiLayer::OnEvent(Event& event)
 	{
+		BB_CORE_TRACE("Not Handled: {0}", event);
 		ImGuiIO& io = ImGui::GetIO();
 		event.Handled |= event.IsInCategory(EventCategoryMouse) & io.WantCaptureMouse;
 		event.Handled |= event.IsInCategory(EventCategoryKeyboard) & io.WantCaptureKeyboard;
+	}
+
+	void ImGuiLayer::Begin()
+	{
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplGlfw_NewFrame();
+		ImGui::NewFrame();
+	}
+
+	void ImGuiLayer::End()
+	{
+		ImGuiIO& io = ImGui::GetIO();
+		Application& app = Application::Get();
+		io.DisplaySize = ImVec2((float)app.GetWindow().GetWidth(), (float)app.GetWindow().GetHeight());
+
+		ImGui::Render();
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 	}
 
 	// TODO: Create own color style

@@ -2,12 +2,12 @@
 
 #include "Core.h"
 #include "LayerStack.h"
+#include "Window.h"
 #include "BackBeat/Events/Event.h"
 #include "BackBeat/Events/ApplicationEvent.h"
-#include "Window.h"
 
+#include "BackBeat/ImGui/ImGuiLayer.h"
 //Application class for applications using the BackBeat engine
-
 namespace BackBeat {
 
 	class BACKBEAT_API Application
@@ -17,25 +17,28 @@ namespace BackBeat {
 		virtual ~Application();
 
 		void Run();
-
 		void OnEvent(Event& e);
-
 		void PushLayer(Layer* layer);
 		void PushOverlay(Layer* layer);
 
-		static inline Application& Get() { return *s_Instance;  }
-		inline Window& GetWindow() { return *m_Window; }
+		ImGuiLayer* GetImGuiLayer() { return m_ImGuiLayer; }
+
+		Window& GetWindow() { return *m_Window; }
+
+		static Application& Get() { return *s_Instance; }
+
 	private:
 		bool OnWindowClose(WindowCloseEvent& e);
 
 	private:
 		static Application* s_Instance;
-		std::unique_ptr<Window> m_Window;
+		ImGuiLayer* m_ImGuiLayer;
+		Window* m_Window;
 		bool m_Running = true;
 		LayerStack m_LayerStack;
 	};
 
-	// TO be defined in CLIENT
+	// To be defined in CLIENT
 	Application* CreateApplication();
 
 }

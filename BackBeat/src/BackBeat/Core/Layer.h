@@ -5,7 +5,6 @@
 
 namespace BackBeat {
 
-
 	class BACKBEAT_API Layer
 	{
 	public:
@@ -14,8 +13,9 @@ namespace BackBeat {
 
 		virtual void OnAttach() {}
 		virtual void OnDetach() {}
-		virtual void OnUpdate() {}
+		virtual void OnUpdate(DWORD timeInterval) {} // For implementation later of a timer for performance and other reasons i.e. metronome, time adjustments
 		virtual void OnEvent(Event& event) {}
+		virtual void OnImGuiRender() {}
 
 		inline const std::string& GetName() const { return m_DebugName; }
 

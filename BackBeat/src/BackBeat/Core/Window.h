@@ -5,8 +5,6 @@
 #include "Core.h"
 #include "BackBeat/Events/Event.h"
 
-
-
 namespace BackBeat {
 
 	struct WindowProps
