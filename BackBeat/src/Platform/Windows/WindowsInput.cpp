@@ -27,7 +27,7 @@ namespace BackBeat {
 		double x, y;
 		glfwGetCursorPos(window, &x, &y);
 
-		return MousePos(x, y); }
+		return MousePos((float)x, (float)y); }
 
 	float Input::GetMouseX() { return GetMousePosition().x; }
 

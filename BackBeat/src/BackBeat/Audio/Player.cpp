@@ -25,8 +25,10 @@ namespace BackBeat {
 	// TODO: Create destructor to release all data
 	Player::~Player()
 	{
-		m_Loader->Stop();
-		m_Worker.join();
+		if (m_Loader->Loading)
+			m_Loader->Stop();
+		if (m_Worker.joinable())
+			m_Worker.join();
 	}
 
 	void Player::Play()

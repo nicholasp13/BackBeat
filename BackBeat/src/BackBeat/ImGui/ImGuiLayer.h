@@ -1,11 +1,10 @@
 #pragma once
 
 #include "BackBeat/Core/Layer.h"
-#include "BackBeat/Core/Application.h"
 
 namespace BackBeat {
 
-	class BACKBEAT_API ImGuiLayer : public Layer 
+	class BACKBEAT_API ImGuiLayer : public Layer
 	{
 	public:
 		ImGuiLayer();
@@ -13,8 +12,9 @@ namespace BackBeat {
 
 		virtual void OnAttach();
 		virtual void OnDetach();
-		virtual void OnUpdate();
 		virtual void OnEvent(Event& event);
+		virtual void Begin();
+		virtual void End();
 
 		void SetDarkThemeColors();
 

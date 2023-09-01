@@ -27,9 +27,7 @@ namespace BackBeat {
 			return ss.str();
 		}
 
-		EventType GetEventType() const { return EventType::MouseMoved; }
-
-		const char* GetName() const { return "MouseMoved"; }
+		EVENT_CLASS_TYPE(MouseMoved);
 		
 		EVENT_CLASS_CATEGORY(EventCategoryMouse | EventCategoryInput)
 
@@ -53,9 +51,7 @@ namespace BackBeat {
 			return ss.str();
 		}
 
-		EventType GetEventType() const { return EventType::MouseScrolled; }
-
-		const char* GetName() const { return "MouseScrolled"; }
+		EVENT_CLASS_TYPE(MouseScrolled);
 
 		EVENT_CLASS_CATEGORY(EventCategoryMouse | EventCategoryInput)
 
@@ -67,10 +63,6 @@ namespace BackBeat {
 	{
 	public:
 		int GetMouseButton() const { return m_Button; }
-
-		EventType GetEventType() const { return EventType::None; }
-
-		const char* GetName() const { return "MouseButtonEvent"; }
 
 		EVENT_CLASS_CATEGORY(EventCategoryMouse | EventCategoryInput | EventCategoryMouseButton)
 
@@ -94,9 +86,7 @@ namespace BackBeat {
 			return ss.str();
 		}
 
-		EventType GetEventType() const { return EventType::MouseButtonPressed; }
-
-		const char* GetName() const { return "MouseButtonPressed"; }
+		EVENT_CLASS_TYPE(MouseButtonPressed);
 	};
 
 	class MouseButtonReleasedEvent : public MouseButtonEvent
@@ -112,9 +102,7 @@ namespace BackBeat {
 			return ss.str();
 		}
 
-		EventType GetEventType() const { return EventType::MouseButtonReleased; }
-
-		const char* GetName() const { return "MouseButtonRelease"; }
+		EVENT_CLASS_TYPE(MouseButtonReleased);
 	};
 
 }
