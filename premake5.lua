@@ -104,6 +104,8 @@ project "Sampler"
 	includedirs
 	{
 		"BackBeat/vendor/spdlog/include",
+		"BackBeat/vendor/imgui",
+		"BackBeat/vendor/glfw/include",
 		"BackBeat/src"
 	}
 	
