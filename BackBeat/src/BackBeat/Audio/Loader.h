@@ -10,9 +10,9 @@ namespace BackBeat {
 		Loader(tWAVEFORMATEX* deviceProps, AudioData* data);
 		~Loader();
 
-		void Start();
-		void Stop();
-		HRESULT GetData(UINT32 framesAvailable, BYTE* buffer, UINT32* position, 
+		void virtual Start();
+		void virtual Stop();
+		HRESULT virtual GetData(UINT32 framesAvailable, BYTE* buffer, UINT32* position,
 							bool* playing);
 		
 		inline UINT32 GetBytePosition() { return m_BytePosition; }

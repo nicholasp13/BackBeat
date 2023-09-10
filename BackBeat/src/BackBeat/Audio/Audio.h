@@ -7,13 +7,34 @@
 #include <AudioSessionTypes.h>
 #include <synchapi.h>
 
-// TODO add helper functions/ failure checks and HRESULT functions
 namespace BackBeat {
 
-// 
+// MISC CONSTANTS
+#define PI 3.141592653589793f // Float(32 bit) precise pi
+#define CIRCLE_DEGREES 360.0f
+#define LOWER_OCTAVE 0.5f
+#define HIGHER_OCTAVE 2.0f
+
+// MUSIC NOTES(middle/4th octave notes and in hertz)
+#define C_NOTE 261.6f
+#define CSHARP_NOTE 277.2f
+#define D_NOTE 293.7f
+#define DSHARP_NOTE 311.1f
+#define E_NOTE 329.6f
+#define F_NOTE 349.2f
+#define FSHARP_NOTE 370.0f
+#define G_NOTE 392.0f
+#define GSHARP_NOTE 392.0f
+#define A_NOTE 440.0f
+#define ASHARP_NOTE 466.2f
+#define B_NOTE 493.9f
+
+// AUDIOFILE CONSTANTS
 #define BYTESIZE 8
 #define SHORT_INT_MAX 32676
 #define WAV_HEADER_SIZE 44
+
+// AUDIO FILE STRINGS
 #define MP3 "ID3"
 #define WAV "RIFF"
 
