@@ -11,6 +11,7 @@
 #include <format>
 #include <vector>
 #include <thread>
+#include <memory>
 
 #ifdef BB_PLATFORM_WINDOWS
 	#include <Windows.h>

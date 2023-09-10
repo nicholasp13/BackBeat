@@ -21,7 +21,6 @@ namespace BackBeat {
 
 	WAVData::~WAVData()
 	{
-		BB_CORE_ERROR("DATA DELETED");
 	}
 
 	// README

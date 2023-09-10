@@ -14,7 +14,8 @@ namespace BackBeat {
 	class Player
 	{
 	public:
-		Player(std::string filePath);
+		
+		Player();
 		virtual ~Player();
 
 		void Play();
@@ -22,12 +23,14 @@ namespace BackBeat {
 		void Pause();
 		void Stop();
 
+		tWAVEFORMATEX* GetProps() { return m_DeviceProps; }
+		void SetLoader(Loader* loader) { m_Loader = loader; }
+
 		bool Playing = false;
 
 	private:
 		void InitAudioClient();
 
-		std::string m_FilePath;
 		UINT32 m_Position;
 		UINT32 m_BufferSize;
 		REFERENCE_TIME m_ActualBufferDuration;

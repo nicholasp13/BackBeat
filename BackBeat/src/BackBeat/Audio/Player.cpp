@@ -1,15 +1,15 @@
 #include "bbpch.h"
 
 #include "Player.h"
+#include "AudioEngine/Renderer.h"
 /* TODO: 
 *		CREATE A FUNCTION TO ALLOW FOR EXCLUSIVE MODE IF POSSIBLE
 *		DELETE/FREE ALL POINTERS/HEAP DATA (CHECK IF NEEDED / IF THRERE ARE MEMORY LEAKS)
 */
 namespace BackBeat {
 
-	Player::Player(std::string filePath)
-		: 
-		m_FilePath(filePath),
+	Player::Player()
+		:
 		m_Position(0),
 		m_Worker{},
 		m_AudioClient(NULL),
@@ -22,7 +22,6 @@ namespace BackBeat {
 		InitAudioClient();
 	}
 
-	// TODO: Create destructor to release all data
 	Player::~Player()
 	{
 		if (m_Loader->Loading)
@@ -33,7 +32,10 @@ namespace BackBeat {
 
 	void Player::Play()
 	{
-
+		if (!m_Loader) {
+			BB_CORE_ERROR("SET LOADER BEFORE PLAYING");
+			return;
+		}
 		if (Playing) {
 			BB_CORE_ERROR("ALREADY PLAYING");
 			return;
@@ -44,7 +46,7 @@ namespace BackBeat {
 		UINT32 framesAvailable;
 		BYTE* data;
 		DWORD flags = 0;
-		DWORD sleepTime = (DWORD)(m_ActualBufferDuration / REFTIMES_PER_MILLISEC / 2);
+		DWORD sleepTime = (DWORD)(m_ActualBufferDuration / REFTIMES_PER_MILLISEC / 10);
 
 		if (!m_Loader->Loading && !m_Loader->Loaded)
 			m_Worker = std::thread(&Loader::Start, m_Loader);
@@ -99,6 +101,7 @@ namespace BackBeat {
 		BB_CORE_INFO("PLAYING DONE");
 	}
 
+	// Might not be needed
 	void Player::PlaySamples(UINT32 samples) {
 		if (!Playing) {
 			BB_CORE_INFO("SET TO PLAY BEFORE CALL");
@@ -146,7 +149,7 @@ namespace BackBeat {
 
 		BB_CORE_INFO("PLAYING SAMPLES");
 
-		for(int i = 1; i < samples; i++)
+		for(UINT32 i = 1; i < samples; i++)
 		{
 			Sleep(sleepTime);
 
@@ -228,7 +231,7 @@ namespace BackBeat {
 		hr = m_AudioClient->Initialize(
 			AUDCLNT_SHAREMODE_SHARED,
 			0,
-			REFTIMES_PER_SECOND,
+			0,
 			0,
 			m_DeviceProps,
 			NULL
@@ -244,7 +247,7 @@ namespace BackBeat {
 		hr = m_AudioClient->GetService(IID_IAudioRenderClient, (void**)&m_Renderer);
 		CHECK_FAILURE(hr);
 
-		m_ActualBufferDuration = (double)REFTIMES_PER_SECOND * m_BufferSize
+		m_ActualBufferDuration = (REFERENCE_TIME)bufferDuration * m_BufferSize
 									/ m_DeviceProps->nSamplesPerSec; 
 
 		BB_CORE_INFO("DEVICE PROPERTIES");
@@ -255,11 +258,5 @@ namespace BackBeat {
 		BB_CORE_TRACE("Block Align: {0}", m_DeviceProps->nBlockAlign);
 		BB_CORE_TRACE("Bits per Sample: {0}", m_DeviceProps->wBitsPerSample);
 
-		hr = FileReader::CreateFile(m_FilePath, &m_File);
-		CHECK_FAILURE(hr);
-
-		m_Loader = new Loader(m_DeviceProps, m_File);
-
-		if (m_File->GetFileType() == FileType::WAV_FILE) m_Position = WAV_HEADER_SIZE;
 	}
 }
