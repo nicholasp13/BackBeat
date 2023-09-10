@@ -6,7 +6,6 @@
 
 #include "Audio.h"
 #include "AudioData.h"
-#include "FileReader.h"
 #include "Loader.h"
 
 namespace BackBeat {
