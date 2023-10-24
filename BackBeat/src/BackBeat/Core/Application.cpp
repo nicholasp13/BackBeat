@@ -1,11 +1,9 @@
 #include "bbpch.h"
-#include "Application.h"
 
 #include <glad/glad.h>
 
+#include "Application.h"
 namespace BackBeat {
-
-	// #define BIND_EVENT_FN(x) std::bind(&Application::x, this, std::placeholders::_1)
 	
 	Application* Application::s_Instance = nullptr;
 	

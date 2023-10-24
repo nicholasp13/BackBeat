@@ -1,36 +1,14 @@
 #pragma once
 
 #include "BackBeat/Core/Core.h"
-
-#include <mmdeviceapi.h>
-#include <Audioclient.h>
-#include <AudioSessionTypes.h>
-#include <synchapi.h>
-
 namespace BackBeat {
 
 // MISC CONSTANTS
-#define PI 3.141592653589793f // Float(32 bit) precise pi
-#define CIRCLE_DEGREES 360.0f
-#define LOWER_OCTAVE 0.5f
-#define HIGHER_OCTAVE 2.0f
-
-// MUSIC NOTES(middle/4th octave notes and in hertz)
-#define C_NOTE 261.6f
-#define CSHARP_NOTE 277.2f
-#define D_NOTE 293.7f
-#define DSHARP_NOTE 311.1f
-#define E_NOTE 329.6f
-#define F_NOTE 349.2f
-#define FSHARP_NOTE 370.0f
-#define G_NOTE 392.0f
-#define GSHARP_NOTE 392.0f
-#define A_NOTE 440.0f
-#define ASHARP_NOTE 466.2f
-#define B_NOTE 493.9f
+#define BYTESIZE 8
 
 // AUDIOFILE CONSTANTS
-#define BYTESIZE 8
+#define MONO (UINT32)1
+#define STEREO (UINT32)2
 #define SHORT_INT_MAX 32676
 #define WAV_HEADER_SIZE 44
 
@@ -56,10 +34,6 @@ namespace BackBeat {
 	{ BB_CORE_ERROR("{0} FAILED TO MIX", hr); return;} \
 	else if (FAILED(hr) != S_OK) \
 	{ BB_CORE_ERROR("{0} WINDOWS WASAPI API FAILURE", hr); return; }
-
-#define FILE_OPENED( fileOpened ) \
-	if (!fileOpened) \
-	{ BB_CORE_ERROR("FAILED TO OPEN FILE"); FileOpened = false; Playing = false; return; }
 
 	class Audio
 	{
@@ -89,8 +63,15 @@ namespace BackBeat {
 		}
 
 		template<typename T>
-		static float ConvertFloat(T value) {
+		static float ConvertFloat(T value) 
+		{
 			return (float)(value);
+		}
+
+		template<typename T>
+		static void CopyInputToOutput(T inputBuffer, T outputBuffer, UINT32 bytesToCopy)
+		{
+			memcpy(reinterpret_cast<void*>(inputBuffer), reinterpret_cast<void*>(outputBuffer), bytesToCopy);
 		}
 	};
 }

@@ -1,11 +1,6 @@
 #include "bbpch.h"
 
 #include "Player.h"
-#include "AudioEngine/Renderer.h"
-/* TODO: 
-*		CREATE A FUNCTION TO ALLOW FOR EXCLUSIVE MODE IF POSSIBLE
-*		DELETE/FREE ALL POINTERS/HEAP DATA (CHECK IF NEEDED / IF THRERE ARE MEMORY LEAKS)
-*/
 namespace BackBeat {
 
 	Player::Player()
@@ -149,7 +144,7 @@ namespace BackBeat {
 
 		BB_CORE_INFO("PLAYING SAMPLES");
 
-		for(UINT32 i = 1; i < samples; i++)
+		for(UINT32 i = 0; i < samples; i++)
 		{
 			Sleep(sleepTime);
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "AudioData.h"
+#include "BackBeat/Audio/Playback/AudioData.h"
 #include "WAVData.h"
 
 namespace BackBeat {
@@ -8,9 +8,6 @@ namespace BackBeat {
 	class FileReader
 	{
 	public:
-		FileReader() {};
-		~FileReader() {};
-
 		static HRESULT CreateFile(std::string fileName, AudioData** audioData);
 		
 	private:

@@ -7,14 +7,16 @@ namespace BackBeat {
 	class Loader
 	{
 	public:
-		Loader(tWAVEFORMATEX* deviceProps, AudioData* data);
+		Loader(tWAVEFORMATEX* deviceProps);
 		~Loader();
 
 		void virtual Start();
 		void virtual Stop();
 		HRESULT virtual GetData(UINT32 framesAvailable, BYTE* buffer, UINT32* position,
 							bool* playing);
-		
+		HRESULT virtual SetDataSource(AudioData* data);
+
+
 		inline UINT32 GetBytePosition() { return m_BytePosition; }
 		inline UINT32 GetSamplePosition() { return m_SamplePosition;  }
 

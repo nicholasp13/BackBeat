@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|x64">
@@ -9,43 +9,39 @@
       <Configuration>Release</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="src\BackBeat\Log.h" />
-    <ClInclude Include="src\BackBeat.h" />
-    <ClInclude Include="src\BackBeat\Application.h" />
-    <ClInclude Include="src\BackBeat\Core.h" />
-    <ClInclude Include="src\BackBeat\EntryPoint.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="src\BackBeat\Log.cpp" />
-    <ClCompile Include="src\BackBeat\Application.cpp" />
+    <ProjectConfiguration Include="Dist|x64">
+      <Configuration>Dist</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>16.0</VCProjectVersion>
+    <ProjectGuid>{F210227E-DEDD-7C89-07F7-6A31F322B217}</ProjectGuid>
+    <IgnoreWarnCompileDuplicatedFilename>true</IgnoreWarnCompileDuplicatedFilename>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{48c6f80f-7117-4efa-afd1-fecde04cc7e3}</ProjectGuid>
     <RootNamespace>BackBeat</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Dist|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
-  </ImportGroup>
-  <ImportGroup Label="Shared">
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -53,47 +49,182 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <TargetExt>.dll</TargetExt>
-    <OutDir>$(SolutionDir)bin\$(Configuration)-$(Platform)\$(ProjectName)\</OutDir>
-    <IntDir>$(SolutionDir)bin-int\$(Configuration)-$(Platform)\$(ProjectName)\</IntDir>
+    <OutDir>..\bin\Debug-windows-x86_64\BackBeat\</OutDir>
+    <IntDir>..\bin-int\Debug-windows-x86_64\BackBeat\</IntDir>
+    <TargetName>BackBeat</TargetName>
+    <TargetExt>.lib</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <TargetExt>.dll</TargetExt>
-    <OutDir>$(SolutionDir)bin\$(Configuration)-$(Platform)\$(ProjectName)\</OutDir>
-    <IntDir>$(SolutionDir)bin-int\$(Configuration)-$(Platform)\$(ProjectName)\</IntDir>
+    <OutDir>..\bin\Release-windows-x86_64\BackBeat\</OutDir>
+    <IntDir>..\bin-int\Release-windows-x86_64\BackBeat\</IntDir>
+    <TargetName>BackBeat</TargetName>
+    <TargetExt>.lib</TargetExt>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">
+    <OutDir>..\bin\Dist-windows-x86_64\BackBeat\</OutDir>
+    <IntDir>..\bin-int\Dist-windows-x86_64\BackBeat\</IntDir>
+    <TargetName>BackBeat</TargetName>
+    <TargetExt>.lib</TargetExt>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>bbpch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
-      <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions> BB_PLATFORM_WINDOWS;BB_BUILD_DLL;_WINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)BackBeat\vendor\spdlog\include</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>BB_PLATFORM_WINDOWS;BB_BUILD_DLL;GLFW_INCLUDE_NONE;BB_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\glfw\include;vendor\Glad\include;vendor\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <Optimization>Disabled</Optimization>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <Lib>
+      <AdditionalDependencies>opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>bbpch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>BB_PLATFORM_WINDOWS;BB_BUILD_DLL;GLFW_INCLUDE_NONE;BB_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\glfw\include;vendor\Glad\include;vendor\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions> BB_PLATFORM_WINDOWS;BB_BUILD_DLL;_WINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)BackBeat\vendor\spdlog\include</AdditionalIncludeDirectories>
+      <MinimalRebuild>false</MinimalRebuild>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <Lib>
+      <AdditionalDependencies>opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Lib>
   </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>bbpch.h</PrecompiledHeaderFile>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>BB_PLATFORM_WINDOWS;BB_BUILD_DLL;GLFW_INCLUDE_NONE;BB_DIST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\glfw\include;vendor\Glad\include;vendor\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <Optimization>Full</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <MinimalRebuild>false</MinimalRebuild>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+    <Lib>
+      <AdditionalDependencies>opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="src\BackBeat.h" />
+    <ClInclude Include="src\BackBeat\Audio\Audio.h" />
+    <ClInclude Include="src\BackBeat\Audio\PlayBack\AudioData.h" />
+    <ClInclude Include="src\BackBeat\Audio\PlayBack\FileReader.h" />
+    <ClInclude Include="src\BackBeat\Audio\PlayBack\Loader.h" />
+    <ClInclude Include="src\BackBeat\Audio\PlayBack\Player.h" />
+    <ClInclude Include="src\BackBeat\Audio\PlayBack\WAVData.h" />
+    <ClInclude Include="src\BackBeat\Audio\Synth\AudioEngine\AudioEngine.h" />
+    <ClInclude Include="src\BackBeat\Audio\Synth\AudioEngine\ModuleCores\EnvelopeGenerator.h" />
+    <ClInclude Include="src\BackBeat\Audio\Synth\AudioEngine\ModuleCores\LinearEGCore.h" />
+    <ClInclude Include="src\BackBeat\Audio\Synth\AudioEngine\ModuleCores\ModuleCore.h" />
+    <ClInclude Include="src\BackBeat\Audio\Synth\AudioEngine\ModuleCores\Oscillator.h" />
+    <ClInclude Include="src\BackBeat\Audio\Synth\AudioEngine\ModuleCores\Wave.h" />
+    <ClInclude Include="src\BackBeat\Audio\Synth\AudioEngine\SynthModules\DCA.h" />
+    <ClInclude Include="src\BackBeat\Audio\Synth\AudioEngine\SynthModules\LinearEG.h" />
+    <ClInclude Include="src\BackBeat\Audio\Synth\AudioEngine\SynthModules\SynthModule.h" />
+    <ClInclude Include="src\BackBeat\Audio\Synth\AudioEngine\SynthModules\WAVEOscillator.h" />
+    <ClInclude Include="src\BackBeat\Audio\Synth\AudioEngine\SynthVoices\SynthVoice.h" />
+    <ClInclude Include="src\BackBeat\Audio\Synth\Render\AudioBuffer.h" />
+    <ClInclude Include="src\BackBeat\Audio\Synth\Render\RenderInfo.h" />
+    <ClInclude Include="src\BackBeat\Audio\Synth\Render\Renderer.h" />
+    <ClInclude Include="src\BackBeat\Audio\Synth\Render\WindowsRenderer.h" />
+    <ClInclude Include="src\BackBeat\Audio\Synth\Synth.h" />
+    <ClInclude Include="src\BackBeat\Audio\Synth\SynthBase.h" />
+    <ClInclude Include="src\BackBeat\Audio\Synth\SynthIO\SynthEventHandler.h" />
+    <ClInclude Include="src\BackBeat\Core\Application.h" />
+    <ClInclude Include="src\BackBeat\Core\Core.h" />
+    <ClInclude Include="src\BackBeat\Core\EntryPoint.h" />
+    <ClInclude Include="src\BackBeat\Core\Input.h" />
+    <ClInclude Include="src\BackBeat\Core\KeyCodes.h" />
+    <ClInclude Include="src\BackBeat\Core\Layer.h" />
+    <ClInclude Include="src\BackBeat\Core\LayerStack.h" />
+    <ClInclude Include="src\BackBeat\Core\Log.h" />
+    <ClInclude Include="src\BackBeat\Core\MouseCodes.h" />
+    <ClInclude Include="src\BackBeat\Core\Timer.h" />
+    <ClInclude Include="src\BackBeat\Core\Window.h" />
+    <ClInclude Include="src\BackBeat\Events\ApplicationEvent.h" />
+    <ClInclude Include="src\BackBeat\Events\Event.h" />
+    <ClInclude Include="src\BackBeat\Events\KeyEvent.h" />
+    <ClInclude Include="src\BackBeat\Events\MouseEvent.h" />
+    <ClInclude Include="src\BackBeat\ImGui\ImGuiLayer.h" />
+    <ClInclude Include="src\Platform\Windows\WindowsWindow.h" />
+    <ClInclude Include="src\bbpch.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\BackBeat\Audio\PlayBack\FileReader.cpp" />
+    <ClCompile Include="src\BackBeat\Audio\PlayBack\Loader.cpp" />
+    <ClCompile Include="src\BackBeat\Audio\PlayBack\Player.cpp" />
+    <ClCompile Include="src\BackBeat\Audio\PlayBack\WAVData.cpp" />
+    <ClCompile Include="src\BackBeat\Audio\Synth\AudioEngine\AudioEngine.cpp" />
+    <ClCompile Include="src\BackBeat\Audio\Synth\AudioEngine\ModuleCores\LinearEGCore.cpp" />
+    <ClCompile Include="src\BackBeat\Audio\Synth\AudioEngine\ModuleCores\Oscillator.cpp" />
+    <ClCompile Include="src\BackBeat\Audio\Synth\AudioEngine\ModuleCores\Wave.cpp" />
+    <ClCompile Include="src\BackBeat\Audio\Synth\AudioEngine\SynthModules\DCA.cpp" />
+    <ClCompile Include="src\BackBeat\Audio\Synth\AudioEngine\SynthModules\LinearEG.cpp" />
+    <ClCompile Include="src\BackBeat\Audio\Synth\AudioEngine\SynthModules\WAVEOscillator.cpp" />
+    <ClCompile Include="src\BackBeat\Audio\Synth\AudioEngine\SynthVoices\SynthVoice.cpp" />
+    <ClCompile Include="src\BackBeat\Audio\Synth\Render\AudioBuffer.cpp" />
+    <ClCompile Include="src\BackBeat\Audio\Synth\Render\RenderInfo.cpp" />
+    <ClCompile Include="src\BackBeat\Audio\Synth\Render\WindowsRenderer.cpp" />
+    <ClCompile Include="src\BackBeat\Audio\Synth\Synth.cpp" />
+    <ClCompile Include="src\BackBeat\Audio\Synth\SynthIO\SynthEventHandler.cpp" />
+    <ClCompile Include="src\BackBeat\Core\Application.cpp" />
+    <ClCompile Include="src\BackBeat\Core\Layer.cpp" />
+    <ClCompile Include="src\BackBeat\Core\LayerStack.cpp" />
+    <ClCompile Include="src\BackBeat\Core\Log.cpp" />
+    <ClCompile Include="src\BackBeat\ImGui\ImGuiLayer.cpp" />
+    <ClCompile Include="src\BackBeat\ImGui\ImGuiLoader.cpp" />
+    <ClCompile Include="src\Platform\Windows\WindowsInput.cpp" />
+    <ClCompile Include="src\Platform\Windows\WindowsWindow.cpp" />
+    <ClCompile Include="src\bbpch.cpp">
+      <PrecompiledHeader>Create</PrecompiledHeader>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="vendor\glfw\GLFW.vcxproj">
+      <Project>{154B857C-0182-860D-AA6E-6C109684020F}</Project>
+    </ProjectReference>
+    <ProjectReference Include="vendor\Glad\Glad.vcxproj">
+      <Project>{BDD6857C-A90D-870D-52FA-6C103E10030F}</Project>
+    </ProjectReference>
+    <ProjectReference Include="vendor\imgui\ImGui.vcxproj">
+      <Project>{C0FF640D-2C14-8DBE-F595-301E616989EF}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
