@@ -1,21 +1,19 @@
 #include "bbpch.h"
 
-#include "BackBeat/Core/Input.h"
-
-#include "BackBeat/Core/Application.h"
 #include <GLFW/glfw3.h>
 
-// TODO: Create own codes to replace int
+#include "BackBeat/Core/Application.h"
+#include "BackBeat/Core/Input.h"
 namespace BackBeat {
 	
-	bool Input::IsKeyPressed(int key)
+	bool Input::IsKeyPressed(KeyCode key)
 	{
 		auto* window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
 		auto state = glfwGetKey(window, key);
 		return state == GLFW_PRESS;
 	}
 
-	bool Input::IsMouseButtonPressed(int button)
+	bool Input::IsMouseButtonPressed(MouseCode button)
 	{
 		auto* window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
 		auto state = glfwGetMouseButton(window, button);

@@ -1,42 +1,255 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    <Filter Include="BackBeat">
+      <UniqueIdentifier>{F210227E-DEDD-7C89-07F7-6A31F322B217}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    <Filter Include="BackBeat\Audio">
+      <UniqueIdentifier>{730C78EA-5FDA-6BF0-486E-DC1634DB4755}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    <Filter Include="BackBeat\Audio\PlayBack">
+      <UniqueIdentifier>{8979F91C-F5B0-41B4-FEBA-A5D76A7168AD}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="BackBeat\Audio\Synth">
+      <UniqueIdentifier>{38FB7EA7-248A-0871-CDA8-1C6CB9161917}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="BackBeat\Audio\Synth\AudioEngine">
+      <UniqueIdentifier>{0F9DB782-FBED-A2C4-2452-91861002362E}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="BackBeat\Audio\Synth\AudioEngine\ModuleCores">
+      <UniqueIdentifier>{A0949AFB-8CA7-9A54-3591-7741218337A2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="BackBeat\Audio\Synth\AudioEngine\SynthModules">
+      <UniqueIdentifier>{CD518EFB-39C2-9074-02E1-0AFD6E10C975}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="BackBeat\Audio\Synth\AudioEngine\SynthVoices">
+      <UniqueIdentifier>{3D6CFD90-297F-FDE9-D268-DAD6BE5A9A37}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="BackBeat\Audio\Synth\Render">
+      <UniqueIdentifier>{A70A77B0-1318-A596-9CFE-A081080B714D}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="BackBeat\Audio\Synth\SynthIO">
+      <UniqueIdentifier>{B596023B-A151-F2E6-4A09-6B3136A33C77}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="BackBeat\Core">
+      <UniqueIdentifier>{8A9CE52D-F65C-6164-BF97-AAE12B17A640}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="BackBeat\Events">
+      <UniqueIdentifier>{96F8E042-0284-4E07-0B95-D1FB779FAA07}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="BackBeat\ImGui">
+      <UniqueIdentifier>{9CF303EB-88C1-F7F0-7155-68175DC2D355}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Platform">
+      <UniqueIdentifier>{2AC788B4-1694-E3BF-3FAD-D1672BD9184E}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Platform\Windows">
+      <UniqueIdentifier>{64FBD71A-50F4-F66C-7926-DCF1657ED678}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\BackBeat\Core.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="src\BackBeat.h" />
+    <ClInclude Include="src\BackBeat\Audio\Audio.h">
+      <Filter>BackBeat\Audio</Filter>
     </ClInclude>
-    <ClInclude Include="src\BackBeat\Application.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="src\BackBeat\Audio\PlayBack\AudioData.h">
+      <Filter>BackBeat\Audio\PlayBack</Filter>
     </ClInclude>
-    <ClInclude Include="src\BackBeat.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="src\BackBeat\Audio\PlayBack\FileReader.h">
+      <Filter>BackBeat\Audio\PlayBack</Filter>
     </ClInclude>
-    <ClInclude Include="src\BackBeat\EntryPoint.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="src\BackBeat\Audio\PlayBack\Loader.h">
+      <Filter>BackBeat\Audio\PlayBack</Filter>
     </ClInclude>
-    <ClInclude Include="src\BackBeat\Log.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="src\BackBeat\Audio\PlayBack\Player.h">
+      <Filter>BackBeat\Audio\PlayBack</Filter>
     </ClInclude>
+    <ClInclude Include="src\BackBeat\Audio\PlayBack\WAVData.h">
+      <Filter>BackBeat\Audio\PlayBack</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BackBeat\Audio\Synth\AudioEngine\AudioEngine.h">
+      <Filter>BackBeat\Audio\Synth\AudioEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BackBeat\Audio\Synth\AudioEngine\ModuleCores\EnvelopeGenerator.h">
+      <Filter>BackBeat\Audio\Synth\AudioEngine\ModuleCores</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BackBeat\Audio\Synth\AudioEngine\ModuleCores\LinearEGCore.h">
+      <Filter>BackBeat\Audio\Synth\AudioEngine\ModuleCores</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BackBeat\Audio\Synth\AudioEngine\ModuleCores\ModuleCore.h">
+      <Filter>BackBeat\Audio\Synth\AudioEngine\ModuleCores</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BackBeat\Audio\Synth\AudioEngine\ModuleCores\Oscillator.h">
+      <Filter>BackBeat\Audio\Synth\AudioEngine\ModuleCores</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BackBeat\Audio\Synth\AudioEngine\ModuleCores\Wave.h">
+      <Filter>BackBeat\Audio\Synth\AudioEngine\ModuleCores</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BackBeat\Audio\Synth\AudioEngine\SynthModules\DCA.h">
+      <Filter>BackBeat\Audio\Synth\AudioEngine\SynthModules</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BackBeat\Audio\Synth\AudioEngine\SynthModules\LinearEG.h">
+      <Filter>BackBeat\Audio\Synth\AudioEngine\SynthModules</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BackBeat\Audio\Synth\AudioEngine\SynthModules\SynthModule.h">
+      <Filter>BackBeat\Audio\Synth\AudioEngine\SynthModules</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BackBeat\Audio\Synth\AudioEngine\SynthModules\WAVEOscillator.h">
+      <Filter>BackBeat\Audio\Synth\AudioEngine\SynthModules</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BackBeat\Audio\Synth\AudioEngine\SynthVoices\SynthVoice.h">
+      <Filter>BackBeat\Audio\Synth\AudioEngine\SynthVoices</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BackBeat\Audio\Synth\Render\AudioBuffer.h">
+      <Filter>BackBeat\Audio\Synth\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BackBeat\Audio\Synth\Render\RenderInfo.h">
+      <Filter>BackBeat\Audio\Synth\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BackBeat\Audio\Synth\Render\Renderer.h">
+      <Filter>BackBeat\Audio\Synth\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BackBeat\Audio\Synth\Render\WindowsRenderer.h">
+      <Filter>BackBeat\Audio\Synth\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BackBeat\Audio\Synth\Synth.h">
+      <Filter>BackBeat\Audio\Synth</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BackBeat\Audio\Synth\SynthBase.h">
+      <Filter>BackBeat\Audio\Synth</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BackBeat\Audio\Synth\SynthIO\SynthEventHandler.h">
+      <Filter>BackBeat\Audio\Synth\SynthIO</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BackBeat\Core\Application.h">
+      <Filter>BackBeat\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BackBeat\Core\Core.h">
+      <Filter>BackBeat\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BackBeat\Core\EntryPoint.h">
+      <Filter>BackBeat\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BackBeat\Core\Input.h">
+      <Filter>BackBeat\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BackBeat\Core\KeyCodes.h">
+      <Filter>BackBeat\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BackBeat\Core\Layer.h">
+      <Filter>BackBeat\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BackBeat\Core\LayerStack.h">
+      <Filter>BackBeat\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BackBeat\Core\Log.h">
+      <Filter>BackBeat\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BackBeat\Core\MouseCodes.h">
+      <Filter>BackBeat\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BackBeat\Core\Timer.h">
+      <Filter>BackBeat\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BackBeat\Core\Window.h">
+      <Filter>BackBeat\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BackBeat\Events\ApplicationEvent.h">
+      <Filter>BackBeat\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BackBeat\Events\Event.h">
+      <Filter>BackBeat\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BackBeat\Events\KeyEvent.h">
+      <Filter>BackBeat\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BackBeat\Events\MouseEvent.h">
+      <Filter>BackBeat\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BackBeat\ImGui\ImGuiLayer.h">
+      <Filter>BackBeat\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Platform\Windows\WindowsWindow.h">
+      <Filter>Platform\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="src\bbpch.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\BackBeat\Application.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\BackBeat\Audio\PlayBack\FileReader.cpp">
+      <Filter>BackBeat\Audio\PlayBack</Filter>
     </ClCompile>
-    <ClCompile Include="src\BackBeat\Log.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\BackBeat\Audio\PlayBack\Loader.cpp">
+      <Filter>BackBeat\Audio\PlayBack</Filter>
     </ClCompile>
+    <ClCompile Include="src\BackBeat\Audio\PlayBack\Player.cpp">
+      <Filter>BackBeat\Audio\PlayBack</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BackBeat\Audio\PlayBack\WAVData.cpp">
+      <Filter>BackBeat\Audio\PlayBack</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BackBeat\Audio\Synth\AudioEngine\AudioEngine.cpp">
+      <Filter>BackBeat\Audio\Synth\AudioEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BackBeat\Audio\Synth\AudioEngine\ModuleCores\LinearEGCore.cpp">
+      <Filter>BackBeat\Audio\Synth\AudioEngine\ModuleCores</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BackBeat\Audio\Synth\AudioEngine\ModuleCores\Oscillator.cpp">
+      <Filter>BackBeat\Audio\Synth\AudioEngine\ModuleCores</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BackBeat\Audio\Synth\AudioEngine\ModuleCores\Wave.cpp">
+      <Filter>BackBeat\Audio\Synth\AudioEngine\ModuleCores</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BackBeat\Audio\Synth\AudioEngine\SynthModules\DCA.cpp">
+      <Filter>BackBeat\Audio\Synth\AudioEngine\SynthModules</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BackBeat\Audio\Synth\AudioEngine\SynthModules\LinearEG.cpp">
+      <Filter>BackBeat\Audio\Synth\AudioEngine\SynthModules</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BackBeat\Audio\Synth\AudioEngine\SynthModules\WAVEOscillator.cpp">
+      <Filter>BackBeat\Audio\Synth\AudioEngine\SynthModules</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BackBeat\Audio\Synth\AudioEngine\SynthVoices\SynthVoice.cpp">
+      <Filter>BackBeat\Audio\Synth\AudioEngine\SynthVoices</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BackBeat\Audio\Synth\Render\AudioBuffer.cpp">
+      <Filter>BackBeat\Audio\Synth\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BackBeat\Audio\Synth\Render\RenderInfo.cpp">
+      <Filter>BackBeat\Audio\Synth\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BackBeat\Audio\Synth\Render\WindowsRenderer.cpp">
+      <Filter>BackBeat\Audio\Synth\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BackBeat\Audio\Synth\Synth.cpp">
+      <Filter>BackBeat\Audio\Synth</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BackBeat\Audio\Synth\SynthIO\SynthEventHandler.cpp">
+      <Filter>BackBeat\Audio\Synth\SynthIO</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BackBeat\Core\Application.cpp">
+      <Filter>BackBeat\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BackBeat\Core\Layer.cpp">
+      <Filter>BackBeat\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BackBeat\Core\LayerStack.cpp">
+      <Filter>BackBeat\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BackBeat\Core\Log.cpp">
+      <Filter>BackBeat\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BackBeat\ImGui\ImGuiLayer.cpp">
+      <Filter>BackBeat\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BackBeat\ImGui\ImGuiLoader.cpp">
+      <Filter>BackBeat\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Platform\Windows\WindowsInput.cpp">
+      <Filter>Platform\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Platform\Windows\WindowsWindow.cpp">
+      <Filter>Platform\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="src\bbpch.cpp" />
   </ItemGroup>
 </Project>

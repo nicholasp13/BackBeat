@@ -1,6 +1,6 @@
 #pragma once
 
-#include "BackBeat/Audio/AudioData.h"
+#include "AudioData.h"
 
 namespace BackBeat {
 

@@ -1,25 +1,25 @@
 #include "bbpch.h"
 
-#include "Audio.h"
+#include "BackBeat/Audio/Audio.h"
 #include "Loader.h"
 
 /* README
-* TODO: CREATE CONVERSION FOR 
-*			DIFFERENT SAMPLE RATES
-*			DIFFERENT BYTE/NUMBER FORMATS
-*			MP3 FORMAT
+* TODO:
+* - Create checks to see if m_DataSrc was set before calls to Start() and GetData()
+* - CREATE CONVERSION FOR DIFFERENT SAMPLE RATES
+* DIFFERENT BYTE/NUMBER FORMATS MP3 FORMAT
 */
 namespace BackBeat {
 
-	Loader::Loader(tWAVEFORMATEX* deviceProps, AudioData* dataSrc)
+	Loader::Loader(tWAVEFORMATEX* deviceProps)
 		: 
+		m_DataSize(0),
+		m_Data(nullptr),
+		m_DataSrc(nullptr),
 		m_DeviceProps(*deviceProps),
 		m_BytePosition(WAV_HEADER_SIZE),
-		m_SamplePosition(WAV_HEADER_SIZE),
-		m_DataSrc(dataSrc)
+		m_SamplePosition(WAV_HEADER_SIZE)
 	{
-		m_DataSize = dataSrc->GetSize() * deviceProps->nBlockAlign / dataSrc->GetProperties()->nBlockAlign;
-		m_Data = new BYTE[m_DataSize];
 	}
 
 	Loader::~Loader()
@@ -63,6 +63,14 @@ namespace BackBeat {
 			*playing = FALSE;
 		}
 
+		return S_OK;
+	}
+
+	HRESULT Loader::SetDataSource(AudioData* dataSource)
+	{
+		m_DataSrc = dataSource;
+		m_Data = new BYTE[m_DataSize];
+		m_DataSize = dataSource->GetSize() * m_DeviceProps.nBlockAlign / dataSource->GetProperties()->nBlockAlign;
 		return S_OK;
 	}
 
