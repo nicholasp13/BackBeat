@@ -3,9 +3,10 @@
 #include "BackBeat/Audio/Audio.h"
 #include "BackBeat/Core/Log.h"
 #include "BackBeat/Core/Timer.h"
+#include "SynthParameters.h"
 namespace BackBeat {
 
-	// CONSTANTS
+// CONSTANTS
 #define FLOAT_SIZE 4
 #define PI 3.141592653589793f // Float(32 bit) precise pi
 #define CIRCLE_DEGREES 360.0f
@@ -29,13 +30,13 @@ namespace BackBeat {
 #define A_SHARP_4_NOTE 466.2f
 #define B_4_NOTE       493.9f
 
-	typedef unsigned char byte;
+typedef unsigned char byte;
 
-	// -------- CONSTANTS FOR MIDI EVENTS --------- //
-	// Website: https://midi.org/specifications/midi-reference-tables/
-	// TODO: Add other constants as needed
+// -------- CONSTANTS FOR MIDI EVENTS --------- //
+// Website: https://midi.org/specifications/midi-reference-tables/
+// TODO: Add other constants as needed
 
-	// 1ST (STATUS) BYTE CONSTANTS
+// 1ST (STATUS) BYTE CONSTANTS
 #define CHANNEL_1_NOTE_OFF (byte)0x80
 #define CHANNEL_2_NOTE_OFF (byte)0x81
 #define CHANNEL_3_NOTE_OFF (byte)0x82
@@ -226,6 +227,70 @@ namespace BackBeat {
 
 //	OTHER (added as needed)
 
+// MIDI Manufacturer's Association (MMA) min, max, and default values for Downloadable Sounds (DLS)
+// Specification level 1
+// LFOs
+#define LFO_FREQ_DEFAULT			5.0f
+#define LFO_FREQ_MIN				0.1f
+#define LFO_FREQ_MAX				10.0f
+#define LFO_ATT_DEFAULT				0.0f
+#define LFO_ATT_MIN					0.0f
+#define LFO_ATT_MAX					12.0f
+#define LFO_PITCH_DEFAULT			0.0f
+#define LFO_PITCH_MIN				-1200.0f
+#define LFO_PITCH_MAX				1200.0f
+#define LFO_MOD_TO_ATT_DEFAULT		0.0f
+#define LFO_MOD_TO_ATT_MIN			0.0f
+#define LFO_MOD_TO_ATT_MAX			12.0f
+#define LFO_MOD_TO_PITCH_DEFAULT	0.0f
+#define LFO_MOD_TO_PITCH_MIN		-1200.0f
+#define LFO_MOD_TO_PITCH_MAX		1200.0f
+// EG1
+#define EG1_ATTACK_TIME_DEFAULT		0.0f
+#define EG1_ATTACK_TIME_MIN			0.0f
+#define EG1_ATTACK_TIME_MAX			20.0f
+#define EG1_DECAY_TIME_DEFAULT		0.0f
+#define EG1_DECAY_TIME_MIN			0.0f
+#define EG1_DECAY_TIME_MAX			40.0f
+#define EG1_SUSTAIN_LEVEL_DEFAULT	1.0f
+#define EG1_SUSTAIN_LEVEL_MIN		0.0f
+#define EG1_SUSTAIN_LEVEL_MAX		1.0f
+#define EG1_RELEASE_TIME_DEFAULT	0.0f
+#define EG1_RELEASE_TIME_MIN		0.0f
+#define EG1_RELEASE_TIME_MAX		20.0f
+#define EG1_VEL_TO_ATTACK_DEFAULT	0.0f
+#define EG1_VEL_TO_ATTACK_MIN		0.0f
+#define EG1_VEL_TO_ATTACK_MAX		20.0f
+#define EG1_KEY_TO_DECAY_DEFAULT	0.0f
+#define EG1_KEY_TO_DECAY_MIN		0.0f
+#define EG1_KEY_TO_DECAY_MAX		20.0f
+// EG2
+#define EG2_ATTACK_TIME_DEFAULT		0.0f
+#define EG2_ATTACK_TIME_MIN			0.0f
+#define EG2_ATTACK_TIME_MAX			20.0f
+#define EG2_DECAY_TIME_DEFAULT		0.0f
+#define EG2_DECAY_TIME_MIN			0.0f
+#define EG2_DECAY_TIME_MAX			40.0f
+#define EG2_SUSTAIN_LEVEL_DEFAULT	1.0f
+#define EG2_SUSTAIN_LEVEL_MIN		0.0f
+#define EG2_SUSTAIN_LEVEL_MAX		1.0f
+#define EG2_RELEASE_TIME_DEFAULT	0.0f
+#define EG2_RELEASE_TIME_MIN		0.0f
+#define EG2_RELEASE_TIME_MAX		20.0f
+#define EG2_VEL_TO_ATTACK_DEFAULT	0.0f
+#define EG2_VEL_TO_ATTACK_MIN		0.0f
+#define EG2_VEL_TO_ATTACK_MAX		20.0f
+#define EG2_KEY_TO_DECAY_DEFAULT	0.0f
+#define EG2_KEY_TO_DECAY_MIN		0.0f
+#define EG2_KEY_TO_DECAY_MAX		20.0f
+#define EG2_TO_PITCH_DEFAULT		0.0f
+#define EG2_TO_PITCH_MIN			-1200.0f
+#define EG2_TO_PITCH_MAX			1200.0f
+// MISC
+#define PAN_DEFAULT					0.0f
+#define PAN_MIN						-0.50f
+#define PAN_MAX						0.50f
+
 // Struct of basic MIDI events for possible future MIDI input feature
 	struct midiEvent {
 		byte status;
@@ -238,7 +303,8 @@ namespace BackBeat {
 		bool noteOn;
 		int channel;
 		float note;
-		float velocity;
+		byte midiNote;
+		byte velocity;
 	};
 
 	class SynthBase {
@@ -285,7 +351,8 @@ namespace BackBeat {
 				.noteOn = false,
 				.channel = -1,
 				.note = 0.0f,
-				.velocity = 0
+				.midiNote = event.data1,
+				.velocity = event.data2
 			};
 
 			if (event.status >= CHANNEL_1_NOTE_ON && event.status <= CHANNEL_16_NOTE_ON) {
@@ -300,11 +367,6 @@ namespace BackBeat {
 				nEvent.note = 0.0f;
 			else
 				nEvent.note = SynthBase::MIDIToFreq(event.data1);
-
-			if (event.data2 > MAX_VELOCITY)
-				nEvent.velocity = 1.0f;
-			else
-				nEvent.velocity = (float)event.data2 / (float)MAX_VELOCITY;
 
 			return nEvent;
 		}

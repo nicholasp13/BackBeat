@@ -2,15 +2,13 @@
 
 #include "WAVEOscillator.h"
 namespace BackBeat {
-	WAVEOscillator::WAVEOscillator(UINT32 sampleRate, UINT32 bufferSize, std::shared_ptr<float[]> buffer)
+	WAVEOscillator::WAVEOscillator(UINT32 sampleRate, std::shared_ptr<float[]> buffer, std::shared_ptr<OscParameters> params)
 		:
-		// SynthModule(sampleRate, bufferSize, buffer),
 		m_SampleRate(sampleRate),
-		m_BufferSize(bufferSize),
 		m_NumCores(0),
 		m_Buffer(buffer)
 	{
-		InitModules();
+		InitModules(params);
 	}
 
 	WAVEOscillator::~WAVEOscillator()
@@ -50,9 +48,9 @@ namespace BackBeat {
 			m_Cores[i]->DoNoteOff(event);
 	}
 
-	void WAVEOscillator::InitModules()
+	void WAVEOscillator::InitModules(std::shared_ptr<OscParameters> params)
 	{
-		std::shared_ptr<Oscillator> waveOscillator = std::make_shared<Oscillator>(m_SampleRate, m_BufferSize, m_Buffer, WaveType::SawtoothUp);
+		std::shared_ptr<Oscillator> waveOscillator = std::make_shared<Oscillator>(m_SampleRate, m_Buffer, params);
 		AddModule(waveOscillator);
 	}
 

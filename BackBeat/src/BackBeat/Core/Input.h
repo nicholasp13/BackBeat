@@ -6,7 +6,6 @@
 #include "BackBeat/Events/MouseEvent.h"
 #include "BackBeat/Core/KeyCodes.h"
 #include "BackBeat/Core/MouseCodes.h"
-// TODO: CREATE KEYCODES AND MOUSE CODES
 namespace BackBeat {
 
 	class Input

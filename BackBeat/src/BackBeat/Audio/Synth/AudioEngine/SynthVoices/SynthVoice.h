@@ -11,7 +11,7 @@ namespace BackBeat {
 	class SynthVoice
 	{
 	public:
-		SynthVoice(std::shared_ptr<float[]> outputBuffer, UINT32 sampleRate, UINT32 bufferSize);
+		SynthVoice(UINT32 sampleRate, std::shared_ptr<float[]> outputBuffer, std::shared_ptr<VoiceParameters> params);
 		~SynthVoice();
 
 		// Virtual for implementation of subclasses if needed
@@ -25,10 +25,11 @@ namespace BackBeat {
 		int GetChannel() { return m_Channel; }
 
 	private:
+		UINT32 m_SampleRate;
 		bool m_Actice;
 		int m_Channel;
-		UINT32 m_SampleRate;
 
+		std::shared_ptr<VoiceParameters> m_Params;
 		std::shared_ptr<float[]> m_InputBuffer;
 		std::shared_ptr<float[]> m_OutputBuffer;
 		std::unique_ptr<DCA> m_DCA;

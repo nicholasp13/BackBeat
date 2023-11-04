@@ -7,7 +7,7 @@ namespace BackBeat {
 	class LinearEG : public SynthModule
 	{
 	public:
-		LinearEG(UINT32 sampleRate, UINT32 bufferSize, std::shared_ptr<float[]> buffer);
+		LinearEG(UINT32 sampleRate, std::shared_ptr<float[]> buffer, std::shared_ptr<EGParameters> params);
 		~LinearEG();
 
 		virtual void Reset(UINT32 sampleRate);
@@ -16,14 +16,11 @@ namespace BackBeat {
 		virtual void DoNoteOn(noteEvent event);
 		virtual void DoNoteOff(noteEvent event);
 
-		virtual std::shared_ptr<float[]> GetBuffer() { return m_Buffer; }
+		virtual std::shared_ptr<float[]> GetBuffer() { return m_Core->GetBuffer(); }
 
 		EGState GetState() { return m_Core->GetState(); }
 
 	private:
-		UINT32 m_BufferSize;
-		UINT32 m_SampleRate;
-		std::shared_ptr<float[]> m_Buffer;
 		std::shared_ptr<LinearEGCore> m_Core;
 	};
 }

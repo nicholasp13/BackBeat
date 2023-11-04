@@ -25,11 +25,13 @@ namespace BackBeat {
 	public:
 		AudioEngine(tWAVEFORMATEX props);
 		~AudioEngine();
+		
+		void Stop();
 
 		virtual void Reset(UINT32 sampleRate);
 		virtual void Render(std::shared_ptr<RenderInfo> info);
-		virtual void SetParam(); // TODO: Implement
-		virtual void GetParam(); // TODO: Implement
+		virtual void SetParam(); // TODO: Implement if needed
+		virtual std::shared_ptr<EngineParameters> GetParam();
 		virtual void ProcessMIDIEvent(midiEvent event);
 
 	private:
@@ -39,10 +41,12 @@ namespace BackBeat {
 		tWAVEFORMATEX m_Props;
 
 		std::shared_ptr<float[]> m_Buffer;
+		std::shared_ptr<EngineParameters> m_Params;
 		std::unique_ptr<SynthVoice> m_Voices[MAX_VOICES];
 		std::queue<midiEvent> m_MIDIEvents;
 
-		void InitVoices();
 		void FlushBuffer(UINT32 numSamples);
+		void InitVoices();
+		void InitParameters();
 	};
 }

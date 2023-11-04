@@ -1,8 +1,8 @@
 #pragma once
 
 /* 
-* Basic virtual polyphonic Synth with basic sound waves.
-* Only produces 48k sample rate and stereo sounds for Windows 10 and 11.
+* Basic virtual polyphonic Synth with basic sound waves following MMA DLS level 1 specifications
+* Only produces 48k sample rate, 32 bit depth, and stereo sounds for Windows 10 and 11.
 * Other formats and Linux may be implemented later
 */
 
@@ -12,12 +12,18 @@
 //       Low Frequency Oscillators(LFOs), and other types of filters to allow for
 //       real time customizable sounds
 // - Create SubModules and ModuleCores for filters, LFOs, etc.
+// - Add string names to ModuleCores and way to expose them for GUI purposes
 // - Create classes and objects that allow for simple to implement GUI contols
 //       for Modulation Matrix and possibly switching SynthVoices' moduleCores
 // - Allow of MIDI input devices to be read and programmed with sounds in this
 //      Engine
 // - Create class to write data to a file to save and to play
 // - Create other Synth modes like mono, legatto etc. Only polyphonic so far.
+// - Create functions to scale units properly with common units like decibels 
+//		for volume
+// - Create nonlinear EGs
+// - Create other types of oscillators or wave types
+// - Upgrade to MMA DLS level 2
 // - Create a Linux Renderer to allow for playing on Linux
 // ------------------------------------------------------------------------------- //
 #include "SynthBase.h"
@@ -39,6 +45,7 @@ namespace BackBeat {
 		boolean IsRunning() { return m_Running; }
 		std::shared_ptr<Renderer> GetRenderer() { return m_Renderer; }
 		std::shared_ptr<SynthEventHandler> GetEventHandler() { return m_Handler; }
+		std::shared_ptr<SynthParameters> GetParams() { return m_Params; }
 	
 	private:
 		boolean m_Running;
@@ -51,9 +58,9 @@ namespace BackBeat {
 		std::shared_ptr<Renderer> m_Renderer;
 		std::shared_ptr<SynthEventHandler> m_Handler;
 		std::shared_ptr<RenderInfo> m_RenderInfo;
+		std::shared_ptr<SynthParameters> m_Params;
 
 		void InitSynth();
 		void Run();
-		void SyncBuffers();
 	};
 }

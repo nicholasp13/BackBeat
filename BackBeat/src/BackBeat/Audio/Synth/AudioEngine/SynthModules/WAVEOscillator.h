@@ -7,7 +7,7 @@ namespace BackBeat {
 	class WAVEOscillator : public SynthModule
 	{
 	public:
-		WAVEOscillator(UINT32 sampleRate, UINT32 bufferSize, std::shared_ptr<float[]> buffer);
+		WAVEOscillator(UINT32 sampleRate, std::shared_ptr<float[]> buffer, std::shared_ptr<OscParameters> params);
 		~WAVEOscillator();
 
 		virtual void Reset(UINT32 sampleRate);
@@ -19,13 +19,12 @@ namespace BackBeat {
 		virtual std::shared_ptr<float[]> GetBuffer() { return m_Buffer; }
 
 	private:
-		UINT32 m_BufferSize;
 		UINT32 m_SampleRate;
 		UINT32 m_NumCores;
 		std::shared_ptr<float[]> m_Buffer;
 		std::vector< std::shared_ptr<ModuleCore> > m_Cores;
 
-		void InitModules();
+		void InitModules(std::shared_ptr<OscParameters> params);
 		void AddModule(std::shared_ptr<ModuleCore> module);
 	};
 }
