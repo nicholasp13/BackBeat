@@ -6,7 +6,6 @@
 // ------------------------------------------------------------------------------- //
 // TODO: 
 // - Make this prettier
-// - Make this more interactive
 // - Create GUI for Modulation Matrix after implementation
 // - Put project in namespace BackBeat?
 // ------------------------------------------------------------------------------- //

@@ -1,5 +1,7 @@
 #include "bbpch.h"
 
+// TODO: Deactivate all voices when stopped
+
 #include "Synth.h"
 namespace BackBeat {
 
@@ -25,6 +27,7 @@ namespace BackBeat {
 	{
 		m_Running = false;
 		m_Renderer->Stop();
+		m_Engine->Stop();
 		if (m_Thread.joinable())
 			m_Thread.join();
 	}
@@ -47,15 +50,11 @@ namespace BackBeat {
 		m_RenderInfo = std::make_shared<RenderInfo>(m_Props);
 		m_Renderer = std::make_shared<WindowsRenderer>(m_Props, m_RenderInfo, m_Engine);
 		m_Handler = std::make_shared<SynthEventHandler>(m_RenderInfo);
+		m_Params = std::make_shared<SynthParameters>(m_Engine->GetParam(), m_Handler->GetParams());
 	}
 
 	void Synth::Run()
 	{
 		m_Thread = std::thread(&Renderer::Render, m_Renderer);
-	}
-
-	void Synth::SyncBuffers()
-	{
-
 	}
 }

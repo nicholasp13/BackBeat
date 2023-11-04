@@ -3,14 +3,13 @@
 #include "DCA.h"
 namespace BackBeat {
 
-	DCA::DCA(UINT32 sampleRate, UINT32 bufferSize, std::shared_ptr<float[]> buffer)
+	DCA::DCA(std::shared_ptr<float[]> buffer, std::shared_ptr<DCAParameters> params)
 		: 
-		m_SampleRate(sampleRate), 
-		m_BufferSize(bufferSize),
-		m_Buffer(buffer),
 		m_Position(0),
-		m_RightAmp(1.0f),
-		m_LeftAmp(1.0f),
+		m_LeftAmp(params->leftAmp),
+		m_RightAmp(params->rightAmp),
+		m_Params(params),
+		m_Buffer(buffer),
 		m_Type(ModuleType::DCA)
 	{
 
@@ -23,21 +22,20 @@ namespace BackBeat {
 
 	void DCA::Reset(UINT32 sampleRate)
 	{
-		m_SampleRate = sampleRate;
 		m_Position = 0;
 	}
 
-	// TODO: Implement after creating ModulationMatrix object to allow for dynamic change
 	void DCA::Update() 
 	{
-		
+		m_LeftAmp = m_Params->leftAmp;
+		m_RightAmp = m_Params->rightAmp;
 	}
 	
 	void DCA::Render(UINT32 numSamples) 
 	{
 		Update();
 
-		for (UINT32 i = 0; i < numSamples * 2; i++) {
+		for (UINT32 i = 0; i < numSamples * STEREO; i++) {
 			if (i % 2 == 0) {
 				m_Buffer[i] *= m_LeftAmp;
 			}

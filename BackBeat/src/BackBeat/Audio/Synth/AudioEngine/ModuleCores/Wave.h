@@ -1,7 +1,7 @@
 #pragma once
 
 // TODO:
-// Change into basic Wave static class that creates different wave types: SAWTOOTH (up/down), SQUARE, TRIANGLE
+// 
 namespace BackBeat {
 
 	enum class WaveType

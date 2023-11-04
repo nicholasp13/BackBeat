@@ -5,36 +5,37 @@
 
 namespace BackBeat {
 
-	Oscillator::Oscillator(UINT32 sampleRate, UINT32 bufferSize, std::shared_ptr<float[]> buffer, WaveType wave)
+	Oscillator::Oscillator(UINT32 sampleRate, std::shared_ptr<float[]> buffer, std::shared_ptr<OscParameters> params)
 		:
 		m_SampleRate(sampleRate),
-		m_BufferSize(bufferSize),
 		m_Buffer(buffer),
-		m_WaveSize(bufferSize),
-		m_Wave(new float[bufferSize]),
+		m_WaveSize(sampleRate),
+		m_Wave(new float[sampleRate]),
 		m_Position(0),
 		m_Amp(1.0f),
-		m_WaveType(wave),
-		m_Type(ModuleType::Oscillator)
+		m_Hertz(0.0f),
+		m_WaveType(params->wave),
+		m_Type(ModuleType::Oscillator),
+		m_Params(params)
 	{
 		
 	}
 
 	Oscillator::~Oscillator()
 	{
-		// delete m_Wave;
+
 	}
 
 	void Oscillator::Reset(UINT32 sampleRate)
 	{
-		m_SampleRate = sampleRate;
 		m_Position = 0;
 	}
 
 	// TODO: Implement after creating ModulationMatrix object to allow for dynamic change
 	void Oscillator::Update()
 	{
-
+		if (m_WaveType != m_Params->wave || m_Amp != m_Params->amp)
+			InitWave();
 	}
 
 	void Oscillator::Render(UINT32 numSamples)
@@ -49,8 +50,9 @@ namespace BackBeat {
 
 	void Oscillator::DoNoteOn(noteEvent event)
 	{
-		m_Position = 0;
-		InitWave(event.note, m_Amp);
+		m_Amp = m_Params->amp;
+		m_Hertz = event.note;
+		InitWave();
 	}
 
 	void Oscillator::DoNoteOff(noteEvent event)
@@ -58,41 +60,43 @@ namespace BackBeat {
 
 	}
 
-	void Oscillator::InitWave(float hertz, float amp)
+	void Oscillator::InitWave()
 	{
 		m_Position = 0;
-		m_WaveSize = (UINT32)(m_BufferSize / hertz);
+		m_WaveSize = (UINT32)(m_SampleRate / m_Hertz);
+		m_WaveType = m_Params->wave;
+		m_Amp = m_Params->amp;
 
 		switch(m_WaveType)
 		{
 
 		case WaveType::Sin:
 		{
-			Wave::GetSinWave(m_Wave, m_WaveSize, STEREO, amp);
+			Wave::GetSinWave(m_Wave, m_WaveSize, STEREO, m_Amp);
 			break;
 		}
 
 		case WaveType::SawtoothUp:
 		{
-			Wave::GetSawtoothUpWave(m_Wave, m_WaveSize, STEREO, amp);
+			Wave::GetSawtoothUpWave(m_Wave, m_WaveSize, STEREO, m_Amp);
 			break;
 		}
 
 		case WaveType::SawtoothDown:
 		{
-			Wave::GetSawtoothDownWave(m_Wave, m_WaveSize, STEREO, amp);
+			Wave::GetSawtoothDownWave(m_Wave, m_WaveSize, STEREO, m_Amp);
 			break;
 		}
 
 		case WaveType::Triangle:
 		{
-			Wave::GetTriangleWave(m_Wave, m_WaveSize, STEREO, amp);
+			Wave::GetTriangleWave(m_Wave, m_WaveSize, STEREO, m_Amp);
 			break;
 		}
 
 		case WaveType::Square:
 		{
-			Wave::GetSquareWave(m_Wave, m_WaveSize, STEREO, amp);
+			Wave::GetSquareWave(m_Wave, m_WaveSize, STEREO, m_Amp);
 			break;
 		}
 

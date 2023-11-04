@@ -3,22 +3,17 @@
 #include "SynthVoice.h"
 namespace BackBeat {
 
-	SynthVoice::SynthVoice(std::shared_ptr<float[]> outputBuffer, UINT32 sampleRate, UINT32 bufferSize)
+	SynthVoice::SynthVoice(UINT32 sampleRate, std::shared_ptr<float[]> outputBuffer, std::shared_ptr<VoiceParameters> voiceParams)
 		:
+		m_SampleRate(sampleRate),
 		m_Actice(false),
 		m_Channel(0),
-		m_SampleRate(sampleRate),
-		m_InputBuffer(std::make_shared<float[]>(bufferSize)),
+		m_Params(voiceParams),
+		m_InputBuffer(std::make_shared<float[]>(sampleRate)),
 		m_OutputBuffer(outputBuffer),
-		m_DCA(std::make_unique<DCA>(sampleRate,
-			bufferSize,
-			m_InputBuffer)),
-		m_Oscillator(std::make_unique<WAVEOscillator>(sampleRate,
-			bufferSize,
-			m_InputBuffer)),
-		m_EG(std::make_unique<LinearEG>(sampleRate,
-			bufferSize,
-			m_InputBuffer))
+		m_DCA(std::make_unique<DCA>(m_InputBuffer, voiceParams->DCAParams) ),
+		m_Oscillator(std::make_unique<WAVEOscillator>(sampleRate, m_InputBuffer, voiceParams->OscParams)),
+		m_EG(std::make_unique<LinearEG>(sampleRate, m_InputBuffer, voiceParams->EGParams))
 	{
 
 	}
