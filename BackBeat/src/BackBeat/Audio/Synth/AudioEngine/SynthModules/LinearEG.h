@@ -1,13 +1,12 @@
 #pragma once
 
-#include "BackBeat/Audio/Synth/AudioEngine/ModuleCores/LinearEGCore.h"
-#include "SynthModule.h"
+#include "EnvelopeGenerator.h"
 namespace BackBeat {
 
-	class LinearEG : public SynthModule
+	class LinearEG : public EnvelopeGenerator
 	{
 	public:
-		LinearEG(UINT32 sampleRate, std::shared_ptr<float[]> buffer, std::shared_ptr<EGParameters> params);
+		LinearEG(UINT32 sampleRate, UINT32 bufferSize, std::shared_ptr<EGParameters> params);
 		~LinearEG();
 
 		virtual void Reset(UINT32 sampleRate);
@@ -16,7 +15,7 @@ namespace BackBeat {
 		virtual void DoNoteOn(noteEvent event);
 		virtual void DoNoteOff(noteEvent event);
 
-		virtual std::shared_ptr<float[]> GetBuffer() { return m_Core->GetBuffer(); }
+		virtual std::shared_ptr<float[]> GetBuffer() { return m_Core->GetOutputBuffer(); }
 
 		EGState GetState() { return m_Core->GetState(); }
 

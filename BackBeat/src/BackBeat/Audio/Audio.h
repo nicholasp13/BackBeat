@@ -73,5 +73,11 @@ namespace BackBeat {
 		{
 			memcpy(reinterpret_cast<void*>(inputBuffer), reinterpret_cast<void*>(outputBuffer), bytesToCopy);
 		}
+
+		static void FlushBuffer(std::shared_ptr<float[]> buffer, UINT32 numSamples, UINT32 numChannels, float defaultValue)
+		{
+			for (UINT32 i = 0; i < numSamples * numChannels; i++)
+				buffer[i] = defaultValue;
+		}
 	};
 }

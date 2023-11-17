@@ -2,7 +2,12 @@
 
 // TODO: 
 //	Create ImGui knobs for more classic synth GUI
+//  Create way to save GUI settings after closing app
 //  Implement ModMatrix GUI after creating ModMatrix
+//	Create visualizer for wavelength
+//  Create custom title bar
+//	Create icons and logos
+//	Create custom colors
 
 #include <BackBeat.h>
 #include <imgui.h>
@@ -12,7 +17,6 @@
 class MainLayer : public BackBeat::Layer
 {
 	public:
-		
 		MainLayer(BackBeat::Window* window);
 		~MainLayer();
 
@@ -24,7 +28,7 @@ class MainLayer : public BackBeat::Layer
 
 	private:
 		std::thread m_Worker;
-		// Playback
+		// Playback, not implemented
 		std::shared_ptr<BackBeat::Player> m_Player; // Not used
 		std::shared_ptr<BackBeat::AudioData> m_AudioData; // Not used
 		std::shared_ptr<BackBeat::Loader> m_Loader; // Not used
@@ -38,7 +42,8 @@ class MainLayer : public BackBeat::Layer
 		bool OnKeyEvent(BackBeat::KeyPressedEvent& event);
 		bool OnMouseButtonEvent(BackBeat::MouseButtonPressedEvent& event);
 
-		void RenderInfo();
+		void RenderMenubar();
 		void RenderControls(); // TODO: Change some sliders to knobs for more classic synth look
-		void RenderModMatrix();// TODO: Implement after creating ModMatrix
+	
+		void HelpMarker(const char* desc);
 };

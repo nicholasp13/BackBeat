@@ -43,7 +43,7 @@ namespace BackBeat {
 		UINT32 bufferSize = info->GetBufferSize();
 		std::shared_ptr<float[]> outputBuffer = info->GetBuffer();
 
-		FlushBuffer(numSamples);
+		Audio::FlushBuffer(m_Buffer, numSamples, STEREO, 0.0f);
 
 		while (!info->MIDIEventsEmpty()) {
 			ProcessMIDIEvent(info->PopMIDIEvent());
@@ -101,12 +101,6 @@ namespace BackBeat {
 		// TODO: Add switch cases for other status bytes
 	}
 	
-	void AudioEngine::FlushBuffer(UINT32 numSamples)
-	{
-		for (UINT32 i = 0; i < numSamples * 2; i++)
-			m_Buffer[i] = 0;
-	}
-
 	// Custom for each engine. Current engine for a basic synth piano
 	void AudioEngine::InitVoices()
 	{
@@ -123,6 +117,12 @@ namespace BackBeat {
 		auto DCAParams = std::make_shared<DCAParameters>();
 		DCAParams->leftAmp = 1.0f;
 		DCAParams->rightAmp = 1.0f;
+
+		auto AmpEGParams = std::make_shared<EGParameters>();
+		AmpEGParams->attackDuration = EG1_ATTACK_TIME_DEFAULT;
+		AmpEGParams->decayDuration = EG1_DECAY_TIME_DEFAULT;
+		AmpEGParams->releaseDuration = EG1_RELEASE_TIME_DEFAULT;
+		AmpEGParams->sustainValue = EG1_SUSTAIN_LEVEL_DEFAULT;
 		
 		auto EGParams = std::make_shared<EGParameters>();
 		EGParams->attackDuration = EG1_ATTACK_TIME_DEFAULT;
@@ -130,16 +130,42 @@ namespace BackBeat {
 		EGParams->releaseDuration = EG1_RELEASE_TIME_DEFAULT;
 		EGParams->sustainValue = EG1_SUSTAIN_LEVEL_DEFAULT;
 		
-		auto OSCParams = std::make_shared<OscParameters>();
-		OSCParams->amp = 1.0f;
-		OSCParams->wave = WaveType::SawtoothUp;
+		auto LFOParams1 = std::make_shared<LFOParameters>();
+		LFOParams1->amp = LFO_ATT_DEFAULT;
+		LFOParams1->hertz = LFO_FREQ_DEFAULT;
+		LFOParams1->wave = WaveType::Sin;
+
+		auto OSCParams1 = std::make_shared<OscParameters>();
+		OSCParams1->amp = 1.0f;
+		OSCParams1->octave = 1.0f; 
+		OSCParams1->wave = WaveType::SawtoothUp;
+
+		auto OSCParams2 = std::make_shared<OscParameters>();
+		OSCParams2->amp = 0.0f;
+		OSCParams2->octave = 1.0f;
+		OSCParams2->wave = WaveType::SawtoothUp;
+
+		auto OSCParams3 = std::make_shared<OscParameters>();
+		OSCParams3->amp = 0.0f;
+		OSCParams3->octave = 1.0f;
+		OSCParams3->wave = WaveType::SawtoothUp;
+
+		auto OSCParams4 = std::make_shared<OscParameters>();
+		OSCParams4->amp = 0.0f;
+		OSCParams4->octave = 1.0f;
+		OSCParams4->wave = WaveType::SawtoothUp;
 		
 		auto modMatrixParams = std::make_shared<ModMatrixParameters>();
 
 		auto voiceParams = std::make_shared<VoiceParameters>();
 		voiceParams->DCAParams = DCAParams;
+		voiceParams->AmpEGParams = AmpEGParams;
 		voiceParams->EGParams = EGParams;
-		voiceParams->OscParams = OSCParams;
+		voiceParams->LFOParams1 = LFOParams1;
+		voiceParams->OscParams1 = OSCParams1;
+		voiceParams->OscParams2 = OSCParams2;
+		voiceParams->OscParams3 = OSCParams3;
+		voiceParams->OscParams4 = OSCParams4;
 		voiceParams->ModMatrixParams = modMatrixParams;
 
 		m_Params = std::make_shared<EngineParameters>();

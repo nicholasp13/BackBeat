@@ -1,14 +1,16 @@
 #pragma once
 
+//  TODO: Change way this class stores cores. Might change to a single core
+
 #include "SynthModule.h"
-#include "BackBeat/Audio/Synth/AudioEngine/ModuleCores/Oscillator.h"
+#include "BackBeat/Audio/Synth/AudioEngine/ModuleCores/WaveOscCore.h"
 namespace BackBeat {
 
-	class WAVEOscillator : public SynthModule
+	class WaveOscillator : public SynthModule
 	{
 	public:
-		WAVEOscillator(UINT32 sampleRate, std::shared_ptr<float[]> buffer, std::shared_ptr<OscParameters> params);
-		~WAVEOscillator();
+		WaveOscillator(UINT32 sampleRate, std::shared_ptr<float[]> buffer, std::shared_ptr<OscParameters> params);
+		~WaveOscillator();
 
 		virtual void Reset(UINT32 sampleRate);
 		virtual void Update();
@@ -16,15 +18,11 @@ namespace BackBeat {
 		virtual void DoNoteOn(noteEvent event);
 		virtual void DoNoteOff(noteEvent event);
 
-		virtual std::shared_ptr<float[]> GetBuffer() { return m_Buffer; }
+		virtual std::shared_ptr<float[]> GetBuffer() { return m_Core->GetBuffer(); }
+		std::shared_ptr<float[]> GetModInputBuffer() { return m_Core->GetInputBuffer(); }
 
 	private:
-		UINT32 m_SampleRate;
-		UINT32 m_NumCores;
-		std::shared_ptr<float[]> m_Buffer;
-		std::vector< std::shared_ptr<ModuleCore> > m_Cores;
+		std::shared_ptr<WaveOscCore> m_Core;
 
-		void InitModules(std::shared_ptr<OscParameters> params);
-		void AddModule(std::shared_ptr<ModuleCore> module);
 	};
 }

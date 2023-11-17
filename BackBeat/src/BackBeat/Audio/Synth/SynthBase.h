@@ -15,8 +15,12 @@ namespace BackBeat {
 #define HIGHER_OCTAVE 2.0f
 #define LOWEST_OCTAVE 0.03125f
 #define HIGHEST_OCTAVE 32.0f
+#define NUM_OSCS 4.0f
 
-// MUSIC NOTES(middle/4th octave notes and in hertz)
+// MUSIC NOTES in hertz
+// Lowest note
+#define C_MINUS_1_NOTE 8.176f
+// Middle/4th octave notes and in hertz)
 #define C_4_NOTE       261.6f
 #define C_SHARP_4_NOTE 277.2f
 #define D_4_NOTE       293.7f
@@ -29,6 +33,8 @@ namespace BackBeat {
 #define A_4_NOTE       440.0f
 #define A_SHARP_4_NOTE 466.2f
 #define B_4_NOTE       493.9f
+// Highest note
+#define G_9_NOTE	   12543.9f
 
 typedef unsigned char byte;
 
@@ -143,7 +149,7 @@ typedef unsigned char byte;
 #define MIDI_NOTE_A_3       (byte)0x39
 #define MIDI_NOTE_A_SHARP_3 (byte)0x3A
 #define MIDI_NOTE_B_3       (byte)0x3B
-//	4th octave (60-71)
+//	4th/Middle octave (60-71)
 #define MIDI_NOTE_C_4       (byte)0x3C
 #define MIDI_NOTE_C_SHARP_4 (byte)0x3D
 #define MIDI_NOTE_D_4       (byte)0x3E
@@ -216,13 +222,13 @@ typedef unsigned char byte;
 #define MIDI_NOTE_E_9       (byte)0x7C
 #define MIDI_NOTE_F_9       (byte)0x7D
 #define MIDI_NOTE_F_SHARP_9 (byte)0x7E
-#define MIDI_NOTE_G_9       (byte)0x7F       // Highest note
+#define MIDI_NOTE_G_9       (byte)0x7F // Highest note
 
 //	OTHER (added as needed)
 
 // 3RD BYTE CONSTANTS
 //	NOTE VELOCITY (0-127)
-#define MIN_VELOCITY 0x00 // SAME AS NOTE OFF
+#define MIN_VELOCITY 0x00
 #define MAX_VELOCITY 0x7F
 
 //	OTHER (added as needed)

@@ -5,7 +5,6 @@
 #include "BackBeat/Audio/Synth/SynthBase.h"
 #include "BackBeat/Events/KeyEvent.h"
 #include "BackBeat/Audio/Synth/Render/RenderInfo.h"
-// TODO: Add event handler params when event handler params is implemented
 namespace BackBeat {
 
 	class SynthEventHandler

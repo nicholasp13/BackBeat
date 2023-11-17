@@ -11,10 +11,9 @@
 // - Create SynthModule Modulation Matrix that has access to EnvelopeGenerators(EGs), 
 //       Low Frequency Oscillators(LFOs), and other types of filters to allow for
 //       real time customizable sounds
-// - Create SubModules and ModuleCores for filters, LFOs, etc.
+// - Create SubModules and ModuleCores for filters
 // - Add string names to ModuleCores and way to expose them for GUI purposes
-// - Create classes and objects that allow for simple to implement GUI contols
-//       for Modulation Matrix and possibly switching SynthVoices' moduleCores
+// - Allow for switching SynthVoices' Modules and/or ModuleCores
 // - Allow of MIDI input devices to be read and programmed with sounds in this
 //      Engine
 // - Create class to write data to a file to save and to play

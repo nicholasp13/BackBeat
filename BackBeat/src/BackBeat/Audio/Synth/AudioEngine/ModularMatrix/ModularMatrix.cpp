@@ -62,7 +62,8 @@ namespace BackBeat {
 				srcOutputBuffer = m_ModSources[j];
 				for (UINT32 k = 0; k < totalSamples; k++)
 				{
-					destinationInputBuffer[k] = srcOutputBuffer[k] 
+					// NOTE: Amp modulators are multiplicative and input modulators are additive. Implementation subject to change
+					destinationInputBuffer[k] += srcOutputBuffer[k] 
 						* destinationIntensity * sourceIntensity * channelIntensity;
 				}
 			}

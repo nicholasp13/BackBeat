@@ -1,18 +1,10 @@
 #pragma once
 
-#include "ModuleCore.h"
+#include "BackBeat/Audio/Synth/AudioEngine/ModuleCores/LinearEGCore.h"
+#include "SynthModule.h"
 namespace BackBeat {
 
-	enum class EGState
-	{
-		Off = 0,
-		Attack,
-		Decay,
-		Sustain,
-		Release
-	};
-
-	class EnvelopeGenerator : public ModuleCore
+	class EnvelopeGenerator : public SynthModule
 	{
 	public:
 		virtual void Reset(UINT32 sampleRate) {}
@@ -21,5 +13,7 @@ namespace BackBeat {
 		virtual void DoNoteOn(noteEvent event) {}
 		virtual void DoNoteOff(noteEvent event) {}
 		virtual std::shared_ptr<float[]> GetBuffer() { return std::shared_ptr<float[]>(); }
+
+		virtual EGState GetState() { return EGState::Off; }
 	};
 }

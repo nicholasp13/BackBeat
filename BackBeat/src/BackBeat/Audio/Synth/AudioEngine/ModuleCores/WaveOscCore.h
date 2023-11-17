@@ -1,18 +1,15 @@
 #pragma once
 
-// TODO:
-// Rename to OscillatorCore for consisntency
-
 #include "ModuleCore.h"
-#include "Wave.h"
+#include "BackBeat/Audio/Synth/AudioEngine/Wave.h"
 #include "BackBeat/Audio/Synth/SynthBase.h"
 namespace BackBeat {
 	
-	class Oscillator : public ModuleCore
+	class WaveOscCore : public ModuleCore
 	{
 	public:
-		Oscillator(UINT32 sampleRate, std::shared_ptr<float[]> buffer, std::shared_ptr<OscParameters> params);
-		~Oscillator();
+		WaveOscCore(UINT32 sampleRate, std::shared_ptr<float[]> buffer, std::shared_ptr<OscParameters> params);
+		~WaveOscCore();
 
 		virtual void Reset(UINT32 sampleRate);
 		virtual void Update();
@@ -21,7 +18,8 @@ namespace BackBeat {
 		virtual void DoNoteOff(noteEvent event);
 
 		std::shared_ptr<float[]> GetBuffer() { return m_Buffer; }
-
+		std::shared_ptr<float[]> GetInputBuffer() { return m_ModInput->GetBuffer(); }
+		 
 	private:
 		UINT32 m_SampleRate;
 		UINT32 m_Position;
@@ -33,6 +31,7 @@ namespace BackBeat {
 
 		std::shared_ptr<float[]> m_Buffer;
 		std::shared_ptr<OscParameters> m_Params;
+		std::unique_ptr<Modulator> m_ModInput;
 		float* m_Wave;
 
 		void InitWave();
