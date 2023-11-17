@@ -1,12 +1,23 @@
 #pragma once
 
-#include "EnvelopeGenerator.h"
+// TODO: Create an EGCore interface
+
+#include "ModuleCore.h"
 namespace BackBeat {
 
-	class LinearEGCore : public EnvelopeGenerator
+	enum class EGState
+	{
+		Off = 0,
+		Attack,
+		Decay,
+		Sustain,
+		Release
+	};
+
+	class LinearEGCore : public ModuleCore
 	{
 	public:
-		LinearEGCore(UINT32 sampleRate, std::shared_ptr<float[]> buffer, std::shared_ptr<EGParameters> params);
+		LinearEGCore(UINT32 sampleRate, UINT32 bufferSize, std::shared_ptr<EGParameters> params);
 		~LinearEGCore();
 
 		virtual void Reset(UINT32 sampleRate);
@@ -15,7 +26,8 @@ namespace BackBeat {
 		virtual void DoNoteOn(noteEvent event);
 		virtual void DoNoteOff(noteEvent event);
 
-		virtual std::shared_ptr<float[]> GetBuffer() { return m_OutputBuffer; }
+		virtual std::shared_ptr<float[]> GetInputBuffer() { return m_Input->GetBuffer(); }
+		virtual std::shared_ptr<float[]> GetOutputBuffer() { return m_Output->GetBuffer(); }
 
 		EGState GetState() { return m_State; }
 	
@@ -31,7 +43,8 @@ namespace BackBeat {
 		float m_SustainValue;
 		EGState m_State;
 
-		std::shared_ptr<float[]> m_OutputBuffer;
+		std::unique_ptr<Modulator> m_Input;
+		std::unique_ptr<Modulator> m_Output;
 		std::shared_ptr<EGParameters> m_Params;
 	};
 }

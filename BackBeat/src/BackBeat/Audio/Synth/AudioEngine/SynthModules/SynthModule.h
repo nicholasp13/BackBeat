@@ -1,5 +1,7 @@
 #pragma once
 
+// TODO: Create function get a vector/array of string names of ModuleCores to expose to GUI
+
 #include "BackBeat/Audio/Synth/SynthBase.h"
 #include "BackBeat/Audio/Synth/AudioEngine/ModuleCores/ModuleCore.h"
 namespace BackBeat {

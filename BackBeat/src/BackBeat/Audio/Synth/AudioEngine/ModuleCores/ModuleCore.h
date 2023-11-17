@@ -1,14 +1,20 @@
 #pragma once
 
+// TODO: Add string names to module cores to expose the cores to GUI
+
 #include "bbpch.h"
+#include "BackBeat/Audio/Synth/AudioEngine/ModularMatrix/Modulator.h"
 #include "BackBeat/Audio/Synth/SynthBase.h"
 namespace BackBeat {
 
+	// NOTE: This enum class is not used currently and maybe unneccsary. 
 	enum class ModuleType
 	{
 		None = 0,
-		Oscillator,
+		WaveOscCore, 
 		Filter,
+		LFO,
+		EG,
 		DCA
 	};
 

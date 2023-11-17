@@ -50,7 +50,6 @@ namespace BackBeat {
 
 	void ImGuiLayer::OnEvent(Event& event)
 	{
-		BB_CORE_TRACE("Not Handled: {0}", event);
 		ImGuiIO& io = ImGui::GetIO();
 		event.Handled |= event.IsInCategory(EventCategoryMouse) & io.WantCaptureMouse;
 		event.Handled |= event.IsInCategory(EventCategoryKeyboard) & io.WantCaptureKeyboard;

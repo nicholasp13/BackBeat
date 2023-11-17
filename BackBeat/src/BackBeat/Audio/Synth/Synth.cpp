@@ -1,7 +1,5 @@
 #include "bbpch.h"
 
-// TODO: Deactivate all voices when stopped
-
 #include "Synth.h"
 namespace BackBeat {
 

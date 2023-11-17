@@ -3,7 +3,7 @@
 #include "LinearEGCore.h"
 namespace BackBeat {
 
-	LinearEGCore::LinearEGCore(UINT32 sampleRate, std::shared_ptr<float[]> buffer, std::shared_ptr<EGParameters> params)
+	LinearEGCore::LinearEGCore(UINT32 sampleRate, UINT32 bufferSize, std::shared_ptr<EGParameters> params)
 		:
 		m_SampleRate(sampleRate),
 		m_InputPosition(0),
@@ -16,7 +16,8 @@ namespace BackBeat {
 		m_SustainValue(params->sustainValue),
 		m_State(EGState::Off),
 		m_Params(params),
-		m_OutputBuffer(buffer)
+		m_Input(std::make_unique<Modulator>(bufferSize)),
+		m_Output(std::make_unique<Modulator>(bufferSize))
 	{
 
 	}
@@ -64,6 +65,7 @@ namespace BackBeat {
 		Update();
 
 		UINT32 totalSamples = numSamples * STEREO;
+		auto outputBuffer = m_Output->GetBuffer();
 
 		for (UINT32 i = 0; i < totalSamples; i+= STEREO)
 		{
@@ -114,7 +116,7 @@ namespace BackBeat {
 
 					}
 				}
-				m_OutputBuffer[i + j] *= m_Value;
+				outputBuffer[i + j] = m_Value;
 			}
 		}
 	}

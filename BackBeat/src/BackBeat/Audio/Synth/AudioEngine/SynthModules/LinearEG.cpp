@@ -3,9 +3,9 @@
 #include "LinearEG.h"
 namespace BackBeat {
 
-	LinearEG::LinearEG(UINT32 sampleRate, std::shared_ptr<float[]> buffer, std::shared_ptr<EGParameters> params)
+	LinearEG::LinearEG(UINT32 sampleRate, UINT32 bufferSize, std::shared_ptr<EGParameters> params)
 		:
-		m_Core(std::make_shared<LinearEGCore>(sampleRate, buffer, params))
+		m_Core(std::make_shared<LinearEGCore>(sampleRate, bufferSize, params))
 	{
 
 	}

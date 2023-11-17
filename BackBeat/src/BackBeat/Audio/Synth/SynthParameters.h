@@ -1,10 +1,8 @@
 #pragma once
 
-// TODO: Remove sample rate and buffersize from parameters
-
 #include "bbpch.h"
 
-#include "AudioEngine/ModuleCores/Wave.h"
+#include "AudioEngine/Wave.h"
 namespace BackBeat {
 
 	enum ModSources {
@@ -52,18 +50,36 @@ namespace BackBeat {
 		float sustainValue;
 	};
 
+	// TODO: 
+	//	Add pitch shifting by cents
+	//	Add panning to individual oscillators	
 	struct OscParameters
 	{
 		float amp;
+		float octave;
 		WaveType wave;
 	};
 
-	// TODO: Multiple params for multiple of the same core
+	// TODO:
+	//	Add delay in LFO start
+	struct LFOParameters
+	{
+		float amp;
+		float hertz;
+		WaveType wave;
+	};
+
+	// TODO: Add params for LFOs, filters, and other SynthModules as coded
 	struct VoiceParameters
 	{
 		std::shared_ptr<DCAParameters> DCAParams;
+		std::shared_ptr<EGParameters> AmpEGParams;
 		std::shared_ptr<EGParameters> EGParams;
-		std::shared_ptr<OscParameters> OscParams;
+		std::shared_ptr<LFOParameters> LFOParams1;
+		std::shared_ptr<OscParameters> OscParams1;
+		std::shared_ptr<OscParameters> OscParams2;
+		std::shared_ptr<OscParameters> OscParams3;
+		std::shared_ptr<OscParameters> OscParams4;
 		std::shared_ptr<ModMatrixParameters> ModMatrixParams;
 	};
 
@@ -79,7 +95,6 @@ namespace BackBeat {
 		byte noteVelocity;
 	};
 
-	// TODO: Add event handler params when event handler params is implemented
 	struct SynthParameters
 	{
 		std::shared_ptr<EngineParameters> engineParams;

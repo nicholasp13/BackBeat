@@ -3,8 +3,10 @@
 #include "BackBeat/Audio/Synth/Render/RenderInfo.h"
 #include "BackBeat/Audio/Synth/AudioEngine/SynthModules/SynthModule.h"
 #include "BackBeat/Audio/Synth/AudioEngine/SynthModules/DCA.h"
-#include "BackBeat/Audio/Synth/AudioEngine/SynthModules/WAVEOscillator.h"
+#include "BackBeat/Audio/Synth/AudioEngine/SynthModules/WaveOscillator.h"
 #include "BackBeat/Audio/Synth/AudioEngine/SynthModules/LinearEG.h"
+#include "BackBeat/Audio/Synth/AudioEngine/SynthModules/AmpEG.h"
+#include "BackBeat/Audio/Synth/AudioEngine/SynthModules/LowFrequencyOscillator.h"
 #include "BackBeat/Audio/Synth/SynthBase.h"
 namespace BackBeat {
 
@@ -33,14 +35,19 @@ namespace BackBeat {
 		std::shared_ptr<float[]> m_InputBuffer;
 		std::shared_ptr<float[]> m_OutputBuffer;
 		std::unique_ptr<DCA> m_DCA;
-		std::unique_ptr<WAVEOscillator> m_Oscillator;
+		std::unique_ptr<WaveOscillator> m_Osc1;
+		std::unique_ptr<WaveOscillator> m_Osc2;
+		std::unique_ptr<WaveOscillator> m_Osc3;
+		std::unique_ptr<WaveOscillator> m_Osc4;
 		std::unique_ptr<LinearEG> m_EG;
+		std::unique_ptr<AmpEG> m_AmpEG;
+		std::unique_ptr<LowFrequencyOscillator> m_LFO1;
 
 		// TODO: Implement filter and modulation matrix
 		// std::unique_ptr<SynthModule> m_Filter;
-		// ModularMatrix (NOTE: Update SynthModule to create
 
 		void DoNoteOn(noteEvent event);
 		void DoNoteOff(noteEvent event);
+		void InitModules();
 	};
 }
