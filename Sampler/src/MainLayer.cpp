@@ -12,6 +12,7 @@
 		m_Synth->Stop();
 	}
 
+	// NOTE: Only implements Synth part of Audio not the Playback
 	void MainLayer::OnAttach()
 	{
 		m_Synth = std::make_unique<BackBeat::Synth>();
@@ -21,6 +22,7 @@
 
 	void MainLayer::OnDetach()
 	{
+
 	}
 	
 	void MainLayer::OnUpdate(DWORD timeInterval)
@@ -55,6 +57,9 @@
 		window_flags |= ImGuiWindowFlags_NoResize;
 		window_flags |= ImGuiWindowFlags_MenuBar;
 		bool open;
+
+		ImGui::ShowDemoWindow();
+
 		ImGui::Begin("Sampler", &open, window_flags);
 
 		RenderMenubar();
@@ -218,6 +223,27 @@
 		ImGui::Spacing();
 		ImGui::PopID();
 
+		// Low Pass Filter Controls
+		ImGui::TableNextColumn();
+		ImGui::PushID("LPFilter");
+		ImGui::SeparatorText("Low Pass Filter");
+		static bool* lpFilterOn = &(m_SynthParams->engineParams->voiceParams->LPFilterParams->isOn);
+		ImGui::Checkbox("Filter On", lpFilterOn);
+		static float* lpCutoffFreq = &(m_SynthParams->engineParams->voiceParams->LPFilterParams->cutoff);
+		ImGui::Text("    "); ImGui::SameLine(); ImGui::SliderFloat("Cutoff Frequency", lpCutoffFreq, FILTER_CUTOFF_MIN, FILTER_CUTOFF_MAX);
+		ImGui::Spacing();
+		ImGui::PopID();
+
+		// High Pass Filter Controls
+		ImGui::PushID("HPFilter");
+		ImGui::SeparatorText("High Pass Filter");
+		static bool* hpFilterOn = &(m_SynthParams->engineParams->voiceParams->HPFilterParams->isOn);
+		ImGui::Checkbox("Filter On", hpFilterOn);
+		static float* hpCutoffFreq = &(m_SynthParams->engineParams->voiceParams->HPFilterParams->cutoff);
+		ImGui::Text("    "); ImGui::SameLine(); ImGui::SliderFloat("Cutoff Frequency", hpCutoffFreq, FILTER_CUTOFF_MIN, FILTER_CUTOFF_MAX);
+		ImGui::Spacing();
+		ImGui::PopID();
+
 		// Amp Envelope Generator Controls
 		ImGui::TableNextColumn();
 		static float* attackDuration = &(m_SynthParams->engineParams->voiceParams->AmpEGParams->attackDuration);
@@ -234,7 +260,6 @@
 
 		// Osc 1 Controls
 		ImGui::PushID("Osc1");
-		ImGui::TableNextColumn();
 		ImGui::TableNextColumn();
 		ImGui::SeparatorText("Oscillator1 ");
 

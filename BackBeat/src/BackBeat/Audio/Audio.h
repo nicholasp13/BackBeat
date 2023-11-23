@@ -62,6 +62,12 @@ namespace BackBeat {
 			return (leftToRight | rightToLeft);
 		}
 
+		static bool EqualsFloat(float x, float y, float delta)
+		{
+			float value = sqrtf(powf(x - y, 2.0f));
+			return (value < delta);
+		}
+
 		template<typename T>
 		static float ConvertFloat(T value) 
 		{

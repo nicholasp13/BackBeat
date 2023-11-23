@@ -9,21 +9,26 @@
 // ------------------------------------------------------------------------------- //
 // TODO:
 // - Create SynthModule Modulation Matrix that has access to EnvelopeGenerators(EGs), 
-//       Low Frequency Oscillators(LFOs), and other types of filters to allow for
-//       real time customizable sounds
-// - Create SubModules and ModuleCores for filters
+//       Low Frequency Oscillators(LFOs), and filters to allow for personal
+//       customizable sounds
 // - Add string names to ModuleCores and way to expose them for GUI purposes
 // - Allow for switching SynthVoices' Modules and/or ModuleCores
 // - Allow of MIDI input devices to be read and programmed with sounds in this
-//      Engine
+//       Engine <- NEXT TO BE IMPLEMENTED
 // - Create class to write data to a file to save and to play
 // - Create other Synth modes like mono, legatto etc. Only polyphonic so far.
 // - Create functions to scale units properly with common units like decibels 
-//		for volume
+//	     for volume
 // - Create nonlinear EGs
 // - Create other types of oscillators or wave types
 // - Upgrade to MMA DLS level 2
+// - Create method for voice stealing ("stealing" a SynthVoice object already playing 
+//       a note to to play a new note on that voice when all voices are active)
 // - Create a Linux Renderer to allow for playing on Linux
+// 
+// NOTE: ModularMatrix on backburner until at least MIDI input devices,
+//       multiple audio formats are supported, and string names are added to
+//       ModuleCores
 // ------------------------------------------------------------------------------- //
 #include "SynthBase.h"
 #include "BackBeat/Audio/Audio.h"

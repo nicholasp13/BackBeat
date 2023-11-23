@@ -38,8 +38,8 @@ namespace BackBeat {
 			InitWave();
 	}
 	
-	// NOTE: FM Synthesis formula is only roughly estimated and might not fully recreate the exact sound effect of
-	//       FM Synthesis. Code subject to change
+	// NOTE: FM Synthesis implementation is only roughly estimated and might not fully recreate the exact sound effect of
+	//       FM Synthesis. Code subject to change.
 	void WaveOscCore::Render(UINT32 numSamples)
 	{
 		Update();

@@ -13,7 +13,7 @@ namespace BackBeat {
 		unsigned int Width;
 		unsigned int Height;
 
-		WindowProps(const std::string& title = "BackBeat Engine",
+		WindowProps(const std::string& title = "BackBeat",
 			unsigned int width = 1200,
 			unsigned int height = 720)
 			: Title(title), Width(width), Height(height)

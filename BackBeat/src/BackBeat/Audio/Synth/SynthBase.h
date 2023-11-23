@@ -16,6 +16,7 @@ namespace BackBeat {
 #define LOWEST_OCTAVE 0.03125f
 #define HIGHEST_OCTAVE 32.0f
 #define NUM_OSCS 4.0f
+#define DELTA_CENTS_HZ 0.004860f // The smallest value of a cent in hz, Formula (C_MINUS_1_NOTE - C_SHARP_MINUS_1_NOTE) / 100.0f.
 
 // MUSIC NOTES in hertz
 // Lowest note
@@ -234,6 +235,7 @@ typedef unsigned char byte;
 //	OTHER (added as needed)
 
 // MIDI Manufacturer's Association (MMA) min, max, and default values for Downloadable Sounds (DLS)
+// Website: https://www.midi.org/specifications-old/item/dls-level-1-specification
 // Specification level 1
 // LFOs
 #define LFO_FREQ_DEFAULT			5.0f
@@ -296,6 +298,13 @@ typedef unsigned char byte;
 #define PAN_DEFAULT					0.0f
 #define PAN_MIN						-0.50f
 #define PAN_MAX						0.50f
+
+// MIDI Manufacturer's Association (MMA) min, max, and default values for Downloadable Sounds (DLS)
+// Specification level 2
+// Website: https://www.midi.org/specifications-old/item/dls-level-2-specification
+// Filters
+#define FILTER_CUTOFF_MIN			200.0f		// Sample rate / 240
+#define FILTER_CUTOFF_MAX			8000.0f		// Sample rate / 6
 
 // Struct of basic MIDI events for possible future MIDI input feature
 	struct midiEvent {

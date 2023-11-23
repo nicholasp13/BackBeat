@@ -5,7 +5,7 @@ namespace BackBeat {
 
 	LowFrequencyOscillator::LowFrequencyOscillator(UINT32 sampleRate, UINT32 bufferSize, std::shared_ptr<float[]> outputBuffer, std::shared_ptr<LFOParameters> params)
 	{
-		m_Core = std::make_unique<LFOCore>(sampleRate, bufferSize, params);
+		m_Core = std::make_shared<LFOCore>(sampleRate, bufferSize, params);
 		m_InputBuffer = m_Core->GetOutputBuffer();
 		m_OutputBuffer = outputBuffer;
 	}
