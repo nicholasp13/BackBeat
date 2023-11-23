@@ -33,7 +33,7 @@ namespace BackBeat {
 	void LFOCore::Update()
 	{
 		m_Amp = m_Params->amp;
-		if (m_Hertz != m_Params->hertz || m_WaveType != m_Params->wave) {
+		if (!Audio::EqualsFloat(m_Hertz, m_Params->hertz, DELTA_CENTS_HZ) || m_WaveType != m_Params->wave) {
 			InitWave();
 		}
 	}

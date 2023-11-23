@@ -7,8 +7,15 @@
 * - SynthVoices are composed of SynthModules like Digitally Controlled Amplifier (DCA) and Oscillators (Osc)
 * - SynthModules is a wrapper class for at most 4 ModuleCore that do the real work
 * - ModuleCores provide the actual work i.e. Osc cores calculating the samples for a basic sine wave.
-* This allows for programming highly customizable Synths. Only basic ModuleCores have been implemented so far.
+* The engine takes MIDI input from the main Synth class and calls its SynthVoices to produce the required sound
+* by descending function calls to DoNoteOn() and Render(). The engine sums the voices output into a single buffer
+* shared with the Renderer that works with the Windows audio API (Linux support on the table) This architecture
+* allows for programming highly customizable Synths. Only basic ModuleCores have been implemented so far.
 * --- SDK Website: https://www.willpirkle.com/synthlab/docs/html/index.html ---
+* 
+* NOTE: All calculations and output are in STEREO, 32 bit depth (float), 48k sample rate properties. Data output is loaded
+*       into a single float buffer with the left channel indexed on even indeces and the right channel on odd indeces. 
+*       Synth Renderer will be responsible for Audio format conversions if necessary (not currently implemented)
  */
 
 #include <queue>

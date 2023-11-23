@@ -67,7 +67,6 @@ namespace BackBeat {
 
 	}
 
-	// Subject to change
 	std::shared_ptr<EngineParameters> AudioEngine::GetParam()
 	{
 		return m_Params;
@@ -154,7 +153,15 @@ namespace BackBeat {
 		OSCParams4->amp = 0.0f;
 		OSCParams4->octave = 1.0f;
 		OSCParams4->wave = WaveType::SawtoothUp;
-		
+
+		auto LPFilterParams = std::make_shared<FilterParameters>();
+		LPFilterParams->isOn = false;
+		LPFilterParams->cutoff = FILTER_CUTOFF_MAX;
+
+		auto HPFilterParams = std::make_shared<FilterParameters>();
+		HPFilterParams->isOn = false;
+		HPFilterParams->cutoff = FILTER_CUTOFF_MIN;
+
 		auto modMatrixParams = std::make_shared<ModMatrixParameters>();
 
 		auto voiceParams = std::make_shared<VoiceParameters>();
@@ -166,6 +173,8 @@ namespace BackBeat {
 		voiceParams->OscParams2 = OSCParams2;
 		voiceParams->OscParams3 = OSCParams3;
 		voiceParams->OscParams4 = OSCParams4;
+		voiceParams->LPFilterParams = LPFilterParams;
+		voiceParams->HPFilterParams = HPFilterParams;
 		voiceParams->ModMatrixParams = modMatrixParams;
 
 		m_Params = std::make_shared<EngineParameters>();

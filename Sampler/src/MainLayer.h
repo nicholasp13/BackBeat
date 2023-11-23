@@ -1,6 +1,7 @@
 #pragma once
 
 // TODO: 
+//	Put Synth into it's own ImGui window and possibly add a PlayBack window
 //	Create ImGui knobs for more classic synth GUI
 //  Create way to save GUI settings after closing app
 //  Implement ModMatrix GUI after creating ModMatrix
@@ -28,7 +29,7 @@ class MainLayer : public BackBeat::Layer
 
 	private:
 		std::thread m_Worker;
-		// Playback, not implemented
+		// Playback, not implemented in current project
 		std::shared_ptr<BackBeat::Player> m_Player; // Not used
 		std::shared_ptr<BackBeat::AudioData> m_AudioData; // Not used
 		std::shared_ptr<BackBeat::Loader> m_Loader; // Not used

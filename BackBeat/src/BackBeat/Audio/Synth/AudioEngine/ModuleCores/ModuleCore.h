@@ -13,6 +13,8 @@ namespace BackBeat {
 		None = 0,
 		WaveOscCore, 
 		Filter,
+		LowPassFilter,
+		HighPassFilter,
 		LFO,
 		EG,
 		DCA

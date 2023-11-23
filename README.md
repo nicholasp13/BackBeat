@@ -14,8 +14,7 @@ Developed soley on Windows with Visual Studios 2022, other IDEs untested and may
 ## Goals
 The goal is to create an open source, simple digital audio workstation (DAW) with the ability to easily customize sounds and interface
 ### Upcoming features:
-- Create basic low pass and high pass filters
-- Allow for reading MIDI input devices from USB and customizing and programming their sounds
+- Allow for reading MIDI input devices from USB as well as customizing and programming their sounds
 ### Planned features:
 - Modular Matrix for interactive GUI implementation to customize sounds
 - Create audio tracks for editing and recording with GUI contols
