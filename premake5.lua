@@ -20,6 +20,7 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 include "BackBeat/vendor/glfw"
 include "BackBeat/vendor/Glad"
 include "BackBeat/vendor/imgui"
+include "BackBeat/vendor/lodepng"
 
 project "BackBeat"
 	location "BackBeat"
@@ -37,7 +38,8 @@ project "BackBeat"
 	files
 	{
 		"%{prj.name}/src/**.h",
-		"%{prj.name}/src/**.cpp"
+		"%{prj.name}/src/**.cpp",
+		"%{prj.name}/assets/**.png"
 	}
 
 	includedirs
@@ -47,7 +49,8 @@ project "BackBeat"
 		-- CURRENT SOL
 		"%{prj.name}/vendor/glfw/include",
 		"%{prj.name}/vendor/Glad/include",
-		"%{prj.name}/vendor/imgui"
+		"%{prj.name}/vendor/imgui",
+		"%{prj.name}/vendor/lodepng"
 		--TO FIX --
 		-- "%IncludeDir.GLFW",
 		-- "%IncludeDir.Glad"
@@ -57,6 +60,7 @@ project "BackBeat"
 		"GLFW",
 		"Glad",
 		"imgui",
+		"lodepng",
 		"opengl32.lib"
 	}
 
@@ -106,6 +110,7 @@ project "Sampler"
 		"BackBeat/vendor/spdlog/include",
 		"BackBeat/vendor/imgui",
 		"BackBeat/vendor/glfw/include",
+		"BackBeat/vendor/lodepng",
 		"BackBeat/src"
 	}
 	

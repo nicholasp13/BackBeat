@@ -2,10 +2,8 @@
 
 #include "Event.h"
 #include "BackBeat/Core/MouseCodes.h"
-
 namespace BackBeat {
 	
-	// TODO: CHECK IF NEEDED
 	struct MousePos
 	{
 		float x;

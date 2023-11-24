@@ -1,14 +1,14 @@
 #include "bbpch.h"
 
-#include "BackBeat/Audio/Audio.h"
-#include "Loader.h"
-
 /* README
 * TODO:
 * - Create checks to see if m_DataSrc was set before calls to Start() and GetData()
 * - CREATE CONVERSION FOR DIFFERENT SAMPLE RATES
-* DIFFERENT BYTE/NUMBER FORMATS MP3 FORMAT
+*   DIFFERENT BYTE/NUMBER FORMATS MP3 FORMAT
 */
+
+#include "BackBeat/Audio/Audio.h"
+#include "Loader.h"
 namespace BackBeat {
 
 	Loader::Loader(tWAVEFORMATEX* deviceProps)

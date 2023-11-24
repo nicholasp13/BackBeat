@@ -7,3 +7,6 @@
 [submodule "imgui"]
 	path = BackBeat/vendor/imgui
 	url = https://github.com/nicholasp13/imgui.git
+[submodule "BackBeat/vendor/lodepng"]
+	path = BackBeat/vendor/lodepng
+	url = https://github.com/nicholasp13/lodepng

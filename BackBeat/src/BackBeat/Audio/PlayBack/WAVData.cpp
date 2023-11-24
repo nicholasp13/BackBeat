@@ -1,9 +1,8 @@
 #include "bbpch.h"
 
 #include "BackBeat/Audio/Audio.h"
-#include "WAVData.h"
 #include "BackBeat/Core/Core.h"
-
+#include "WAVData.h"
 namespace BackBeat {
 
 	WAVData::WAVData(std::string filePath, tWAVEFORMATEX* props, int size)

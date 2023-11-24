@@ -2,7 +2,6 @@
 
 #include "Core.h"
 #include "Layer.h"
-
 namespace BackBeat {
 
 	typedef std::vector<Layer*> LAYERS;

@@ -13,7 +13,7 @@
 #include <thread>
 #include <memory>
 #include <chrono>
-
+#include <filesystem>
 
 #ifdef BB_PLATFORM_WINDOWS
 	#include <Windows.h>

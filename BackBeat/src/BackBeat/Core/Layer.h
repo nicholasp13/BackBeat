@@ -2,7 +2,6 @@
 
 #include "Core.h"
 #include "BackBeat/Events/Event.h"
-
 namespace BackBeat {
 
 	class BACKBEAT_API Layer

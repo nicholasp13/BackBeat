@@ -1,12 +1,11 @@
 #pragma once
 
-#include "Core.h"
+// Log wrapper class for flexibility if needed for changing the logging API
 
 #include <spdlog/spdlog.h>
 #include <spdlog/fmt/ostr.h>
 
-// Log wrapper class for flexibility if needed for changing the logging API
-
+#include "Core.h"
 namespace BackBeat {
 	
 	class BACKBEAT_API Log

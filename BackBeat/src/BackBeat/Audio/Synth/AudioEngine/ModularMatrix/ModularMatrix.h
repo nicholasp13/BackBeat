@@ -1,6 +1,6 @@
 #pragma once
 
-// TODO: Fully implement by changing the way ModuleCores write to buffers
+// TODO: Fully implement by changing writing to and connecting to ModSources and ModDestinations
 
 #include "BackBeat/Audio/Synth/SynthBase.h"
 #include "BackBeat/Audio/Synth/SynthParameters.h"

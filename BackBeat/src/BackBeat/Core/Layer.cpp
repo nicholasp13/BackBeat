@@ -1,6 +1,6 @@
 #include "bbpch.h"
-#include "Layer.h"
 
+#include "Layer.h"
 namespace BackBeat {
 
 	Layer::Layer(const std::string& debugName)
