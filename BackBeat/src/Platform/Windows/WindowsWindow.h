@@ -1,10 +1,12 @@
 #pragma once
 
-#include "BackBeat/Core/Window.h"
-
 #include <GLFW/glfw3.h>
+#include <lodepng.h>
 
+#include "BackBeat/Core/Window.h"
 namespace BackBeat {
+
+#define NUM_LOGOS 4
 
 	class WindowsWindow : public Window
 	{
@@ -22,9 +24,12 @@ namespace BackBeat {
 		bool IsVSync() const override;
 
 		virtual void* GetNativeWindow() const { return m_Window; }
+
 	private:
 		virtual void Init(const WindowProps& props);
 		virtual void Shutdown();
+		
+		void LoadIcons();
 
 	private:
 		GLFWwindow* m_Window;
@@ -39,5 +44,7 @@ namespace BackBeat {
 		};
 
 		WindowData m_Data;
+		unsigned char* m_Icons[NUM_LOGOS];
+		GLFWimage m_Images[NUM_LOGOS];
 	};
 }

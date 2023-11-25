@@ -1,13 +1,13 @@
 #pragma once
 
+//Application class for applications using the BackBeat backend as an application engine
+
 #include "Core.h"
 #include "LayerStack.h"
 #include "Window.h"
 #include "BackBeat/Events/Event.h"
 #include "BackBeat/Events/ApplicationEvent.h"
-
 #include "BackBeat/ImGui/ImGuiLayer.h"
-//Application class for applications using the BackBeat engine
 namespace BackBeat {
 
 	class BACKBEAT_API Application

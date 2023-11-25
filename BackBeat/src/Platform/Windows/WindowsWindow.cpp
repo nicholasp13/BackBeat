@@ -1,11 +1,11 @@
 #include "bbpch.h"
-#include "WindowsWindow.h"
+
+#include <glad/glad.h>
 
 #include "BackBeat/Events/ApplicationEvent.h"
 #include "BackBeat/Events/KeyEvent.h"
 #include "BackBeat/Events/MouseEvent.h"
-
-#include <glad/glad.h>
+#include "WindowsWindow.h"
 
 namespace BackBeat {
 
@@ -32,12 +32,6 @@ namespace BackBeat {
 
 	void WindowsWindow::Init(const WindowProps& props)
 	{
-		m_Data.Title = props.Title;
-		m_Data.Width = props.Width;
-		m_Data.Height = props.Height;
-
-		BB_CORE_INFO("Creating window {0} ({1}, {2})", props.Title, props.Width, props.Height);
-
 		if (!s_GLFWInitialized)
 		{
 			int success = glfwInit();
@@ -46,12 +40,32 @@ namespace BackBeat {
 			s_GLFWInitialized = true;
 		}
 
-		m_Window = glfwCreateWindow((int)props.Width, (int)props.Height, m_Data.Title.c_str(), nullptr, nullptr);
+		// Get monitor resolution. Window props size is ignored
+		int count;
+		const GLFWvidmode* modes = glfwGetVideoModes(glfwGetPrimaryMonitor(), &count);
+		int maxWidth = 0;
+		int maxHeight = 0;
+		for (int i = 0; i < count; i++)
+		{
+			if (modes[i].width > maxWidth)
+				maxWidth = modes[i].width;
+			if (modes[i].height > maxHeight)
+				maxHeight = modes[i].height;
+		}
+		m_Data.Title = props.Title;
+		m_Data.Width = maxWidth;
+		m_Data.Height = maxHeight;
+		BB_CORE_INFO("Creating window {0} ({1}, {2})", m_Data.Title, m_Data.Width, m_Data.Height);
+		m_Window = glfwCreateWindow((int)m_Data.Width, (int)m_Data.Height, m_Data.Title.c_str(), nullptr, nullptr);
 		glfwMakeContextCurrent(m_Window);
 		int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 		BB_CORE_ASSERTS(status, "Failed to initialize Glad!")
 		glfwSetWindowUserPointer(m_Window, &m_Data);
 		SetVSync(true);
+
+		// Set Windows icons for BackBeat app
+		LoadIcons();
+		glfwSetWindowIcon(m_Window, NUM_LOGOS, m_Images);
 
 		// Set GLFW callbacks
 		glfwSetWindowSizeCallback(m_Window, [](GLFWwindow* window, int width, int height)
@@ -163,4 +177,35 @@ namespace BackBeat {
 	}
 
 
+
+	void WindowsWindow::LoadIcons()
+	{
+
+		int index = 0;
+		unsigned width = 0;
+		unsigned height = 0;
+
+		lodepng_decode32_file(m_Icons + index, &width, &height, "../BackBeat/assets/logos/BackbeatLogo_NoFilter_16x16.png");
+		m_Images[index].width = width;
+		m_Images[index].height = height;
+		m_Images[index].pixels = m_Icons[index];
+		index++;
+
+		lodepng_decode32_file(m_Icons + index, &width, &height, "../BackBeat/assets/logos/BackbeatLogo_NoFilter_32x32.png");
+		m_Images[index].width = width;
+		m_Images[index].height = height;
+		m_Images[index].pixels = m_Icons[index];
+		index++;
+
+		lodepng_decode32_file(m_Icons + index, &width, &height, "../BackBeat/assets/logos/BackbeatLogo_NoFilter_48x48.png");
+		m_Images[index].width = width;
+		m_Images[index].height = height;
+		m_Images[index].pixels = m_Icons[index];
+		index++;
+
+		lodepng_decode32_file(m_Icons + index, &width, &height, "../BackBeat/assets/logos/BackbeatLogo_NoFilter_256x256.png");
+		m_Images[index].width = width;
+		m_Images[index].height = height;
+		m_Images[index].pixels = m_Icons[index];
+	}
 }

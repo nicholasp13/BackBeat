@@ -3,7 +3,6 @@
 #include "BackBeat/Audio/Audio.h"
 #include "BackBeat/Core/Core.h"
 #include "FileReader.h"
-
 namespace BackBeat {
 
 	HRESULT FileReader::CreateFile(std::string filePath, AudioData** audioData)

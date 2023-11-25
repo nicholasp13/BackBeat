@@ -1,6 +1,5 @@
 #pragma once
 
-
 // Makes sure that the platform the application is run is Windows
 
 #ifdef BB_PLATFORM_WINDOWS

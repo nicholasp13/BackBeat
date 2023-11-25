@@ -40,7 +40,7 @@ namespace BackBeat {
 		tWAVEFORMATEX* GetProps() { return m_DeviceProps; }
 		void SetLoader(std::shared_ptr<Loader> loader) { m_Loader = loader; }
 
-		bool Playing = false;
+		bool Playing = false; // TODO: Change to private variable and change check to a function
 
 	private:
 		void InitAudioClient();

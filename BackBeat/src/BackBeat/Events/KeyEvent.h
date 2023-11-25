@@ -2,7 +2,6 @@
 
 #include "Event.h"
 #include "BackBeat/Core/KeyCodes.h"
-
 namespace BackBeat {
 
 	class KeyEvent : public Event

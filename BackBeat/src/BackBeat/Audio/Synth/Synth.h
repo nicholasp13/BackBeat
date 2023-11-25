@@ -25,6 +25,8 @@
 // - Create method for voice stealing ("stealing" a SynthVoice object already playing 
 //       a note to to play a new note on that voice when all voices are active)
 // - Create a Linux Renderer to allow for playing on Linux
+// - Create an implementation of Fast Fourier Transform and create a way to graph
+//   frequency s-plane
 // 
 // NOTE: ModularMatrix on backburner until at least MIDI input devices,
 //       multiple audio formats are supported, and string names are added to

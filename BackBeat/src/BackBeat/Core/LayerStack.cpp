@@ -1,6 +1,6 @@
 #include "bbpch.h"
-#include "LayerStack.h"
 
+#include "LayerStack.h"
 namespace BackBeat {
 	
 	LayerStack::LayerStack()

@@ -3,13 +3,6 @@
 * of certain properties. Future implentation of other sample rates, file types to be done later or as needed
 */
 
-// ------------------------------------------------------------------------------- //
-// TODO: 
-// - Make this prettier
-// - Create GUI for Modulation Matrix after implementation
-// - Put project in namespace BackBeat?
-// ------------------------------------------------------------------------------- //
-
 #include <BackBeat.h>
 #include <BackBeat/Core/EntryPoint.h>
 

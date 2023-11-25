@@ -7,9 +7,9 @@ namespace BackBeat {
 #define BYTESIZE 8
 
 // AUDIOFILE CONSTANTS
-#define MONO (UINT32)1
-#define STEREO (UINT32)2
-#define SHORT_INT_MAX 32676
+#define MONO    (UINT32)1
+#define STEREO  (UINT32)2
+#define SHORT_INT_MAX   32676
 #define WAV_HEADER_SIZE 44
 
 // AUDIO FILE STRINGS
@@ -17,7 +17,7 @@ namespace BackBeat {
 #define WAV "RIFF"
 
 // REFERENCE_TIME time units per second and per millisecond
-#define REFTIMES_PER_SECOND 10000000
+#define REFTIMES_PER_SECOND   10000000
 #define REFTIMES_PER_MILLISEC 10000
 
 // HRESULT FAILURE CODES

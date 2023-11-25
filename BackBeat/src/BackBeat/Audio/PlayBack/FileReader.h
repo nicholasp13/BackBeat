@@ -2,7 +2,6 @@
 
 #include "BackBeat/Audio/Playback/AudioData.h"
 #include "WAVData.h"
-
 namespace BackBeat {
 
 	class FileReader

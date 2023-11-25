@@ -1,7 +1,6 @@
 #pragma once
 
 #include "AudioData.h"
-
 namespace BackBeat {
 
 	class Loader

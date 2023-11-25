@@ -1,7 +1,4 @@
 #include "bbpch.h"
-#include "ImGuiLayer.h"
-
-#include "BackBeat/Core/Application.h"
 
 #include <imgui.h>
 #include <glad/glad.h>
@@ -9,6 +6,8 @@
 #include <backends/imgui_impl_opengl3.h>
 #include <backends/imgui_impl_glfw.h>
 
+#include "BackBeat/Core/Application.h"
+#include "ImGuiLayer.h"
 namespace BackBeat {
 
 	ImGuiLayer::ImGuiLayer()
@@ -29,7 +28,7 @@ namespace BackBeat {
 
 		ImGui::StyleColorsDark();
 
-		ImGuiStyle&  style = ImGui::GetStyle();
+		ImGuiStyle& style = ImGui::GetStyle();
 
 		SetDarkThemeColors();
 
@@ -72,8 +71,7 @@ namespace BackBeat {
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 	}
 
-	// TODO: Create own color style
-	//       Code/Settings taken from TheCherno/Hazel
+	//  Color style taken from TheCherno/Hazel
 	void ImGuiLayer::SetDarkThemeColors() 
 	{
 		auto& colors = ImGui::GetStyle().Colors;

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "BackBeat/Core/Layer.h"
-
 namespace BackBeat {
 
 	class BACKBEAT_API ImGuiLayer : public Layer

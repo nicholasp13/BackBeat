@@ -83,7 +83,7 @@ namespace BackBeat {
 		float cutoff;	// Wave cutoff in hz
 	};
 
-	// TODO: Add params for multiple LFOs, filters, and other SynthModules as coded
+	// TODO: Add params for multiple LFOs, filters, and other SynthModules as needed
 	struct VoiceParameters
 	{
 		std::shared_ptr<DCAParameters> DCAParams;

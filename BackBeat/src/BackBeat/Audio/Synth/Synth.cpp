@@ -23,9 +23,12 @@ namespace BackBeat {
 
 	void Synth::Stop()
 	{
+		while (!m_RenderInfo->MIDIEventsEmpty()) {
+			m_RenderInfo->PopMIDIEvent();
+		}
 		m_Running = false;
-		m_Renderer->Stop();
 		m_Engine->Stop();
+		m_Renderer->Stop();
 		if (m_Thread.joinable())
 			m_Thread.join();
 	}

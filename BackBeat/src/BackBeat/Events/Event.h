@@ -1,8 +1,8 @@
 #pragma once
 
 #include "bbpch.h"
-#include "BackBeat/Core/Core.h"
 
+#include "BackBeat/Core/Core.h"
 namespace BackBeat {
 	
 
