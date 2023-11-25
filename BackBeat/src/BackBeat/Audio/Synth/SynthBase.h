@@ -7,16 +7,16 @@
 namespace BackBeat {
 
 // CONSTANTS
-#define FLOAT_SIZE 4
-#define PI 3.141592653589793f // Float(32 bit) precise pi
-#define CIRCLE_DEGREES 360.0f
+#define FLOAT_SIZE      4
+#define PI              3.141592653589793f // Float(32 bit) precise pi
+#define CIRCLE_DEGREES  360.0f
 #define NOTES_IN_OCTAVE 12
-#define LOWER_OCTAVE 0.5f
-#define HIGHER_OCTAVE 2.0f
-#define LOWEST_OCTAVE 0.03125f
-#define HIGHEST_OCTAVE 32.0f
-#define NUM_OSCS 4.0f
-#define DELTA_CENTS_HZ 0.004860f // The smallest value of a cent in hz, Formula (C_MINUS_1_NOTE - C_SHARP_MINUS_1_NOTE) / 100.0f.
+#define LOWER_OCTAVE    0.5f
+#define HIGHER_OCTAVE   2.0f
+#define LOWEST_OCTAVE   0.03125f
+#define HIGHEST_OCTAVE  32.0f
+#define NUM_OSCS        4.0f
+#define DELTA_CENTS_HZ  0.004860f // The smallest value of a cent in hz, Formula (C_MINUS_1_NOTE - C_SHARP_MINUS_1_NOTE) / 100.0f.
 
 // MUSIC NOTES in hertz
 // Lowest note
@@ -35,7 +35,7 @@ namespace BackBeat {
 #define A_SHARP_4_NOTE 466.2f
 #define B_4_NOTE       493.9f
 // Highest note
-#define G_9_NOTE	   12543.9f
+#define G_9_NOTE       12543.9f
 
 typedef unsigned char byte;
 
@@ -111,7 +111,7 @@ typedef unsigned char byte;
 #define MIDI_NOTE_A_0       (byte)0x15
 #define MIDI_NOTE_A_SHARP_0 (byte)0x16
 #define MIDI_NOTE_B_0       (byte)0x17
-	//	1st octave (24-35)
+//	1st octave (24-35)
 #define MIDI_NOTE_C_1       (byte)0x18
 #define MIDI_NOTE_C_SHARP_1 (byte)0x19
 #define MIDI_NOTE_D_1       (byte)0x1A
@@ -124,7 +124,7 @@ typedef unsigned char byte;
 #define MIDI_NOTE_A_1       (byte)0x21
 #define MIDI_NOTE_A_SHARP_1 (byte)0x22
 #define MIDI_NOTE_B_1       (byte)0x23
-	//	2nd octave (36-47)
+//	2nd octave (36-47)
 #define MIDI_NOTE_C_2       (byte)0x24
 #define MIDI_NOTE_C_SHARP_2 (byte)0x25
 #define MIDI_NOTE_D_2       (byte)0x26
@@ -238,73 +238,73 @@ typedef unsigned char byte;
 // Website: https://www.midi.org/specifications-old/item/dls-level-1-specification
 // Specification level 1
 // LFOs
-#define LFO_FREQ_DEFAULT			5.0f
-#define LFO_FREQ_MIN				0.1f
-#define LFO_FREQ_MAX				10.0f
-#define LFO_ATT_DEFAULT				0.0f
-#define LFO_ATT_MIN					0.0f
-#define LFO_ATT_MAX					12.0f
-#define LFO_PITCH_DEFAULT			0.0f
-#define LFO_PITCH_MIN				-1200.0f
-#define LFO_PITCH_MAX				1200.0f
-#define LFO_MOD_TO_ATT_DEFAULT		0.0f
-#define LFO_MOD_TO_ATT_MIN			0.0f
-#define LFO_MOD_TO_ATT_MAX			12.0f
-#define LFO_MOD_TO_PITCH_DEFAULT	0.0f
-#define LFO_MOD_TO_PITCH_MIN		-1200.0f
-#define LFO_MOD_TO_PITCH_MAX		1200.0f
+#define LFO_FREQ_DEFAULT            5.0f
+#define LFO_FREQ_MIN                0.1f
+#define LFO_FREQ_MAX                10.0f
+#define LFO_ATT_DEFAULT	            0.0f
+#define LFO_ATT_MIN                 0.0f
+#define LFO_ATT_MAX                 12.0f
+#define LFO_PITCH_DEFAULT           0.0f
+#define LFO_PITCH_MIN              -1200.0f
+#define LFO_PITCH_MAX               1200.0f
+#define LFO_MOD_TO_ATT_DEFAULT      0.0f
+#define LFO_MOD_TO_ATT_MIN          0.0f
+#define LFO_MOD_TO_ATT_MAX          12.0f
+#define LFO_MOD_TO_PITCH_DEFAULT    0.0f
+#define LFO_MOD_TO_PITCH_MIN       -1200.0f
+#define LFO_MOD_TO_PITCH_MAX        1200.0f
 // EG1
-#define EG1_ATTACK_TIME_DEFAULT		0.0f
-#define EG1_ATTACK_TIME_MIN			0.0f
-#define EG1_ATTACK_TIME_MAX			20.0f
-#define EG1_DECAY_TIME_DEFAULT		0.0f
-#define EG1_DECAY_TIME_MIN			0.0f
-#define EG1_DECAY_TIME_MAX			40.0f
-#define EG1_SUSTAIN_LEVEL_DEFAULT	1.0f
-#define EG1_SUSTAIN_LEVEL_MIN		0.0f
-#define EG1_SUSTAIN_LEVEL_MAX		1.0f
-#define EG1_RELEASE_TIME_DEFAULT	0.0f
-#define EG1_RELEASE_TIME_MIN		0.0f
-#define EG1_RELEASE_TIME_MAX		20.0f
-#define EG1_VEL_TO_ATTACK_DEFAULT	0.0f
-#define EG1_VEL_TO_ATTACK_MIN		0.0f
-#define EG1_VEL_TO_ATTACK_MAX		20.0f
-#define EG1_KEY_TO_DECAY_DEFAULT	0.0f
-#define EG1_KEY_TO_DECAY_MIN		0.0f
-#define EG1_KEY_TO_DECAY_MAX		20.0f
+#define EG1_ATTACK_TIME_DEFAULT     0.0f
+#define EG1_ATTACK_TIME_MIN         0.0f
+#define EG1_ATTACK_TIME_MAX         20.0f
+#define EG1_DECAY_TIME_DEFAULT      0.0f
+#define EG1_DECAY_TIME_MIN          0.0f
+#define EG1_DECAY_TIME_MAX          40.0f
+#define EG1_SUSTAIN_LEVEL_DEFAULT   1.0f
+#define EG1_SUSTAIN_LEVEL_MIN       0.0f
+#define EG1_SUSTAIN_LEVEL_MAX       1.0f
+#define EG1_RELEASE_TIME_DEFAULT    0.0f
+#define EG1_RELEASE_TIME_MIN        0.0f
+#define EG1_RELEASE_TIME_MAX        20.0f
+#define EG1_VEL_TO_ATTACK_DEFAULT   0.0f
+#define EG1_VEL_TO_ATTACK_MIN       0.0f
+#define EG1_VEL_TO_ATTACK_MAX       20.0f
+#define EG1_KEY_TO_DECAY_DEFAULT    0.0f
+#define EG1_KEY_TO_DECAY_MIN        0.0f
+#define EG1_KEY_TO_DECAY_MAX        20.0f
 // EG2
-#define EG2_ATTACK_TIME_DEFAULT		0.0f
-#define EG2_ATTACK_TIME_MIN			0.0f
-#define EG2_ATTACK_TIME_MAX			20.0f
-#define EG2_DECAY_TIME_DEFAULT		0.0f
-#define EG2_DECAY_TIME_MIN			0.0f
-#define EG2_DECAY_TIME_MAX			40.0f
-#define EG2_SUSTAIN_LEVEL_DEFAULT	1.0f
-#define EG2_SUSTAIN_LEVEL_MIN		0.0f
-#define EG2_SUSTAIN_LEVEL_MAX		1.0f
-#define EG2_RELEASE_TIME_DEFAULT	0.0f
-#define EG2_RELEASE_TIME_MIN		0.0f
-#define EG2_RELEASE_TIME_MAX		20.0f
-#define EG2_VEL_TO_ATTACK_DEFAULT	0.0f
-#define EG2_VEL_TO_ATTACK_MIN		0.0f
-#define EG2_VEL_TO_ATTACK_MAX		20.0f
-#define EG2_KEY_TO_DECAY_DEFAULT	0.0f
-#define EG2_KEY_TO_DECAY_MIN		0.0f
-#define EG2_KEY_TO_DECAY_MAX		20.0f
-#define EG2_TO_PITCH_DEFAULT		0.0f
-#define EG2_TO_PITCH_MIN			-1200.0f
-#define EG2_TO_PITCH_MAX			1200.0f
+#define EG2_ATTACK_TIME_DEFAULT	    0.0f
+#define EG2_ATTACK_TIME_MIN         0.0f
+#define EG2_ATTACK_TIME_MAX         20.0f
+#define EG2_DECAY_TIME_DEFAULT      0.0f
+#define EG2_DECAY_TIME_MIN          0.0f
+#define EG2_DECAY_TIME_MAX          40.0f
+#define EG2_SUSTAIN_LEVEL_DEFAULT   1.0f
+#define EG2_SUSTAIN_LEVEL_MIN       0.0f
+#define EG2_SUSTAIN_LEVEL_MAX       1.0f
+#define EG2_RELEASE_TIME_DEFAULT    0.0f
+#define EG2_RELEASE_TIME_MIN        0.0f
+#define EG2_RELEASE_TIME_MAX        20.0f
+#define EG2_VEL_TO_ATTACK_DEFAULT   0.0f
+#define EG2_VEL_TO_ATTACK_MIN       0.0f
+#define EG2_VEL_TO_ATTACK_MAX       20.0f
+#define EG2_KEY_TO_DECAY_DEFAULT    0.0f
+#define EG2_KEY_TO_DECAY_MIN        0.0f
+#define EG2_KEY_TO_DECAY_MAX        20.0f
+#define EG2_TO_PITCH_DEFAULT        0.0f
+#define EG2_TO_PITCH_MIN           -1200.0f
+#define EG2_TO_PITCH_MAX            1200.0f
 // MISC
-#define PAN_DEFAULT					0.0f
-#define PAN_MIN						-0.50f
-#define PAN_MAX						0.50f
+#define PAN_DEFAULT                 0.0f
+#define PAN_MIN                    -0.50f
+#define PAN_MAX                     0.50f
 
 // MIDI Manufacturer's Association (MMA) min, max, and default values for Downloadable Sounds (DLS)
 // Specification level 2
 // Website: https://www.midi.org/specifications-old/item/dls-level-2-specification
 // Filters
-#define FILTER_CUTOFF_MIN			200.0f		// Sample rate / 240
-#define FILTER_CUTOFF_MAX			8000.0f		// Sample rate / 6
+#define FILTER_CUTOFF_MIN           200.0f      // Sample rate / 240
+#define FILTER_CUTOFF_MAX           8000.0f     // Sample rate / 6
 
 // Struct of basic MIDI events for possible future MIDI input feature
 	struct midiEvent {
