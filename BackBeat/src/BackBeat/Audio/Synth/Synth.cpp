@@ -51,6 +51,7 @@ namespace BackBeat {
 		m_RenderInfo = std::make_shared<RenderInfo>(m_Props);
 		m_Renderer = std::make_shared<WindowsRenderer>(m_Props, m_RenderInfo, m_Engine);
 		m_Handler = std::make_shared<SynthEventHandler>(m_RenderInfo);
+		m_MIDIInput = std::make_shared<MIDIInputHandler>(m_RenderInfo);
 		m_Params = std::make_shared<SynthParameters>(m_Engine->GetParam(), m_Handler->GetParams());
 	}
 

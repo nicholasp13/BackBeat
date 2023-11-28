@@ -8,6 +8,7 @@ namespace BackBeat {
 		m_SampleRate(sampleRate),
 		m_Actice(false),
 		m_Channel(0),
+		m_NotePressed(NOTE_OFF),
 		m_Params(voiceParams),
 		m_InputBuffer(std::make_shared<float[]>(sampleRate)),
 		m_OutputBuffer(outputBuffer)
@@ -66,6 +67,7 @@ namespace BackBeat {
 		{
 			m_Actice = false;
 			m_Channel = 0;
+			m_NotePressed = NOTE_OFF;
 		}
 	}
 	void SynthVoice::ProcessMIDIEvent(midiEvent event)
@@ -78,10 +80,12 @@ namespace BackBeat {
 			DoNoteOff(nEvent);
 	}
 
+	// TODO: On and off channel decided by note
 	void SynthVoice::DoNoteOn(noteEvent event)
 	{
 		m_Actice = true;
 		m_Channel = event.channel;
+		m_NotePressed = event.midiNote;
 		m_Osc1->DoNoteOn(event);
 		m_Osc2->DoNoteOn(event);
 		m_Osc3->DoNoteOn(event);

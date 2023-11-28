@@ -75,20 +75,22 @@ namespace BackBeat {
 		virtual void Render(UINT32 numSamples);
 		virtual void ProcessMIDIEvent(midiEvent event);
 
+		virtual int GetChannel() { return m_Channel; }
+		virtual byte GetNote() { return m_NotePressed; }
 		virtual bool IsActive() { return m_Actice; }
-
-		int GetChannel() { return m_Channel; }
 
 	private:
 		UINT32 m_SampleRate;
 		bool m_Actice;
 		int m_Channel;
+		byte m_NotePressed;
 
 		std::shared_ptr<VoiceParameters> m_Params;
 		std::shared_ptr<float[]> m_InputBuffer;
 		std::shared_ptr<float[]> m_OutputBuffer;
 		std::unique_ptr<DCA> m_DCA;
 		// NOTE: Might change to one SynthModule with Four Oscillator cores
+		//       Might change to stack allocation for objects for performance
 		std::unique_ptr<WaveOscillator> m_Osc1;
 		std::unique_ptr<WaveOscillator> m_Osc2;
 		std::unique_ptr<WaveOscillator> m_Osc3;

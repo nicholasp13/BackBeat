@@ -1,5 +1,11 @@
 #include "bbpch.h"
 
+// TODO: 
+//     Add support for other file formats.
+//     Fix bug where changing the audio output device on PC stops audio from rendering
+
+// NOTE: Setting a different output device on your Windows PC changes the props
+
 #include "WindowsRenderer.h"
 namespace BackBeat {
 

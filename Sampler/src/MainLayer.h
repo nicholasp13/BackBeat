@@ -1,15 +1,15 @@
 #pragma once
 
 // TODO: 
-//	Put Synth into it's own ImGui window and possibly add a PlayBack window
-//	Create ImGui knobs for more classic synth GUI
+//	Put Synth into it's own ImGui layer
+//  Make a PlayBack window
+//	Create ImGui knobs for more classic synth GUI 
 //  Create way to save GUI settings after closing app
 //  Implement ModMatrix GUI after creating ModMatrix
 //  Create basic 2D Renderer
 //	Create visualizer for wavelength
 //  Create custom title bar
 //	Create custom icons
-//	Create custom colors
 
 #include <BackBeat.h>
 #include <imgui.h>
@@ -37,6 +37,11 @@ class MainLayer : public BackBeat::Layer
 		std::unique_ptr<BackBeat::Synth> m_Synth;
 		std::shared_ptr<BackBeat::SynthEventHandler> m_SynthEventHandler;
 		std::shared_ptr<BackBeat::SynthParameters> m_SynthParams;
+
+		// IO
+		std::unique_ptr<BackBeat::WindowsMIDIDeviceManager> m_MIDIDeviceManager;
+		std::vector<std::string> m_DeviceNames;
+		UINT m_NumMIDIDevices;
 
 		BackBeat::Window* m_Window;
 

@@ -24,3 +24,5 @@
 #include "BackBeat/Audio/PlayBack/WAVData.h"
 
 #include "BackBeat/Audio/Synth/Synth.h"
+
+#include "BackBeat/Audio/MIDI/WindowsMIDIDeviceManager.h"

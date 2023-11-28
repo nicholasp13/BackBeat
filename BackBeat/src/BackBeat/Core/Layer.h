@@ -12,6 +12,7 @@ namespace BackBeat {
 
 		virtual void OnAttach() {}
 		virtual void OnDetach() {}
+		// TODO: Remove DWORD as it is a Windows only data type
 		virtual void OnUpdate(DWORD timeInterval) {} // For implementation later of a timer for performance and other reasons i.e. metronome, time adjustments
 		virtual void OnEvent(Event& event) {}
 		virtual void OnImGuiRender() {}
