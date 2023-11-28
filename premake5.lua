@@ -39,7 +39,8 @@ project "BackBeat"
 	{
 		"%{prj.name}/src/**.h",
 		"%{prj.name}/src/**.cpp",
-		"%{prj.name}/assets/**.png"
+		"%{prj.name}/assets/**.png",
+		"%{prj.name}/assets/**.wav"
 	}
 
 	includedirs

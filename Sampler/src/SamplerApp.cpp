@@ -14,7 +14,7 @@ class Sampler : public BackBeat::Application
 public:
 	Sampler()
 	{
-		PushOverlay(new MainLayer(&this->GetWindow()));
+		PushLayer(new MainLayer(&this->GetWindow()));
 	}
 
 	~Sampler()

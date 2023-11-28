@@ -119,13 +119,12 @@ namespace BackBeat {
 		mr = midiInOpen(
 				(LPHMIDIIN)(&m_DeviceHandle),
 				m_ID,
-				reinterpret_cast<DWORD_PTR>(BackBeat::MidiInProc), // Use the MidiInProc,
+				reinterpret_cast<DWORD_PTR>(BackBeat::MidiInProc),
 				reinterpret_cast<DWORD_PTR>(this),
 				CALLBACK_FUNCTION
 		);
 		// CHECK_FAILURE(mr);
 
-		BB_CORE_INFO("DEVICE OPEN");
 		m_Open = true;
 		return m_Open;
 	}
@@ -149,7 +148,6 @@ namespace BackBeat {
 			return;
 		MMRESULT mr = midiInStart(m_DeviceHandle);
 		// CHECK_FAILURE(mr);
-		BB_CORE_INFO("MIDI DEVICE Start ERROR: {0}", mr);
 	}
 
 	void WindowsMIDIDevice::Stop()
