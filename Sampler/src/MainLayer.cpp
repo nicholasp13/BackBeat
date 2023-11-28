@@ -1,9 +1,11 @@
- #include "MainLayer.h"
+#include "MainLayer.h"
 
 static bool s_OpenSynth = true;
+static UINT32 s_DevicesOpen = 0;
+static bool s_KeyboardActive = true;
 
 	MainLayer::MainLayer(BackBeat::Window* window)
-		: Layer("MainLayer"), m_Window(window)
+		: Layer("MainLayer"), m_Window(window), m_NumMIDIDevices(0)
 	{
 	}
 
@@ -15,9 +17,19 @@ static bool s_OpenSynth = true;
 	// NOTE: Only implements Synth part of Audio not the Playback
 	void MainLayer::OnAttach()
 	{
+		// Initializing synth
 		m_Synth = std::make_unique<BackBeat::Synth>();
 		m_SynthEventHandler = m_Synth->GetEventHandler();
 		m_SynthParams = m_Synth->GetParams();
+
+		// Initializing MIDI input device manager
+		m_MIDIDeviceManager = std::make_unique<BackBeat::WindowsMIDIDeviceManager>();
+		m_NumMIDIDevices = m_MIDIDeviceManager->GetNumDevices();
+		for (UINT i = 0; i < m_NumMIDIDevices; i++)
+		{
+			m_DeviceNames.push_back(m_MIDIDeviceManager->GetDeviceName(i));
+		}
+		m_MIDIDeviceManager->SetOutput(m_Synth->GetMIDIInput());
 	}
 
 	void MainLayer::OnDetach()
@@ -25,9 +37,30 @@ static bool s_OpenSynth = true;
 
 	}
 	
+	// TODO: Change to not DWORD as DWORD is a Windows only data type
 	void MainLayer::OnUpdate(DWORD timeInterval)
 	{
+		 // Update MDIDevices
+		{
+			// TODO: Check if MIDIDevices changes during runtime
 
+			for (UINT i = 0; i < m_NumMIDIDevices; i++) {
+				if ((s_DevicesOpen & (UINT)0x01 << i) != 0) {
+					if (!m_MIDIDeviceManager->IsOpen(i)) {
+						m_Synth->Stop();
+						m_MIDIDeviceManager->OpenDevice(i);
+						m_MIDIDeviceManager->RunDevice(i);
+						m_Synth->Start();
+					}
+				}
+				else if (m_MIDIDeviceManager->IsOpen(i))
+				{
+					m_Synth->Stop();
+					m_MIDIDeviceManager->CloseDevice(i);
+					m_Synth->Start();
+				}
+			}
+		}
 	}
 
 	void MainLayer::OnEvent(BackBeat::Event& event) 
@@ -37,7 +70,7 @@ static bool s_OpenSynth = true;
 		dispatcher.Dispatch<BackBeat::KeyPressedEvent>(BIND_EVENT_FN(MainLayer::OnKeyEvent));
 		dispatcher.Dispatch<BackBeat::MouseButtonPressedEvent>(BIND_EVENT_FN(MainLayer::OnMouseButtonEvent));
 
-		if (m_Synth->IsRunning())
+		if (m_Synth->IsRunning() && s_KeyboardActive)
 			m_SynthEventHandler->HandleEvent(event);
 
 		event.Handled = true;
@@ -99,6 +132,7 @@ static bool s_OpenSynth = true;
 				m_Synth->Stop();
 			}
 		}
+
 	}
 
 	bool MainLayer::OnKeyEvent(BackBeat::KeyPressedEvent& event)
@@ -135,7 +169,7 @@ static bool s_OpenSynth = true;
 	}
 
 	// TODO: 
-	//   Change slider controls as they are linear while standard Synth controls which are usually logarithmic
+	//   Change slider controls as they are linear while standard Synth controls are usually logarithmic
 	//     NOTE: Check MMA DLS 1 and 2 standards as they specify controls. Also will probably need helper 
 	//     functions (to defined in main BackBeat project) to scale properly with standard units like decibels.
 	void MainLayer::RenderSynth()
@@ -145,34 +179,77 @@ static bool s_OpenSynth = true;
 			// TODO: Add options after features are added i.e. Menu with 'Save' to save Synth config
 			if (ImGui::BeginMenuBar())
 			{
-
-				if (ImGui::BeginMenu("Controls"))
+				if (ImGui::BeginMenu("Devices"))
 				{
-					ImGui::SeparatorText("WHITE KEYS:");
-					ImGui::Text(" NOTES:");   ImGui::SameLine(); ImGui::Text("KEYS:");
-					ImGui::BulletText("C  "); ImGui::SameLine(); ImGui::BulletText("A");
-					ImGui::BulletText("D  "); ImGui::SameLine(); ImGui::BulletText("S");
-					ImGui::BulletText("E  "); ImGui::SameLine(); ImGui::BulletText("D");
-					ImGui::BulletText("F  "); ImGui::SameLine(); ImGui::BulletText("F");
-					ImGui::BulletText("G  "); ImGui::SameLine(); ImGui::BulletText("G");
-					ImGui::BulletText("A  "); ImGui::SameLine(); ImGui::BulletText("H");
-					ImGui::BulletText("B  "); ImGui::SameLine(); ImGui::BulletText("J");
-					ImGui::BulletText("C  "); ImGui::SameLine(); ImGui::BulletText("K");
+					// Keyboard
+					if (ImGui::BeginMenu("Keyboard"))
+					{
+						if (ImGui::MenuItem("Set Active", "", &s_KeyboardActive))
+						{
+							m_Synth->Stop();
+							m_Synth->Start();
+						}
 
-					ImGui::SeparatorText("BLACK KEYS:");
-					ImGui::Text(" NOTES:    ");   ImGui::SameLine(); ImGui::Text("KEYS:");
-					ImGui::BulletText("C Sharp"); ImGui::SameLine(); ImGui::BulletText("W");
-					ImGui::BulletText("D Sharp"); ImGui::SameLine(); ImGui::BulletText("E");
-					ImGui::BulletText("F Sharp"); ImGui::SameLine(); ImGui::BulletText("T");
-					ImGui::BulletText("G Sharp"); ImGui::SameLine(); ImGui::BulletText("Y");
-					ImGui::BulletText("A Sharp"); ImGui::SameLine(); ImGui::BulletText("U");
+						if (ImGui::BeginMenu("Controls"))
+						{
+							ImGui::SeparatorText("WHITE KEYS:");
+							ImGui::Text(" NOTES:");   ImGui::SameLine(); ImGui::Text("KEYS:");
+							ImGui::BulletText("C  "); ImGui::SameLine(); ImGui::BulletText("A");
+							ImGui::BulletText("D  "); ImGui::SameLine(); ImGui::BulletText("S");
+							ImGui::BulletText("E  "); ImGui::SameLine(); ImGui::BulletText("D");
+							ImGui::BulletText("F  "); ImGui::SameLine(); ImGui::BulletText("F");
+							ImGui::BulletText("G  "); ImGui::SameLine(); ImGui::BulletText("G");
+							ImGui::BulletText("A  "); ImGui::SameLine(); ImGui::BulletText("H");
+							ImGui::BulletText("B  "); ImGui::SameLine(); ImGui::BulletText("J");
+							ImGui::BulletText("C  "); ImGui::SameLine(); ImGui::BulletText("K");
+
+							ImGui::SeparatorText("BLACK KEYS:");
+							ImGui::Text(" NOTES:    ");   ImGui::SameLine(); ImGui::Text("KEYS:");
+							ImGui::BulletText("C Sharp"); ImGui::SameLine(); ImGui::BulletText("W");
+							ImGui::BulletText("D Sharp"); ImGui::SameLine(); ImGui::BulletText("E");
+							ImGui::BulletText("F Sharp"); ImGui::SameLine(); ImGui::BulletText("T");
+							ImGui::BulletText("G Sharp"); ImGui::SameLine(); ImGui::BulletText("Y");
+							ImGui::BulletText("A Sharp"); ImGui::SameLine(); ImGui::BulletText("U");
+
+							ImGui::EndMenu();
+						}
+						ImGui::EndMenu();
+					}
+
+					// MIDIDevices
+					if (ImGui::BeginMenu("MIDI Devices"))
+					{
+						if (m_NumMIDIDevices == 0) {
+							ImGui::BeginDisabled();
+							if (ImGui::MenuItem("No devices detected"))
+							{
+
+							}
+							ImGui::EndDisabled();
+						}
+
+						for (UINT i = 0; i < m_NumMIDIDevices; i++) {
+
+							// TODO: Test multiple MIDI devices and if MIDI devices change number
+							static bool s_DeviceOpen = m_MIDIDeviceManager->IsOpen(i);
+
+							if (ImGui::BeginMenu(m_DeviceNames[i].c_str()))
+							{
+								if (ImGui::MenuItem("Set Active", "", &s_DeviceOpen))
+								{
+									s_DevicesOpen ^= (UINT)0x01 << i;
+								}
+								ImGui::EndMenu();
+							}
+						}
+						ImGui::EndMenu();
+					}
 
 					ImGui::EndMenu();
 				}
 				ImGui::EndMenuBar();
 			}
 		}
-
 		// Render Controls
 		// Table flags
 		static ImGuiTableFlags table_flags = 0;
@@ -184,21 +261,21 @@ static bool s_OpenSynth = true;
 		// Note controls
 		{
 			ImGui::TableNextColumn();
-			ImGui::SeparatorText("Note Control");
+			ImGui::SeparatorText("General Controls");;
 			static int* octave = &(m_SynthParams->eventHandlerParams->octave);
 			ImGui::Text("Octave: %d", *octave); ImGui::SameLine();
 			if (ImGui::SmallButton("+")) {
-				if (*octave < 9)
+				if (*octave < HIGHEST_OCTAVE_SYNTH)
 					(*octave)++;
 			} ImGui::SameLine();
 			if (ImGui::SmallButton("-")) {
-				if (*octave > -1)
+				if (*octave > LOWEST_OCTAVE_SYNTH)
 					(*octave)--;
-			}
+			} ImGui::SameLine(); HelpMarker("KEYBOARD ONLY");
 
-			static int velocity = 60;
+			static int velocity = MAX_VELOCITY;
 			ImGui::Text("    "); ImGui::SameLine(); ImGui::SliderInt("Note Velocity", &velocity, MIN_VELOCITY, MAX_VELOCITY);
-			ImGui::SameLine(); HelpMarker("Slider to emulate how 'hard' the note was pressed");
+			ImGui::SameLine(); HelpMarker("KEYBOARD ONLY \nSlider to emulate how 'hard' the note was pressed");
 			m_SynthParams->eventHandlerParams->noteVelocity = (byte)velocity;
 
 			ImGui::Spacing();
@@ -580,7 +657,10 @@ static bool s_OpenSynth = true;
 		}
 
 		ImGui::EndTable();
-		// TODO: Add 2D piano render here
+
+		// TODO: Add ModMatrix here
+		// 
+		// TODO: Add 2D piano and/or keyboard render here
 	}
 
 	// NOTE: Call PushStyleColor

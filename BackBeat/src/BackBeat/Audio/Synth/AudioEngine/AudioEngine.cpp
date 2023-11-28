@@ -76,27 +76,23 @@ namespace BackBeat {
 	{
 		int channel = 0;
 		bool noteOn = SynthBase::IsNoteOn(event);
-		if (noteOn) {
-			channel = SynthBase::GetMidiChannel(event, noteOn);
-			for (UINT32 i = 0; i < m_NumVoices; i++) {
-				if (!m_Voices[i]->IsActive() || m_Voices[i]->GetChannel() == channel) {
-					m_Voices[i]->ProcessMIDIEvent(event);
-					return;
-				}
+
+		for (UINT32 i = 0; i < m_NumVoices; i++) {
+			if (event.data1 == m_Voices[i]->GetNote()) {
+				m_Voices[i]->ProcessMIDIEvent(event);
+				return;
 			}
 		}
 
-		channel = SynthBase::GetMidiChannel(event, noteOn);
-		if (channel >= 0 && channel <= 16)
-		{
-			for (UINT32 j = 0; j < m_NumVoices; j++) {
-				if (channel == m_Voices[j]->GetChannel()) {
+		if (noteOn) {
+			for (UINT j = 0; j < m_NumVoices; j++) {
+				if (!m_Voices[j]->IsActive()) {
 					m_Voices[j]->ProcessMIDIEvent(event);
 					return;
 				}
 			}
 		}
-
+		
 		// TODO: Add switch cases for other status bytes
 	}
 	

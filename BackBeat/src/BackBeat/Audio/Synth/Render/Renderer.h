@@ -1,6 +1,5 @@
 #pragma once
 
-// CHANGE TO ABSTRACT CLASS
 namespace BackBeat {
 
 	class Renderer

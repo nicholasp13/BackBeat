@@ -20,11 +20,12 @@ namespace BackBeat {
 #define REFTIMES_PER_SECOND   10000000
 #define REFTIMES_PER_MILLISEC 10000
 
-// HRESULT FAILURE CODES
+// BackBeat HRESULT FAILURE CODES
 #define PLAY_FAILURE (HRESULT)1001
 #define LOAD_FAILURE (HRESULT)1002
 #define MIX_FAILURE  (HRESULT)1003
 
+// TODO: Expand/Make another CHECK_FAILURE for MMRESULT (Midi Input device Windows error messages) 
 #define CHECK_FAILURE( hr ) \
 	if (hr == PLAY_FAILURE) \
 	{ BB_CORE_ERROR("{0} FAILED TO PLAY", hr);  return; } \
@@ -34,6 +35,15 @@ namespace BackBeat {
 	{ BB_CORE_ERROR("{0} FAILED TO MIX", hr); return;} \
 	else if (FAILED(hr) != S_OK) \
 	{ BB_CORE_ERROR("{0} WINDOWS WASAPI API FAILURE", hr); return; }
+
+	typedef unsigned char byte;
+
+	// Struct of basic MIDI events
+	struct midiEvent {
+		byte status;
+		byte data1;
+		byte data2;
+	};
 
 	class Audio
 	{

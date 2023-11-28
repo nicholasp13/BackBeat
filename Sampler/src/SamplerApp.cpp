@@ -3,11 +3,12 @@
 * of certain properties. Future implentation of other sample rates, file types to be done later or as needed
 */
 
+// TODO: Make Synth own layer
+
 #include <BackBeat.h>
 #include <BackBeat/Core/EntryPoint.h>
 
 #include "MainLayer.h"
-
 class Sampler : public BackBeat::Application
 {
 public:

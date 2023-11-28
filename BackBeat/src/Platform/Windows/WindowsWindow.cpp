@@ -40,21 +40,9 @@ namespace BackBeat {
 			s_GLFWInitialized = true;
 		}
 
-		// Get monitor resolution. Window props size is ignored
-		int count;
-		const GLFWvidmode* modes = glfwGetVideoModes(glfwGetPrimaryMonitor(), &count);
-		int maxWidth = 0;
-		int maxHeight = 0;
-		for (int i = 0; i < count; i++)
-		{
-			if (modes[i].width > maxWidth)
-				maxWidth = modes[i].width;
-			if (modes[i].height > maxHeight)
-				maxHeight = modes[i].height;
-		}
 		m_Data.Title = props.Title;
-		m_Data.Width = maxWidth;
-		m_Data.Height = maxHeight;
+		m_Data.Width = props.Width;
+		m_Data.Height = props.Height;
 		BB_CORE_INFO("Creating window {0} ({1}, {2})", m_Data.Title, m_Data.Width, m_Data.Height);
 		m_Window = glfwCreateWindow((int)m_Data.Width, (int)m_Data.Height, m_Data.Title.c_str(), nullptr, nullptr);
 		glfwMakeContextCurrent(m_Window);

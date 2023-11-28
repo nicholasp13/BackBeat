@@ -14,6 +14,7 @@
 #include <memory>
 #include <chrono>
 #include <filesystem>
+#include <queue>
 
 #ifdef BB_PLATFORM_WINDOWS
 	#include <Windows.h>

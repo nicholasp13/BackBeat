@@ -10,6 +10,8 @@
 // - Rename and refactor into a WindowsPlayer and an implementation of a Player
 //       abstract class for clarification on platform and for possible 
 //       implementation of Linux player.
+// - Change implementation after checking performance (specifically Loader and how
+//       the file is loaded and read)
 // - Allow for other file types i.e. MP3s, other sample rates, other bit depth,
 //       and 
 // - Create an exclusive Windows audio mode that only allows for Audio from this

@@ -14,6 +14,7 @@ namespace BackBeat {
 		std::ifstream file;
 
 		// TODO: Implement Function to get mp3 file header info
+		//       Change the way filepath is taken? Use <filesystem> possibly
 		file.open(filePath, std::ios::binary);
 		if (file.is_open())
 		{

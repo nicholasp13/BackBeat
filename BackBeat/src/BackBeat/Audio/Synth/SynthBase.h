@@ -7,16 +7,19 @@
 namespace BackBeat {
 
 // CONSTANTS
-#define FLOAT_SIZE      4
-#define PI              3.141592653589793f // Float(32 bit) precise pi
-#define CIRCLE_DEGREES  360.0f
-#define NOTES_IN_OCTAVE 12
-#define LOWER_OCTAVE    0.5f
-#define HIGHER_OCTAVE   2.0f
-#define LOWEST_OCTAVE   0.03125f
-#define HIGHEST_OCTAVE  32.0f
-#define NUM_OSCS        4.0f
-#define DELTA_CENTS_HZ  0.004860f // The smallest value of a cent in hz, Formula (C_MINUS_1_NOTE - C_SHARP_MINUS_1_NOTE) / 100.0f.
+#define FLOAT_SIZE             4
+#define PI                     3.141592653589793f // Float(32 bit) precise pi
+#define CIRCLE_DEGREES       360.0f
+#define NOTES_IN_OCTAVE       12
+#define LOWER_OCTAVE          0.5f
+#define HIGHER_OCTAVE         2.0f
+#define LOWEST_OCTAVE         0.03125f
+#define HIGHEST_OCTAVE_SYNTH  9
+#define LOWEST_OCTAVE_SYNTH  -1
+#define HIGHEST_OCTAVE       32.0f
+#define NUM_OSCS              4.0f
+#define DELTA_CENTS_HZ        0.004860f // The smallest value of a cent in hz, Formula (C_MINUS_1_NOTE - C_SHARP_MINUS_1_NOTE) / 100.0f.
+#define NOTE_OFF        (byte)0xFF
 
 // MUSIC NOTES in hertz
 // Lowest note
@@ -36,8 +39,6 @@ namespace BackBeat {
 #define B_4_NOTE       493.9f
 // Highest note
 #define G_9_NOTE       12543.9f
-
-typedef unsigned char byte;
 
 // -------- CONSTANTS FOR MIDI EVENTS --------- //
 // Website: https://midi.org/specifications/midi-reference-tables/
@@ -305,13 +306,6 @@ typedef unsigned char byte;
 // Filters
 #define FILTER_CUTOFF_MIN           200.0f      // Sample rate / 240
 #define FILTER_CUTOFF_MAX           8000.0f     // Sample rate / 6
-
-// Struct of basic MIDI events for possible future MIDI input feature
-	struct midiEvent {
-		byte status;
-		byte data1;
-		byte data2;
-	};
 
 	// TODO: Add other members as needed for other MIDI data i.e. channel number, pitch modulation
 	struct noteEvent {
