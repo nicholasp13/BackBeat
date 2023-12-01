@@ -21,7 +21,7 @@
 #include <queue>
 
 #include "BackBeat/Audio/Synth/SynthBase.h"
-#include "BackBeat/Audio/Synth/Render/RenderInfo.h"
+#include "BackBeat/Audio/Synth/SynthIO/RenderInfo.h"
 #include "BackBeat/Audio/Synth/AudioEngine/SynthVoices/SynthVoice.h"
 namespace BackBeat {
 
@@ -30,7 +30,7 @@ namespace BackBeat {
 	class AudioEngine
 	{
 	public:
-		AudioEngine(tWAVEFORMATEX props);
+		AudioEngine(AudioProps props);
 		~AudioEngine();
 		
 		void Stop();
@@ -39,18 +39,18 @@ namespace BackBeat {
 		virtual void Render(std::shared_ptr<RenderInfo> info);
 		virtual void SetParam(); // TODO: Implement if needed
 		virtual std::shared_ptr<EngineParameters> GetParam();
-		virtual void ProcessMIDIEvent(midiEvent event);
+		virtual void ProcessMIDIEvent(MIDIEvent event);
 
 	private:
 		UINT32 m_NumVoices;
 		UINT32 m_OutputBufferPosition;
 		float m_VoiceFactor;
-		tWAVEFORMATEX m_Props;
+		AudioProps m_Props;
 
 		std::shared_ptr<float[]> m_Buffer;
 		std::shared_ptr<EngineParameters> m_Params;
 		std::unique_ptr<SynthVoice> m_Voices[MAX_VOICES];
-		std::queue<midiEvent> m_MIDIEvents;
+		std::queue<MIDIEvent> m_MIDIEvents;
 
 		void InitVoices();
 		void InitParameters();

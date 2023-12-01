@@ -9,12 +9,9 @@
 #include "WindowsRenderer.h"
 namespace BackBeat {
 
-	WindowsRenderer::WindowsRenderer(tWAVEFORMATEX props, std::shared_ptr<RenderInfo> info, std::shared_ptr<AudioEngine> engine)
+	WindowsRenderer::WindowsRenderer()
 		:
 		m_Rendering(false),
-		m_SynthProps(props),
-		m_Info(info),
-		m_Engine(engine),
 		m_BufferSize(0),
 		m_AudioClient(NULL),
 		m_Enumerator(NULL),
@@ -26,12 +23,25 @@ namespace BackBeat {
 
 	WindowsRenderer::~WindowsRenderer()
 	{
-
+		Stop();
 	}
+
+	void WindowsRenderer::Start()
+	{
+		m_Rendering = true;
+		m_Thread = std::thread(&WindowsRenderer::Render, this);
+	}
+
+	void WindowsRenderer::Stop() 
+	{
+		m_Rendering = false; 
+		if (m_Thread.joinable())
+			m_Thread.join();
+	}
+
 
 	void WindowsRenderer::Render()
 	{
-		m_Rendering = true;
 		HRESULT hr;
 		UINT32 padding;
 		UINT32 framesAvailable;
@@ -50,7 +60,7 @@ namespace BackBeat {
 		hr = m_ClientRenderer->GetBuffer(framesAvailable, &data);
 		CHECK_FAILURE(hr);
 
-		GetData(data, framesAvailable);
+		m_Mixer->GetData(data, framesAvailable); //  TODO: Reimplement way to get data after creating mixer
 
 		hr = m_ClientRenderer->ReleaseBuffer(framesAvailable, flags);
 		CHECK_FAILURE(hr);
@@ -70,7 +80,7 @@ namespace BackBeat {
 			hr = m_ClientRenderer->GetBuffer(framesAvailable, &data);
 			CHECK_FAILURE(hr);
 
-			GetData(data, framesAvailable);
+			m_Mixer->GetData(data, framesAvailable);
 
 			hr = m_ClientRenderer->ReleaseBuffer(framesAvailable, flags);
 			CHECK_FAILURE(hr);
@@ -133,22 +143,30 @@ namespace BackBeat {
 
 		m_ActualBufferDuration = (REFERENCE_TIME)bufferDuration * m_BufferSize
 			/ m_DeviceProps->nSamplesPerSec;
+
+		m_Props.bigEndian = Audio::IsBigEndian();
+		m_Props.format = m_DeviceProps->wFormatTag;
+		m_Props.numChannels = m_DeviceProps->nChannels;
+		m_Props.sampleRate = m_DeviceProps->nSamplesPerSec;
+		m_Props.byteRate = m_DeviceProps->nAvgBytesPerSec;
+		m_Props.blockAlign = m_DeviceProps->nBlockAlign;
+		m_Props.bitDepth = m_DeviceProps->wBitsPerSample;
+		m_Props.fileSize = 0;
+
+
+		m_Mixer = std::make_shared<Mixer>(m_Props);
+
+		BB_CORE_INFO("------ MY DEVICE PROPERTIES ------");
+		if (m_Props.bigEndian)
+			BB_CORE_TRACE("Big endian");
+		else
+			BB_CORE_TRACE("Little endian");
+		BB_CORE_TRACE("Audio Format: {0}", m_Props.format);
+		BB_CORE_TRACE("Number of Channels: {0}", m_Props.numChannels);
+		BB_CORE_TRACE("Sample Rate: {0}", m_Props.sampleRate);
+		BB_CORE_TRACE("Byte Rate: {0}", m_Props.byteRate);
+		BB_CORE_TRACE("Block Align: {0}", m_Props.blockAlign);
+		BB_CORE_TRACE("Bits per Sample: {0}", m_Props.bitDepth);
 	}
 
-	void WindowsRenderer::GetData(BYTE* data, UINT32 framesAvailable)
-	{
-		m_Info->SetSamplesToRender(framesAvailable);
-		m_Engine->Render(m_Info);
-
-		float* targetBuffer = reinterpret_cast<float*>(data);
-		std::shared_ptr<float[]> srcBuffer = m_Info->GetBuffer();
-
-		for (UINT32 i = 0; i < framesAvailable * m_SynthProps.nChannels; i += m_SynthProps.nChannels)
-		{
-			for (UINT32 j = 0; j < m_SynthProps.nChannels; j++)
-			{
-				targetBuffer[i + j] = srcBuffer[i + j];
-			}
-		}
-	}
 }

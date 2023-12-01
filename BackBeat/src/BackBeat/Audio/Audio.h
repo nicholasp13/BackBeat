@@ -1,10 +1,17 @@
 #pragma once
 
+// NOTE: UINT and UINT32 are Windows
+
 #include "BackBeat/Core/Core.h"
 namespace BackBeat {
 
 // MISC CONSTANTS
-#define BYTESIZE 8
+#define BYTE_BIT_SIZE     8
+#define INT16_BIT_SIZE    16
+#define INT24_BIT_SIZE    24
+#define FLOAT_BIT_SIZE    32
+#define DOUBLE_BIT_SIZE   64
+#define INT24_MAX         8388607.0f
 
 // AUDIOFILE CONSTANTS
 #define MONO    (UINT32)1
@@ -14,7 +21,7 @@ namespace BackBeat {
 
 // AUDIO FILE STRINGS
 #define MP3 "ID3"
-#define WAV "RIFF"
+#define WAV "RIF"
 
 // REFERENCE_TIME time units per second and per millisecond
 #define REFTIMES_PER_SECOND   10000000
@@ -38,8 +45,19 @@ namespace BackBeat {
 
 	typedef unsigned char byte;
 
+	struct AudioProps {
+		bool bigEndian;
+		unsigned short format;
+		unsigned short numChannels;
+		unsigned long sampleRate;
+		unsigned long byteRate;
+		unsigned short blockAlign;  // numChannels * bitDepth / 8
+		unsigned short bitDepth;
+		unsigned long fileSize;
+	};
+
 	// Struct of basic MIDI events
-	struct midiEvent {
+	struct MIDIEvent {
 		byte status;
 		byte data1;
 		byte data2;
@@ -51,7 +69,7 @@ namespace BackBeat {
 		static unsigned short EndianConverterShort(char num1, char num2)
 		{
 			unsigned short leftToRight = (num1 & 0x00FF);
-			unsigned short rightToLeft = (num2 & 0x00FF) << BYTESIZE;
+			unsigned short rightToLeft = (num2 & 0x00FF) << BYTE_BIT_SIZE;
 			return (leftToRight | rightToLeft);
 		}
 
@@ -59,16 +77,16 @@ namespace BackBeat {
 			char num3, char num4)
 		{
 			unsigned long leftMost = (num1 & 0x000000FF);
-			unsigned long left = (num2 & 0x000000FF) << BYTESIZE;
-			unsigned long right = (num3 & 0x000000FF) << (2 * BYTESIZE);
-			unsigned long rightMost = (num4 & 0x000000FF) << (3 * BYTESIZE);
+			unsigned long left = (num2 & 0x000000FF) << BYTE_BIT_SIZE;
+			unsigned long right = (num3 & 0x000000FF) << (2 * BYTE_BIT_SIZE);
+			unsigned long rightMost = (num4 & 0x000000FF) << (3 * BYTE_BIT_SIZE);
 			return (left | leftMost | right | rightMost);
 		}
 
 		static short EndianConverterSignedShort(char num1, char num2)
 		{
 			short leftToRight = (num1 & 0x00FF);
-			short rightToLeft = (num2 & 0x00FF) << BYTESIZE;
+			short rightToLeft = (num2 & 0x00FF) << BYTE_BIT_SIZE;
 			return (leftToRight | rightToLeft);
 		}
 
@@ -94,6 +112,18 @@ namespace BackBeat {
 		{
 			for (UINT32 i = 0; i < numSamples * numChannels; i++)
 				buffer[i] = defaultValue;
+		}
+
+		// Taken from IBM developer
+		static bool IsBigEndian()
+		{
+			int i = 1;
+			char *p = (char*) & i;
+
+			if (p[0] == 1)
+				return false;
+			else
+				return true;
 		}
 	};
 }

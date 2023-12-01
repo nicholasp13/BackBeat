@@ -6,7 +6,9 @@
 #include "SynthParameters.h"
 namespace BackBeat {
 
-// CONSTANTS
+// ---- CONSTANTS ---- //
+
+// MISC
 #define FLOAT_SIZE             4
 #define PI                     3.141592653589793f // Float(32 bit) precise pi
 #define CIRCLE_DEGREES       360.0f
@@ -20,6 +22,12 @@ namespace BackBeat {
 #define NUM_OSCS              4.0f
 #define DELTA_CENTS_HZ        0.004860f // The smallest value of a cent in hz, Formula (C_MINUS_1_NOTE - C_SHARP_MINUS_1_NOTE) / 100.0f.
 #define NOTE_OFF        (byte)0xFF
+
+// SYNTH PROPERTIES
+#define SYNTH_SAMPLE_RATE  48000
+#define SYNTH_BYTE_RATE   384000 
+#define SYNTH_BLOCK_ALIGN      8
+#define SYNTH_BIT_DEPTH       32
 
 // MUSIC NOTES in hertz
 // Lowest note
@@ -239,6 +247,8 @@ namespace BackBeat {
 // Website: https://www.midi.org/specifications-old/item/dls-level-1-specification
 // Specification level 1
 // LFOs
+#define LFO_MIN_DELAY               0.1f    // in seconds
+#define LFO_MAX_DELAY              10.0f
 #define LFO_FREQ_DEFAULT            5.0f
 #define LFO_FREQ_MIN                0.1f
 #define LFO_FREQ_MAX                10.0f
@@ -308,7 +318,7 @@ namespace BackBeat {
 #define FILTER_CUTOFF_MAX           8000.0f     // Sample rate / 6
 
 	// TODO: Add other members as needed for other MIDI data i.e. channel number, pitch modulation
-	struct noteEvent {
+	struct NoteEvent {
 		bool noteOn;
 		int channel;
 		float note;
@@ -327,13 +337,13 @@ namespace BackBeat {
 			return timePos * SamplesPerMS;
 		}
 
-		static boolean IsNoteOn(midiEvent event)
+		static boolean IsNoteOn(MIDIEvent event)
 		{
 			return (event.status <= CHANNEL_16_NOTE_ON && event.status >= CHANNEL_1_NOTE_ON);
 		}
 
 
-		static int GetMidiChannel(midiEvent event, boolean noteOn)
+		static int GetMidiChannel(MIDIEvent event, boolean noteOn)
 		{
 			if (noteOn) {
 				return (int)event.status - (int)CHANNEL_1_NOTE_ON + 1;
@@ -354,9 +364,9 @@ namespace BackBeat {
 			return A_4_NOTE * pow(2.0f, ((float)midiNote - (float)MIDI_NOTE_A_4) / 12.0f);
 		}
 
-		static noteEvent ConvertEvent(midiEvent event)
+		static NoteEvent ConvertEvent(MIDIEvent event)
 		{
-			noteEvent nEvent = {
+			NoteEvent nEvent = {
 				.noteOn = false,
 				.channel = -1,
 				.note = 0.0f,

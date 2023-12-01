@@ -70,9 +70,9 @@ namespace BackBeat {
 			m_NotePressed = NOTE_OFF;
 		}
 	}
-	void SynthVoice::ProcessMIDIEvent(midiEvent event)
+	void SynthVoice::ProcessMIDIEvent(MIDIEvent event)
 	{
-		noteEvent nEvent = SynthBase::ConvertEvent(event);
+		NoteEvent nEvent = SynthBase::ConvertEvent(event);
 
 		if (nEvent.noteOn)
 			DoNoteOn(nEvent);
@@ -81,7 +81,7 @@ namespace BackBeat {
 	}
 
 	// TODO: On and off channel decided by note
-	void SynthVoice::DoNoteOn(noteEvent event)
+	void SynthVoice::DoNoteOn(NoteEvent event)
 	{
 		m_Actice = true;
 		m_Channel = event.channel;
@@ -100,7 +100,7 @@ namespace BackBeat {
 
 	// NOTE: Only EGs have non-empty DoNoteOff() functions. Voice only calls other SynthModules
 	//       to match function call hierarchy
-	void SynthVoice::DoNoteOff(noteEvent event)
+	void SynthVoice::DoNoteOff(NoteEvent event)
 	{
 		m_Osc1->DoNoteOff(event);
 		m_Osc2->DoNoteOff(event);

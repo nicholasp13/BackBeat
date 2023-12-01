@@ -10,7 +10,7 @@ namespace BackBeat {
 		static HRESULT CreateFile(std::string fileName, AudioData** audioData);
 		
 	private:
-		static void ReadMP3Header(char* header, tWAVEFORMATEX* props, unsigned long* size);
-		static void ReadWAVHeader(char* header, tWAVEFORMATEX* props, unsigned long* size);
+		static void ReadMP3Header(char* header, AudioProps* props);
+		static void ReadWAVHeader(char* header, AudioProps* props);
 	};
 }

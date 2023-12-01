@@ -31,12 +31,12 @@ namespace BackBeat {
 		m_Core->Render(numSamples);
 	}
 
-	void LinearEG::DoNoteOn(noteEvent event)
+	void LinearEG::DoNoteOn(NoteEvent event)
 	{
 		m_Core->DoNoteOn(event);
 	}
 
-	void LinearEG::DoNoteOff(noteEvent event)
+	void LinearEG::DoNoteOff(NoteEvent event)
 	{
 		m_Core->DoNoteOff(event);
 	}

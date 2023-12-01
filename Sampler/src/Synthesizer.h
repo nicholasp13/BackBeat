@@ -25,11 +25,13 @@ public:
 	void Open();
 	void Close();
 
+	std::shared_ptr<BackBeat::SynthProcessor> GetSynthProc() { return m_Synth.GetProcessor(); }
+
 private:
 	bool m_Open;
 	bool m_KeyboardActive;
-	UINT m_DevicesOpen;
-	UINT m_NumMIDIDevices;
+	unsigned int m_DevicesOpen;
+	unsigned int m_NumMIDIDevices;
 
 	// Synth
 	BackBeat::Synth m_Synth;

@@ -13,7 +13,6 @@
 //       customizable sounds
 // - Add string names to ModuleCores and way to expose them for GUI purposes
 // - Allow for switching SynthVoices' Modules and/or ModuleCores
-// - Create class to write data to a file to save and to play
 // - Create other Synth modes like mono, legatto etc. Only polyphonic so far.
 // - Create functions to scale units properly with common units like decibels 
 //	     for volume
@@ -36,7 +35,7 @@
 #include "SynthBase.h"
 #include "BackBeat/Audio/Audio.h"
 #include "BackBeat/Audio/Synth/AudioEngine/AudioEngine.h"
-#include "BackBeat/Audio/Synth/Render/WindowsRenderer.h"
+#include "BackBeat/Audio/Synth/SynthIO/SynthProcessor.h"
 #include "BackBeat/Audio/Synth/SynthIO/SynthEventHandler.h"
 #include "BackBeat/Audio/Synth/SynthIO/MIDIInputHandler.h"
 namespace BackBeat {
@@ -51,21 +50,20 @@ namespace BackBeat {
 		void Stop();
 
 		boolean IsRunning() { return m_Running; }
-		std::shared_ptr<Renderer> GetRenderer() { return m_Renderer; }
+		AudioProps GetProps() { return m_Props; }
 		std::shared_ptr<SynthEventHandler> GetEventHandler() { return m_Handler; }
 		std::shared_ptr<MIDIInputHandler> GetMIDIInput() { return m_MIDIInput; }
 		std::shared_ptr<SynthParameters> GetParams() { return m_Params; }
+		std::shared_ptr<SynthProcessor> GetProcessor() { return m_Proc; }
 	
 	private:
 		boolean m_Running;
 		UINT32 m_SamplesToRender;
 		DWORD m_SleepTime;
-		tWAVEFORMATEX m_Props;
-		std::thread m_Thread;
-		std::shared_ptr<Timer> m_Timer;
+		AudioProps m_Props;
+
 		std::shared_ptr<AudioEngine> m_Engine;
-		std::shared_ptr<Renderer> m_Renderer;
-		std::shared_ptr<RenderInfo> m_RenderInfo;
+		std::shared_ptr <SynthProcessor> m_Proc;
 		std::shared_ptr<SynthEventHandler> m_Handler;
 		std::shared_ptr<MIDIInputHandler> m_MIDIInput;
 		std::shared_ptr<SynthParameters> m_Params;

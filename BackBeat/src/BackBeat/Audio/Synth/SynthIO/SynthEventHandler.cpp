@@ -7,7 +7,7 @@ namespace BackBeat {
 		:
 		m_RenderInfo(renderInfo),
 		m_Params(std::make_shared<EventHandlerParameters>(4, (byte)0x7F)),
-		m_MIDIMap(std::map<KeyCode, midiEvent>())
+		m_MIDIMap(std::map<KeyCode, MIDIEvent>())
 	{
 		InitMIDIMap();
 	}
@@ -25,7 +25,7 @@ namespace BackBeat {
 		return true;
 	}
 	
-	bool SynthEventHandler::AddEvent(KeyCode key, midiEvent event)
+	bool SynthEventHandler::AddEvent(KeyCode key, MIDIEvent event)
 	{
 		m_MIDIMap[key] = event;
 		return true;
@@ -36,33 +36,33 @@ namespace BackBeat {
 	{
 		// WHITE KEYS: 'ASDFGHJK'
 		AddEvent(Key::A, 
-			midiEvent(CHANNEL_1_NOTE_ON, MIDI_NOTE_C_4, 0x7f));
+			MIDIEvent(CHANNEL_1_NOTE_ON, MIDI_NOTE_C_4, 0x7f));
 		AddEvent(Key::S,
-			midiEvent(CHANNEL_1_NOTE_ON, MIDI_NOTE_D_4, 0x7f));
+			MIDIEvent(CHANNEL_1_NOTE_ON, MIDI_NOTE_D_4, 0x7f));
 		AddEvent(Key::D,
-			midiEvent(CHANNEL_1_NOTE_ON, MIDI_NOTE_E_4, 0x7f));
+			MIDIEvent(CHANNEL_1_NOTE_ON, MIDI_NOTE_E_4, 0x7f));
 		AddEvent(Key::F,
-			midiEvent(CHANNEL_1_NOTE_ON, MIDI_NOTE_F_4, 0x7f));
+			MIDIEvent(CHANNEL_1_NOTE_ON, MIDI_NOTE_F_4, 0x7f));
 		AddEvent(Key::G,
-			midiEvent(CHANNEL_1_NOTE_ON, MIDI_NOTE_G_4, 0x7f));
+			MIDIEvent(CHANNEL_1_NOTE_ON, MIDI_NOTE_G_4, 0x7f));
 		AddEvent(Key::H,
-			midiEvent(CHANNEL_1_NOTE_ON, MIDI_NOTE_A_4, 0x7f));
+			MIDIEvent(CHANNEL_1_NOTE_ON, MIDI_NOTE_A_4, 0x7f));
 		AddEvent(Key::J,
-			midiEvent(CHANNEL_1_NOTE_ON, MIDI_NOTE_B_4, 0x7f));
+			MIDIEvent(CHANNEL_1_NOTE_ON, MIDI_NOTE_B_4, 0x7f));
 		AddEvent(Key::K,
-			midiEvent(CHANNEL_1_NOTE_ON, MIDI_NOTE_C_5, 0x7f));
+			MIDIEvent(CHANNEL_1_NOTE_ON, MIDI_NOTE_C_5, 0x7f));
 
 		// BLACK KEYS: 'WE TYU'
 		AddEvent(Key::W,
-			midiEvent(CHANNEL_1_NOTE_ON, MIDI_NOTE_C_SHARP_4, 0x7f));
+			MIDIEvent(CHANNEL_1_NOTE_ON, MIDI_NOTE_C_SHARP_4, 0x7f));
 		AddEvent(Key::E,
-			midiEvent(CHANNEL_1_NOTE_ON, MIDI_NOTE_D_SHARP_4, 0x7f));
+			MIDIEvent(CHANNEL_1_NOTE_ON, MIDI_NOTE_D_SHARP_4, 0x7f));
 		AddEvent(Key::T,
-			midiEvent(CHANNEL_1_NOTE_ON, MIDI_NOTE_F_SHARP_4, 0x7f));
+			MIDIEvent(CHANNEL_1_NOTE_ON, MIDI_NOTE_F_SHARP_4, 0x7f));
 		AddEvent(Key::Y,
-			midiEvent(CHANNEL_1_NOTE_ON, MIDI_NOTE_G_SHARP_4, 0x7f));
+			MIDIEvent(CHANNEL_1_NOTE_ON, MIDI_NOTE_G_SHARP_4, 0x7f));
 		AddEvent(Key::U,
-			midiEvent(CHANNEL_1_NOTE_ON, MIDI_NOTE_A_SHARP_4, 0x7f));
+			MIDIEvent(CHANNEL_1_NOTE_ON, MIDI_NOTE_A_SHARP_4, 0x7f));
 	}
 
 	// Note: Does not set event.Handled to true in case application wants to 
@@ -76,7 +76,7 @@ namespace BackBeat {
 
 		byte octave = (m_Params->octave - 4) * NOTES_IN_OCTAVE;
 
-		midiEvent mEvent = m_MIDIMap[event.GetKeyCode()];
+		MIDIEvent mEvent = m_MIDIMap[event.GetKeyCode()];
 		mEvent.data1 += octave;
 		mEvent.data2 = m_Params->noteVelocity;
 		if (mEvent.data1 > MIDI_NOTE_G_9)
@@ -92,7 +92,7 @@ namespace BackBeat {
 
 		byte octave = (m_Params->octave - 4) * NOTES_IN_OCTAVE;
 
-		midiEvent mEvent = m_MIDIMap[event.GetKeyCode()];
+		MIDIEvent mEvent = m_MIDIMap[event.GetKeyCode()];
 		mEvent.status = SynthBase::GetChannelOff(mEvent.status);
 		mEvent.data1 += octave;
 		mEvent.data2 = m_Params->noteVelocity;

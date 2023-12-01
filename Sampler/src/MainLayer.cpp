@@ -15,14 +15,16 @@
 	{
 		m_Synth.Init();
 		m_Synth.Open();
+		m_AudioRenderer.GetMixer()->SetProc(m_Synth.GetSynthProc());
+		m_AudioRenderer.Start();
 	}
 
 	void MainLayer::OnDetach()
 	{
-
+		m_Synth.Close();
+		m_AudioRenderer.Stop();
 	}
 	
-	// TODO: Change to not DWORD as DWORD is a Windows only data type
 	void MainLayer::OnUpdate()
 	{
 		m_Synth.Update();

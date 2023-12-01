@@ -29,12 +29,12 @@ namespace BackBeat {
 		m_Core->Render(numSamples);
 	}
 
-	void WaveOscillator::DoNoteOn(noteEvent event)
+	void WaveOscillator::DoNoteOn(NoteEvent event)
 	{
 		m_Core->DoNoteOn(event);
 	}
 
-	void WaveOscillator::DoNoteOff(noteEvent event)
+	void WaveOscillator::DoNoteOff(NoteEvent event)
 	{
 		m_Core->DoNoteOff(event);
 	}

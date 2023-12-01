@@ -12,4 +12,3 @@
 
 #include "Playback.h"
 
-// TODO: Before take out DWORD from Update() method

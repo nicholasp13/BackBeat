@@ -68,6 +68,7 @@
 	}
 	
 	// TODO: Change some sliders to knobs for more classic synth look
+	//       Change the scale of sliders to match DLS 1
 	void Synthesizer::ImGuiRender()
 	{
 		if (!m_Open)
@@ -111,7 +112,8 @@
 							ImGui::SeparatorText("WHITE KEYS:");
 							ImGui::Text(" NOTES:");   ImGui::SameLine(); ImGui::Text("KEYS:");
 							ImGui::BulletText("C  "); ImGui::SameLine(); ImGui::BulletText("A");
-							ImGui::BulletText("D  "); ImGui::SameLine(); ImGui::BulletText("S");								ImGui::BulletText("E  "); ImGui::SameLine(); ImGui::BulletText("D");
+							ImGui::BulletText("D  "); ImGui::SameLine(); ImGui::BulletText("S");								
+							ImGui::BulletText("E  "); ImGui::SameLine(); ImGui::BulletText("D");
 							ImGui::BulletText("F  "); ImGui::SameLine(); ImGui::BulletText("F");
 							ImGui::BulletText("G  "); ImGui::SameLine(); ImGui::BulletText("G");
 							ImGui::BulletText("A  "); ImGui::SameLine(); ImGui::BulletText("H");
@@ -201,7 +203,7 @@
 			ImGui::Text("    "); ImGui::SameLine(); ImGui::SliderFloat("Volume", volume, 0.0f, 1.0f);
 			ImGui::Spacing();
 
-			static float pan = PAN_DEFAULT;
+			static float pan = PAN_DEFAULT; // Note: Actually .70 in DLS 1
 			static float defaultAmp = 0.50f;
 			ImGui::Text("Panning"); ImGui::SameLine();
 			if (ImGui::SmallButton("Reset"))
@@ -524,7 +526,7 @@
 			}
 			m_SynthParams->engineParams->voiceParams->OscParams4->octave = pow(2.0f, (float)octave4);
 
-			static int selected = 4;
+			static int selected = 3;
 			BackBeat::WaveType* wave = &(m_SynthParams->engineParams->voiceParams->OscParams4->wave);
 			ImGui::Text("    "); ImGui::SameLine(); ImGui::Combo("Waveform", &selected, waveTypes, numWaveforms, numWaveforms);
 
@@ -590,7 +592,7 @@
 	void Synthesizer::Close()
 	{
 		m_Open = false;
-		m_Synth.Start();
+		m_Synth.Stop();
 	}
 
 	bool Synthesizer::OnKeyEvent(BackBeat::KeyPressedEvent& event)

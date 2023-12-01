@@ -27,38 +27,40 @@
 #include "Loader.h"
 namespace BackBeat {
 
-	class Player
+	class WindowsPlayer
 	{
 	public:
 		
-		Player();
-		~Player();
+		WindowsPlayer();
+		~WindowsPlayer();
 
 		void Play();
-		void PlaySamples(UINT32 samples);
 		void Pause();
 		void Stop();
 
-		tWAVEFORMATEX* GetProps() { return m_DeviceProps; }
+		tWAVEFORMATEX* GetProps() { return m_WDeviceProps; }
 		void SetLoader(std::shared_ptr<Loader> loader) { m_Loader = loader; }
 
 		bool Playing = false; // TODO: Change to private variable and change check to a function
 
 	private:
-		void InitAudioClient();
-
 		UINT32 m_Position;
 		UINT32 m_BufferSize;
-		REFERENCE_TIME m_ActualBufferDuration;
+		AudioProps m_Props;
 		std::thread m_Worker;
 
+		// Windows Audio Renderer members
+		REFERENCE_TIME m_ActualBufferDuration;
 		IAudioClient* m_AudioClient;
 		IMMDeviceEnumerator* m_Enumerator;
 		IMMDevice* m_Device;
 		IAudioRenderClient* m_Renderer;
-		tWAVEFORMATEX* m_DeviceProps;
+		// Windows struct for audio file properties
+		tWAVEFORMATEX* m_WDeviceProps;
 
 		std::shared_ptr<AudioData> m_File;
 		std::shared_ptr<Loader> m_Loader;
+
+		void InitAudioClient();
 	};
 }

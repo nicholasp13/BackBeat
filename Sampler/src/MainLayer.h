@@ -13,6 +13,7 @@
 #include <GLFW/glfw3.h>
 
 #include "Synthesizer.h"
+#include "Playback.h"
 class MainLayer : public BackBeat::Layer
 {
 	public:
@@ -28,6 +29,10 @@ class MainLayer : public BackBeat::Layer
 	private:
 		BackBeat::Window* m_Window;
 		Synthesizer m_Synth;
+		// Playback m_Player;
+
+		BackBeat::WindowsRenderer m_AudioRenderer;
+
 
 		bool OnKeyEvent(BackBeat::KeyPressedEvent& event);
 		bool OnMouseButtonEvent(BackBeat::MouseButtonPressedEvent& event);

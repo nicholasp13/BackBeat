@@ -68,7 +68,7 @@ namespace BackBeat {
 		}
 	}
 
-	void TPTHPFilterCore::DoNoteOn(noteEvent event)
+	void TPTHPFilterCore::DoNoteOn(NoteEvent event)
 	{
 		float noteFreq = event.note / m_SampleRate;
 		m_S = 0.0f;
@@ -80,7 +80,7 @@ namespace BackBeat {
 
 	}
 
-	void TPTHPFilterCore::DoNoteOff(noteEvent event)
+	void TPTHPFilterCore::DoNoteOff(NoteEvent event)
 	{
 
 	}
