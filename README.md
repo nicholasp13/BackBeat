@@ -1,8 +1,8 @@
 # ![BackBeat](BackBeat/assets/logos/BackbeatLogo_NoFilter_32x32.png?raw=true "BackBeat")  BackBeat
 
 Currently a music application engine for Windows 10/11 written in C++.
-Currently implements basic polyphonic synth following the MIDI Manufacturers Association (MMA) DLS Level 1 Specification and the ability to play WAV files in one current format.
-Has an example _Sampler_ application for testing.
+Currently implements basic polyphonic synth following the MIDI Manufacturers Association (MMA) DLS Level 1 Specification and the ability to play WAV files
+with bit depths of 8, 16, 32, 64 and sample rate of 48k. Has an example _Sampler_ application for example and testing.
 
 ## How To Use
 Developed soley on Windows with Visual Studios 2022, other IDEs untested and may not work. Set `Sampler` as Startup project to run and make sure to clone recursively. If not, use `git submodule update --init` to clone submodules.
@@ -15,8 +15,9 @@ Developed soley on Windows with Visual Studios 2022, other IDEs untested and may
 ## Goals
 The goal is to create an open source, simple digital audio workstation (DAW) with the ability to easily customize sounds and interface
 ### Upcoming features:
-- Add support to play MP3 files and files with different sample rates, different bit depths, in mono, etc. 
-- Add playback window/layer to Sampler project
+- Add downsampling and upsampling to support different sample rates (only 48k sample rate supported currently)
+- Add support for 24 bit integers
+- Add GUI timeline to edit audio tracks i.e. cutting, copying, multiple tracks, saving edits
 ### Planned features:
 - Modular Matrix for interactive GUI implementation to customize sounds
 - Create audio tracks for editing and recording with GUI contols
@@ -24,6 +25,7 @@ The goal is to create an open source, simple digital audio workstation (DAW) wit
 - Other GUI controls for changing module cores and/or synth voices, and other features
 - Writing, saving, and exporting music files
 - Other Synth modes including monophonic, legatto, gliding, etc.
+- Add support to play MP3 file
 - Linux support and other random features as necessary or personally desired
 ## Sources
 #### _Designing Software Synthesizer Plugins in C++ with Audio DSP_ by Will C. Pirkle
