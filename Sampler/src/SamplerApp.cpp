@@ -1,9 +1,7 @@
 /*
-* Demonstrates a virtual Synth and basic application of BackBeat Engine. BackBeat can also support playback of WAV files 
-* of certain properties. Future implentation of other sample rates, file types to be done later or as needed
+* Demonstrates application of BackBeat Engine with a Synth and Playback functionality. Playback only supports  
+* WAV files with only 48k sample rate and supports all bit depths except 24 bit.
 */
-
-// TODO: Make Synth own layer
 
 #include <BackBeat.h>
 #include <BackBeat/Core/EntryPoint.h>

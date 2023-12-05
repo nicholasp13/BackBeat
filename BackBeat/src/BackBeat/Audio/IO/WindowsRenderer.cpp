@@ -60,7 +60,7 @@ namespace BackBeat {
 		hr = m_ClientRenderer->GetBuffer(framesAvailable, &data);
 		CHECK_FAILURE(hr);
 
-		m_Mixer->GetData(data, framesAvailable); //  TODO: Reimplement way to get data after creating mixer
+		m_Mixer->GetData(data, framesAvailable);
 
 		hr = m_ClientRenderer->ReleaseBuffer(framesAvailable, flags);
 		CHECK_FAILURE(hr);

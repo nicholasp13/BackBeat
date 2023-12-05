@@ -10,7 +10,6 @@
 
 	}
 
-	// NOTE: Only implements Synth part of Audio not the Playback
 	void MainLayer::OnAttach()
 	{
 		m_Synth.Init();
@@ -91,7 +90,6 @@
 
 		m_Synth.ImGuiRender();
 		m_Player.ImGuiRender();
-		ImGui::ShowDemoWindow();
 	}
 
 	bool MainLayer::OnKeyEvent(BackBeat::KeyPressedEvent& event)

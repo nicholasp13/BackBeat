@@ -2,8 +2,8 @@
 
 /* 
 * Basic virtual polyphonic Synth with basic sound waves following MMA DLS level 1 specifications
-* Only produces 48k sample rate, 32 bit depth, and stereo sounds for Windows 10 and 11.
-* Other formats and Linux may be implemented later
+* Produces only 48k sample rate, 32 bit depth, and stereo sounds for Windows 10 and 11 but 
+* other formats are translated by the SynthProcessor (not fully implemented)
 */
 
 // ------------------------------------------------------------------------------- //

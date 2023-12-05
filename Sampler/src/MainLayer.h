@@ -1,7 +1,7 @@
 #pragma once
 
 // TODO: 
-//  Make PlayBack
+//  Create ImGui timeline to edit tracks by GUI input <-- Priority for frontend
 //  Create way to save GUI settings after closing app
 //  Create custom title bar
 //	Create custom icons

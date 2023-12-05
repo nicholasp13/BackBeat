@@ -1,10 +1,9 @@
 #pragma once
 
 // TODO:
-//	Create ImGui knobs for more classic synth GUI 
 //  Create way to save GUI settings after closing app
 //  Implement ModMatrix GUI after creating ModMatrix
-//  Create basic 2D Renderer
+//  Add custom icons, objects, etc. for a more unique and cleaner look
 //	Create visualizer for wavelength
 
 #include <BackBeat.h>

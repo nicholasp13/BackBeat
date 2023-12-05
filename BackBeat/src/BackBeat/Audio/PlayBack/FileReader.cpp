@@ -12,7 +12,6 @@ namespace BackBeat {
 		std::ifstream file;
 
 		// TODO: Implement Function to get mp3 file header info
-		//       Change the way filepath is taken? Use <filesystem> possibly
 		file.open(filePath, std::ios::binary);
 		if (file.is_open())
 		{
@@ -30,7 +29,6 @@ namespace BackBeat {
 				return ReadMP3Header(filePath, 0);
 			}
 			
-			// TODO: THE 'fmt ' subchunk is not specified to be directly after the header
 			if (std::strcmp(WAV, header) == 0)
 			{
 				header[4] = temp2;
@@ -48,12 +46,16 @@ namespace BackBeat {
 	}
 
 
-	// TODO: CREATE INITIALIZE AFTER CREATING MP3 format reader
+	// TODO: CREATE INITIALIZE AFTER CREATING MP3 decoder
 	AudioData* FileReader::ReadMP3Header(std::string filePath, unsigned int size)
 	{
 		return nullptr;
 	}
 
+	// Gets relevant info from headers on WAV files and creates WavData pointer
+	// based on that info
+	// NOTE: WAV file headers are standardized and this function will fail if the WAV file
+	//       is not properly formatted
 	AudioData* FileReader::ReadWAVHeader(std::string filePath, unsigned int size)
 	{
 		char data;
@@ -103,8 +105,12 @@ namespace BackBeat {
 
 		if (Audio::IsBigEndian())
 		{
-			// TODO: CREATE WAY TO GET BIG ENDIAN INTO PROPS
-			return nullptr;
+			props.format = (unsigned short)fileProps[audioFormat];
+			props.numChannels = (unsigned short)fileProps[numChannels];
+			props.sampleRate = (unsigned long)fileProps[sampleRate];
+			props.byteRate = (unsigned long)fileProps[byteRate];
+			props.blockAlign = (unsigned short)fileProps[blockAlign];
+			props.bitDepth = (unsigned short)fileProps[bitDepth];
 		}
 		else {
 			// Rearranges bytes from little Endian to big Endian for this system's standard units

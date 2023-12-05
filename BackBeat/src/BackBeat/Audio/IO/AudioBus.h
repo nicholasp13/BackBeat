@@ -1,5 +1,7 @@
 #pragma once
 
+// NOTE: Implemented but not currently used in application. Here for possible standardization with other audio plugins
+
 #include "AudioBuffer.h"
 #include "Bus.h"
 namespace BackBeat {

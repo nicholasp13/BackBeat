@@ -21,6 +21,7 @@ namespace BackBeat {
 		delete m_Data;
 	}
 
+	// TODO: Implement endianness conversion if the track does not match the systems endianness
 	bool Track::Render(byte* output, unsigned int numBytes) 
 	{
 		if (numBytes == 0)
@@ -34,8 +35,12 @@ namespace BackBeat {
 		std::ifstream file;
 		file.open(m_Data->GetFilePath(), std::ios::binary);
 		file.seekg(m_Position);
-		file.read((char*)output, numBytes);
 
+		if (Audio::IsBigEndian() == m_Data->GetProps().bigEndian)
+			file.read((char*)output, numBytes);
+		else
+			return false; // TODO: Implement way to switch endianness of track data
+		
 		MultiplyVolume(output, numBytes);
 
 		m_Position += numBytes;

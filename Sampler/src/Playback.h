@@ -1,5 +1,7 @@
 #pragma once
 
+// TODO: Create editable timeline for track objects
+
 #include <BackBeat.h>
 #include <imgui.h>
 #include <backends/imgui_impl_opengl3.h>

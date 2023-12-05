@@ -7,8 +7,6 @@
 #include "AudioProcessor.h"
 namespace BackBeat {
 
-	// TODO: Add way to adjust volumes of each proc/channel
-
 	class Mixer
 	{
 	public:

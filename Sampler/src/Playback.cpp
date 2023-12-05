@@ -1,7 +1,7 @@
 #include "Playback.h"
 
 	Playback::Playback()
-		: m_Open(true)
+		: m_Open(false)
 	{
 	
 	}
@@ -23,9 +23,6 @@
 		dispatcher.Dispatch<BackBeat::MouseButtonPressedEvent>(BIND_EVENT_FN(Playback::OnMouseButtonEvent));
 	}
 
-	// TODO: Print out file/song name w/o directory
-	//       Create a makeshift selectable progress bar
-	//       Add a volume bar
 	void Playback::ImGuiRender() 
 	{
 		if (!m_Open) {
