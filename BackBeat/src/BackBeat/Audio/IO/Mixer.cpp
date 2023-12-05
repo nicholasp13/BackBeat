@@ -20,7 +20,7 @@ namespace BackBeat {
 	{
 		for (unsigned int i = 0; i < m_Procs.size(); i++) {
 			if (!m_Procs[i]->IsOn())
-				break;
+				continue;
 			m_Procs[i]->ProcessSamples(numSamples, m_Props.sampleRate, m_Props.numChannels); // TODO: Multithread this call
 		}
 		// Flush data buffer
@@ -54,7 +54,7 @@ namespace BackBeat {
 			float* targetBuffer = reinterpret_cast<float*>(data);
 			for (unsigned int i = 0; i < m_Procs.size(); i++) {
 				if (!m_Procs[i]->IsOn())
-					break;
+					continue;
 
 				AudioProps inProps = m_Procs[i]->GetProperties();
 				depthRatio = GetTypeRatio(m_Props.bitDepth, inProps.bitDepth);
@@ -193,31 +193,31 @@ namespace BackBeat {
 
 		case (BYTE_BIT_SIZE):
 		{
-			max1 = INT8_MAX;
+			max2 = INT8_MAX;
 			break;
 		}
 
 		case (INT16_BIT_SIZE):
 		{
-			max1 = INT16_MAX;
+			max2 = INT16_MAX;
 			break;
 		}
 
 		case (INT24_BIT_SIZE):
 		{
-			max1 = INT24_MAX;
+			max2 = INT24_MAX;
 			break;
 		}
 
 		case (FLOAT_BIT_SIZE):
 		{
-			max1 = 1.0f;
+			max2 = 1.0f;
 			break;
 		}
 
 		case (DOUBLE_BIT_SIZE):
 		{
-			max1 = 1.0f;
+			max2 = 1.0f;
 			break;
 		}
 

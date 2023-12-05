@@ -1,7 +1,7 @@
 #include "Synthesizer.h"
 
 	Synthesizer::Synthesizer()
-		: m_Open(true), m_KeyboardActive(true), m_DevicesOpen(0), m_NumMIDIDevices(0)
+		: m_Open(false), m_KeyboardActive(true), m_DevicesOpen(0), m_NumMIDIDevices(0)
 	{
 
 	}
@@ -67,8 +67,7 @@
 		}
 	}
 	
-	// TODO: Change some sliders to knobs for more classic synth look
-	//       Change the scale of sliders to match DLS 1
+	// TODO: Change sliders to match DLS 1 scaling
 	void Synthesizer::ImGuiRender()
 	{
 		if (!m_Open)
@@ -166,6 +165,7 @@
 				ImGui::EndMenuBar();
 			}
 		}
+
 		// Render Controls
 		// Table flags
 		static ImGuiTableFlags table_flags = 0;
@@ -299,7 +299,7 @@
 			ImGui::PopID();
 		}
 
-			// Amp Envelope Generator Controls
+		// Amp Envelope Generator Controls
 		{
 			ImGui::PushID("AmpEG");
 			ImGui::TableNextColumn();

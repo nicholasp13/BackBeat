@@ -17,7 +17,7 @@ namespace BackBeat {
 
 	SynthProcessor::~SynthProcessor()
 	{
-
+		delete[m_Props.sampleRate] m_Output;
 	}
 
 	void SynthProcessor::ProcessSamples(unsigned int numSamples, unsigned int sampleRate, unsigned int numChannels)
@@ -27,7 +27,7 @@ namespace BackBeat {
 		if (numSamples * m_Props.numChannels > m_Bus.GetBufferSize())
 			return;
 
-		m_Info->SetSamplesToRender(numSamples);
+		m_Info->SetSamplesToRender(numSamples); // NOTE: numSamples should be scaled with the target sampleRate
 		m_Engine->Render(m_Info);
 
 		// NOTE: Synth's should always be a floating point (or a double) and this is assumed and not checked

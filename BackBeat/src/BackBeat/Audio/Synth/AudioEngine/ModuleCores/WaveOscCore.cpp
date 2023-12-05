@@ -23,7 +23,7 @@ namespace BackBeat {
 
 	WaveOscCore::~WaveOscCore()
 	{
-
+		delete[m_WaveSize] m_Wave;
 	}
 
 	void WaveOscCore::Reset(UINT32 sampleRate)

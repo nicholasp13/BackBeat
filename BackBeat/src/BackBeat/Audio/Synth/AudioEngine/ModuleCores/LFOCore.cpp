@@ -24,7 +24,7 @@ namespace BackBeat {
 
 	LFOCore::~LFOCore()
 	{
-
+		delete[m_WaveSize] m_Wave;
 	}
 
 	void LFOCore::Reset(UINT32 sampleRate)

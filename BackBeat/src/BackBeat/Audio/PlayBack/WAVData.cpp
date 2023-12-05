@@ -5,51 +5,48 @@
 #include "WAVData.h"
 namespace BackBeat {
 
-	WAVData::WAVData(std::string filePath, tWAVEFORMATEX* props, int size)
-		: m_FilePath(filePath), m_Props(*props), m_Size(size)
+	WAVData::WAVData(std::string filePath, std::string name, AudioProps props)
+		: 
+		m_Zero(0), 
+		m_DataSize(0), 
+		m_FilePath(filePath), 
+		m_Name(name), 
+		m_Props(props)
 	{
-		BB_CORE_INFO("FILE PROPERTIES");
-		BB_CORE_TRACE("Audio Format: {0}", m_Props.wFormatTag);
-		BB_CORE_TRACE("Number of Channels: {0}", m_Props.nChannels);
-		BB_CORE_TRACE("Sample Rate: {0}", m_Props.nSamplesPerSec);
-		BB_CORE_TRACE("Byte Rate: {0}", m_Props.nAvgBytesPerSec);
-		BB_CORE_TRACE("Block Align: {0}", m_Props.nBlockAlign);
-		BB_CORE_TRACE("Bits per Sample: {0}", m_Props.wBitsPerSample);
-		BB_CORE_TRACE("File Size: {0}", m_Size);
+		
 	}
 
 	WAVData::~WAVData()
 	{
 	}
 
-	// README
-	// MIGHT NEED TO CREATE A CHECK/SEPERATE LOOP FOR DIFFERENT ENDIANNESS
-	HRESULT WAVData::LoadBuffer(UINT32 byteTotal, BYTE* buffer, UINT32* position, bool* loading) 
+	bool WAVData::LoadBuffer(unsigned int byteTotal, byte* buffer, unsigned int* position, bool* loading) 
 	{
 		char data;
 		std::ifstream file(m_FilePath, std::ios::binary);
 
-		for (UINT32 i = 0; i < byteTotal; i++)
+		if (m_Props.bigEndian == Audio::IsBigEndian())
 		{
-			if (*position + i >= m_Size || !(*loading))
+			for (UINT32 i = 0; i < byteTotal; i++)
 			{
-				file.close();
-				*position = *position + i;
-				return S_OK;
+				if (*position + i >= m_Props.fileSize || !(*loading))
+				{
+					file.close();
+					*position = *position + i;
+					return true;
+				}
+				file.seekg(*position + i);
+				file.get(data);
+				buffer[i] = data;
 			}
-			file.seekg(*position + i);
-			file.get(data);
-			buffer[i] = data;	
+		}
+		else
+		{
+			// TODO: Implement changing endianness using 
 		}
 		file.close();
 		*position = *position + byteTotal;
-		return S_OK;
+		return false;
 	}
-
-	FileType WAVData::GetFileType() { return FileType::WAV_FILE; }
-
-	tWAVEFORMATEX* WAVData::GetProperties() { return &m_Props;  }
-
-	UINT32 WAVData::GetSize() {	return m_Size; }
 
 }

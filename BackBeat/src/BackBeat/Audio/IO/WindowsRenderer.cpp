@@ -153,20 +153,7 @@ namespace BackBeat {
 		m_Props.bitDepth = m_DeviceProps->wBitsPerSample;
 		m_Props.fileSize = 0;
 
-
 		m_Mixer = std::make_shared<Mixer>(m_Props);
-
-		BB_CORE_INFO("------ MY DEVICE PROPERTIES ------");
-		if (m_Props.bigEndian)
-			BB_CORE_TRACE("Big endian");
-		else
-			BB_CORE_TRACE("Little endian");
-		BB_CORE_TRACE("Audio Format: {0}", m_Props.format);
-		BB_CORE_TRACE("Number of Channels: {0}", m_Props.numChannels);
-		BB_CORE_TRACE("Sample Rate: {0}", m_Props.sampleRate);
-		BB_CORE_TRACE("Byte Rate: {0}", m_Props.byteRate);
-		BB_CORE_TRACE("Block Align: {0}", m_Props.blockAlign);
-		BB_CORE_TRACE("Bits per Sample: {0}", m_Props.bitDepth);
 	}
 
 }

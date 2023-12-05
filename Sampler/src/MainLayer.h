@@ -29,7 +29,7 @@ class MainLayer : public BackBeat::Layer
 	private:
 		BackBeat::Window* m_Window;
 		Synthesizer m_Synth;
-		// Playback m_Player;
+		Playback m_Player;
 
 		BackBeat::WindowsRenderer m_AudioRenderer;
 

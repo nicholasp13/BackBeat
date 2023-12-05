@@ -17,7 +17,9 @@ namespace BackBeat {
 #define MONO    (UINT32)1
 #define STEREO  (UINT32)2
 #define SHORT_INT_MAX   32676
-#define WAV_HEADER_SIZE 44
+#define WAV_HEADER_SIZE 12
+#define WAV_FMT_SIZE    24
+#define WAV_DATA_SIZE   8
 
 // AUDIO FILE STRINGS
 #define MP3 "ID3"
@@ -61,6 +63,11 @@ namespace BackBeat {
 		byte status;
 		byte data1;
 		byte data2;
+	};
+
+	struct TimeMinSec {
+		unsigned int minutes;
+		unsigned int seconds;
 	};
 
 	class Audio

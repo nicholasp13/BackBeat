@@ -14,11 +14,10 @@
 #include "BackBeat/Core/MouseCodes.h"
 #include "BackBeat/Core/Timer.h"
 #include "BackBeat/Core/Window.h"
-
-#include "BackBeat/ImGui/ImGuiLayer.h"
+#include "BackBeat/Core/FileDialog.h"
 
 #include "BackBeat/Audio/Audio.h"
-#include "BackBeat/Audio/Playback/WindowsPlayer.h"
 #include "BackBeat/Audio/IO/WindowsRenderer.h"
 #include "BackBeat/Audio/Synth/Synth.h"
 #include "BackBeat/Audio/MIDI/WindowsMIDIDeviceManager.h"
+#include "BackBeat/Audio/PlayBack/Player.h"

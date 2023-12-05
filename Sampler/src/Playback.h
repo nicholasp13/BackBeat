@@ -8,16 +8,22 @@
 class Playback
 {
 	public:
-		Playback() {};
-		~Playback() {};
+		Playback();
+		~Playback();
 
-		void Init() {};
-		void Update() {};
-		void OnEvent(BackBeat::Event& event) {};
-		void ImGuiRender() {};
-		void Open() {};
-		void Close() {};
+		void Update();
+		void OnEvent(BackBeat::Event& event);
+		void ImGuiRender();
+		void Open();
+		void Close();
+
+		std::shared_ptr<BackBeat::PlayerProcessor> GetProc() { return m_Player.GetProc(); }
 
 	private:
-		BackBeat::WindowsPlayer m_Player;
+		bool m_Open;
+		BackBeat::Player m_Player;
+
+		bool OnKeyEvent(BackBeat::KeyPressedEvent& event);
+		bool OnMouseButtonEvent(BackBeat::MouseButtonPressedEvent& event);
+		unsigned int SetPlaybackColors();
 };
