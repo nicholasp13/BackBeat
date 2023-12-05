@@ -2,7 +2,7 @@
 
 Currently a music application engine for Windows 10/11 written in C++.
 Currently implements basic polyphonic synth following the MIDI Manufacturers Association (MMA) DLS Level 1 Specification and the ability to play WAV files
-with bit depths of 8, 16, 32, 64 and sample rate of 48k. Has an example _Sampler_ application for example and testing.
+with bit depths of 8, 16, 32, 64 and sample rate of 48k. Has _Sampler_ application for example and testing.
 
 ## How To Use
 Developed soley on Windows with Visual Studios 2022, other IDEs untested and may not work. Set `Sampler` as Startup project to run and make sure to clone recursively. If not, use `git submodule update --init` to clone submodules.
