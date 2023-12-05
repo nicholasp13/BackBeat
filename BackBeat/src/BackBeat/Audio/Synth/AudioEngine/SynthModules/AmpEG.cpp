@@ -40,12 +40,12 @@ namespace BackBeat {
 		}
 	}
 
-	void AmpEG::DoNoteOn(noteEvent event)
+	void AmpEG::DoNoteOn(NoteEvent event)
 	{
 		m_Core->DoNoteOn(event);
 	}
 
-	void AmpEG::DoNoteOff(noteEvent event)
+	void AmpEG::DoNoteOff(NoteEvent event)
 	{
 		m_Core->DoNoteOff(event);
 	}

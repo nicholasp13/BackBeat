@@ -3,11 +3,10 @@
 #include "RenderInfo.h"
 namespace BackBeat {
 
-	RenderInfo::RenderInfo(tWAVEFORMATEX props)
+	RenderInfo::RenderInfo(AudioBuffer* buffer)
 		: 
 		m_SamplesToRender(0), 
-		m_BufferSize(props.nSamplesPerSec), 
-		m_Buffer(std::make_shared<AudioBuffer>(props))
+		m_Buffer(buffer)
 	{
 
 	}
@@ -17,9 +16,9 @@ namespace BackBeat {
 
 	}
 
-	midiEvent RenderInfo::PopMIDIEvent()
+	MIDIEvent RenderInfo::PopMIDIEvent()
 	{
-		midiEvent event = {
+		MIDIEvent event = {
 			.status = (byte)0x00,
 			.data1 =  (byte)0x00,
 			.data2 =  (byte)0x00

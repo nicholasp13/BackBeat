@@ -29,12 +29,12 @@ namespace BackBeat {
 		m_Core->Render(numSamples);
 	}
 
-	void TPTHighPassFilter::DoNoteOn(noteEvent event)
+	void TPTHighPassFilter::DoNoteOn(NoteEvent event)
 	{
 		m_Core->DoNoteOn(event);
 	}
 
-	void TPTHighPassFilter::DoNoteOff(noteEvent event)
+	void TPTHighPassFilter::DoNoteOff(NoteEvent event)
 	{
 		m_Core->DoNoteOff(event);
 	}

@@ -41,7 +41,7 @@ namespace BackBeat {
 		while (m_Running)
 		{
 			for (Layer* layer : m_LayerStack)
-				layer->OnUpdate(DWORD(1000000 / 2));
+				layer->OnUpdate();
 
 			m_ImGuiLayer->Begin();
 

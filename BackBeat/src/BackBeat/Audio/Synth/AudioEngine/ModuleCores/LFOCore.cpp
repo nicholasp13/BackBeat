@@ -1,5 +1,7 @@
 #include "bbpch.h"
 
+// TODO: Add delay
+
 #include "LFOCore.h"
 namespace BackBeat {
 
@@ -22,7 +24,7 @@ namespace BackBeat {
 
 	LFOCore::~LFOCore()
 	{
-
+		delete[m_WaveSize] m_Wave;
 	}
 
 	void LFOCore::Reset(UINT32 sampleRate)
@@ -51,13 +53,13 @@ namespace BackBeat {
 		}
 	}
 
-	void LFOCore::DoNoteOn(noteEvent event)
+	void LFOCore::DoNoteOn(NoteEvent event)
 	{
 		m_Position = 0;
 		InitWave();
 	}
 
-	void LFOCore::DoNoteOff(noteEvent event)
+	void LFOCore::DoNoteOff(NoteEvent event)
 	{
 
 	}

@@ -23,7 +23,7 @@ namespace BackBeat {
 
 	WaveOscCore::~WaveOscCore()
 	{
-
+		delete[m_WaveSize] m_Wave;
 	}
 
 	void WaveOscCore::Reset(UINT32 sampleRate)
@@ -59,14 +59,14 @@ namespace BackBeat {
 		m_ModInput->FlushBuffer(numSamples, 0.0f);
 	}
 
-	void WaveOscCore::DoNoteOn(noteEvent event)
+	void WaveOscCore::DoNoteOn(NoteEvent event)
 	{
 		m_Amp = m_Params->amp;
 		m_Hertz = event.note;
 		InitWave();
 	}
 
-	void WaveOscCore::DoNoteOff(noteEvent event)
+	void WaveOscCore::DoNoteOff(NoteEvent event)
 	{
 
 	}

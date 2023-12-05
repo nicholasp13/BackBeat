@@ -51,7 +51,7 @@
 //	Add EG for filters specifically
 //  Implement ModularMatrix
 
-#include "BackBeat/Audio/Synth/Render/RenderInfo.h"
+// #include "BackBeat/Audio/SynthIO/RenderInfo.h"
 #include "BackBeat/Audio/Synth/AudioEngine/SynthModules/SynthModule.h"
 #include "BackBeat/Audio/Synth/AudioEngine/SynthModules/DCA.h"
 #include "BackBeat/Audio/Synth/AudioEngine/SynthModules/WaveOscillator.h"
@@ -73,7 +73,7 @@ namespace BackBeat {
 		virtual void Reset(UINT32 sampleRate);
 		virtual void Update();
 		virtual void Render(UINT32 numSamples);
-		virtual void ProcessMIDIEvent(midiEvent event);
+		virtual void ProcessMIDIEvent(MIDIEvent event);
 
 		virtual int GetChannel() { return m_Channel; }
 		virtual byte GetNote() { return m_NotePressed; }
@@ -103,8 +103,8 @@ namespace BackBeat {
 
 		// TODO: Implement filterEG and modulation matrix
 
-		void DoNoteOn(noteEvent event);
-		void DoNoteOff(noteEvent event);
+		void DoNoteOn(NoteEvent event);
+		void DoNoteOff(NoteEvent event);
 		void InitModules();
 	};
 }

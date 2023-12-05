@@ -3,9 +3,12 @@
 #include "AudioEngine.h"
 namespace BackBeat {
 
-	AudioEngine::AudioEngine(tWAVEFORMATEX props)
+	// TODO: Change UINT32 to unsigned long
+	//       Finely tune volume
+
+	AudioEngine::AudioEngine(AudioProps props)
 		: 
-		m_Buffer(std::make_shared<float[]>(props.nSamplesPerSec)), 
+		m_Buffer(std::make_shared<float[]>(props.sampleRate)), 
 		m_OutputBufferPosition(0),
 		m_Props(props)
 	{
@@ -20,7 +23,7 @@ namespace BackBeat {
 
 	void AudioEngine::Stop()
 	{
-		midiEvent noteOff = {
+		MIDIEvent noteOff = {
 			.status = 0x00,
 			.data1 = 0x00,
 			.data2 = 0x00,
@@ -72,7 +75,7 @@ namespace BackBeat {
 		return m_Params;
 	}
 
-	void AudioEngine::ProcessMIDIEvent(midiEvent event)
+	void AudioEngine::ProcessMIDIEvent(MIDIEvent event)
 	{
 		int channel = 0;
 		bool noteOn = SynthBase::IsNoteOn(event);
@@ -100,10 +103,10 @@ namespace BackBeat {
 	void AudioEngine::InitVoices()
 	{
 		m_NumVoices = 13;
-		m_VoiceFactor = 1.0f / (float)m_NumVoices;
+		m_VoiceFactor = 2.0f / (float)m_NumVoices; // NOTE: This is arbitrary and needs more finely tuned
 
 		for (UINT32 i = 0; i < m_NumVoices; i++)
-			m_Voices[i] = std::make_unique<SynthVoice>(m_Props.nSamplesPerSec, m_Buffer, m_Params->voiceParams);
+			m_Voices[i] = std::make_unique<SynthVoice>(m_Props.sampleRate, m_Buffer, m_Params->voiceParams);
 	}
 	 
 

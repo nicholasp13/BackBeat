@@ -5,7 +5,7 @@
 
 #include "BackBeat/Audio/Synth/SynthBase.h"
 #include "BackBeat/Events/KeyEvent.h"
-#include "BackBeat/Audio/Synth/Render/RenderInfo.h"
+#include "RenderInfo.h"
 namespace BackBeat {
 
 	class SynthEventHandler
@@ -17,11 +17,11 @@ namespace BackBeat {
 		std::shared_ptr<EventHandlerParameters> GetParams() { return m_Params; }
 
 		bool HandleEvent(Event& event);
-		bool AddEvent(KeyCode key, midiEvent note);
+		bool AddEvent(KeyCode key, MIDIEvent note);
 
 	private:
 
-		std::map<KeyCode, midiEvent> m_MIDIMap;
+		std::map<KeyCode, MIDIEvent> m_MIDIMap;
 		std::shared_ptr<RenderInfo> m_RenderInfo;
 		std::shared_ptr<EventHandlerParameters> m_Params;
 

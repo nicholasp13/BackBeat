@@ -50,12 +50,12 @@ namespace BackBeat {
 		m_ModInput->FlushBuffer(numSamples, 1.0f);
 	}
 	
-	void DCA::DoNoteOn(noteEvent event) 
+	void DCA::DoNoteOn(NoteEvent event) 
 	{
 
 	}
 	
-	void DCA::DoNoteOff(noteEvent event)
+	void DCA::DoNoteOff(NoteEvent event)
 	{
 
 	}

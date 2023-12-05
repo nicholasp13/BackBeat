@@ -121,7 +121,7 @@ namespace BackBeat {
 		}
 	}
 
-	void LinearEGCore::DoNoteOn(noteEvent event) 
+	void LinearEGCore::DoNoteOn(NoteEvent event) 
 	{
 		m_ScalarNote = 1.0f - ((float)event.midiNote / 127.0f);
 		m_ScalarVelocity = 1.0f - ((float)event.velocity / 127.0f);
@@ -156,7 +156,7 @@ namespace BackBeat {
 		m_State = EGState::Attack;
 	}
 	
-	void LinearEGCore::DoNoteOff(noteEvent event)
+	void LinearEGCore::DoNoteOff(NoteEvent event)
 	{
 		m_State = EGState::Release;
 	}

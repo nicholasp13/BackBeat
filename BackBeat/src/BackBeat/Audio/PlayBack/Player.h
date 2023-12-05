@@ -1,64 +1,40 @@
 #pragma once
 
-/*
-* Audio player that uses Windows API.
-* Only 48K sample and stereo .WAV files
-*/
+// TODO: Add support for int24 data types
+//       Create upsamplers and downsamplers for support of other sample rates
 
-// ------------------------------------------------------------------------------- //
-// TODO:
-// - Rename and refactor into a WindowsPlayer and an implementation of a Player
-//       abstract class for clarification on platform and for possible 
-//       implementation of Linux player.
-// - Change implementation after checking performance (specifically Loader and how
-//       the file is loaded and read)
-// - Allow for other file types i.e. MP3s, other sample rates, other bit depth,
-//       and 
-// - Create an exclusive Windows audio mode that only allows for Audio from this
-//      application to play
-// ------------------------------------------------------------------------------- //
-
-#include <string>
-#include <mmdeviceapi.h>
-#include <Audioclient.h>
-
-#include "BackBeat/Audio/Audio.h"
-#include "AudioData.h"
-#include "Loader.h"
+#include "TrackFactory.h"
+#include "PlayerProcessor.h"
 namespace BackBeat {
+
+	// NOTE: Tracklist / multiple tracks will be implemented later as needed
 
 	class Player
 	{
 	public:
-		
 		Player();
 		~Player();
 
-		void Play();
-		void PlaySamples(UINT32 samples);
+		void Start();
 		void Pause();
 		void Stop();
+		void LoadTrack(std::string filePath);
+		
+		TimeMinSec GetTime();
+		TimeMinSec GetLength();
+		float GetProgress();
+		void SetPosition(unsigned int pos);
+		void SetVolume(float vol);
 
-		tWAVEFORMATEX* GetProps() { return m_DeviceProps; }
-		void SetLoader(std::shared_ptr<Loader> loader) { m_Loader = loader; }
-
-		bool Playing = false; // TODO: Change to private variable and change check to a function
+		bool IsLoaded() { return m_SelectedTrack != nullptr; }
+		bool IsPlaying() { return m_PlayerProcessor->IsOn(); }
+		std::string GetTrackName();
+		std::shared_ptr<PlayerProcessor> GetProc() { return m_PlayerProcessor; }
 
 	private:
-		void InitAudioClient();
+		TrackFactory m_TrackFactory;
+		Track* m_SelectedTrack;
+		std::shared_ptr<PlayerProcessor> m_PlayerProcessor;
 
-		UINT32 m_Position;
-		UINT32 m_BufferSize;
-		REFERENCE_TIME m_ActualBufferDuration;
-		std::thread m_Worker;
-
-		IAudioClient* m_AudioClient;
-		IMMDeviceEnumerator* m_Enumerator;
-		IMMDevice* m_Device;
-		IAudioRenderClient* m_Renderer;
-		tWAVEFORMATEX* m_DeviceProps;
-
-		std::shared_ptr<AudioData> m_File;
-		std::shared_ptr<Loader> m_Loader;
 	};
 }

@@ -65,7 +65,6 @@ namespace BackBeat {
 			// NOTE: Only is called when app specifies MIDI_IO_STATUS in the call to the midiInOpen()
 			//       Params same as MIM_DATA
 			device->MIDIInput(param1, param2);
-			// device->Yell();
 			break;
 		}
 
@@ -119,13 +118,12 @@ namespace BackBeat {
 		mr = midiInOpen(
 				(LPHMIDIIN)(&m_DeviceHandle),
 				m_ID,
-				reinterpret_cast<DWORD_PTR>(BackBeat::MidiInProc), // Use the MidiInProc,
+				reinterpret_cast<DWORD_PTR>(BackBeat::MidiInProc),
 				reinterpret_cast<DWORD_PTR>(this),
 				CALLBACK_FUNCTION
 		);
 		// CHECK_FAILURE(mr);
 
-		BB_CORE_INFO("DEVICE OPEN");
 		m_Open = true;
 		return m_Open;
 	}
@@ -149,7 +147,6 @@ namespace BackBeat {
 			return;
 		MMRESULT mr = midiInStart(m_DeviceHandle);
 		// CHECK_FAILURE(mr);
-		BB_CORE_INFO("MIDI DEVICE Start ERROR: {0}", mr);
 	}
 
 	void WindowsMIDIDevice::Stop()
@@ -160,32 +157,32 @@ namespace BackBeat {
 
 	void WindowsMIDIDevice::MIDIInput(DWORD_PTR part1, DWORD_PTR part2)
 	{
-		midiEvent event = {
+		MIDIEvent event = {
 			.status = 0x00,
 			.data1 = 0x00,
 			.data2 = 0x00,
 		};
 
 		// NOTE: Logging comments still here for testing MIDI inputs
-		byte a1 = (byte)((part1 & 0x000000FF));       // status
-		byte a2 = (byte)((part1 & 0x0000FF00) >> BYTESIZE);  // data1
-		byte a3 = (byte)((part1 & 0x00FF0000) >> BYTESIZE * 2); // data2
-		byte a4 = (byte)((part1 & 0xFF000000) >> BYTESIZE * 3); // <--- BYTE NOT USED
+		// byte a1 = (byte)((part1 & 0x000000FF));       // status
+		// byte a2 = (byte)((part1 & 0x0000FF00) >> BYTE_BIT_SIZE);  // data1
+		// byte a3 = (byte)((part1 & 0x00FF0000) >> BYTE_BIT_SIZE * 2); // data2
+		// byte a4 = (byte)((part1 & 0xFF000000) >> BYTE_BIT_SIZE * 3); // <--- BYTE NOT USED
 		// BB_CORE_INFO("BYTES FOR PART 1: {4}\n1: {0} \n2: {1}\n3: {2}\n4: {3}", a1, a2, a3, a4, part1);
 
 
 		// Time stamps, not implemented
-		byte b1 = (byte)((part2 & 0x000000FF));       // Most
-		byte b2 = (byte)((part2 & 0x0000FF00) >> BYTESIZE);  // More
-		byte b3 = (byte)((part2 & 0x00FF0000) >> BYTESIZE * 2); // Lesser
-		byte b4 = (byte)((part2 & 0xFF000000) >> BYTESIZE * 3); // Least
+		// byte b1 = (byte)((part2 & 0x000000FF));       // Most
+		// byte b2 = (byte)((part2 & 0x0000FF00) >> BYTE_BIT_SIZE);  // More
+		// byte b3 = (byte)((part2 & 0x00FF0000) >> BYTE_BIT_SIZE * 2); // Lesser
+		// byte b4 = (byte)((part2 & 0xFF000000) >> BYTE_BIT_SIZE * 3); // Least
 
 		// BB_CORE_INFO("BYTES FOR PART 2: {4}\n1: {0} \n2: {1}\n3: {2}\n4: {3}", b1, b2, b3, b4, part2);
 		
 		// This byte is either CHANNEL_1_NOTE_ON or CHANNEL_1_NOTE_OFF | NOTE: This might change with multiple MIDI devices plugged in
 		event.status = (byte)((part1 & 0x000000FF));
-		event.data1 =  (byte)((part1 & 0x0000FF00) >> BYTESIZE);
-		event.data2 = (byte)((part1 & 0x00FF0000) >> BYTESIZE * 2);
+		event.data1 =  (byte)((part1 & 0x0000FF00) >> BYTE_BIT_SIZE);
+		event.data2 = (byte)((part1 & 0x00FF0000) >> BYTE_BIT_SIZE * 2);
 		
 		m_Output->In(event);
 	}

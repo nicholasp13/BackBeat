@@ -13,8 +13,8 @@ namespace BackBeat {
 		virtual void Reset(UINT32 sampleRate);
 		virtual void Update();
 		virtual void Render(UINT32 numSamples);
-		virtual void DoNoteOn(noteEvent event);
-		virtual void DoNoteOff(noteEvent event);
+		virtual void DoNoteOn(NoteEvent event);
+		virtual void DoNoteOff(NoteEvent event);
 
 		virtual std::shared_ptr<float[]> GetBuffer() { return m_Core->GetInputBuffer(); }
 

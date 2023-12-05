@@ -38,12 +38,12 @@ namespace BackBeat {
 		}
 	}
 
-	void LowFrequencyOscillator::DoNoteOn(noteEvent event)
+	void LowFrequencyOscillator::DoNoteOn(NoteEvent event)
 	{
 		m_Core->DoNoteOn(event);
 	}
 
-	void LowFrequencyOscillator::DoNoteOff(noteEvent event)
+	void LowFrequencyOscillator::DoNoteOff(NoteEvent event)
 	{
 		m_Core->DoNoteOff(event);
 	}
