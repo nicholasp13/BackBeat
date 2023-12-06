@@ -103,7 +103,7 @@ namespace BackBeat {
 	void AudioEngine::InitVoices()
 	{
 		m_NumVoices = 13;
-		m_VoiceFactor = 2.0f / (float)m_NumVoices; // NOTE: This is arbitrary and needs more finely tuned
+		m_VoiceFactor = 2.0f / (float)m_NumVoices; // NOTE: This is arbitrary and needs more fine tuning
 
 		for (UINT32 i = 0; i < m_NumVoices; i++)
 			m_Voices[i] = std::make_unique<SynthVoice>(m_Props.sampleRate, m_Buffer, m_Params->voiceParams);

@@ -32,7 +32,6 @@ namespace BackBeat {
 		std::shared_ptr<PlayerProcessor> GetProc() { return m_PlayerProcessor; }
 
 	private:
-		TrackFactory m_TrackFactory;
 		Track* m_SelectedTrack;
 		std::shared_ptr<PlayerProcessor> m_PlayerProcessor;
 

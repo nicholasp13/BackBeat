@@ -2,6 +2,8 @@
 
 #include "bbpch.h"
 
+// NOTE: With current implementation this could just be a struct
+
 #include "BackBeat/Audio/Audio.h"
 namespace BackBeat {
 
@@ -15,8 +17,6 @@ namespace BackBeat {
 	class AudioData
 	{
 	public:
-		virtual bool LoadBuffer(unsigned int framesAvailable, byte* buffer, unsigned int* position, bool* loading) { return false; }
-		
 		virtual FileType GetFileType() { return FileType::None; }
 		virtual std::string GetName() { return ""; }
 		virtual std::string GetFilePath() { return ""; }

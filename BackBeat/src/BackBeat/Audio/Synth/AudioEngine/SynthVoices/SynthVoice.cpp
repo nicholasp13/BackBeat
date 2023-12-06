@@ -80,7 +80,6 @@ namespace BackBeat {
 			DoNoteOff(nEvent);
 	}
 
-	// TODO: On and off channel decided by note
 	void SynthVoice::DoNoteOn(NoteEvent event)
 	{
 		m_Actice = true;

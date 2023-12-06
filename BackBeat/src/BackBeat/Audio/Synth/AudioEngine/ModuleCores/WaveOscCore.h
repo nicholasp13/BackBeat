@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ModuleCore.h"
-#include "BackBeat/Audio/Synth/AudioEngine/Wave.h"
+#include "BackBeat/Audio/Helpers/Wave.h"
 #include "BackBeat/Audio/Synth/SynthBase.h"
 namespace BackBeat {
 	

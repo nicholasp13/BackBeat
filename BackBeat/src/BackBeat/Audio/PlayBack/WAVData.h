@@ -1,5 +1,7 @@
 #pragma once
 
+// NOTE: With current implementation this could just be a struct
+
 #include "AudioData.h"
 namespace BackBeat {
 
@@ -8,8 +10,6 @@ namespace BackBeat {
 	public:
 		WAVData(std::string filePath, std::string name, AudioProps props);
 		~WAVData();
-
-		virtual bool LoadBuffer(unsigned int byteTotal, byte* buffer, unsigned int* position, bool* loading);
 		
 		virtual FileType GetFileType() { return FileType::WAV_FILE; }
 		virtual std::string GetName() { return m_Name; }
@@ -21,6 +21,7 @@ namespace BackBeat {
 
 		virtual void SetZero(unsigned int position) { m_Zero = position; }
 		virtual void SetDataSize(unsigned int size) { m_DataSize = size; }
+
 	private:
 		unsigned int m_Zero;
 		unsigned int m_DataSize;

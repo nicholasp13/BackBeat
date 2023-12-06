@@ -43,7 +43,7 @@ namespace BackBeat {
 	{
 		m_PlayerProcessor->Off();
 		delete m_SelectedTrack;
-		m_SelectedTrack = m_TrackFactory.BuildTrack(filePath);
+		m_SelectedTrack = TrackFactory::BuildTrack(filePath);
 	}
 
 	TimeMinSec Player::GetTime()
