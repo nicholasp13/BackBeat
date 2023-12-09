@@ -139,3 +139,58 @@ project "Sampler"
 	filter "configurations:Dist"
 		defines "BB_DIST"
 		optimize "on"
+
+project "UnitTests"
+	location "UnitTests"
+	kind "ConsoleApp"
+	language "C++"
+	cppdialect "C++20"
+	staticruntime "on"
+
+	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
+	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
+
+	files
+	{
+		"%{prj.name}/**.h",
+		"%{prj.name}/**.cpp"
+	}
+
+	includedirs
+	{
+		"BackBeat/vendor/spdlog/include",
+		"BackBeat/vendor/imgui",
+		"BackBeat/vendor/glfw/include",
+		"BackBeat/vendor/lodepng",
+		"BackBeat/src"
+	}
+	
+	links
+	{
+		"BackBeat"
+	}
+
+	nuget
+	{
+		"Microsoft.googletest.v140.windesktop.msvcstl.static.rt-static:1.8.1.6"
+	}
+
+	filter "system:windows"
+		systemversion "latest"
+
+		defines
+		{
+			"BB_PLATFORM_WINDOWS"
+		}
+
+	filter "configurations:Debug"
+		defines "BB_DEBUG"
+		symbols "on"
+
+	filter "configurations:RELEASE"
+		defines "BB_RELEASE"
+		optimize "on"
+	
+	filter "configurations:Dist"
+		defines "BB_DIST"
+		optimize "on"
