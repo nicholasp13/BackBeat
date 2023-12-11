@@ -2,7 +2,7 @@
 
 Currently a music application engine for Windows 10/11 written in C++.
 Currently implements basic polyphonic synth following the MIDI Manufacturers Association (MMA) DLS Level 1 Specification and the ability to play WAV files
-with bit depths of 8, 16, 32, 64 and sample rate of 48k. Has _Sampler_ application for example and testing.
+of all bit depths and sample rate of 48k. Has _Sampler_ application for example and testing.
 
 ## How To Use
 Developed soley on Windows with Visual Studios 2022, other IDEs untested and may not work. Set `Sampler` as Startup project to run and make sure to clone recursively. If not, use `git submodule update --init` to clone submodules.
@@ -16,13 +16,10 @@ Developed soley on Windows with Visual Studios 2022, other IDEs untested and may
 The goal is to create an open source, simple digital audio workstation (DAW) with the ability to easily customize sounds and interface
 ### Upcoming features:
 - Add downsampling and upsampling to support different sample rates (only 48k sample rate supported currently)
-- Add support for 24 bit integers
 - Add GUI timeline to edit audio tracks i.e. cutting, copying, multiple tracks, saving edits
 ### Planned features:
-- Modular Matrix for interactive GUI implementation to customize sounds
-- Create audio tracks for editing and recording with GUI contols
-- Allow for sampling, editing, and programming existing audio 
-- Other GUI controls for changing module cores and/or synth voices, and other features
+- Modular Matrix for interactive GUI implementation to customize synth sounds
+- Add sampling and programming those samples to SynthVoices
 - Writing, saving, and exporting music files
 - Other Synth modes including monophonic, legatto, gliding, etc.
 - Add support to play MP3 file
@@ -40,8 +37,7 @@ The goal is to create an open source, simple digital audio workstation (DAW) wit
 	* https://www.youtube.com/playlist?list=PLlrATfBNZ98dC-V-N3m0Go4deliWHPFwT
 	* https://github.com/TheCherno/Hazel
 - personal uses:
-	* To start/lead the project until implementation of OpenGL (first 18 commits) using videoes 1-14 near verbatim.
-	* For guidance and reference when lost.
+	* To start the project for implementation of OpenGL, ImGui, logging, event handling, etc. 
 #### MIDI Association Documents
 - DLS Level 1 Specification
   	* link: https://www.midi.org/specifications-old/item/dls-level-1-specification
