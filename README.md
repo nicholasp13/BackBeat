@@ -24,6 +24,12 @@ The goal is to create an open source, simple digital audio workstation (DAW) wit
 - Other Synth modes including monophonic, legatto, gliding, etc.
 - Add support to play MP3 file
 - Linux support and other random features as necessary or personally desired
+
+## How To Run Unit Tests on Visual Studios 2022
+1. `Tools` -> `NuGet Package Manager` -> `Manage NuGet Packages for Solution...`
+2. Browse for _GoogleTest_ and install the static version of Microsoft GoogleTest into _UnitTests_ project
+3. Run tests through Visual Studios `Test Explorer`
+  
 ## Sources
 #### _Designing Software Synthesizer Plugins in C++ with Audio DSP_ by Will C. Pirkle
 - link to SynthLab SDK:
