@@ -73,14 +73,14 @@ namespace BackBeat {
 				else if (inProps.bitDepth == INT24_BIT_SIZE) {
 					unsigned int pos = 0;
 					auto srcBuffer = reinterpret_cast<byte*>(m_Procs[i]->GetOutputBuffer());
-					byte srcBytes[3];
+					byte srcBytes[INT24_BYTE_SIZE];
 					int24 src = int24();
 
 					for (unsigned int i = 0; i < numSamples * m_Props.numChannels; i += m_Props.numChannels)
 					{
 						for (unsigned int j = 0; j < m_Props.numChannels; j++)
 						{
-							for (unsigned int k = 0; k < 3; k++)
+							for (unsigned int k = 0; k < INT24_BYTE_SIZE; k++)
 							{
 								srcBytes[2 - k] = srcBuffer[pos];
 								pos++;
@@ -157,14 +157,14 @@ namespace BackBeat {
 				else if (inProps.bitDepth == INT24_BIT_SIZE) {
 					unsigned int pos = 0;
 					auto srcBuffer = reinterpret_cast<byte*>(m_Procs[i]->GetOutputBuffer());
-					byte srcBytes[3];
+					byte srcBytes[INT24_BYTE_SIZE];
 					int24 src = int24();
 
 					for (unsigned int i = 0; i < numSamples * m_Props.numChannels; i += m_Props.numChannels)
 					{
 						for (unsigned int j = 0; j < m_Props.numChannels; j++)
 						{
-							for (unsigned int k = 0; k < 3; k++)
+							for (unsigned int k = 0; k < INT24_BYTE_SIZE; k++)
 							{
 								srcBytes[2 - k] = srcBuffer[pos];
 								pos++;
@@ -241,14 +241,14 @@ namespace BackBeat {
 				else if (inProps.bitDepth == INT24_BIT_SIZE) {
 					unsigned int pos = 0;
 					auto srcBuffer = reinterpret_cast<byte*>(m_Procs[i]->GetOutputBuffer());
-					byte srcBytes[3];
+					byte srcBytes[INT24_BYTE_SIZE];
 					int24 src = int24();
 
 					for (unsigned int i = 0; i < numSamples * m_Props.numChannels; i += m_Props.numChannels)
 					{
 						for (unsigned int j = 0; j < m_Props.numChannels; j++)
 						{
-							for (unsigned int k = 0; k < 3; k++)
+							for (unsigned int k = 0; k < INT24_BYTE_SIZE; k++)
 							{
 								srcBytes[2 - k] = srcBuffer[pos];
 								pos++;
@@ -324,14 +324,14 @@ namespace BackBeat {
 				else if (inProps.bitDepth == INT24_BIT_SIZE) {
 					unsigned int pos = 0;
 					auto srcBuffer = reinterpret_cast<byte*>(m_Procs[i]->GetOutputBuffer());
-					byte srcBytes[3];
+					byte srcBytes[INT24_BYTE_SIZE];
 					int24 src = int24();
 
 					for (unsigned int i = 0; i < numSamples * m_Props.numChannels; i += m_Props.numChannels)
 					{
 						for (unsigned int j = 0; j < m_Props.numChannels; j++)
 						{
-							for (unsigned int k = 0; k < 3; k++) 
+							for (unsigned int k = 0; k < INT24_BYTE_SIZE; k++)
 							{
 								srcBytes[2 - k] = srcBuffer[pos];
 								pos++;
@@ -374,7 +374,7 @@ namespace BackBeat {
 
 		case (DOUBLE_BIT_SIZE):
 		{
-			float* targetBuffer = reinterpret_cast<float*>(data);
+			double* targetBuffer = reinterpret_cast<double*>(data);
 			for (unsigned int i = 0; i < m_Procs.size(); i++) {
 				if (!m_Procs[i]->IsOn())
 					continue;
@@ -389,7 +389,7 @@ namespace BackBeat {
 					{
 						for (unsigned int j = 0; j < m_Props.numChannels; j++)
 						{
-							targetBuffer[i + j] += (double)srcBuffer[i + j] * depthRatio;
+							targetBuffer[i + j] += (double)((float)srcBuffer[i + j] * depthRatio);
 						}
 					}
 				}
@@ -400,7 +400,7 @@ namespace BackBeat {
 					{
 						for (unsigned int j = 0; j < m_Props.numChannels; j++)
 						{
-							targetBuffer[i + j] += (double)srcBuffer[i + j] * depthRatio;
+							targetBuffer[i + j] += (double)((float)srcBuffer[i + j] * depthRatio);
 						}
 					}
 				}
@@ -408,20 +408,20 @@ namespace BackBeat {
 				else if (inProps.bitDepth == INT24_BIT_SIZE) {
 					unsigned int pos = 0;
 					auto srcBuffer = reinterpret_cast<byte*>(m_Procs[i]->GetOutputBuffer());
-					byte srcBytes[3];
+					byte srcBytes[INT24_BYTE_SIZE];
 					int24 src = int24();
 
 					for (unsigned int i = 0; i < numSamples * m_Props.numChannels; i += m_Props.numChannels)
 					{
 						for (unsigned int j = 0; j < m_Props.numChannels; j++)
 						{
-							for (unsigned int k = 0; k < 3; k++)
+							for (unsigned int k = 0; k < INT24_BYTE_SIZE; k++)
 							{
 								srcBytes[2 - k] = srcBuffer[pos];
 								pos++;
 							}
 							src = int24(srcBytes[0], srcBytes[1], srcBytes[2]);
-							targetBuffer[i + j] += src.ToDouble() * depthRatio;
+							targetBuffer[i + j] += src.ToDouble() * (double)depthRatio;
 						}
 					}
 
@@ -434,7 +434,7 @@ namespace BackBeat {
 					{
 						for (unsigned int j = 0; j < m_Props.numChannels; j++)
 						{
-							targetBuffer[i + j] += (double)srcBuffer[i + j] * depthRatio;
+							targetBuffer[i + j] += (double)((float)srcBuffer[i + j] * depthRatio);
 						}
 					}
 				}
@@ -446,7 +446,7 @@ namespace BackBeat {
 					{
 						for (unsigned int j = 0; j < m_Props.numChannels; j++)
 						{
-							targetBuffer[i + j] += (double)srcBuffer[i + j] * depthRatio;
+							targetBuffer[i + j] += (double)((float)srcBuffer[i + j] * depthRatio);
 						}
 					}
 				}

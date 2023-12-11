@@ -1,5 +1,6 @@
 #include "bbpch.h"
 
+#include "BackBeat/Audio/Helpers/int24.h"
 #include "Track.h"
 namespace BackBeat {
 
@@ -125,7 +126,19 @@ namespace BackBeat {
 
 		case (INT24_BIT_SIZE):
 		{
-			// TODO: Implement INT24 data type
+			auto buffer = reinterpret_cast<byte*>(output);
+			int24 src = int24();
+			byte srcBytes[INT24_BYTE_SIZE];
+			for (unsigned int i = 0; i < numBytes; i+= INT24_BYTE_SIZE) {
+				for (unsigned int j = 0; j < INT24_BYTE_SIZE; j++) {
+					srcBytes[2 - j] = buffer[i + j];
+				}
+				src = int24(srcBytes[0], srcBytes[1], srcBytes[2]);
+				src = int24(src.ToFloat() * m_Volume);
+				output[i] = src[2];
+				output[i + 1] = src [1];
+				output[i + 2] = src[0];
+			}
 			break;
 		}
 

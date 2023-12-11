@@ -11,6 +11,7 @@ namespace BackBeat {
 #define INT24_BIT_SIZE    24
 #define FLOAT_BIT_SIZE    32
 #define DOUBLE_BIT_SIZE   64
+#define INT24_BYTE_SIZE   3
 #define INT24_MAX         8388607.0f
 
 // AUDIOFILE CONSTANTS
