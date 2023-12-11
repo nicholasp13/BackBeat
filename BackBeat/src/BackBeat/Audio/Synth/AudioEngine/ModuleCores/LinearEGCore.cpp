@@ -53,10 +53,10 @@ namespace BackBeat {
 		}
 
 		if (releaseDuration <= 0) {
-			m_ReleaseDecrement = m_SustainValue;
+			m_ReleaseDecrement = 1.0f;
 		}
 		else {
-			m_ReleaseDecrement = m_SustainValue / m_SampleRate / releaseDuration;
+			m_ReleaseDecrement = 1.0f / m_SampleRate / releaseDuration;
 		}
 	}
 

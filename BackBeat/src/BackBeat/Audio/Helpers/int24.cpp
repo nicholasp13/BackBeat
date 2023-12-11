@@ -51,16 +51,53 @@ namespace BackBeat {
 		}
 	}
 
+	int24::int24(int num)
+	{
+		auto x = reinterpret_cast<byte*>(&num);
+
+		if (Audio::IsBigEndian()) {
+			m_SignedByte = x[0];
+			m_UpperByte = x[1];
+			m_LowerByte = x[2];
+		}
+		else {
+			m_SignedByte = x[2];
+			m_UpperByte = x[1];
+			m_LowerByte = x[0];
+		}
+	}
+
 	int24::int24(float num)
 	{
-
+		auto x = (long)num;
+		auto y = reinterpret_cast<byte*>(&x);
+		if (Audio::IsBigEndian()) {
+			m_SignedByte = y[0];
+			m_UpperByte = y[1];
+			m_LowerByte = y[2];
+		}
+		else {
+			m_SignedByte = y[2];
+			m_UpperByte = y[1];
+			m_LowerByte = y[0];
+		}
 	}
 
 	int24::int24(double num)
 	{
-
+		auto x = (long)num;
+		auto y = reinterpret_cast<byte*>(&x);
+		if (Audio::IsBigEndian()) {
+			m_SignedByte = y[0];
+			m_UpperByte = y[1];
+			m_LowerByte = y[2];
+		}
+		else {
+			m_SignedByte = y[2];
+			m_UpperByte = y[1];
+			m_LowerByte = y[0];
+		}
 	}
-
 
 	int24::~int24()
 	{
@@ -69,22 +106,30 @@ namespace BackBeat {
 
 	int24 int24::operator + (int24 num)
 	{
-		return int24();
+		long x = ToLong();
+		long y = num.ToLong();
+		return int24(x + y);
 	}
 	
 	int24 int24::operator - (int24 num)
 	{
-		return int24();
+		long x = ToLong();
+		long y = num.ToLong();
+		return int24(x - y);
 	}
 
 	int24 int24::operator * (int24 num)
 	{
-		return int24();
+		long x = ToLong();
+		long y = num.ToLong();
+		return int24(x * y);
 	}
 	
 	int24 int24::operator / (int24 num)
 	{
-		return int24();
+		long x = ToLong();
+		long y = num.ToLong();
+		return int24(x / y);
 	}
 	
 	
@@ -93,6 +138,13 @@ namespace BackBeat {
 		return (m_SignedByte == num[0]) && (m_UpperByte == num[1]) && (m_LowerByte == num[2]);
 	}
 	
+	bool int24::operator < (int24 num)
+	{
+		long x = ToLong();
+		long y = num.ToLong();
+		return x < y;
+	}
+
 	byte int24::operator [] (int num)
 	{
 		if (num == 0)
@@ -105,18 +157,17 @@ namespace BackBeat {
 			throw std::out_of_range("int24 ERROR: Out of range");
 	}
 	
-	float int24::toFloat()
-	{
-		return 0.0f;
-	}
 
-	signed long int24::toLong()
+	signed long int24::ToLong()
 	{
 		signed long negativeByte = 0x00;
 		signed long signedByte = 0x00;
 		signed long upperByte = 0x00;
 		signed long lowerByte = 0x00;
 		
+		if (*this == int24())
+			return long(0);
+
 		if (Audio::IsBigEndian()) {
 			negativeByte = 0xFF;
 			signedByte = m_SignedByte << BYTE_BIT_SIZE;
@@ -146,8 +197,11 @@ namespace BackBeat {
 
 	bool int24::IsPositive()
 	{
-		byte signedBit = 0x80;
-		return (m_SignedByte & signedBit) == 0x00;
+		if (*this != int24()) {
+			byte signedBit = 0x80;
+			return (m_SignedByte & signedBit) == 0x00;
+		}
+		return false;
 	}
 
 }

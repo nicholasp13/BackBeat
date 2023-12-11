@@ -8,10 +8,11 @@ namespace BackBeat {
 	class int24 
 	{
 	public:
-		int24(); // Checked
-		int24(byte signedByte, byte upperByte, byte lowerByte); // Checked
-		int24(short num); // Checked
-		int24(long num); // Checked
+		int24();
+		int24(byte signedByte, byte upperByte, byte lowerByte);
+		int24(short num);
+		int24(long num);
+		int24(int num);
 		int24(float num);
 		int24(double num);
 		~int24();
@@ -20,15 +21,28 @@ namespace BackBeat {
 		int24 operator - (int24 num);
 		int24 operator * (int24 num);
 		int24 operator / (int24 num);
-		bool operator == (int24 num); // Checked
-		byte operator [] (int num);   // Checked
+		bool operator == (int24 num);
+		bool operator < (int24 num);
+		byte operator [] (int num);
 
-		float toFloat();
-		signed long toLong(); // Checked
+		signed long ToLong();
+		bool IsPositive();
 
-		bool IsPositive(); 
-
+		int24 operator ++ () { return *this + int24(1); }
+		int24 operator -- () { return *this - int24(1); }
+		int24 operator += (int24 num) { return *this + num; }
+		int24 operator -= (int24 num) { return *this - num; }
+		int24 operator *= (int24 num) { return *this * num; }
+		int24 operator /= (int24 num) { return *this / num; }
 		bool operator != (int24 num) { return !(*this == num); }
+		bool operator <= (int24 num) { return (*this < num) || (*this == num); }
+		bool operator > (int24 num) { return !(*this <= num); }
+		bool operator >= (int24 num) { return !(*this < num); }
+
+		short ToShort() { return (short)ToLong(); }
+		int ToInt() { return (int)ToLong(); }
+		float ToFloat() { return (float)ToLong(); }
+		double ToDouble() { return (double)ToLong(); }
 
 	private:
 		byte m_SignedByte;

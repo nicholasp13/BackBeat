@@ -12,11 +12,6 @@ workspace "BackBeat"
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
--- TO FIX --
--- IncludeDir = {}
--- IncludeDir["GLFW"] = "BackBeat/vendor/GLFW/include"
--- IncludeDir["Glad"] = "BackBeat/vendor/Glad/include"
-
 include "BackBeat/vendor/glfw"
 include "BackBeat/vendor/Glad"
 include "BackBeat/vendor/imgui"
@@ -47,14 +42,10 @@ project "BackBeat"
 	{
 		"%{prj.name}/src",
 		"%{prj.name}/vendor/spdlog/include",
-		-- CURRENT SOL
 		"%{prj.name}/vendor/glfw/include",
 		"%{prj.name}/vendor/Glad/include",
 		"%{prj.name}/vendor/imgui",
 		"%{prj.name}/vendor/lodepng"
-		--TO FIX --
-		-- "%IncludeDir.GLFW",
-		-- "%IncludeDir.Glad"
 	}
 
 	links{
@@ -153,6 +144,7 @@ project "UnitTests"
 	files
 	{
 		"%{prj.name}/**.h",
+		"%{prj.name}/**.cpp",
 		"%{prj.name}/**.cpp"
 	}
 
@@ -172,7 +164,7 @@ project "UnitTests"
 
 	nuget
 	{
-		"Microsoft.googletest.v140.windesktop.msvcstl.static.rt-static:1.8.1.6"
+		"Microsoft.googletest.v140.windesktop.msvcstl.static.rt-static:1.8.1.7"
 	}
 
 	filter "system:windows"
