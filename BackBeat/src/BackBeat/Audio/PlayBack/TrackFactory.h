@@ -6,11 +6,7 @@ namespace BackBeat {
 	class TrackFactory
 	{
 	public:
-		TrackFactory();
-		~TrackFactory();
+		static Track* BuildTrack(std::string filePath);
 
-		Track* BuildTrack(std::string filePath);
-
-	private:
 	};
 }

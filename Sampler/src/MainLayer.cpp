@@ -61,7 +61,7 @@
 			window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus;
 			bool open;
 
-			ImGui::Begin("Backgroumd", &open, window_flags);
+			ImGui::Begin("Background", &open, window_flags);
 
 			// Render MenuBar
 			if (ImGui::BeginMenuBar())

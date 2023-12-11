@@ -17,6 +17,7 @@
 #include "BackBeat/Core/FileDialog.h"
 
 #include "BackBeat/Audio/Audio.h"
+#include "BackBeat/Audio/Helpers/int24.h"
 #include "BackBeat/Audio/IO/WindowsRenderer.h"
 #include "BackBeat/Audio/Synth/Synth.h"
 #include "BackBeat/Audio/MIDI/WindowsMIDIDeviceManager.h"

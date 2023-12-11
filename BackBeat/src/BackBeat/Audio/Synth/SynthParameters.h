@@ -6,7 +6,7 @@
 //       MIDI Manufacturer's Association (MMA) Downloadable Sounds (DLS) Specification level 1 and 2
 //       documents
 
-#include "AudioEngine/Wave.h"
+#include "BackBeat/Audio/Helpers/Wave.h"
 namespace BackBeat {
 
 	// NOTE: Modular structs here temporarily as they are needed for the ModMatrix Parameters but

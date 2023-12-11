@@ -140,7 +140,6 @@ namespace BackBeat {
 		return m_Open;
 	}
 
-	// Use a double buffer method
 	void WindowsMIDIDevice::Run()
 	{
 		if (!m_Open)

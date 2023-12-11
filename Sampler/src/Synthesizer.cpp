@@ -177,7 +177,7 @@
 		// Note controls
 		{
 			ImGui::TableNextColumn();
-			ImGui::SeparatorText("General Controls");;
+			ImGui::SeparatorText("General Controls");
 			
 			static int* octave = &(m_SynthParams->eventHandlerParams->octave);
 			ImGui::Text("Octave: %d", *octave); ImGui::SameLine();

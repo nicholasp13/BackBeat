@@ -1,5 +1,6 @@
 #include "bbpch.h"
 
+#include "BackBeat/Audio/Helpers/int24.h"
 #include "Mixer.h"
 namespace BackBeat {
 
@@ -14,8 +15,10 @@ namespace BackBeat {
 
 	}
 
-	// NOTE: Upsampling, downsampling, and adjusting for number of channels will be handled by AudioProcessors
-	//       This only handles adjusting for different bitdepths
+	// NOTE: 
+	// - Upsampling, downsampling, and adjusting for number of channels will be handled by AudioProcessors
+	// - This only handles adjusting for different bitdepths
+	// - Only floating bit size case has been tested but the code for the others is there and should work
 	void Mixer::GetData(byte* data, unsigned int numSamples)
 	{
 		for (unsigned int i = 0; i < m_Procs.size(); i++) {
@@ -36,17 +39,253 @@ namespace BackBeat {
 
 		case (BYTE_BIT_SIZE):
 		{
-			return;
+			byte* targetBuffer = reinterpret_cast<byte*>(data);
+			for (unsigned int i = 0; i < m_Procs.size(); i++) {
+				if (!m_Procs[i]->IsOn())
+					continue;
+
+				AudioProps inProps = m_Procs[i]->GetProperties();
+				depthRatio = GetTypeRatio(m_Props.bitDepth, inProps.bitDepth);
+
+				if (inProps.bitDepth == BYTE_BIT_SIZE) {
+					auto srcBuffer = reinterpret_cast<byte*>(m_Procs[i]->GetOutputBuffer());
+
+					for (unsigned int i = 0; i < numSamples * m_Props.numChannels; i += m_Props.numChannels)
+					{
+						for (unsigned int j = 0; j < m_Props.numChannels; j++)
+						{
+							targetBuffer[i + j] += (byte)((float)srcBuffer[i + j] * depthRatio);
+						}
+					}
+				}
+				else if (inProps.bitDepth == INT16_BIT_SIZE) {
+					auto srcBuffer = reinterpret_cast<signed short*>(m_Procs[i]->GetOutputBuffer());
+
+					for (unsigned int i = 0; i < numSamples * m_Props.numChannels; i += m_Props.numChannels)
+					{
+						for (unsigned int j = 0; j < m_Props.numChannels; j++)
+						{
+							targetBuffer[i + j] += (byte)((float)srcBuffer[i + j] * depthRatio);
+						}
+					}
+				}
+
+				else if (inProps.bitDepth == INT24_BIT_SIZE) {
+					unsigned int pos = 0;
+					auto srcBuffer = reinterpret_cast<byte*>(m_Procs[i]->GetOutputBuffer());
+					byte srcBytes[3];
+					int24 src = int24();
+
+					for (unsigned int i = 0; i < numSamples * m_Props.numChannels; i += m_Props.numChannels)
+					{
+						for (unsigned int j = 0; j < m_Props.numChannels; j++)
+						{
+							for (unsigned int k = 0; k < 3; k++)
+							{
+								srcBytes[2 - k] = srcBuffer[pos];
+								pos++;
+							}
+							src = int24(srcBytes[0], srcBytes[1], srcBytes[2]);
+							targetBuffer[i + j] += (byte)(src.ToFloat() * depthRatio);
+						}
+					}
+
+				}
+
+				else if (inProps.bitDepth == FLOAT_BIT_SIZE) {
+					auto srcBuffer = reinterpret_cast<float*>(m_Procs[i]->GetOutputBuffer());
+
+					for (unsigned int i = 0; i < numSamples * m_Props.numChannels; i += m_Props.numChannels)
+					{
+						for (unsigned int j = 0; j < m_Props.numChannels; j++)
+						{
+							targetBuffer[i + j] += (byte)((float)srcBuffer[i + j] * depthRatio);
+						}
+					}
+				}
+
+				else if (inProps.bitDepth == DOUBLE_BIT_SIZE) {
+					auto srcBuffer = reinterpret_cast<double*>(m_Procs[i]->GetOutputBuffer());
+
+					for (unsigned int i = 0; i < numSamples * m_Props.numChannels; i += m_Props.numChannels)
+					{
+						for (unsigned int j = 0; j < m_Props.numChannels; j++)
+						{
+							targetBuffer[i + j] += (byte)((float)srcBuffer[i + j] * depthRatio);
+						}
+					}
+				}
+
+			}
+
+			break;
 		}
 
 		case (INT16_BIT_SIZE):
 		{
-			return;
+			short* targetBuffer = reinterpret_cast<short*>(data);
+			for (unsigned int i = 0; i < m_Procs.size(); i++) {
+				if (!m_Procs[i]->IsOn())
+					continue;
+
+				AudioProps inProps = m_Procs[i]->GetProperties();
+				depthRatio = GetTypeRatio(m_Props.bitDepth, inProps.bitDepth);
+
+				if (inProps.bitDepth == BYTE_BIT_SIZE) {
+					auto srcBuffer = reinterpret_cast<byte*>(m_Procs[i]->GetOutputBuffer());
+
+					for (unsigned int i = 0; i < numSamples * m_Props.numChannels; i += m_Props.numChannels)
+					{
+						for (unsigned int j = 0; j < m_Props.numChannels; j++)
+						{
+							targetBuffer[i + j] += (short)((float)srcBuffer[i + j] * depthRatio);
+						}
+					}
+				}
+				else if (inProps.bitDepth == INT16_BIT_SIZE) {
+					auto srcBuffer = reinterpret_cast<signed short*>(m_Procs[i]->GetOutputBuffer());
+
+					for (unsigned int i = 0; i < numSamples * m_Props.numChannels; i += m_Props.numChannels)
+					{
+						for (unsigned int j = 0; j < m_Props.numChannels; j++)
+						{
+							targetBuffer[i + j] += (short)((float)srcBuffer[i + j] * depthRatio);
+						}
+					}
+				}
+
+				else if (inProps.bitDepth == INT24_BIT_SIZE) {
+					unsigned int pos = 0;
+					auto srcBuffer = reinterpret_cast<byte*>(m_Procs[i]->GetOutputBuffer());
+					byte srcBytes[3];
+					int24 src = int24();
+
+					for (unsigned int i = 0; i < numSamples * m_Props.numChannels; i += m_Props.numChannels)
+					{
+						for (unsigned int j = 0; j < m_Props.numChannels; j++)
+						{
+							for (unsigned int k = 0; k < 3; k++)
+							{
+								srcBytes[2 - k] = srcBuffer[pos];
+								pos++;
+							}
+							src = int24(srcBytes[0], srcBytes[1], srcBytes[2]);
+							targetBuffer[i + j] += (short)(src.ToFloat() * depthRatio);
+						}
+					}
+
+				}
+
+				else if (inProps.bitDepth == FLOAT_BIT_SIZE) {
+					auto srcBuffer = reinterpret_cast<float*>(m_Procs[i]->GetOutputBuffer());
+
+					for (unsigned int i = 0; i < numSamples * m_Props.numChannels; i += m_Props.numChannels)
+					{
+						for (unsigned int j = 0; j < m_Props.numChannels; j++)
+						{
+							targetBuffer[i + j] += (short)((float)srcBuffer[i + j] * depthRatio);
+						}
+					}
+				}
+
+				else if (inProps.bitDepth == DOUBLE_BIT_SIZE) {
+					auto srcBuffer = reinterpret_cast<double*>(m_Procs[i]->GetOutputBuffer());
+
+					for (unsigned int i = 0; i < numSamples * m_Props.numChannels; i += m_Props.numChannels)
+					{
+						for (unsigned int j = 0; j < m_Props.numChannels; j++)
+						{
+							targetBuffer[i + j] += (short)((float)srcBuffer[i + j] * depthRatio);
+						}
+					}
+				}
+
+			}
+
+			break;
 		}
 
 		case (INT24_BIT_SIZE):
 		{
-			return;
+			int24* targetBuffer = reinterpret_cast<int24*>(data);
+			for (unsigned int i = 0; i < m_Procs.size(); i++) {
+				if (!m_Procs[i]->IsOn())
+					continue;
+
+				AudioProps inProps = m_Procs[i]->GetProperties();
+				depthRatio = GetTypeRatio(m_Props.bitDepth, inProps.bitDepth);
+
+				if (inProps.bitDepth == BYTE_BIT_SIZE) {
+					auto srcBuffer = reinterpret_cast<byte*>(m_Procs[i]->GetOutputBuffer());
+
+					for (unsigned int i = 0; i < numSamples * m_Props.numChannels; i += m_Props.numChannels)
+					{
+						for (unsigned int j = 0; j < m_Props.numChannels; j++)
+						{
+							targetBuffer[i + j] += (int24)((float)srcBuffer[i + j] * depthRatio);
+						}
+					}
+				}
+				else if (inProps.bitDepth == INT16_BIT_SIZE) {
+					auto srcBuffer = reinterpret_cast<signed short*>(m_Procs[i]->GetOutputBuffer());
+
+					for (unsigned int i = 0; i < numSamples * m_Props.numChannels; i += m_Props.numChannels)
+					{
+						for (unsigned int j = 0; j < m_Props.numChannels; j++)
+						{
+							targetBuffer[i + j] += (int24)((float)srcBuffer[i + j] * depthRatio);
+						}
+					}
+				}
+
+				else if (inProps.bitDepth == INT24_BIT_SIZE) {
+					unsigned int pos = 0;
+					auto srcBuffer = reinterpret_cast<byte*>(m_Procs[i]->GetOutputBuffer());
+					byte srcBytes[3];
+					int24 src = int24();
+
+					for (unsigned int i = 0; i < numSamples * m_Props.numChannels; i += m_Props.numChannels)
+					{
+						for (unsigned int j = 0; j < m_Props.numChannels; j++)
+						{
+							for (unsigned int k = 0; k < 3; k++)
+							{
+								srcBytes[2 - k] = srcBuffer[pos];
+								pos++;
+							}
+							src = int24(srcBytes[0], srcBytes[1], srcBytes[2]);
+							targetBuffer[i + j] += (int24)(src.ToFloat() * depthRatio);
+						}
+					}
+
+				}
+
+				else if (inProps.bitDepth == FLOAT_BIT_SIZE) {
+					auto srcBuffer = reinterpret_cast<float*>(m_Procs[i]->GetOutputBuffer());
+
+					for (unsigned int i = 0; i < numSamples * m_Props.numChannels; i += m_Props.numChannels)
+					{
+						for (unsigned int j = 0; j < m_Props.numChannels; j++)
+						{
+							targetBuffer[i + j] += (int24)((float)srcBuffer[i + j] * depthRatio);
+						}
+					}
+				}
+
+				else if (inProps.bitDepth == DOUBLE_BIT_SIZE) {
+					auto srcBuffer = reinterpret_cast<double*>(m_Procs[i]->GetOutputBuffer());
+
+					for (unsigned int i = 0; i < numSamples * m_Props.numChannels; i += m_Props.numChannels)
+					{
+						for (unsigned int j = 0; j < m_Props.numChannels; j++)
+						{
+							targetBuffer[i + j] += (int24)((float)srcBuffer[i + j] * depthRatio);
+						}
+					}
+				}
+
+			}
+			break;
 		}
 
 		case (FLOAT_BIT_SIZE):
@@ -83,14 +322,22 @@ namespace BackBeat {
 				}
 
 				else if (inProps.bitDepth == INT24_BIT_SIZE) {
-					
-					auto srcBuffer = reinterpret_cast<signed long*>(m_Procs[i]->GetOutputBuffer());
+					unsigned int pos = 0;
+					auto srcBuffer = reinterpret_cast<byte*>(m_Procs[i]->GetOutputBuffer());
+					byte srcBytes[3];
+					int24 src = int24();
 
 					for (unsigned int i = 0; i < numSamples * m_Props.numChannels; i += m_Props.numChannels)
 					{
 						for (unsigned int j = 0; j < m_Props.numChannels; j++)
 						{
-							targetBuffer[i + j] += (float)srcBuffer[i + j] * depthRatio;
+							for (unsigned int k = 0; k < 3; k++) 
+							{
+								srcBytes[2 - k] = srcBuffer[pos];
+								pos++;
+							}
+							src = int24(srcBytes[0], srcBytes[1], srcBytes[2]);
+							targetBuffer[i + j] += src.ToFloat() * depthRatio;
 						}
 					}
 
@@ -127,7 +374,86 @@ namespace BackBeat {
 
 		case (DOUBLE_BIT_SIZE):
 		{
+			float* targetBuffer = reinterpret_cast<float*>(data);
+			for (unsigned int i = 0; i < m_Procs.size(); i++) {
+				if (!m_Procs[i]->IsOn())
+					continue;
 
+				AudioProps inProps = m_Procs[i]->GetProperties();
+				depthRatio = GetTypeRatio(m_Props.bitDepth, inProps.bitDepth);
+
+				if (inProps.bitDepth == BYTE_BIT_SIZE) {
+					auto srcBuffer = reinterpret_cast<byte*>(m_Procs[i]->GetOutputBuffer());
+
+					for (unsigned int i = 0; i < numSamples * m_Props.numChannels; i += m_Props.numChannels)
+					{
+						for (unsigned int j = 0; j < m_Props.numChannels; j++)
+						{
+							targetBuffer[i + j] += (double)srcBuffer[i + j] * depthRatio;
+						}
+					}
+				}
+				else if (inProps.bitDepth == INT16_BIT_SIZE) {
+					auto srcBuffer = reinterpret_cast<signed short*>(m_Procs[i]->GetOutputBuffer());
+
+					for (unsigned int i = 0; i < numSamples * m_Props.numChannels; i += m_Props.numChannels)
+					{
+						for (unsigned int j = 0; j < m_Props.numChannels; j++)
+						{
+							targetBuffer[i + j] += (double)srcBuffer[i + j] * depthRatio;
+						}
+					}
+				}
+
+				else if (inProps.bitDepth == INT24_BIT_SIZE) {
+					unsigned int pos = 0;
+					auto srcBuffer = reinterpret_cast<byte*>(m_Procs[i]->GetOutputBuffer());
+					byte srcBytes[3];
+					int24 src = int24();
+
+					for (unsigned int i = 0; i < numSamples * m_Props.numChannels; i += m_Props.numChannels)
+					{
+						for (unsigned int j = 0; j < m_Props.numChannels; j++)
+						{
+							for (unsigned int k = 0; k < 3; k++)
+							{
+								srcBytes[2 - k] = srcBuffer[pos];
+								pos++;
+							}
+							src = int24(srcBytes[0], srcBytes[1], srcBytes[2]);
+							targetBuffer[i + j] += src.ToDouble() * depthRatio;
+						}
+					}
+
+				}
+
+				else if (inProps.bitDepth == FLOAT_BIT_SIZE) {
+					auto srcBuffer = reinterpret_cast<float*>(m_Procs[i]->GetOutputBuffer());
+
+					for (unsigned int i = 0; i < numSamples * m_Props.numChannels; i += m_Props.numChannels)
+					{
+						for (unsigned int j = 0; j < m_Props.numChannels; j++)
+						{
+							targetBuffer[i + j] += (double)srcBuffer[i + j] * depthRatio;
+						}
+					}
+				}
+
+				else if (inProps.bitDepth == DOUBLE_BIT_SIZE) {
+					auto srcBuffer = reinterpret_cast<double*>(m_Procs[i]->GetOutputBuffer());
+
+					for (unsigned int i = 0; i < numSamples * m_Props.numChannels; i += m_Props.numChannels)
+					{
+						for (unsigned int j = 0; j < m_Props.numChannels; j++)
+						{
+							targetBuffer[i + j] += (double)srcBuffer[i + j] * depthRatio;
+						}
+					}
+				}
+
+			}
+
+			break;
 		}
 
 		default:

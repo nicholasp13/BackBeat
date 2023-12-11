@@ -16,9 +16,9 @@ namespace BackBeat {
 #define LOWER_OCTAVE          0.5f
 #define HIGHER_OCTAVE         2.0f
 #define LOWEST_OCTAVE         0.03125f
+#define HIGHEST_OCTAVE       32.0f
 #define HIGHEST_OCTAVE_SYNTH  9
 #define LOWEST_OCTAVE_SYNTH  -1
-#define HIGHEST_OCTAVE       32.0f
 #define NUM_OSCS              4.0f
 #define DELTA_CENTS_HZ        0.004860f // The smallest value of a cent in hz, Formula (C_MINUS_1_NOTE - C_SHARP_MINUS_1_NOTE) / 100.0f.
 #define NOTE_OFF        (byte)0xFF
@@ -317,7 +317,7 @@ namespace BackBeat {
 #define FILTER_CUTOFF_MIN           200.0f      // Sample rate / 240
 #define FILTER_CUTOFF_MAX           8000.0f     // Sample rate / 6
 
-	// TODO: Add other members as needed for other MIDI data i.e. channel number, pitch modulation
+	// TODO: Add other members as needed for other MIDI data i.e. pitch modulation
 	struct NoteEvent {
 		bool noteOn;
 		int channel;
