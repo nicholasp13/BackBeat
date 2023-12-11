@@ -16,13 +16,10 @@ Developed soley on Windows with Visual Studios 2022, other IDEs untested and may
 The goal is to create an open source, simple digital audio workstation (DAW) with the ability to easily customize sounds and interface
 ### Upcoming features:
 - Add downsampling and upsampling to support different sample rates (only 48k sample rate supported currently)
-- Add support for 24 bit integers
 - Add GUI timeline to edit audio tracks i.e. cutting, copying, multiple tracks, saving edits
 ### Planned features:
-- Modular Matrix for interactive GUI implementation to customize sounds
-- Create audio tracks for editing and recording with GUI contols
-- Allow for sampling, editing, and programming existing audio 
-- Other GUI controls for changing module cores and/or synth voices, and other features
+- Modular Matrix for interactive GUI implementation to customize synth sounds
+- Add sampling and programming those samples to SynthVoices
 - Writing, saving, and exporting music files
 - Other Synth modes including monophonic, legatto, gliding, etc.
 - Add support to play MP3 file
