@@ -27,11 +27,6 @@ namespace BackBeat {
 		m_PlayerProcessor->On();
 	}
 
-	void Player::Pause()
-	{
-		m_PlayerProcessor->Off();
-	}
-
 	void Player::Stop()
 	{
 		m_PlayerProcessor->Off();
@@ -60,11 +55,18 @@ namespace BackBeat {
 		return TimeMinSec();
 	}
 
-	float Player::GetProgress()
+	unsigned int Player::GetPosition()
 	{
 		if (m_SelectedTrack)
-			return m_SelectedTrack->GetProgress();
-		return 0.0f;
+			return m_SelectedTrack->GetPosition();
+		return 0;
+	}
+
+	unsigned int Player::GetSize()
+	{
+		if (m_SelectedTrack)
+			return m_SelectedTrack->GetSize();
+		return 0;
 	}
 
 	std::string Player::GetTrackName() 
@@ -76,7 +78,8 @@ namespace BackBeat {
 
 	void Player::SetPosition(unsigned int pos)
 	{
-		// TODO: Implement
+		if (m_SelectedTrack)
+			return m_SelectedTrack->SetPosition(pos);
 	}
 
 	void Player::SetVolume(float vol)

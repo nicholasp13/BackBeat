@@ -82,16 +82,44 @@
 
 			BackBeat::TimeMinSec trackTime = m_Player.GetTime();
 			BackBeat::TimeMinSec trackLength = m_Player.GetLength();
-			float progress = m_Player.GetProgress();
-
+			
+			int pos1 = m_Player.GetPosition();
+			int size = m_Player.GetSize();
+			static bool wasPlaying = false;
 			ImGui::Text("%d:%02d", trackTime.minutes, trackTime.seconds); ImGui::SameLine();
-			ImGui::ProgressBar(progress, ImVec2(0.0f, 0.0f), ""); ImGui::SameLine();
-			ImGui::Text("%d:%02d", trackLength.minutes, trackLength.seconds);
+			
+			// NOTE: - Future implementation might want the track to keep playing while visually the seek bar changes
+			//           and only when the bar is released then the position is changed. (This does not work as either
+			//           the bar does not update while the track plays but does change only when released OR the
+			//           bar does not move or change with the track position)
+			//       - Removing the Pause() creates an annoying effect where the sound at the position is repeatedly playing
+			if (m_Player.IsLoaded()) {
+				if (BackBeat::ImGuiWidgets::ImGuiSeekBarInt("##", &pos1, m_Player.GetSize(), "", ImGuiSliderFlags(0))) {
+					if (m_Player.IsPlaying()) {
+						m_Player.Pause();
+						wasPlaying = true;
+					}
+					m_Player.SetPosition(pos1);
+				}
+
+				if (ImGui::IsItemDeactivated() && wasPlaying) {
+					m_Player.Play();
+					wasPlaying = false;
+				}
+			}
+			else {
+				// Renders an empty, uninteractable seek bar if no track is loaded
+				int temp = 0;
+				BackBeat::ImGuiWidgets::ImGuiSeekBarInt("##", &temp, 10000, "", ImGuiSliderFlags(0));
+			}
+
+			ImGui::SameLine(); ImGui::Text("%d:%02d", trackLength.minutes, trackLength.seconds);
 
 			ImGui::Spacing();
 
 			static float volume = 1.0f;
-			ImGui::Text("    "); ImGui::SameLine(); ImGui::SliderFloat("Volume", &volume, 0.0f, 1.0f);
+			ImGui::Text("    "); ImGui::SameLine(); 
+			BackBeat::ImGuiWidgets::ImGuiSeekBarFloat ("Volume", &volume, 1.0f, "", ImGuiSliderFlags(0));
 			m_Player.SetVolume(volume);
 		}
 

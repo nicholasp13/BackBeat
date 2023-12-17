@@ -16,19 +16,21 @@ namespace BackBeat {
 		~Player();
 
 		void Start();
-		void Pause();
 		void Stop();
 		void LoadTrack(std::string filePath);
 		
 		TimeMinSec GetTime();
 		TimeMinSec GetLength();
-		float GetProgress();
+		unsigned int GetPosition();
+		unsigned int GetSize();
+		std::string GetTrackName();
 		void SetPosition(unsigned int pos);
 		void SetVolume(float vol);
 
+		void Play() { m_PlayerProcessor->On(); }
+		void Pause() { m_PlayerProcessor->Off(); }
 		bool IsLoaded() { return m_SelectedTrack != nullptr; }
 		bool IsPlaying() { return m_PlayerProcessor->IsOn(); }
-		std::string GetTrackName();
 		std::shared_ptr<PlayerProcessor> GetProc() { return m_PlayerProcessor; }
 
 	private:

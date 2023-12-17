@@ -19,8 +19,8 @@ namespace BackBeat {
 		float GetProgress();
 
 		bool IsDone() { return m_Done; }
-		unsigned int GetSize() { return m_Data->GetSize(); }
-		unsigned int GetPosition() { return m_Position; }
+		unsigned int GetSize() { return m_Data->GetDataSize(); }
+		unsigned int GetPosition() { return m_Position - m_Data->GetZero(); }
 		std::string GetName() { return m_Data->GetName(); }
 		AudioProps GetProps() { return m_Data->GetProps(); }
 		void SetVolume(float vol) { m_Volume = vol; }

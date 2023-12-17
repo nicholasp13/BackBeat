@@ -11,7 +11,7 @@ namespace BackBeat {
 			m_Position = data->GetZero();
 		}
 		else {
-			m_Position = 0; // NOTE: Will change with implementation of mp3 files
+			m_Position = 0; // NOTE: Will change with implementation if needed with other file types
 		}
 		m_Volume = 1.0f;
 		m_Data = data;
@@ -77,20 +77,15 @@ namespace BackBeat {
 
 	void Track::SetPosition(unsigned int position)
 	{
-		if (position <= m_Data->GetZero()) {
-			m_Position = m_Data->GetZero();
-			m_Done = false;
+		unsigned int truePos = position + m_Data->GetZero();
+		unsigned int offset = truePos % m_Data->GetProps().blockAlign;
+		m_Position = truePos - offset;
+		if (truePos >= m_Data->GetDataSize()) {
+			m_Position = m_Data->GetDataSize() + m_Data->GetZero();
+			m_Done = true;
 			return;
 		}
-		unsigned int trueSize = m_Data->GetDataSize() + m_Data->GetZero();
-		if (position >= trueSize) {
-			return;
-		}
-		unsigned int offset = (position + m_Data->GetZero()) % m_Data->GetProps().blockAlign;
-		m_Position = position - offset;
-		if (m_Position < trueSize)
-			m_Done = false;
-		m_Done = true;
+		m_Done = false;
 	}
 
 	float Track::GetProgress()
