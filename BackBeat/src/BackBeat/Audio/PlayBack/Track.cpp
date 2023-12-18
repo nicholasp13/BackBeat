@@ -77,10 +77,9 @@ namespace BackBeat {
 
 	void Track::SetPosition(unsigned int position)
 	{
-		unsigned int truePos = position + m_Data->GetZero();
-		unsigned int offset = truePos % m_Data->GetProps().blockAlign;
-		m_Position = truePos - offset;
-		if (truePos >= m_Data->GetDataSize()) {
+		unsigned int offset = position % m_Data->GetProps().blockAlign;
+		m_Position = position - offset + m_Data->GetZero();
+		if (m_Position >= m_Data->GetDataSize()) {
 			m_Position = m_Data->GetDataSize() + m_Data->GetZero();
 			m_Done = true;
 			return;
