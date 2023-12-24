@@ -1,7 +1,5 @@
 #pragma once
 
-// NOTE: UINT and UINT32 are Windows
-
 #include "BackBeat/Core/Core.h"
 namespace BackBeat {
 
@@ -48,6 +46,12 @@ namespace BackBeat {
 
 	typedef unsigned char byte;
 
+	enum FileType {
+		none = 0,
+		wav,
+		mp3
+	};
+
 	struct AudioProps {
 		bool bigEndian;
 		unsigned short format;
@@ -57,6 +61,15 @@ namespace BackBeat {
 		unsigned short blockAlign;  // numChannels * bitDepth / 8
 		unsigned short bitDepth;
 		unsigned long fileSize;
+	};
+
+	struct AudioInfo {
+		FileType type;
+		std::string name;
+		std::string filePath;
+		AudioProps props;
+		unsigned int dataZero;    // Data subchunk position of audio files is not uniform across all files
+		unsigned int dataSize;    // Size of data subchunk (file size is stored in AudioProps)
 	};
 
 	// Struct of basic MIDI events

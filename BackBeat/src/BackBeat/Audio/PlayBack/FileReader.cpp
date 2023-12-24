@@ -5,7 +5,7 @@
 #include "FileReader.h"
 namespace BackBeat {
 
-	AudioData* FileReader::CreateFile(std::string filePath)
+	AudioInfo FileReader::CreateFile(std::string filePath)
 	{
 		unsigned long size = 0;
 		char header[WAV_HEADER_SIZE];
@@ -39,36 +39,39 @@ namespace BackBeat {
 					size = Audio::EndianConverterLong(header[4], header[5],
 						header[6], header[7]);
 				}
+				// TODO: Refactor code to work with AudioInfo struct insted of AudioData struct
 				return ReadWAVHeader(filePath, size);
 			}
 		}
-		return nullptr;
+		return AudioInfo();
 	}
 
 
 	// TODO: CREATE INITIALIZE AFTER CREATING MP3 decoder
-	AudioData* FileReader::ReadMP3Header(std::string filePath, unsigned int size)
+	AudioInfo FileReader::ReadMP3Header(std::string filePath, unsigned int size)
 	{
-		return nullptr;
+		return AudioInfo();
 	}
 
 	// Gets relevant info from headers on WAV files and creates WavData pointer
 	// based on that info
 	// NOTE: WAV file headers are standardized and this function will fail if the WAV file
 	//       is not properly formatted
-	AudioData* FileReader::ReadWAVHeader(std::string filePath, unsigned int size)
+	AudioInfo FileReader::ReadWAVHeader(std::string filePath, unsigned int size)
 	{
 		char data;
 		std::ifstream file;
 		AudioProps props = AudioProps();
+		AudioInfo info = AudioInfo();
+		info.type = none;
 		props.fileSize = size;
 		file.open(filePath, std::ios::binary);
 		
 		file.seekg(3);
-		file.get(data);
+		file.get(data); 
 		props.bigEndian = (data == 'X');
 
-		unsigned int fmtPosition = -1;
+		int fmtPosition = -1;
 		char fmt[4];
 		fmt[3] = '\0';
 		for (unsigned int i = 0; i < size; i++)
@@ -87,7 +90,7 @@ namespace BackBeat {
 		}
 
 		if (fmtPosition < 0)
-			return nullptr;
+			return info;
 
 		file.seekg(fmtPosition);
 		char fileProps[WAV_FMT_SIZE];
@@ -149,17 +152,18 @@ namespace BackBeat {
 						dataSize = Audio::EndianConverterLong(dataChunk[dataChunkPos], dataChunk[dataChunkPos + 1],
 							dataChunk[dataChunkPos + 2], dataChunk[dataChunkPos + 3]);
 					}
-
 					std::string fileName = std::filesystem::path(filePath).stem().string();
-					WAVData* wavData = new WAVData(filePath, fileName, props);
-					wavData->SetDataSize(dataSize);
-					wavData->SetZero((unsigned int)file.tellg());
-					file.close();
-					return wavData;
+					info.type = wav;
+					info.filePath = filePath;
+					info.name = fileName;
+					info.props = props;
+					info.dataSize = dataSize;
+					info.dataZero = (unsigned int)file.tellg();
+					return info;
 				}
 			}
 		}
 		file.close();
-		return nullptr;
+		return info;
 	}
 }

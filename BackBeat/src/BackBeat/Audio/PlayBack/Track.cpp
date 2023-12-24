@@ -1,25 +1,27 @@
 #include "bbpch.h"
 
+// TODO: Refactor code to work with AudioInfo struct insted of AudioData class
+
 #include "BackBeat/Audio/Helpers/int24.h"
 #include "Track.h"
 namespace BackBeat {
 
-	Track::Track(AudioData* data)
+	Track::Track(AudioInfo info)
 	{
 		m_Done = false;
-		if (data->GetFileType() == FileType::WAV_FILE) {
-			m_Position = data->GetZero();
+		if (info.type == wav) {
+			m_Position = info.dataZero;
 		}
 		else {
 			m_Position = 0; // NOTE: Will change with implementation if needed with other file types
 		}
 		m_Volume = 1.0f;
-		m_Data = data;
+		m_Info = info;
 	}
 
 	Track::~Track()
 	{
-		delete m_Data;
+		
 	}
 
 	// TODO: Implement endianness conversion if the track does not match the systems endianness
@@ -27,17 +29,17 @@ namespace BackBeat {
 	{
 		if (numBytes == 0)
 			return true;
-		if ((numBytes % m_Data->GetProps().blockAlign) != 0)
+		if ((numBytes % m_Info.props.blockAlign) != 0)
 			return false;
-		unsigned int trueSize = m_Data->GetDataSize() + m_Data->GetZero();
+		unsigned int trueSize = m_Info.dataSize + m_Info.dataZero;
 		if (numBytes + m_Position > trueSize)
 			numBytes = trueSize - m_Position;
 
 		std::ifstream file;
-		file.open(m_Data->GetFilePath(), std::ios::binary);
+		file.open(m_Info.filePath, std::ios::binary);
 		file.seekg(m_Position);
 
-		if (Audio::IsBigEndian() == m_Data->GetProps().bigEndian)
+		if (Audio::IsBigEndian() == m_Info.props.bigEndian)
 			file.read((char*)output, numBytes);
 		else
 			return false; // TODO: Implement way to switch endianness of track data
@@ -54,8 +56,8 @@ namespace BackBeat {
 	TimeMinSec Track::GetTime()
 	{
 		TimeMinSec time = TimeMinSec();
-		AudioProps props = m_Data->GetProps();
-		float timeTotal = (float)((m_Position - m_Data->GetZero()) / props.byteRate);
+		AudioProps props = m_Info.props;
+		float timeTotal = (float)((m_Position - m_Info.dataZero) / props.byteRate);
 		unsigned int minutes = (unsigned int)floor(timeTotal / 60);
 		unsigned int seconds = (unsigned int)((unsigned int)timeTotal % 60);
 		time.minutes = minutes;
@@ -66,8 +68,8 @@ namespace BackBeat {
 	TimeMinSec Track::GetLength()
 	{
 		TimeMinSec time = TimeMinSec();
-		AudioProps props = m_Data->GetProps();
-		float timeTotal = (float)(m_Data->GetDataSize() / props.byteRate);
+		AudioProps props = m_Info.props;
+		float timeTotal = (float)(m_Info.dataSize / props.byteRate);
 		unsigned int minutes = (unsigned int)floor(timeTotal / 60);
 		unsigned int seconds = (unsigned int)((unsigned int)timeTotal % 60);
 		time.minutes = minutes;
@@ -77,10 +79,10 @@ namespace BackBeat {
 
 	void Track::SetPosition(unsigned int position)
 	{
-		unsigned int offset = position % m_Data->GetProps().blockAlign;
-		m_Position = position - offset + m_Data->GetZero();
-		if (m_Position >= m_Data->GetDataSize()) {
-			m_Position = m_Data->GetDataSize() + m_Data->GetZero();
+		unsigned int offset = position % m_Info.props.blockAlign;
+		m_Position = position - offset + m_Info.dataZero;
+		if (m_Position >= m_Info.dataSize) {
+			m_Position = m_Info.dataSize + m_Info.dataZero;
 			m_Done = true;
 			return;
 		}
@@ -89,13 +91,13 @@ namespace BackBeat {
 
 	float Track::GetProgress()
 	{
-		float progress = ((float)m_Position - (float)m_Data->GetZero()) / (float)m_Data->GetDataSize();
+		float progress = ((float)m_Position - (float)m_Info.dataZero) / (float)m_Info.dataSize;
 		return progress;
 	}
 
 	void Track::MultiplyVolume(byte* output, unsigned int numBytes)
 	{
-		AudioProps props = m_Data->GetProps();
+		AudioProps props = m_Info.props;
 		unsigned int numSamples = numBytes / props.blockAlign * props.numChannels;
 		
 		switch (props.bitDepth)

@@ -16,9 +16,6 @@ namespace BackBeat {
 		ImVec2 pos = window->DC.CursorPos;
 	    ImRect background = window->InnerClipRect;
 
-		// FUNCTIONALITY:
-		// 
-		// 
 		// LAYOUT:
 		// ----- Child Window ----- 
 		// Draw backgroumd
@@ -50,7 +47,7 @@ namespace BackBeat {
 
 	// NOTE: Only handles int, may implement other data types later
 	// COLORS:
-	//     - Frame rectangle    - ImGui::GetColorU32(g.ActiveId == id ? ImGuiCol_FrameBgActive : ImGuiCol_FrameBg)
+	//     - Frame rectangle  - ImGui::GetColorU32(g.ActiveId == id ? ImGuiCol_FrameBgActive : ImGuiCol_FrameBg)
 	//     - Active rectangle - ImGuiCol_SliderGrab
 	bool ImGuiWidgets::ImGuiTrackEditor(const char* label, int* lowerV, int* upperV, const int* pMin, const int* pMax,
 		const char* format, ImGuiSliderFlags flags)
@@ -276,19 +273,13 @@ namespace BackBeat {
 			int newVal = (int)(clickedPos * ((float)vMax - (float)vMin) + (float)vMin);
 			if (lowerActive)
 			{
-				if (newVal >= *upperV)
-					newVal = *upperV - 1;
-				if (newVal < vMin)
-					newVal = vMin;
+				newVal = newVal >= *upperV ? *upperV - 1 : newVal < vMin ? vMin : newVal;
 				*lowerV = newVal;
 				lowerTruePos = (float(newVal) - float(vMin)) / float(vMax - vMin) * sliderSize + sliderMin;
 			}
 			else if (upperActive)
 			{
-				if (newVal <= *lowerV)
-					newVal = *lowerV + 1;
-				if (newVal > vMax)
-					newVal = vMax;
+				newVal = newVal <= *lowerV ? *lowerV + 1 : newVal > vMax ? vMax : newVal;
 				*upperV = newVal;
 				upperTruePos = (float(newVal) - float(vMin)) / float(vMax - vMin) * sliderSize + sliderMin;
 			}

@@ -1,7 +1,6 @@
 #pragma once
 
-// TODO: Add support for int24 data types
-//       Create upsamplers and downsamplers for support of other sample rates
+// TODO: Create upsamplers and downsamplers for support of other sample rates
 
 #include "TrackFactory.h"
 #include "PlayerProcessor.h"
