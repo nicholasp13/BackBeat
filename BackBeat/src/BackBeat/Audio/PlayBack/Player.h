@@ -20,10 +20,14 @@ namespace BackBeat {
 		
 		TimeMinSec GetTime();
 		TimeMinSec GetLength();
-		unsigned int GetPosition();
+		unsigned int GetByteRate();
+		unsigned int GetPosition(); 
+		unsigned int GetSampleRate();
 		unsigned int GetSize();
 		std::string GetTrackName();
 		void SetPosition(unsigned int pos);
+		void SetStart(unsigned int start);
+		void SetEnd(unsigned int end);
 		void SetVolume(float vol);
 
 		void Play() { m_PlayerProcessor->On(); }

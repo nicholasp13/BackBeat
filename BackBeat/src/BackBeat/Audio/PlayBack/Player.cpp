@@ -55,11 +55,25 @@ namespace BackBeat {
 		return TimeMinSec();
 	}
 
+	unsigned int Player::GetByteRate()
+	{
+		if (m_SelectedTrack)
+			return m_SelectedTrack->GetProps().byteRate;
+		return 1;
+	}
+
 	unsigned int Player::GetPosition()
 	{
 		if (m_SelectedTrack)
 			return m_SelectedTrack->GetPosition();
 		return 0;
+	}
+
+	unsigned int Player::GetSampleRate()
+	{
+		if (m_SelectedTrack)
+			return m_SelectedTrack->GetProps().sampleRate;
+		return 1;
 	}
 
 	unsigned int Player::GetSize()
@@ -79,7 +93,19 @@ namespace BackBeat {
 	void Player::SetPosition(unsigned int pos)
 	{
 		if (m_SelectedTrack)
-			return m_SelectedTrack->SetPosition(pos);
+			m_SelectedTrack->SetPosition(pos);
+	}
+
+	void Player::SetStart(unsigned int start)
+	{
+		if (m_SelectedTrack)
+			m_SelectedTrack->SetStart(start);
+	}
+
+	void Player::SetEnd(unsigned int end)
+	{
+		if (m_SelectedTrack)
+			m_SelectedTrack->SetEnd(end);
 	}
 
 	void Player::SetVolume(float vol)

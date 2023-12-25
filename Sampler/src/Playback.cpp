@@ -93,27 +93,54 @@
 			//           the bar does not update while the track plays but does change only when released OR the
 			//           bar does not move or change with the track position)
 			//       - Removing the Pause() creates an annoying effect where the sound at the position is repeatedly playing
-			if (m_Player.IsLoaded()) {
-				if (BackBeat::ImGuiWidgets::ImGuiSeekBarInt("##", &pos1, m_Player.GetSize(), "", ImGuiSliderFlags(0))) {
-					if (m_Player.IsPlaying()) {
+			if (m_Player.IsLoaded()) 
+			{
+				ImGui::PushID("Seekbar");
+				if (BackBeat::ImGuiWidgets::ImGuiSeekBarInt("##", &pos1, m_Player.GetSize(), "", ImGuiSliderFlags(0))) 
+				{
+					if (m_Player.IsPlaying()) 
+					{
 						m_Player.Pause();
 						wasPlaying = true;
 					}
 					m_Player.SetPosition(pos1);
 				}
-
-				if (ImGui::IsItemDeactivated() && wasPlaying) {
+				if (ImGui::IsItemDeactivated() && wasPlaying) 
+				{
 					m_Player.Play();
 					wasPlaying = false;
 				}
+				ImGui::SameLine(); ImGui::Text("%d:%02d", trackLength.minutes, trackLength.seconds);
+				ImGui::PopID();
+
+				ImGui::PushID("TrackEditor");
+				const int zero = 0;
+				float byteRate = (float)m_Player.GetByteRate();
+				static int start = 0;
+				static int end = size;
+				BackBeat::TimeMinSec startTime = BackBeat::Audio::GetTime((float)start / byteRate);
+				BackBeat::TimeMinSec endTime = BackBeat::Audio::GetTime((float)end / byteRate);
+				ImGui::Text("%d:%02d", startTime.minutes, startTime.seconds); ImGui::SameLine();
+				if (BackBeat::ImGuiWidgets::ImGuiTrackEditor("##", &start, &end, &zero, &size, "", ImGuiSliderFlags(0))) 
+				{
+					m_Player.SetStart(start);
+					m_Player.SetEnd(end);
+				}
+				ImGui::SameLine(); ImGui::Text("%d:%02d", endTime.minutes, endTime.seconds);
+				ImGui::PopID();
 			}
-			else {
+			else 
+			{
 				// Renders an empty, uninteractable seek bar if no track is loaded
 				int temp = 0;
 				BackBeat::ImGuiWidgets::ImGuiSeekBarInt("##", &temp, 10000, "", ImGuiSliderFlags(0));
-			}
+				ImGui::SameLine(); ImGui::Text("%d:%02d", trackLength.minutes, trackLength.seconds);
 
-			ImGui::SameLine(); ImGui::Text("%d:%02d", trackLength.minutes, trackLength.seconds);
+				// Renders an empty, uninteractable track editor
+				ImGui::Text("%d:%02d", 0, 0); ImGui::SameLine();
+				BackBeat::ImGuiWidgets::ImGuiTrackEditor("temp", &temp, &temp, &temp, &temp, "", ImGuiSliderFlags(0));
+				ImGui::SameLine(); ImGui::Text("%d:%02d", 0, 0);
+			}
 
 			ImGui::Spacing();
 
@@ -143,10 +170,12 @@
 	{
 		if (m_Player.IsLoaded() && event.GetKeyCode() == BackBeat::Key::Space)
 		{
-			if (!m_Player.IsPlaying()) {
+			if (!m_Player.IsPlaying()) 
+			{
 				m_Player.Start();
 			}
-			else {
+			else 
+			{
 				m_Player.Pause();
 			}
 			event.Handled = true;

@@ -46,6 +46,7 @@ namespace BackBeat {
 	}
 
 	// NOTE: Only handles int, may implement other data types later
+	//       Flags not used, may remove
 	// COLORS:
 	//     - Frame rectangle  - ImGui::GetColorU32(g.ActiveId == id ? ImGuiCol_FrameBgActive : ImGuiCol_FrameBg)
 	//     - Active rectangle - ImGuiCol_SliderGrab
@@ -222,12 +223,15 @@ namespace BackBeat {
 		float lowerTruePos = ((float)(*lowerV - vMin) / (float)(vMax - vMin)) * sliderSize + sliderMin;
 		float upperTruePos = ((float)(*upperV - vMin) / (float)(vMax - vMin)) * sliderSize + sliderMin;
 
+		const bool hovered = ImGui::ItemHoverable(frame, id, g.LastItemData.InFlags);
+		if (hovered)
+			g.MouseCursor = ImGuiMouseCursor_TextInput;
+
 		// Slider interaction
 		bool valueChanged = false;
 		bool lowerActive = false;
 		bool upperActive = false;
 		float clickedPos = 0.0f;
-
 		if (g.ActiveId == id)
 		{
 			if (g.ActiveIdSource == ImGuiInputSource_Mouse)
@@ -267,25 +271,21 @@ namespace BackBeat {
 				}
 			}
 		}
-
-		if (valueChanged)
+		if (valueChanged) 
 		{
 			int newVal = (int)(clickedPos * ((float)vMax - (float)vMin) + (float)vMin);
 			if (lowerActive)
-			{
-				newVal = newVal >= *upperV ? *upperV - 1 : newVal < vMin ? vMin : newVal;
 				*lowerV = newVal;
-				lowerTruePos = (float(newVal) - float(vMin)) / float(vMax - vMin) * sliderSize + sliderMin;
-			}
 			else if (upperActive)
-			{
-				newVal = newVal <= *lowerV ? *lowerV + 1 : newVal > vMax ? vMax : newVal;
 				*upperV = newVal;
-				upperTruePos = (float(newVal) - float(vMin)) / float(vMax - vMin) * sliderSize + sliderMin;
-			}
 		}
 
 		// Sets bounds for rendering
+		const int padding = 64;
+		*lowerV = *lowerV >= *upperV ? *upperV - padding : *lowerV < vMin ? vMin : *lowerV;
+		*upperV = *upperV <= *lowerV ? *lowerV + padding : *upperV > vMax ? vMax : *upperV;
+		lowerTruePos = (float(*lowerV) - float(vMin)) / float(vMax - vMin) * sliderSize + sliderMin;
+		upperTruePos = (float(*upperV) - float(vMin)) / float(vMax - vMin) * sliderSize + sliderMin;
 		*grabLower = ImRect(ImVec2(lowerTruePos, frame.Min.y),
 			ImVec2(lowerTruePos, frame.Max.y));
 		*grabUpper = ImRect(ImVec2(upperTruePos, frame.Min.y),

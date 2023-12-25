@@ -1,22 +1,19 @@
 #include "bbpch.h"
 
-// TODO: Refactor code to work with AudioInfo struct insted of AudioData class
-
 #include "BackBeat/Audio/Helpers/int24.h"
 #include "Track.h"
 namespace BackBeat {
 
 	Track::Track(AudioInfo info)
+		:
+		m_Done(false),
+		m_Position(info.dataZero),
+		m_StartPos(info.dataZero),
+		m_EndPos(info.dataSize + info.dataZero),
+		m_Volume(1.0f),
+		m_Info(info)
 	{
-		m_Done = false;
-		if (info.type == wav) {
-			m_Position = info.dataZero;
-		}
-		else {
-			m_Position = 0; // NOTE: Will change with implementation if needed with other file types
-		}
-		m_Volume = 1.0f;
-		m_Info = info;
+
 	}
 
 	Track::~Track()
@@ -31,24 +28,50 @@ namespace BackBeat {
 			return true;
 		if ((numBytes % m_Info.props.blockAlign) != 0)
 			return false;
-		unsigned int trueSize = m_Info.dataSize + m_Info.dataZero;
-		if (numBytes + m_Position > trueSize)
-			numBytes = trueSize - m_Position;
+
+		unsigned int position = m_Position + numBytes;
+		unsigned int bytesToRender = numBytes;
+		if (m_Position < m_StartPos) 
+		{
+			if (position >= m_StartPos) 
+			{
+				bytesToRender = position - m_StartPos;
+				m_Position = m_StartPos;
+			}
+			else 
+			{
+				m_Position = position;
+				return true;
+			}
+		}
+		else if (m_Position >= m_EndPos) 
+		{
+			m_Position += bytesToRender;
+			if (m_Position >= m_Info.dataSize + m_Info.dataZero) 
+			{
+				m_Position = m_Info.dataSize + m_Info.dataZero;
+				m_Done = true;
+			}
+			return true;
+		}
+		else if (position > m_EndPos)
+			bytesToRender = m_EndPos - m_Position;
 
 		std::ifstream file;
 		file.open(m_Info.filePath, std::ios::binary);
 		file.seekg(m_Position);
 
 		if (Audio::IsBigEndian() == m_Info.props.bigEndian)
-			file.read((char*)output, numBytes);
+			file.read((char*)output, bytesToRender);
 		else
 			return false; // TODO: Implement way to switch endianness of track data
 		
-		MultiplyVolume(output, numBytes);
+		MultiplyVolume(output, bytesToRender);
 
-		m_Position += numBytes;
-		if (m_Position >= trueSize)
+		m_Position += bytesToRender;
+		if (m_Position >= m_Info.dataSize + m_Info.dataZero)
 			m_Done = true;
+
 		file.close();
 		return true;
 	}
@@ -58,11 +81,7 @@ namespace BackBeat {
 		TimeMinSec time = TimeMinSec();
 		AudioProps props = m_Info.props;
 		float timeTotal = (float)((m_Position - m_Info.dataZero) / props.byteRate);
-		unsigned int minutes = (unsigned int)floor(timeTotal / 60);
-		unsigned int seconds = (unsigned int)((unsigned int)timeTotal % 60);
-		time.minutes = minutes;
-		time.seconds = seconds;
-		return time;
+		return Audio::GetTime(timeTotal);
 	}
 
 	TimeMinSec Track::GetLength()
@@ -70,18 +89,22 @@ namespace BackBeat {
 		TimeMinSec time = TimeMinSec();
 		AudioProps props = m_Info.props;
 		float timeTotal = (float)(m_Info.dataSize / props.byteRate);
-		unsigned int minutes = (unsigned int)floor(timeTotal / 60);
-		unsigned int seconds = (unsigned int)((unsigned int)timeTotal % 60);
-		time.minutes = minutes;
-		time.seconds = seconds;
-		return time;
+		return Audio::GetTime(timeTotal);
+	}
+
+	// NOTE: Not used and may be deleted (only used for testing but is currently uneeded)
+	float Track::GetProgress()
+	{
+		float progress = ((float)m_Position - (float)m_Info.dataZero) / (float)m_Info.dataSize;
+		return progress;
 	}
 
 	void Track::SetPosition(unsigned int position)
 	{
 		unsigned int offset = position % m_Info.props.blockAlign;
 		m_Position = position - offset + m_Info.dataZero;
-		if (m_Position >= m_Info.dataSize) {
+		if (m_Position >= m_Info.dataSize + m_Info.dataZero) 
+		{
 			m_Position = m_Info.dataSize + m_Info.dataZero;
 			m_Done = true;
 			return;
@@ -89,10 +112,34 @@ namespace BackBeat {
 		m_Done = false;
 	}
 
-	float Track::GetProgress()
+	void Track::SetStart(unsigned int start)
 	{
-		float progress = ((float)m_Position - (float)m_Info.dataZero) / (float)m_Info.dataSize;
-		return progress;
+		unsigned int offset = start % m_Info.props.blockAlign;
+		m_StartPos = start - offset + m_Info.dataZero;
+		if (m_StartPos >= m_Info.dataSize + m_Info.dataZero) 
+		{
+			m_StartPos = m_Info.dataSize + m_Info.dataZero;
+			m_Done = true;
+			return;
+		}
+		else if (m_StartPos <= m_Info.dataZero) 
+		{
+			m_StartPos = m_Info.dataZero;
+		}
+	}
+
+	void Track::SetEnd(unsigned int end)
+	{
+		unsigned int offset = end % m_Info.props.blockAlign;
+		m_EndPos = end - offset + m_Info.dataZero;
+		if (m_EndPos >= m_Info.dataSize) 
+		{
+			m_EndPos = m_Info.dataSize + m_Info.dataZero;
+		}
+		else if (m_EndPos <= m_Info.dataZero) 
+		{
+			m_EndPos = m_Info.dataZero;
+		}
 	}
 
 	void Track::MultiplyVolume(byte* output, unsigned int numBytes)

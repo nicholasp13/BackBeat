@@ -33,6 +33,7 @@ namespace BackBeat {
 #define LOAD_FAILURE (HRESULT)1002
 #define MIX_FAILURE  (HRESULT)1003
 
+// NOTE: ONLY USED FOR WINDOWS API
 // TODO: Expand/Make another CHECK_FAILURE for MMRESULT (Midi Input device Windows error messages) 
 #define CHECK_FAILURE( hr ) \
 	if (hr == PLAY_FAILURE) \
@@ -84,6 +85,8 @@ namespace BackBeat {
 		unsigned int seconds;
 	};
 
+	// NOTE: May want to move this to a Helpers.h file in the Helpers folder for better organization, not much sense to have these functions here
+	//       other than consolidation
 	class Audio
 	{
 	public:
@@ -123,6 +126,7 @@ namespace BackBeat {
 			return (float)(value);
 		}
 
+		// Note: Not currently used as most buffers need either to recast/type convert or are shared pointers
 		template<typename T>
 		static void CopyInputToOutput(T inputBuffer, T outputBuffer, UINT32 bytesToCopy)
 		{
@@ -145,6 +149,16 @@ namespace BackBeat {
 				return false;
 			else
 				return true;
+		}
+
+		static TimeMinSec GetTime(float totalSeconds)
+		{
+			TimeMinSec time = TimeMinSec();
+			unsigned int minutes = (unsigned int)floor(totalSeconds / 60.0f);
+			unsigned int seconds = (unsigned int)((unsigned int)totalSeconds % 60);
+			time.minutes = minutes;
+			time.seconds = seconds;
+			return time;
 		}
 	};
 }
