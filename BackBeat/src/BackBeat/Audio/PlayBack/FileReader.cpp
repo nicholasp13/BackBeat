@@ -127,7 +127,6 @@ namespace BackBeat {
 			props.bitDepth = Audio::EndianConverterShort(fileProps[bitDepth], fileProps[bitDepth + 1]);
 		}
 
-
 		unsigned int dataPosition = 0;
 		char dataChunk[WAV_DATA_SIZE];
 		dataChunk[4] = '\0';
