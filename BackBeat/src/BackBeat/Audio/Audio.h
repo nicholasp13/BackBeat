@@ -1,6 +1,6 @@
 #pragma once
 
-// NOTE: UINT and UINT32 are Windows
+// TODO: Change macro constants to constexpr
 
 #include "BackBeat/Core/Core.h"
 namespace BackBeat {
@@ -15,12 +15,13 @@ namespace BackBeat {
 #define INT24_MAX         8388607.0f
 
 // AUDIOFILE CONSTANTS
-#define MONO    (UINT32)1
-#define STEREO  (UINT32)2
-#define SHORT_INT_MAX   32676
-#define WAV_HEADER_SIZE 12
-#define WAV_FMT_SIZE    24
-#define WAV_DATA_SIZE   8
+#define MONO           (UINT32)1
+#define STEREO         (UINT32)2
+#define SHORT_INT_MAX          32676
+#define WAV_HEADER_SIZE        12
+#define WAV_FMT_SIZE           24
+#define WAV_DATA_SIZE          8
+#define WAV_TOTAL_HEADER_SIZE  44
 
 // AUDIO FILE STRINGS
 #define MP3 "ID3"
@@ -35,6 +36,7 @@ namespace BackBeat {
 #define LOAD_FAILURE (HRESULT)1002
 #define MIX_FAILURE  (HRESULT)1003
 
+// NOTE: ONLY USED FOR WINDOWS API
 // TODO: Expand/Make another CHECK_FAILURE for MMRESULT (Midi Input device Windows error messages) 
 #define CHECK_FAILURE( hr ) \
 	if (hr == PLAY_FAILURE) \
@@ -48,15 +50,30 @@ namespace BackBeat {
 
 	typedef unsigned char byte;
 
+	enum FileType {
+		none = 0,
+		wav,
+		mp3
+	};
+
 	struct AudioProps {
 		bool bigEndian;
-		unsigned short format;
+		unsigned short format;      // 1 is uncompressed, pcm with 2's complement bit representation / 3 is uncompressed, pcm with floating point bit representation / All other numbers indicate some kind of compression
 		unsigned short numChannels;
 		unsigned long sampleRate;
 		unsigned long byteRate;
 		unsigned short blockAlign;  // numChannels * bitDepth / 8
 		unsigned short bitDepth;
 		unsigned long fileSize;
+	};
+
+	struct AudioInfo {
+		FileType type;
+		std::string name;
+		std::string filePath;
+		AudioProps props;
+		unsigned int dataZero;    // Data subchunk position of audio files is not uniform across all files
+		unsigned int dataSize;    // Size of data subchunk (file size is stored in AudioProps)
 	};
 
 	// Struct of basic MIDI events
@@ -71,6 +88,8 @@ namespace BackBeat {
 		unsigned int seconds;
 	};
 
+	// NOTE: May want to move this to a Helpers.h file in the Helpers folder for better organization, not much sense to have these functions here
+	//       other than consolidation
 	class Audio
 	{
 	public:
@@ -110,6 +129,7 @@ namespace BackBeat {
 			return (float)(value);
 		}
 
+		// Note: Not currently used as most buffers need either to recast/type convert or are shared pointers
 		template<typename T>
 		static void CopyInputToOutput(T inputBuffer, T outputBuffer, UINT32 bytesToCopy)
 		{
@@ -132,6 +152,16 @@ namespace BackBeat {
 				return false;
 			else
 				return true;
+		}
+
+		static TimeMinSec GetTime(float totalSeconds)
+		{
+			TimeMinSec time = TimeMinSec();
+			unsigned int minutes = (unsigned int)floor(totalSeconds / 60.0f);
+			unsigned int seconds = (unsigned int)((unsigned int)totalSeconds % 60);
+			time.minutes = minutes;
+			time.seconds = seconds;
+			return time;
 		}
 	};
 }

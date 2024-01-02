@@ -27,5 +27,8 @@ namespace BackBeat {
 		unsigned int m_BufferSize;
 		byte* m_Output;
 		Track* m_Track;
+
+		void MonoToStereo(unsigned int numBytes, unsigned int bitDepth, byte* mBuffer, byte* sBuffer);
+		void StereoToMono(unsigned int numBytes, unsigned int bitDepth, byte* sBuffer, byte* mBuffer);
 	};
 }

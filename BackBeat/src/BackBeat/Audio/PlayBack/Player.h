@@ -1,7 +1,6 @@
 #pragma once
 
-// TODO: Add support for int24 data types
-//       Create upsamplers and downsamplers for support of other sample rates
+// TODO: Create upsamplers and downsamplers for support of other sample rates
 
 #include "TrackFactory.h"
 #include "PlayerProcessor.h"
@@ -16,19 +15,28 @@ namespace BackBeat {
 		~Player();
 
 		void Start();
-		void Pause();
 		void Stop();
 		void LoadTrack(std::string filePath);
 		
 		TimeMinSec GetTime();
 		TimeMinSec GetLength();
-		float GetProgress();
+		unsigned int GetByteRate();
+		unsigned int GetPosition(); 
+		unsigned int GetSampleRate();
+		unsigned int GetSize();
+		unsigned int GetStartPosition();
+		unsigned int GetEndPosition();
+		Track* GetTrack();
+		std::string GetTrackName();
 		void SetPosition(unsigned int pos);
+		void SetStart(unsigned int start);
+		void SetEnd(unsigned int end);
 		void SetVolume(float vol);
 
+		void Play() { m_PlayerProcessor->On(); }
+		void Pause() { m_PlayerProcessor->Off(); }
 		bool IsLoaded() { return m_SelectedTrack != nullptr; }
 		bool IsPlaying() { return m_PlayerProcessor->IsOn(); }
-		std::string GetTrackName();
 		std::shared_ptr<PlayerProcessor> GetProc() { return m_PlayerProcessor; }
 
 	private:

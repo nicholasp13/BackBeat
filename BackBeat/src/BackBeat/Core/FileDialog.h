@@ -5,7 +5,7 @@ namespace BackBeat {
 	class FileDialog
 	{
 	public:
-		static std::string OpenFile();
-		static void SaveFile();
+		static std::string OpenFile(const char* filter);
+		static std::string SaveFile(const char* filter);
 	};
 }

@@ -1,5 +1,7 @@
 #pragma once
 
+// TODO: Change macro constants to constexpr
+
 #include "BackBeat/Audio/Audio.h"
 #include "BackBeat/Core/Log.h"
 #include "BackBeat/Core/Timer.h"
@@ -50,7 +52,8 @@ namespace BackBeat {
 
 // -------- CONSTANTS FOR MIDI EVENTS --------- //
 // Website: https://midi.org/specifications/midi-reference-tables/
-// TODO: Add other constants as needed
+// TODO: Put these constants into an enum like the Mouse and Key codes
+//       Add other constants as needed
 
 // 1ST (STATUS) BYTE CONSTANTS
 #define CHANNEL_1_NOTE_OFF (byte)0x80

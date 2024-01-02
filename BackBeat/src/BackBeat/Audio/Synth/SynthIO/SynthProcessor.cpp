@@ -50,6 +50,8 @@ namespace BackBeat {
 			}
 		}
 
+		// NOTE: For Synths we should use the AudioEngine Reset() function to reset sample rate instead
+		//       of upsampling and downsampling
 		bool downSampling = (m_Props.sampleRate > sampleRate);
 		if (downSampling) {
 			// TODO: Implement downscaling by integer factor

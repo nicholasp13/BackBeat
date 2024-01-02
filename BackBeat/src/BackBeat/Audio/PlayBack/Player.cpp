@@ -27,11 +27,6 @@ namespace BackBeat {
 		m_PlayerProcessor->On();
 	}
 
-	void Player::Pause()
-	{
-		m_PlayerProcessor->Off();
-	}
-
 	void Player::Stop()
 	{
 		m_PlayerProcessor->Off();
@@ -60,11 +55,53 @@ namespace BackBeat {
 		return TimeMinSec();
 	}
 
-	float Player::GetProgress()
+	unsigned int Player::GetByteRate()
 	{
 		if (m_SelectedTrack)
-			return m_SelectedTrack->GetProgress();
-		return 0.0f;
+			return m_SelectedTrack->GetProps().byteRate;
+		return 1;
+	}
+
+	unsigned int Player::GetPosition()
+	{
+		if (m_SelectedTrack)
+			return m_SelectedTrack->GetPosition();
+		return 0;
+	}
+
+	unsigned int Player::GetSampleRate()
+	{
+		if (m_SelectedTrack)
+			return m_SelectedTrack->GetProps().sampleRate;
+		return 1;
+	}
+
+	unsigned int Player::GetSize()
+	{
+		if (m_SelectedTrack)
+			return m_SelectedTrack->GetSize();
+		return 0;
+	}
+
+	Track* Player::GetTrack()
+	{
+		if (m_SelectedTrack)
+			return m_SelectedTrack;
+		return nullptr;
+	}
+
+	unsigned int Player::GetStartPosition()
+	{
+		if (m_SelectedTrack)
+			return m_SelectedTrack->GetStart();
+		return 0;
+	}
+
+	unsigned int Player::GetEndPosition()
+	{
+		if (m_SelectedTrack)
+			return m_SelectedTrack->GetEnd();
+		return 0;
 	}
 
 	std::string Player::GetTrackName() 
@@ -76,7 +113,20 @@ namespace BackBeat {
 
 	void Player::SetPosition(unsigned int pos)
 	{
-		// TODO: Implement
+		if (m_SelectedTrack)
+			m_SelectedTrack->SetPosition(pos);
+	}
+
+	void Player::SetStart(unsigned int start)
+	{
+		if (m_SelectedTrack)
+			m_SelectedTrack->SetStart(start);
+	}
+
+	void Player::SetEnd(unsigned int end)
+	{
+		if (m_SelectedTrack)
+			m_SelectedTrack->SetEnd(end);
 	}
 
 	void Player::SetVolume(float vol)
