@@ -21,8 +21,8 @@ namespace BackBeat {
 		bool IsDone() { return m_Done; }
 		unsigned int GetSize() { return m_Info.dataSize; }
 		unsigned int GetPosition() { return m_Position - m_Info.dataZero; }
-		unsigned int GetStart() { return m_StartPos - m_Info.dataZero; }
-		unsigned int GetEnd() { return m_EndPos - m_Info.dataSize; }
+		unsigned int GetStart() { return m_StartPosition - m_Info.dataZero; }
+		unsigned int GetEnd() { return m_EndPosition - m_Info.dataZero; }
 		std::string GetName() { return m_Info.name; }
 		AudioProps GetProps() { return m_Info.props; }
 		AudioInfo GetInfo() { return m_Info; }
@@ -32,8 +32,8 @@ namespace BackBeat {
 	private:
 		bool m_Done;
 		unsigned int m_Position;
-		unsigned int m_StartPos;
-		unsigned int m_EndPos;
+		unsigned int m_StartPosition;
+		unsigned int m_EndPosition;
 		float m_Volume;
 		AudioInfo m_Info;
 

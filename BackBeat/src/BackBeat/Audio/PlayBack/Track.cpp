@@ -8,8 +8,8 @@ namespace BackBeat {
 		:
 		m_Done(false),
 		m_Position(info.dataZero),
-		m_StartPos(info.dataZero),
-		m_EndPos(info.dataSize + info.dataZero),
+		m_StartPosition(info.dataZero),
+		m_EndPosition(info.dataSize + info.dataZero),
 		m_Volume(1.0f),
 		m_Info(info)
 	{
@@ -31,12 +31,12 @@ namespace BackBeat {
 
 		unsigned int position = m_Position + numBytes;
 		unsigned int bytesToRender = numBytes;
-		if (m_Position < m_StartPos) 
+		if (m_Position < m_StartPosition) 
 		{
-			if (position >= m_StartPos) 
+			if (position >= m_StartPosition) 
 			{
-				bytesToRender = position - m_StartPos;
-				m_Position = m_StartPos;
+				bytesToRender = position - m_StartPosition;
+				m_Position = m_StartPosition;
 			}
 			else 
 			{
@@ -44,7 +44,7 @@ namespace BackBeat {
 				return true;
 			}
 		}
-		else if (m_Position >= m_EndPos) 
+		else if (m_Position >= m_EndPosition) 
 		{
 			m_Position += bytesToRender;
 			if (m_Position >= m_Info.dataSize + m_Info.dataZero) 
@@ -54,8 +54,8 @@ namespace BackBeat {
 			}
 			return true;
 		}
-		else if (position > m_EndPos)
-			bytesToRender = m_EndPos - m_Position;
+		else if (position > m_EndPosition)
+			bytesToRender = m_EndPosition - m_Position;
 
 		std::ifstream file;
 		file.open(m_Info.filePath, std::ios::binary);
@@ -115,30 +115,30 @@ namespace BackBeat {
 	void Track::SetStart(unsigned int start)
 	{
 		unsigned int offset = start % m_Info.props.blockAlign;
-		m_StartPos = start - offset + m_Info.dataZero;
-		if (m_StartPos >= m_Info.dataSize + m_Info.dataZero) 
+		m_StartPosition = start - offset + m_Info.dataZero;
+		if (m_StartPosition >= m_Info.dataSize + m_Info.dataZero) 
 		{
-			m_StartPos = m_Info.dataSize + m_Info.dataZero;
+			m_StartPosition = m_Info.dataSize + m_Info.dataZero;
 			m_Done = true;
 			return;
 		}
-		else if (m_StartPos <= m_Info.dataZero) 
+		else if (m_StartPosition <= m_Info.dataZero) 
 		{
-			m_StartPos = m_Info.dataZero;
+			m_StartPosition = m_Info.dataZero;
 		}
 	}
 
 	void Track::SetEnd(unsigned int end)
 	{
 		unsigned int offset = end % m_Info.props.blockAlign;
-		m_EndPos = end - offset + m_Info.dataZero;
-		if (m_EndPos >= m_Info.dataSize) 
+		m_EndPosition = end - offset + m_Info.dataZero;
+		if (m_EndPosition >= m_Info.dataSize) 
 		{
-			m_EndPos = m_Info.dataSize + m_Info.dataZero;
+			m_EndPosition = m_Info.dataSize + m_Info.dataZero;
 		}
-		else if (m_EndPos <= m_Info.dataZero) 
+		else if (m_EndPosition <= m_Info.dataZero) 
 		{
-			m_EndPos = m_Info.dataZero;
+			m_EndPosition = m_Info.dataZero;
 		}
 	}
 

@@ -1,5 +1,7 @@
 #pragma once
 
+// TODO: Change macro constants to constexpr
+
 #include "BackBeat/Core/Core.h"
 namespace BackBeat {
 
@@ -13,12 +15,13 @@ namespace BackBeat {
 #define INT24_MAX         8388607.0f
 
 // AUDIOFILE CONSTANTS
-#define MONO    (UINT32)1
-#define STEREO  (UINT32)2
-#define SHORT_INT_MAX   32676
-#define WAV_HEADER_SIZE 12
-#define WAV_FMT_SIZE    24
-#define WAV_DATA_SIZE   8
+#define MONO           (UINT32)1
+#define STEREO         (UINT32)2
+#define SHORT_INT_MAX          32676
+#define WAV_HEADER_SIZE        12
+#define WAV_FMT_SIZE           24
+#define WAV_DATA_SIZE          8
+#define WAV_TOTAL_HEADER_SIZE  44
 
 // AUDIO FILE STRINGS
 #define MP3 "ID3"
@@ -55,7 +58,7 @@ namespace BackBeat {
 
 	struct AudioProps {
 		bool bigEndian;
-		unsigned short format;
+		unsigned short format;      // 1 is uncompressed, pcm with 2's complement bit representation / 3 is uncompressed, pcm with floating point bit representation / All other numbers indicate some kind of compression
 		unsigned short numChannels;
 		unsigned long sampleRate;
 		unsigned long byteRate;

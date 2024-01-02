@@ -18,7 +18,6 @@ namespace BackBeat {
 		delete[m_BufferSize](m_Output);
 	}
 
-	// FIXME: Add MONO support
 	void PlayerProcessor::ProcessSamples(unsigned int numSamples, unsigned int sampleRate, unsigned int numChannels)
 	{
 		if (!m_On)

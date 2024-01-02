@@ -90,8 +90,6 @@
 
 		m_Synth.ImGuiRender();
 		m_Player.ImGuiRender();
-
-		// ImGui::ShowDemoWindow();
 	}
 
 	bool MainLayer::OnKeyEvent(BackBeat::KeyPressedEvent& event)

@@ -31,7 +31,7 @@ namespace BackBeat {
 		m_Running = false;
 		m_Props = {
 			.bigEndian = Audio::IsBigEndian(),
-			.format =      0,
+			.format =      3,
 			.numChannels = STEREO,
 			.sampleRate =  SYNTH_SAMPLE_RATE,
 			.byteRate =    SYNTH_BYTE_RATE,

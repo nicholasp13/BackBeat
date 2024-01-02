@@ -5,6 +5,7 @@
 #include "ImGuiWidgets.h"
 namespace BackBeat {
 
+	// TODO: FINISH
 	bool ImGuiWidgets::ImGuiTimeline()
 	{
 		ImGuiWindow* window = ImGui::GetCurrentWindow();
@@ -15,31 +16,6 @@ namespace BackBeat {
 
 		ImVec2 pos = window->DC.CursorPos;
 	    ImRect background = window->InnerClipRect;
-
-		// LAYOUT:
-		// ----- Child Window ----- 
-		// Draw backgroumd
-		// Top menu bar:
-		//     menu
-		//     etc
-		// -- Child Child Window -- 
-		// Measures/timer
-		// Draw Tracks:
-    	// for i tracks draw
-		//     Info rectangle with track name, current time, length with button for play, pause stop
-		//     To the right of that create a frame around another rectangle to the right of indefinite length
-		//     Inner rectangle is a solid neutral color bar that goes on for a bit
-		//     Overlayed rectangle is progress bar with a lighter color and finishes at the end of the track
-		//         with a solid colored line at the end to mark the end (might be another border around the track)
-		// 
-		// Bottom of the frame is a scroll bar that goes right until an arbitrary end
-		// Right of the frame is a scroll bar that goes down until an arbitrary end
-		// ------------------------ 
-		// Play bar
-		// ------------------------
-		// 
-		// HELPERS:
-		//     Track Editor
 
 		ImGui::PopID();
 		return true;

@@ -83,6 +83,27 @@ namespace BackBeat {
 		return 0;
 	}
 
+	Track* Player::GetTrack()
+	{
+		if (m_SelectedTrack)
+			return m_SelectedTrack;
+		return nullptr;
+	}
+
+	unsigned int Player::GetStartPosition()
+	{
+		if (m_SelectedTrack)
+			return m_SelectedTrack->GetStart();
+		return 0;
+	}
+
+	unsigned int Player::GetEndPosition()
+	{
+		if (m_SelectedTrack)
+			return m_SelectedTrack->GetEnd();
+		return 0;
+	}
+
 	std::string Player::GetTrackName() 
 	{
 		if (m_SelectedTrack)

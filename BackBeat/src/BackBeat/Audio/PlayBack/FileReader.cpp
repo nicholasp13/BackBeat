@@ -39,7 +39,6 @@ namespace BackBeat {
 					size = Audio::EndianConverterLong(header[4], header[5],
 						header[6], header[7]);
 				}
-				// TODO: Refactor code to work with AudioInfo struct insted of AudioData struct
 				return ReadWAVHeader(filePath, size);
 			}
 		}
@@ -97,8 +96,8 @@ namespace BackBeat {
 		file.read(fileProps, WAV_FMT_SIZE);
 
 		// Indices of relevant properties in standard WAV file headers 
-		// NOTE: Headers are always written in big endian
-		const int fileSize		= 4;
+		// All written in little endian
+		const int fmtSize		= 4;
 		const int audioFormat	= 8;
 		const int numChannels	= 10;
 		const int sampleRate	= 12;
@@ -116,7 +115,6 @@ namespace BackBeat {
 			props.bitDepth = (unsigned short)fileProps[bitDepth];
 		}
 		else {
-			// Rearranges bytes from little Endian to big Endian for this system's standard units
 			props.format = Audio::EndianConverterShort(fileProps[audioFormat], fileProps[audioFormat + 1]);
 			props.numChannels = Audio::EndianConverterShort(fileProps[numChannels], fileProps[numChannels + 1]);
 			props.sampleRate = Audio::EndianConverterLong(fileProps[sampleRate], fileProps[sampleRate + 1],
@@ -128,8 +126,9 @@ namespace BackBeat {
 		}
 
 		unsigned int dataPosition = 0;
+		const int dataChunkPos = 4;
 		char dataChunk[WAV_DATA_SIZE];
-		dataChunk[4] = '\0';
+		dataChunk[dataChunkPos] = '\0';
 		for (unsigned int j = fmtPosition; j < size; j++)
 		{
 			file.seekg(j);
@@ -141,8 +140,9 @@ namespace BackBeat {
 				if (std::strcmp("data", dataChunk) == 0) {
 					file.seekg(j);
 					file.read(dataChunk, WAV_DATA_SIZE);
-					const int dataChunkPos = 4;
 					unsigned int dataSize = 0;
+					char dataTemp = dataChunk[dataChunkPos];
+					dataChunk[dataChunkPos] = dataTemp;
 					if (Audio::IsBigEndian())
 					{
 						dataSize = *reinterpret_cast<unsigned int*>(dataChunk);

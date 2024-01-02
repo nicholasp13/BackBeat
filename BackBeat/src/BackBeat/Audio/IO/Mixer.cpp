@@ -94,6 +94,7 @@ namespace BackBeat {
 
 				}
 
+				// TODO: WAV files can either be 32 bit long or float and this or the AudioProcessor will need to check AudioProps.format
 				else if (inProps.bitDepth == FLOAT_BIT_SIZE) 
 				{
 					auto srcBuffer = reinterpret_cast<float*>(m_Procs[i]->GetOutputBuffer());

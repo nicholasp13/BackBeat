@@ -22,5 +22,6 @@
 #include "BackBeat/Audio/Synth/Synth.h"
 #include "BackBeat/Audio/MIDI/WindowsMIDIDeviceManager.h"
 #include "BackBeat/Audio/PlayBack/Player.h"
+#include "BackBeat/Audio/PlayBack/AudioFileBuilder.h"
 
 #include "BackBeat/ImGui/ImGuiWidgets.h"

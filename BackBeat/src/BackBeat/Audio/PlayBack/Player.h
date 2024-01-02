@@ -24,6 +24,9 @@ namespace BackBeat {
 		unsigned int GetPosition(); 
 		unsigned int GetSampleRate();
 		unsigned int GetSize();
+		unsigned int GetStartPosition();
+		unsigned int GetEndPosition();
+		Track* GetTrack();
 		std::string GetTrackName();
 		void SetPosition(unsigned int pos);
 		void SetStart(unsigned int start);

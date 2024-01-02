@@ -54,7 +54,23 @@
 					if (ImGui::MenuItem("Open"))
 					{
 						m_Player.Pause();
-						m_Player.LoadTrack(BackBeat::FileDialog::OpenFile());
+						m_Player.LoadTrack(BackBeat::FileDialog::OpenFile("WAV Files (*.wav)\0*.wav\0"));
+					}
+					if (m_Player.IsLoaded())
+					{
+						if (ImGui::MenuItem("Save"))
+						{
+							m_Player.Pause();
+							unsigned int position = m_Player.GetPosition();
+							unsigned int startPosition = m_Player.GetStartPosition();
+							unsigned int endPosition = m_Player.GetEndPosition();
+							BackBeat::AudioFileBuilder::BuildWAVFile(m_Player.GetTrack(), startPosition, endPosition);
+							m_Player.SetPosition(position);
+						}
+					}
+					else
+					{
+						ImGui::MenuItem("Save", NULL, false, false);
 					}
 					ImGui::EndMenu();
 				}
@@ -127,19 +143,24 @@
 					m_Player.SetEnd(end);
 				}
 				ImGui::SameLine(); ImGui::Text("%d:%02d", endTime.minutes, endTime.seconds);
+
 				ImGui::PopID();
 			}
 			else 
 			{
 				// Renders an empty, uninteractable seek bar if no track is loaded
+				ImGui::PushID("EmptySeekbar");
 				int temp = 0;
 				BackBeat::ImGuiWidgets::ImGuiSeekBarInt("##", &temp, 10000, "", ImGuiSliderFlags(0));
 				ImGui::SameLine(); ImGui::Text("%d:%02d", trackLength.minutes, trackLength.seconds);
+				ImGui::PopID();
 
 				// Renders an empty, uninteractable track editor
+				ImGui::PushID("EmptyTrackEditor");
 				ImGui::Text("%d:%02d", 0, 0); ImGui::SameLine();
-				BackBeat::ImGuiWidgets::ImGuiTrackEditor("temp", &temp, &temp, &temp, &temp, "", ImGuiSliderFlags(0));
+				BackBeat::ImGuiWidgets::ImGuiTrackEditor("##", &temp, &temp, &temp, &temp, "", ImGuiSliderFlags(0));
 				ImGui::SameLine(); ImGui::Text("%d:%02d", 0, 0);
+				ImGui::PopID();
 			}
 
 			ImGui::Spacing();

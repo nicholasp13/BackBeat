@@ -9,7 +9,7 @@
 #include "BackBeat/Core/FileDialog.h"
 namespace BackBeat {
 
-    std::string FileDialog::OpenFile()
+    std::string FileDialog::OpenFile(const char* filter)
     {
 
         OPENFILENAMEA fileName;
@@ -20,6 +20,7 @@ namespace BackBeat {
         fileName.hwndOwner = glfwGetWin32Window((GLFWwindow*)Application::Get().GetWindow().GetNativeWindow());
         fileName.lpstrFile = sizeFile;
         fileName.nMaxFile = sizeof(sizeFile);
+		fileName.lpstrFilter = filter;
         if (GetCurrentDirectoryA(256, currentDir))
             fileName.lpstrInitialDir = currentDir;
         fileName.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR;
@@ -30,9 +31,26 @@ namespace BackBeat {
         return std::string();
     }
 
-    void FileDialog::SaveFile() 
+	std::string FileDialog::SaveFile(const char* filter)
     { 
-        // fileName.lpstrFilter = "WAV Files (*.wav)\0";  // Note: Code to filter what kind of files can be saved
+		OPENFILENAMEA fileName;
+		CHAR sizeFile[260] = { 0 };
+		CHAR currentDir[256] = { 0 };
+		ZeroMemory(&fileName, sizeof(OPENFILENAME));
+		fileName.lStructSize = sizeof(OPENFILENAME);
+		fileName.hwndOwner = glfwGetWin32Window((GLFWwindow*)Application::Get().GetWindow().GetNativeWindow());
+		fileName.lpstrFile = sizeFile;
+		fileName.nMaxFile = sizeof(sizeFile);
+		fileName.lpstrFilter = filter;
+		fileName.lpstrDefExt = strchr(filter, '\0') + 1;
+		if (GetCurrentDirectoryA(256, currentDir))
+			fileName.lpstrInitialDir = currentDir;
+		fileName.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR;
+
+		if (GetSaveFileNameA(&fileName) == TRUE)
+			return fileName.lpstrFile;
+
+		return std::string();
     };
 }
 
