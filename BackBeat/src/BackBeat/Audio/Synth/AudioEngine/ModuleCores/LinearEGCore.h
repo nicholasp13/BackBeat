@@ -17,12 +17,12 @@ namespace BackBeat {
 	class LinearEGCore : public ModuleCore
 	{
 	public:
-		LinearEGCore(UINT32 sampleRate, UINT32 bufferSize, std::shared_ptr<EGParameters> params);
+		LinearEGCore(unsigned int sampleRate, unsigned int bufferSize, std::shared_ptr<EGParameters> params);
 		~LinearEGCore();
 
-		virtual void Reset(UINT32 sampleRate);
+		virtual void Reset(unsigned int sampleRate);
 		virtual void Update();
-		virtual void Render(UINT32 numSamples);
+		virtual void Render(unsigned int numSamples);
 		virtual void DoNoteOn(NoteEvent event);
 		virtual void DoNoteOff(NoteEvent event);
 
@@ -32,8 +32,8 @@ namespace BackBeat {
 		EGState GetState() { return m_State; }
 	
 	private:
-		UINT32 m_SampleRate;
-		UINT32 m_InputPosition;
+		unsigned int m_SampleRate;
+		unsigned int m_InputPosition;
 		float m_Value;
 		float m_ScalarNote;
 		float m_ScalarVelocity;

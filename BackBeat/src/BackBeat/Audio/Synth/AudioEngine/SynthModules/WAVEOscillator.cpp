@@ -2,7 +2,7 @@
 
 #include "WAVEOscillator.h"
 namespace BackBeat {
-	WaveOscillator::WaveOscillator(UINT32 sampleRate, std::shared_ptr<float[]> buffer, std::shared_ptr<OscParameters> params)
+	WaveOscillator::WaveOscillator(unsigned int sampleRate, std::shared_ptr<float[]> buffer, std::shared_ptr<OscParameters> params)
 		:
 		m_Core(std::make_shared<WaveOscCore>(sampleRate, buffer, params))
 	{
@@ -13,7 +13,7 @@ namespace BackBeat {
 
 	}
 
-	void WaveOscillator::Reset(UINT32 sampleRate)
+	void WaveOscillator::Reset(unsigned int sampleRate)
 	{
 		m_Core->Reset(sampleRate);
 	}
@@ -23,7 +23,7 @@ namespace BackBeat {
 
 	}
 
-	void WaveOscillator::Render(UINT32 numSamples)
+	void WaveOscillator::Render(unsigned int numSamples)
 	{
 		Update();
 		m_Core->Render(numSamples);

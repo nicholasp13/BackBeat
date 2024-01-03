@@ -18,19 +18,23 @@ namespace BackBeat {
 	int24::int24(short num)
 	{
 		auto x = reinterpret_cast<byte*>(&num);
-		if (Audio::IsBigEndian()) {
+		if (Audio::IsBigEndian())
+		{
 			m_UpperByte = x[0];
 			m_LowerByte = x[1];
 		}
-		else {
+		else 
+		{
 			m_UpperByte = x[1];
 			m_LowerByte = x[0];
 		}
 		
-		if (num >= 0) {
+		if (num >= 0) 
+		{
 			m_SignedByte = 0x00;
 		}
-		else {
+		else 
+		{
 			m_SignedByte = 0xFF;
 		}
 	}
@@ -39,12 +43,14 @@ namespace BackBeat {
 	{
 		auto x = reinterpret_cast<byte*>(&num);
 
-		if (Audio::IsBigEndian()) {
+		if (Audio::IsBigEndian()) 
+		{
 			m_SignedByte = x[0];
 			m_UpperByte = x[1];
 			m_LowerByte = x[2];
 		}
-		else {
+		else 
+		{
 			m_SignedByte = x[2];
 			m_UpperByte = x[1];
 			m_LowerByte = x[0];
@@ -55,12 +61,14 @@ namespace BackBeat {
 	{
 		auto x = reinterpret_cast<byte*>(&num);
 
-		if (Audio::IsBigEndian()) {
+		if (Audio::IsBigEndian()) 
+		{
 			m_SignedByte = x[0];
 			m_UpperByte = x[1];
 			m_LowerByte = x[2];
 		}
-		else {
+		else 
+		{
 			m_SignedByte = x[2];
 			m_UpperByte = x[1];
 			m_LowerByte = x[0];
@@ -71,12 +79,14 @@ namespace BackBeat {
 	{
 		auto x = (long)num;
 		auto y = reinterpret_cast<byte*>(&x);
-		if (Audio::IsBigEndian()) {
+		if (Audio::IsBigEndian())
+		{
 			m_SignedByte = y[0];
 			m_UpperByte = y[1];
 			m_LowerByte = y[2];
 		}
-		else {
+		else 
+		{
 			m_SignedByte = y[2];
 			m_UpperByte = y[1];
 			m_LowerByte = y[0];
@@ -87,12 +97,14 @@ namespace BackBeat {
 	{
 		auto x = (long)num;
 		auto y = reinterpret_cast<byte*>(&x);
-		if (Audio::IsBigEndian()) {
+		if (Audio::IsBigEndian()) 
+		{
 			m_SignedByte = y[0];
 			m_UpperByte = y[1];
 			m_LowerByte = y[2];
 		}
-		else {
+		else 
+		{
 			m_SignedByte = y[2];
 			m_UpperByte = y[1];
 			m_LowerByte = y[0];
@@ -168,28 +180,34 @@ namespace BackBeat {
 		if (*this == int24())
 			return long(0);
 
-		if (Audio::IsBigEndian()) {
+		if (Audio::IsBigEndian()) 
+		{
 			negativeByte = 0xFF;
-			signedByte = m_SignedByte << BYTE_BIT_SIZE;
-			upperByte = m_UpperByte << BYTE_BIT_SIZE * 2;
-			lowerByte = m_LowerByte << BYTE_BIT_SIZE * 3;
-			if (IsPositive()) {
+			signedByte = m_SignedByte << Audio::ByteBitSize;
+			upperByte = m_UpperByte << Audio::ByteBitSize * 2;
+			lowerByte = m_LowerByte << Audio::ByteBitSize * 3;
+			if (IsPositive()) 
+			{
 				return signedByte | upperByte | lowerByte;
 			}
-			else {
+			else 
+			{
 				return negativeByte | signedByte | upperByte | lowerByte;
 			}
 		}
-		else {
-			negativeByte = 0xFF << BYTE_BIT_SIZE * 3;
-			signedByte = m_SignedByte << BYTE_BIT_SIZE * 2;
-			upperByte = m_UpperByte << BYTE_BIT_SIZE;
+		else 
+		{
+			negativeByte = 0xFF << Audio::ByteBitSize * 3;
+			signedByte = m_SignedByte << Audio::ByteBitSize * 2;
+			upperByte = m_UpperByte << Audio::ByteBitSize;
 			lowerByte = m_LowerByte;
 
-			if (IsPositive()) {
+			if (IsPositive()) 
+			{
 				return signedByte | upperByte | lowerByte;
 			}
-			else {
+			else 
+			{
 				return negativeByte | signedByte | upperByte | lowerByte;
 			}
 		}
@@ -197,7 +215,8 @@ namespace BackBeat {
 
 	bool int24::IsPositive()
 	{
-		if (*this != int24()) {
+		if (*this != int24()) 
+		{
 			byte signedBit = 0x80;
 			return (m_SignedByte & signedBit) == 0x00;
 		}

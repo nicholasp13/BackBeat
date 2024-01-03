@@ -3,7 +3,7 @@
 #include "Modulator.h"
 namespace BackBeat {
 
-	Modulator::Modulator(UINT32 bufferSize)
+	Modulator::Modulator(unsigned int bufferSize)
 		: m_BufferSize(bufferSize), m_Buffer(std::make_shared<float[]>(bufferSize))
 	{
 
@@ -14,8 +14,8 @@ namespace BackBeat {
 
 	}
 
-	void Modulator::FlushBuffer(UINT32 numSamples, float defaultValue)
+	void Modulator::FlushBuffer(unsigned int numSamples, float defaultValue)
 	{
-		Audio::FlushBuffer(m_Buffer, numSamples, STEREO, defaultValue);
+		Audio::FlushBuffer(m_Buffer, numSamples, Audio::Stereo, defaultValue);
 	}
 }

@@ -20,8 +20,8 @@ namespace BackBeat {
 		if (success)
 		{
 			const unsigned int dataSize = props.byteRate;
-			const unsigned int fileSize = size + WAV_TOTAL_HEADER_SIZE;
-			unsigned int filePosition = WAV_TOTAL_HEADER_SIZE;
+			const unsigned int fileSize = size + Audio::WAVTotalHeaderSize;
+			unsigned int filePosition = Audio::WAVTotalHeaderSize;
 			unsigned int dataIncrement = dataSize;
 			char* data = new char[dataSize];
 			track->SetStart(start);

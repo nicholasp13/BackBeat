@@ -3,7 +3,7 @@
 #include "LowFrequencyOscillator.h"
 namespace BackBeat {
 
-	LowFrequencyOscillator::LowFrequencyOscillator(UINT32 sampleRate, UINT32 bufferSize, std::shared_ptr<float[]> outputBuffer, std::shared_ptr<LFOParameters> params)
+	LowFrequencyOscillator::LowFrequencyOscillator(unsigned int sampleRate, unsigned int bufferSize, std::shared_ptr<float[]> outputBuffer, std::shared_ptr<LFOParameters> params)
 	{
 		m_Core = std::make_shared<LFOCore>(sampleRate, bufferSize, params);
 		m_InputBuffer = m_Core->GetOutputBuffer();
@@ -15,7 +15,7 @@ namespace BackBeat {
 
 	}
 
-	void LowFrequencyOscillator::Reset(UINT32 sampleRate)
+	void LowFrequencyOscillator::Reset(unsigned int sampleRate)
 	{
 		m_Core->Reset(sampleRate);
 	}
@@ -25,14 +25,14 @@ namespace BackBeat {
 
 	}
 
-	void LowFrequencyOscillator::Render(UINT32 numSamples)
+	void LowFrequencyOscillator::Render(unsigned int numSamples)
 	{
 		Update();
 		m_Core->Render(numSamples);
 
 		// NOTE: This step will be implemented by the ModularMatrix for all modulations. This is only temporary
-		UINT32 totalSamples = numSamples * STEREO;
-		for (UINT32 i = 0; i < totalSamples; i++)
+		unsigned int totalSamples = numSamples * Audio::Stereo;
+		for (unsigned int i = 0; i < totalSamples; i++)
 		{
 			m_OutputBuffer[i] += m_InputBuffer[i];
 		}

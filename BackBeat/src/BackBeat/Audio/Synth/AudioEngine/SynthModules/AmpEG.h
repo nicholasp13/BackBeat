@@ -11,12 +11,12 @@ namespace BackBeat {
 	class AmpEG : public EnvelopeGenerator
 	{
 	public:
-		AmpEG(UINT32 sampleRate, UINT32 bufferSize, std::shared_ptr<float[]> DCABuffer, std::shared_ptr<EGParameters> params);
+		AmpEG(unsigned int sampleRate, unsigned int bufferSize, std::shared_ptr<float[]> DCABuffer, std::shared_ptr<EGParameters> params);
 		~AmpEG();
 
-		virtual void Reset(UINT32 sampleRate);
+		virtual void Reset(unsigned int sampleRate);
 		virtual void Update();
-		virtual void Render(UINT32 numSamples);
+		virtual void Render(unsigned int numSamples);
 		virtual void DoNoteOn(NoteEvent event);
 		virtual void DoNoteOff(NoteEvent event);
 

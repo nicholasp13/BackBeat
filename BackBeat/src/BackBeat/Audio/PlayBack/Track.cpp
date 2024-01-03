@@ -150,7 +150,7 @@ namespace BackBeat {
 		switch (props.bitDepth)
 		{
 
-		case (BYTE_BIT_SIZE):
+		case (Audio::ByteBitSize):
 		{
 			for (unsigned int i = 0; i < numSamples; i++) {
 				output[i] = (byte)((float)(output[i]) * m_Volume);
@@ -158,7 +158,7 @@ namespace BackBeat {
 			break;
 		}
 
-		case (INT16_BIT_SIZE):
+		case (Audio::Int16BitSize):
 		{
 			auto buffer = reinterpret_cast<signed short*>(output);
 			for (unsigned int i = 0; i < numSamples; i++) {
@@ -167,13 +167,13 @@ namespace BackBeat {
 			break;
 		}
 
-		case (INT24_BIT_SIZE):
+		case (Audio::Int24BitSize):
 		{
 			auto buffer = reinterpret_cast<byte*>(output);
 			int24 src = int24();
-			byte srcBytes[INT24_BYTE_SIZE];
-			for (unsigned int i = 0; i < numBytes; i+= INT24_BYTE_SIZE) {
-				for (unsigned int j = 0; j < INT24_BYTE_SIZE; j++) {
+			byte srcBytes[Audio::Int24ByteSize];
+			for (unsigned int i = 0; i < numBytes; i+= Audio::Int24ByteSize) {
+				for (unsigned int j = 0; j < Audio::Int24ByteSize; j++) {
 					srcBytes[2 - j] = buffer[i + j];
 				}
 				src = int24(srcBytes[0], srcBytes[1], srcBytes[2]);
@@ -185,7 +185,7 @@ namespace BackBeat {
 			break;
 		}
 
-		case (FLOAT_BIT_SIZE):
+		case (Audio::FloatBitSize):
 		{
 			auto buffer = reinterpret_cast<float*>(output);
 			for (unsigned int i = 0; i < numSamples; i++) {
@@ -194,7 +194,7 @@ namespace BackBeat {
 			break;
 		}
 
-		case (DOUBLE_BIT_SIZE):
+		case (Audio::DoubleBitSize):
 		{
 			auto buffer = reinterpret_cast<double*>(output);
 			for (unsigned int i = 0; i < numSamples; i++) {

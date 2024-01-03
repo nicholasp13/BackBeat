@@ -3,7 +3,7 @@
 #include "TPTLowPassFilter.h"
 namespace BackBeat {
 
-	TPTLowPassFilter::TPTLowPassFilter(UINT32 sampleRate, UINT32 bufferSize, std::shared_ptr<float[]> buffer, std::shared_ptr<FilterParameters> params)
+	TPTLowPassFilter::TPTLowPassFilter(unsigned int sampleRate, unsigned int bufferSize, std::shared_ptr<float[]> buffer, std::shared_ptr<FilterParameters> params)
 		: m_Core(std::make_shared<TPTLPFilterCore>(sampleRate, bufferSize, buffer, params))
 	{
 
@@ -14,7 +14,7 @@ namespace BackBeat {
 
 	}
 
-	void TPTLowPassFilter::Reset(UINT32 sampleRate)
+	void TPTLowPassFilter::Reset(unsigned int sampleRate)
 	{
 		m_Core->Reset(sampleRate);
 	}
@@ -24,7 +24,7 @@ namespace BackBeat {
 
 	}
 
-	void TPTLowPassFilter::Render(UINT32 numSamples)
+	void TPTLowPassFilter::Render(unsigned int numSamples)
 	{
 		m_Core->Render(numSamples);
 	}

@@ -25,7 +25,8 @@
 
 	void Playback::ImGuiRender() 
 	{
-		if (!m_Open) {
+		if (!m_Open) 
+		{
 			m_Player.Pause();
 			return;
 		}

@@ -6,15 +6,15 @@ namespace BackBeat {
 	class Modulator
 	{
 	public:
-		Modulator(UINT32 bufferSize);
+		Modulator(unsigned int bufferSize);
 		~Modulator();
 
-		void FlushBuffer(UINT32 numSamples, float defaultValue);
+		void FlushBuffer(unsigned int numSamples, float defaultValue);
 
 		std::shared_ptr<float[]> GetBuffer() { return m_Buffer; }
 		
 	private:
-		UINT32 m_BufferSize;
+		unsigned int m_BufferSize;
 		std::shared_ptr<float[]> m_Buffer;
 	};
 }

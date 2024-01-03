@@ -8,14 +8,14 @@ namespace BackBeat {
 	AudioInfo FileReader::CreateFile(std::string filePath)
 	{
 		unsigned long size = 0;
-		char header[WAV_HEADER_SIZE];
+		char header[Audio::WAVHeaderSize];
 		std::ifstream file;
 
 		// TODO: Implement Function to get mp3 file header info
 		file.open(filePath, std::ios::binary);
 		if (file.is_open())
 		{
-			file.read(header, WAV_HEADER_SIZE);
+			file.read(header, Audio::WAVHeaderSize);
 			file.close();
 
 			char temp1 = header[3];
@@ -23,13 +23,13 @@ namespace BackBeat {
 			header[3] = '\0';
 			header[4] = '\0';
 			
-			if (std::strcmp(MP3, header) == 0)
+			if (std::strcmp(Audio::MP3, header) == 0)
 			{
 				BB_CORE_ERROR("MP3 File found {0} \nMP3 decoding not yet implemented", filePath);
 				return ReadMP3Header(filePath, 0);
 			}
 			
-			if (std::strcmp(WAV, header) == 0)
+			if (std::strcmp(Audio::WAV, header) == 0)
 			{
 				header[4] = temp2;
 				if (Audio::IsBigEndian()) {
@@ -78,7 +78,7 @@ namespace BackBeat {
 			file.seekg(i);
 			file.get(data);
 
-			if (data == 'f' && i + WAV_FMT_SIZE < size) {
+			if (data == 'f' && i + Audio::WAVFormatSize < size) {
 				file.seekg(i);
 				file.read(fmt, 3);
 				if (std::strcmp("fmt", fmt) == 0) {
@@ -92,8 +92,8 @@ namespace BackBeat {
 			return info;
 
 		file.seekg(fmtPosition);
-		char fileProps[WAV_FMT_SIZE];
-		file.read(fileProps, WAV_FMT_SIZE);
+		char fileProps[Audio::WAVFormatSize];
+		file.read(fileProps, Audio::WAVFormatSize);
 
 		// Indices of relevant properties in standard WAV file headers 
 		// All written in little endian
@@ -127,19 +127,19 @@ namespace BackBeat {
 
 		unsigned int dataPosition = 0;
 		const int dataChunkPos = 4;
-		char dataChunk[WAV_DATA_SIZE];
+		char dataChunk[Audio::WAVDataSize];
 		dataChunk[dataChunkPos] = '\0';
 		for (unsigned int j = fmtPosition; j < size; j++)
 		{
 			file.seekg(j);
 			file.get(data);
 
-			if (data == 'd' && j + WAV_FMT_SIZE < size) {
+			if (data == 'd' && j + Audio::WAVFormatSize < size) {
 				file.seekg(j);
 				file.read(dataChunk, 4);
 				if (std::strcmp("data", dataChunk) == 0) {
 					file.seekg(j);
-					file.read(dataChunk, WAV_DATA_SIZE);
+					file.read(dataChunk, Audio::WAVDataSize);
 					unsigned int dataSize = 0;
 					char dataTemp = dataChunk[dataChunkPos];
 					dataChunk[dataChunkPos] = dataTemp;

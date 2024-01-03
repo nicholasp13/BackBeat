@@ -3,12 +3,12 @@
 #include "SynthVoice.h"
 namespace BackBeat {
 
-	SynthVoice::SynthVoice(UINT32 sampleRate, std::shared_ptr<float[]> outputBuffer, std::shared_ptr<VoiceParameters> voiceParams)
+	SynthVoice::SynthVoice(unsigned int sampleRate, std::shared_ptr<float[]> outputBuffer, std::shared_ptr<VoiceParameters> voiceParams)
 		:
 		m_SampleRate(sampleRate),
 		m_Actice(false),
 		m_Channel(0),
-		m_NotePressed(NOTE_OFF),
+		m_NotePressed(MIDI::NoteOff),
 		m_Params(voiceParams),
 		m_InputBuffer(std::make_shared<float[]>(sampleRate)),
 		m_OutputBuffer(outputBuffer)
@@ -22,7 +22,7 @@ namespace BackBeat {
 	}
 
 	// NOTE: Not used in current implementation. Holdover from following SynthLabs architecture. Subject to change/deletion
-	void SynthVoice::Reset(UINT32 sampleRate)
+	void SynthVoice::Reset(unsigned int sampleRate)
 	{
 		m_Osc1->Reset(sampleRate);
 		m_Osc2->Reset(sampleRate);
@@ -41,7 +41,7 @@ namespace BackBeat {
 
 	}
 
-	void SynthVoice::Render(UINT32 numSamples)
+	void SynthVoice::Render(unsigned int numSamples)
 	{
 		// Render ModSources
 		m_EG->Render(numSamples);
@@ -59,7 +59,7 @@ namespace BackBeat {
 		m_HPFilter->Render(numSamples);
 		m_DCA->Render(numSamples);
 
-		for (UINT32 i = 0; i < numSamples * STEREO; i++) {
+		for (unsigned int i = 0; i < numSamples * Audio::Stereo; i++) {
 			m_OutputBuffer[i] += (m_InputBuffer[i]);
 		}
 
@@ -67,7 +67,7 @@ namespace BackBeat {
 		{
 			m_Actice = false;
 			m_Channel = 0;
-			m_NotePressed = NOTE_OFF;
+			m_NotePressed = MIDI::NoteOff;
 		}
 	}
 	void SynthVoice::ProcessMIDIEvent(MIDIEvent event)

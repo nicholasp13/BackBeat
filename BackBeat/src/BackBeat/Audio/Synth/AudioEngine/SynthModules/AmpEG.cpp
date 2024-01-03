@@ -3,7 +3,7 @@
 #include "AmpEG.h"
 namespace BackBeat {
 
-	AmpEG::AmpEG(UINT32 sampleRate, UINT32 bufferSize, std::shared_ptr<float[]> DCABuffer, std::shared_ptr<EGParameters> params)
+	AmpEG::AmpEG(unsigned int sampleRate, unsigned int bufferSize, std::shared_ptr<float[]> DCABuffer, std::shared_ptr<EGParameters> params)
 		:
 		m_Core(std::make_shared<LinearEGCore>(sampleRate, bufferSize, params)),
 		m_InputBuffer(m_Core->GetOutputBuffer()),
@@ -17,7 +17,7 @@ namespace BackBeat {
 
 	}
 
-	void AmpEG::Reset(UINT32 sampleRate)
+	void AmpEG::Reset(unsigned int sampleRate)
 	{
 		m_Core->Reset(sampleRate);
 	}
@@ -27,14 +27,14 @@ namespace BackBeat {
 
 	}
 
-	void AmpEG::Render(UINT32 numSamples)
+	void AmpEG::Render(unsigned int numSamples)
 	{
 		Update();
 		m_Core->Render(numSamples);
 
 		// NOTE: This step will be implemented by the ModularMatrix for all other modulations
-		UINT32 totalSamples = numSamples * STEREO;
-		for (UINT32 i = 0; i < totalSamples; i++)
+		unsigned int totalSamples = numSamples * Audio::Stereo;
+		for (unsigned int i = 0; i < totalSamples; i++)
 		{
 			m_OutputBuffer[i] *= m_InputBuffer[i];
 		}

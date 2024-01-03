@@ -3,7 +3,7 @@
 #include "TPTHighPassFilter.h"
 namespace BackBeat {
 
-	TPTHighPassFilter::TPTHighPassFilter(UINT32 sampleRate, UINT32 bufferSize, std::shared_ptr<float[]> buffer, std::shared_ptr<FilterParameters> params)
+	TPTHighPassFilter::TPTHighPassFilter(unsigned int sampleRate, unsigned int bufferSize, std::shared_ptr<float[]> buffer, std::shared_ptr<FilterParameters> params)
 		: m_Core(std::make_shared<TPTHPFilterCore>(sampleRate, bufferSize, buffer, params))
 	{
 
@@ -14,7 +14,7 @@ namespace BackBeat {
 
 	}
 
-	void TPTHighPassFilter::Reset(UINT32 sampleRate)
+	void TPTHighPassFilter::Reset(unsigned int sampleRate)
 	{
 		m_Core->Reset(sampleRate);
 	}
@@ -24,7 +24,7 @@ namespace BackBeat {
 
 	}
 
-	void TPTHighPassFilter::Render(UINT32 numSamples)
+	void TPTHighPassFilter::Render(unsigned int numSamples)
 	{
 		m_Core->Render(numSamples);
 	}

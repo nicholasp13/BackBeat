@@ -34,7 +34,7 @@ namespace BackBeat {
 		float* targetBuffer = reinterpret_cast<float*>(m_Output);
 		auto srcBuffer = m_Bus.GetBuffer()->GetBuffer();
 		if (m_Props.sampleRate == sampleRate) {
-			if (numChannels == STEREO) {
+			if (numChannels == Audio::Stereo) {
 				for (unsigned int i = 0; i < numSamples * m_Props.numChannels; i += m_Props.numChannels) {
 					for (unsigned int j = 0; j < m_Props.numChannels; j++) {
 						targetBuffer[i + j] = (float)srcBuffer[i + j];

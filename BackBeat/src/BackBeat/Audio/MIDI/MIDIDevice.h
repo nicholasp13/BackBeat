@@ -4,6 +4,7 @@
 
 #include "BackBeat/Audio/Audio.h"
 #include "BackBeat/Audio/Synth/SynthIO/MIDIInputHandler.h"
+#include "MIDICodes.h"
 namespace BackBeat {
 	
 	// NOTE: Might need enum types and/or subclasses to specify if the device is input or output 

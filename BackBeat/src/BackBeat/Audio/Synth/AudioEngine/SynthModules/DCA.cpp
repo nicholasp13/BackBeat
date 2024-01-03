@@ -3,7 +3,7 @@
 #include "DCA.h"
 namespace BackBeat {
 
-	DCA::DCA(UINT32 bufferSize, std::shared_ptr<float[]> buffer, std::shared_ptr<DCAParameters> params)
+	DCA::DCA(unsigned int bufferSize, std::shared_ptr<float[]> buffer, std::shared_ptr<DCAParameters> params)
 		: 
 		m_Position(0),
 		m_LeftAmp(params->leftAmp),
@@ -13,7 +13,7 @@ namespace BackBeat {
 		m_ModInput(std::make_unique<Modulator>(bufferSize)),
 		m_Type(ModuleType::DCA)
 	{
-		m_ModInput->FlushBuffer(bufferSize / STEREO, 1.0f);
+		m_ModInput->FlushBuffer(bufferSize / Audio::Stereo, 1.0f);
 	}
 
 	DCA::~DCA()
@@ -21,7 +21,7 @@ namespace BackBeat {
 
 	}
 
-	void DCA::Reset(UINT32 sampleRate)
+	void DCA::Reset(unsigned int sampleRate)
 	{
 		m_Position = 0;
 	}
@@ -32,18 +32,20 @@ namespace BackBeat {
 		m_RightAmp = m_Params->rightAmp;
 	}
 	
-	void DCA::Render(UINT32 numSamples) 
+	void DCA::Render(unsigned int numSamples)
 	{
 		Update();
 
 		std::shared_ptr<float[]> modulator = m_ModInput->GetBuffer();
 
-		for (UINT32 i = 0; i < numSamples * STEREO; i++) {
-			if (i % 2 == 0) {
-				m_Buffer[i] *= m_LeftAmp * modulator[i] / NUM_OSCS;
+		for (unsigned int i = 0; i < numSamples * Audio::Stereo; i++) {
+			if (i % 2 == 0) 
+			{
+				m_Buffer[i] *= m_LeftAmp * modulator[i] / SynthBase::NumOscillators;
 			}
-			else {
-				m_Buffer[i] *= m_RightAmp * modulator[i] / NUM_OSCS;
+			else 
+			{
+				m_Buffer[i] *= m_RightAmp * modulator[i] / SynthBase::NumOscillators;
 			}
 		}
 

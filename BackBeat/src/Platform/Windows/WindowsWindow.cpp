@@ -53,7 +53,7 @@ namespace BackBeat {
 
 		// Set Windows icons for BackBeat app
 		LoadIcons();
-		glfwSetWindowIcon(m_Window, NUM_LOGOS, m_Images);
+		glfwSetWindowIcon(m_Window, NumLogos, m_Images);
 
 		// Set GLFW callbacks
 		glfwSetWindowSizeCallback(m_Window, [](GLFWwindow* window, int width, int height)

@@ -16,12 +16,12 @@ namespace BackBeat {
 	class  TPTLPFilterCore : public ModuleCore
 	{
 	public:
-		TPTLPFilterCore(UINT32 sampleRate, UINT32 bufferSize, std::shared_ptr<float[]> buffer, std::shared_ptr<FilterParameters> params);
+		TPTLPFilterCore(unsigned int sampleRate, unsigned int bufferSize, std::shared_ptr<float[]> buffer, std::shared_ptr<FilterParameters> params);
 		~TPTLPFilterCore();
 
-		virtual void Reset(UINT32 sampleRate);
+		virtual void Reset(unsigned int sampleRate);
 		virtual void Update();
-		virtual void Render(UINT32 numSamples);
+		virtual void Render(unsigned int numSamples);
 		virtual void DoNoteOn(NoteEvent event);
 		virtual void DoNoteOff(NoteEvent event);
 
@@ -29,8 +29,8 @@ namespace BackBeat {
 
 	private:
 		bool m_IsOn; // NOTE: Current implementation does not follow DLS 2 specifications where it states that the m_CutOffFreq be set to 0x7FFFFFFF for no low pass filter
-		UINT32 m_SampleRate;
-		UINT32 m_OutputBufferSize;
+		unsigned int m_SampleRate;
+		unsigned int m_OutputBufferSize;
 		float m_Gain; // Represented by T in the transform method, defaulted to 1 and not subject to change yet
 		float m_CutoffFreq;
 		float m_Resonance; // Not implemented

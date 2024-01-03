@@ -5,11 +5,11 @@
 #include "LFOCore.h"
 namespace BackBeat {
 
-	LFOCore::LFOCore(UINT32 sampleRate, UINT32 bufferSize, std::shared_ptr<LFOParameters> params)
+	LFOCore::LFOCore(unsigned int sampleRate, unsigned int bufferSize, std::shared_ptr<LFOParameters> params)
 		:
 		m_SampleRate(sampleRate),
-		m_WaveSize((UINT32)(sampleRate * STEREO / LFO_FREQ_MIN)),
-		m_Wave(new float[(UINT32)(sampleRate * STEREO / LFO_FREQ_MIN)]),
+		m_WaveSize((unsigned int)(sampleRate * Audio::Stereo / SynthBase::LFOFrequencyMin)),
+		m_Wave(new float[(unsigned int)(sampleRate * Audio::Stereo / SynthBase::LFOFrequencyMin)]),
 		m_Position(0),
 		m_Amp(1.0f),
 		m_Hertz(0.0f),
@@ -27,7 +27,7 @@ namespace BackBeat {
 		delete[m_WaveSize] m_Wave;
 	}
 
-	void LFOCore::Reset(UINT32 sampleRate)
+	void LFOCore::Reset(unsigned int sampleRate)
 	{
 		m_Position = 0;
 	}
@@ -35,19 +35,19 @@ namespace BackBeat {
 	void LFOCore::Update()
 	{
 		m_Amp = m_Params->amp;
-		if (!Audio::EqualsFloat(m_Hertz, m_Params->hertz, DELTA_CENTS_HZ) || m_WaveType != m_Params->wave) {
+		if (!Audio::EqualsFloat(m_Hertz, m_Params->hertz, SynthBase::DeltaCentsHertz) || m_WaveType != m_Params->wave) {
 			InitWave();
 		}
 	}
 
 	// TODO: Change to allow for modulator input
-	void LFOCore::Render(UINT32 numSamples)
+	void LFOCore::Render(unsigned int numSamples)
 	{
 		Update();
 
 		// auto inputBuffer = m_Input->GetBuffer();
 		auto outputBuffer = m_Output->GetBuffer();
-		for (UINT32 i = 0; i < numSamples * STEREO; i++) {
+		for (unsigned int i = 0; i < numSamples * Audio::Stereo; i++) {
 			outputBuffer[i] = (m_Wave[m_Position] * m_Amp);
 			m_Position = (m_Position + 1) % (m_WaveSize);
 		}
@@ -67,12 +67,12 @@ namespace BackBeat {
 	void LFOCore::InitWave()
 	{
 		m_Hertz = m_Params->hertz;
-		if (m_Hertz > LFO_FREQ_MAX)
-			m_Hertz = LFO_FREQ_MAX;
-		else if (m_Hertz < LFO_FREQ_MIN)
-			m_Hertz = LFO_FREQ_MIN;
+		if (m_Hertz > SynthBase::LFOFrequencyMax)
+			m_Hertz = SynthBase::LFOFrequencyMax;
+		else if (m_Hertz < SynthBase::LFOFrequencyMin)
+			m_Hertz = SynthBase::LFOFrequencyMin;
 		m_Position = 0;
-		m_WaveSize = (UINT32)(m_SampleRate / m_Hertz);
+		m_WaveSize = (unsigned int)(m_SampleRate / m_Hertz);
 		m_WaveType = m_Params->wave;
 
 		switch (m_WaveType)
@@ -80,31 +80,31 @@ namespace BackBeat {
 
 		case WaveType::Sin:
 		{
-			Wave::GetSinWave(m_Wave, m_WaveSize, STEREO);
+			Wave::GetSinWave(m_Wave, m_WaveSize, Audio::Stereo);
 			break;
 		}
 
 		case WaveType::SawtoothUp:
 		{
-			Wave::GetSawtoothUpWave(m_Wave, m_WaveSize, STEREO);
+			Wave::GetSawtoothUpWave(m_Wave, m_WaveSize, Audio::Stereo);
 			break;
 		}
 
 		case WaveType::SawtoothDown:
 		{
-			Wave::GetSawtoothDownWave(m_Wave, m_WaveSize, STEREO);
+			Wave::GetSawtoothDownWave(m_Wave, m_WaveSize, Audio::Stereo);
 			break;
 		}
 
 		case WaveType::Triangle:
 		{
-			Wave::GetTriangleWave(m_Wave, m_WaveSize, STEREO);
+			Wave::GetTriangleWave(m_Wave, m_WaveSize, Audio::Stereo);
 			break;
 		}
 
 		case WaveType::Square:
 		{
-			Wave::GetSquareWave(m_Wave, m_WaveSize, STEREO);
+			Wave::GetSquareWave(m_Wave, m_WaveSize, Audio::Stereo);
 			break;
 		}
 

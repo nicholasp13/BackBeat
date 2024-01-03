@@ -3,7 +3,7 @@
 #include "LinearEG.h"
 namespace BackBeat {
 
-	LinearEG::LinearEG(UINT32 sampleRate, UINT32 bufferSize, std::shared_ptr<EGParameters> params)
+	LinearEG::LinearEG(unsigned int sampleRate, unsigned int bufferSize, std::shared_ptr<EGParameters> params)
 		:
 		m_Core(std::make_shared<LinearEGCore>(sampleRate, bufferSize, params))
 	{
@@ -15,7 +15,7 @@ namespace BackBeat {
 
 	}
 
-	void LinearEG::Reset(UINT32 sampleRate)
+	void LinearEG::Reset(unsigned int sampleRate)
 	{
 		m_Core->Reset(sampleRate);
 	}
@@ -25,7 +25,7 @@ namespace BackBeat {
 		
 	}
 
-	void LinearEG::Render(UINT32 numSamples)
+	void LinearEG::Render(unsigned int numSamples)
 	{
 		Update();
 		m_Core->Render(numSamples);

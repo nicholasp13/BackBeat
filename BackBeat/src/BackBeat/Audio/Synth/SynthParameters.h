@@ -101,7 +101,7 @@ namespace BackBeat {
 
 	struct EngineParameters
 	{
-		float volume;
+		float volume = 1.0f;
 		std::shared_ptr<VoiceParameters> voiceParams;
 	};
 

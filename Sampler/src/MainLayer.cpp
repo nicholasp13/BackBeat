@@ -94,7 +94,8 @@
 
 	bool MainLayer::OnKeyEvent(BackBeat::KeyPressedEvent& event)
 	{
-		if (event.isRepeat()) {
+		if (event.isRepeat()) 
+		{
 			event.Handled = true;
 			return true;
 		}

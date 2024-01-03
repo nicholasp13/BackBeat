@@ -5,31 +5,10 @@
 #include "BackBeat/Core/Core.h"
 namespace BackBeat {
 
-// MISC CONSTANTS
-#define BYTE_BIT_SIZE     8
-#define INT16_BIT_SIZE    16
-#define INT24_BIT_SIZE    24
-#define FLOAT_BIT_SIZE    32
-#define DOUBLE_BIT_SIZE   64
-#define INT24_BYTE_SIZE   3
-#define INT24_MAX         8388607.0f
-
-// AUDIOFILE CONSTANTS
-#define MONO           (UINT32)1
-#define STEREO         (UINT32)2
-#define SHORT_INT_MAX          32676
-#define WAV_HEADER_SIZE        12
-#define WAV_FMT_SIZE           24
-#define WAV_DATA_SIZE          8
-#define WAV_TOTAL_HEADER_SIZE  44
-
-// AUDIO FILE STRINGS
-#define MP3 "ID3"
-#define WAV "RIF"
-
+// ---- WINDOWS MACROS ---- //
 // REFERENCE_TIME time units per second and per millisecond
-#define REFTIMES_PER_SECOND   10000000
-#define REFTIMES_PER_MILLISEC 10000
+#define REFTIMES_PER_SECOND    10000000
+#define REFTIMES_PER_MILLISEC  10000
 
 // BackBeat HRESULT FAILURE CODES
 #define PLAY_FAILURE (HRESULT)1001
@@ -83,6 +62,15 @@ namespace BackBeat {
 		byte data2;
 	};
 
+	// TODO: Add other members as needed for other MIDI data i.e. pitch modulation
+	struct NoteEvent {
+		bool noteOn;
+		int channel;
+		float note;
+		byte midiNote;
+		byte velocity;
+	};
+
 	struct TimeMinSec {
 		unsigned int minutes;
 		unsigned int seconds;
@@ -90,13 +78,34 @@ namespace BackBeat {
 
 	// NOTE: May want to move this to a Helpers.h file in the Helpers folder for better organization, not much sense to have these functions here
 	//       other than consolidation
-	class Audio
-	{
-	public:
+	namespace Audio {
+
+		// MISC CONSTANTS
+		constexpr unsigned int ByteBitSize   = 8;
+		constexpr unsigned int Int16BitSize  = 16;
+		constexpr unsigned int Int24BitSize  = 24;
+		constexpr unsigned int FloatBitSize  = 32;
+		constexpr unsigned int DoubleBitSize = 64;
+		constexpr unsigned int Int24ByteSize = 3;
+		constexpr unsigned int FloatByteSize = 4;
+		constexpr float Int24Max             = 8388607.0f;
+
+		// AUDIOFILE CONSTANTS
+		constexpr unsigned int Mono               = 1;
+		constexpr unsigned int Stereo             = 2;
+		constexpr unsigned int WAVHeaderSize      = 12;
+		constexpr unsigned int WAVFormatSize      = 24;
+		constexpr unsigned int WAVDataSize        = 8;
+		constexpr unsigned int WAVTotalHeaderSize = 44;
+
+		// AUDIO FILE STRINGS
+		constexpr auto MP3 = "ID3";
+		constexpr auto WAV = "RIF";
+
 		static unsigned short EndianConverterShort(char num1, char num2)
 		{
 			unsigned short leftToRight = (num1 & 0x00FF);
-			unsigned short rightToLeft = (num2 & 0x00FF) << BYTE_BIT_SIZE;
+			unsigned short rightToLeft = (num2 & 0x00FF) << ByteBitSize;
 			return (leftToRight | rightToLeft);
 		}
 
@@ -104,16 +113,16 @@ namespace BackBeat {
 			char num3, char num4)
 		{
 			unsigned long leftMost = (num1 & 0x000000FF);
-			unsigned long left = (num2 & 0x000000FF) << BYTE_BIT_SIZE;
-			unsigned long right = (num3 & 0x000000FF) << (2 * BYTE_BIT_SIZE);
-			unsigned long rightMost = (num4 & 0x000000FF) << (3 * BYTE_BIT_SIZE);
+			unsigned long left = (num2 & 0x000000FF) << ByteBitSize;
+			unsigned long right = (num3 & 0x000000FF) << (2 * ByteBitSize);
+			unsigned long rightMost = (num4 & 0x000000FF) << (3 * ByteBitSize);
 			return (left | leftMost | right | rightMost);
 		}
 
 		static short EndianConverterSignedShort(char num1, char num2)
 		{
 			short leftToRight = (num1 & 0x00FF);
-			short rightToLeft = (num2 & 0x00FF) << BYTE_BIT_SIZE;
+			short rightToLeft = (num2 & 0x00FF) << ByteBitSize;
 			return (leftToRight | rightToLeft);
 		}
 
@@ -131,14 +140,14 @@ namespace BackBeat {
 
 		// Note: Not currently used as most buffers need either to recast/type convert or are shared pointers
 		template<typename T>
-		static void CopyInputToOutput(T inputBuffer, T outputBuffer, UINT32 bytesToCopy)
+		static void CopyInputToOutput(T inputBuffer, T outputBuffer, unsigned int bytesToCopy)
 		{
 			memcpy(reinterpret_cast<void*>(inputBuffer), reinterpret_cast<void*>(outputBuffer), bytesToCopy);
 		}
 
-		static void FlushBuffer(std::shared_ptr<float[]> buffer, UINT32 numSamples, UINT32 numChannels, float defaultValue)
+		static void FlushBuffer(std::shared_ptr<float[]> buffer, unsigned int numSamples, unsigned int numChannels, float defaultValue)
 		{
-			for (UINT32 i = 0; i < numSamples * numChannels; i++)
+			for (unsigned int i = 0; i < numSamples * numChannels; i++)
 				buffer[i] = defaultValue;
 		}
 
@@ -147,11 +156,7 @@ namespace BackBeat {
 		{
 			int i = 1;
 			char *p = (char*) & i;
-
-			if (p[0] == 1)
-				return false;
-			else
-				return true;
+			return !p[0] == 1;
 		}
 
 		static TimeMinSec GetTime(float totalSeconds)
@@ -163,5 +168,5 @@ namespace BackBeat {
 			time.seconds = seconds;
 			return time;
 		}
-	};
+	}
 }

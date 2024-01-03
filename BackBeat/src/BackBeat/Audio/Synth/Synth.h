@@ -58,8 +58,8 @@ namespace BackBeat {
 	
 	private:
 		boolean m_Running;
-		UINT32 m_SamplesToRender;
-		DWORD m_SleepTime;
+		unsigned int m_SamplesToRender;
+		unsigned long m_SleepTime;
 		AudioProps m_Props;
 
 		std::shared_ptr<AudioEngine> m_Engine;

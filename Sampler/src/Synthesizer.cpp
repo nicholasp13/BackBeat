@@ -19,8 +19,7 @@
 
 		// Initializing MIDI input device manager
 		m_NumMIDIDevices = m_MIDIDeviceManager.GetNumDevices();
-		for (UINT i = 0; i < m_NumMIDIDevices; i++)
-		{
+		for (unsigned int i = 0; i < m_NumMIDIDevices; i++) {
 			m_DeviceNames.push_back(m_MIDIDeviceManager.GetDeviceName(i));
 		}
 		m_MIDIDeviceManager.SetOutput(m_Synth.GetMIDIInput());
@@ -35,9 +34,11 @@
 		{
 			// TODO: Check if MIDIDevices changes during runtime
 
-			for (UINT i = 0; i < m_NumMIDIDevices; i++) {
-				if ((m_DevicesOpen & (UINT)0x01 << i) != 0) {
-					if (!m_MIDIDeviceManager.IsOpen(i)) {
+			for (unsigned int i = 0; i < m_NumMIDIDevices; i++) {
+				if ((m_DevicesOpen & (unsigned int)0x01 << i) != 0) 
+				{
+					if (!m_MIDIDeviceManager.IsOpen(i)) 
+					{
 						m_Synth.Stop();
 						m_MIDIDeviceManager.OpenDevice(i);
 						m_MIDIDeviceManager.RunDevice(i);
@@ -61,7 +62,8 @@
 		dispatcher.Dispatch<BackBeat::KeyPressedEvent>(BIND_EVENT_FN(Synthesizer::OnKeyEvent));
 		dispatcher.Dispatch<BackBeat::MouseButtonPressedEvent>(BIND_EVENT_FN(Synthesizer::OnMouseButtonEvent));
 
-		if (m_Synth.IsRunning() && m_KeyboardActive) {
+		if (m_Synth.IsRunning() && m_KeyboardActive) 
+		{
 			m_SynthEventHandler->HandleEvent(event);
 			event.Handled = true;
 		}
@@ -135,7 +137,8 @@
 					// MIDIDevices
 					if (ImGui::BeginMenu("MIDI Devices"))
 					{
-						if (m_NumMIDIDevices == 0) {
+						if (m_NumMIDIDevices == 0) 
+						{
 							ImGui::BeginDisabled();
 							if (ImGui::MenuItem("No devices detected"))
 							{
@@ -144,7 +147,7 @@
 							ImGui::EndDisabled();
 						}
 
-						for (UINT i = 0; i < m_NumMIDIDevices; i++) {
+						for (unsigned int i = 0; i < m_NumMIDIDevices; i++) {
 
 							// TODO: Test multiple MIDI devices and if MIDI devices change number
 							static bool s_DeviceOpen = m_MIDIDeviceManager.IsOpen(i);
@@ -153,7 +156,7 @@
 							{
 								if (ImGui::MenuItem("Set Active", "", &s_DeviceOpen))
 								{
-									m_DevicesOpen ^= (UINT)0x01 << i;
+									m_DevicesOpen ^= (unsigned int)0x01 << i;
 								}
 								ImGui::EndMenu();
 							}
@@ -181,17 +184,20 @@
 			
 			static int* octave = &(m_SynthParams->eventHandlerParams->octave);
 			ImGui::Text("Octave: %d", *octave); ImGui::SameLine();
-			if (ImGui::SmallButton("+")) {
-				if (*octave < HIGHEST_OCTAVE_SYNTH)
+			if (ImGui::SmallButton("+")) 
+			{
+				if (*octave < BackBeat::SynthBase::HighestOctaveSynth)
 					(*octave)++;
 			} ImGui::SameLine();
-			if (ImGui::SmallButton("-")) {
-				if (*octave > LOWEST_OCTAVE_SYNTH)
+			if (ImGui::SmallButton("-")) 
+			{
+				if (*octave > BackBeat::SynthBase::LowestOctaveSynth)
 					(*octave)--;
 			} ImGui::SameLine(); HelpMarker("KEYBOARD ONLY");
 			
-			static int velocity = MAX_VELOCITY;
-			ImGui::Text("    "); ImGui::SameLine(); ImGui::SliderInt("Note Velocity", &velocity, MIN_VELOCITY, MAX_VELOCITY);
+			static int velocity = BackBeat::MIDI::MaxVelocity;
+			ImGui::Text("    "); ImGui::SameLine(); 
+			ImGui::SliderInt("Note Velocity", &velocity, BackBeat::MIDI::MinVelocity, BackBeat::MIDI::MaxVelocity);
 			ImGui::SameLine(); HelpMarker("KEYBOARD ONLY \nSlider to emulate how 'hard' the note was pressed");
 			m_SynthParams->eventHandlerParams->noteVelocity = (byte)velocity;
 			ImGui::Spacing();
@@ -203,12 +209,12 @@
 			ImGui::Text("    "); ImGui::SameLine(); ImGui::SliderFloat("Volume", volume, 0.0f, 1.0f);
 			ImGui::Spacing();
 
-			static float pan = PAN_DEFAULT; // Note: Actually .70 in DLS 1
+			static float pan = BackBeat::SynthBase::PanDefault; // Note: Actually .70 in DLS 1
 			static float defaultAmp = 0.50f;
 			ImGui::Text("Panning"); ImGui::SameLine();
 			if (ImGui::SmallButton("Reset"))
 				pan = 0.0f;
-			ImGui::Text("Left"); ImGui::SameLine(); ImGui::SliderFloat("Right", &pan, PAN_MIN, PAN_MAX);
+			ImGui::Text("Left"); ImGui::SameLine(); ImGui::SliderFloat("Right", &pan, BackBeat::SynthBase::PanMin, BackBeat::SynthBase::PanMax);
 			m_SynthParams->engineParams->voiceParams->DCAParams->leftAmp = defaultAmp - pan;
 			m_SynthParams->engineParams->voiceParams->DCAParams->rightAmp = defaultAmp + pan;
 
@@ -265,11 +271,11 @@
 			ImGui::Spacing(); ImGui::Spacing();
 
 			static float* LFOFreq1 = &(m_SynthParams->engineParams->voiceParams->LFOParams1->hertz);
-			ImGui::Text("    "); ImGui::SameLine(); ImGui::SliderFloat("LFO 1 Frequency", LFOFreq1, LFO_FREQ_MIN, LFO_FREQ_MAX);
+			ImGui::Text("    "); ImGui::SameLine(); ImGui::SliderFloat("LFO 1 Frequency", LFOFreq1, BackBeat::SynthBase::LFOFrequencyMin, BackBeat::SynthBase::LFOFrequencyMax);
 			ImGui::Spacing();
 
 			static float* LFOAmp1 = &(m_SynthParams->engineParams->voiceParams->LFOParams1->amp);
-			ImGui::Text("    "); ImGui::SameLine(); ImGui::SliderFloat("LFO 1 Amp", LFOAmp1, LFO_ATT_MIN, LFO_ATT_MAX);
+			ImGui::Text("    "); ImGui::SameLine(); ImGui::SliderFloat("LFO 1 Amp", LFOAmp1, BackBeat::SynthBase::LFOAttentuationMin, BackBeat::SynthBase::LFOAttentuationMax);
 			ImGui::Spacing();
 			ImGui::PopID();
 		}
@@ -282,7 +288,7 @@
 			static bool* lpFilterOn = &(m_SynthParams->engineParams->voiceParams->LPFilterParams->isOn);
 			ImGui::Checkbox("Filter On", lpFilterOn);
 			static float* lpCutoffFreq = &(m_SynthParams->engineParams->voiceParams->LPFilterParams->cutoff);
-			ImGui::Text("    "); ImGui::SameLine(); ImGui::SliderFloat("Cutoff Frequency", lpCutoffFreq, FILTER_CUTOFF_MIN, FILTER_CUTOFF_MAX);
+			ImGui::Text("    "); ImGui::SameLine(); ImGui::SliderFloat("Cutoff Frequency", lpCutoffFreq, BackBeat::SynthBase::FilterCutoffMin, BackBeat::SynthBase::FilterCutoffMax);
 			ImGui::Spacing();
 			ImGui::PopID();
 		}
@@ -294,7 +300,7 @@
 			static bool* hpFilterOn = &(m_SynthParams->engineParams->voiceParams->HPFilterParams->isOn);
 			ImGui::Checkbox("Filter On", hpFilterOn);
 			static float* hpCutoffFreq = &(m_SynthParams->engineParams->voiceParams->HPFilterParams->cutoff);
-			ImGui::Text("    "); ImGui::SameLine(); ImGui::SliderFloat("Cutoff Frequency", hpCutoffFreq, FILTER_CUTOFF_MIN, FILTER_CUTOFF_MAX);
+			ImGui::Text("    "); ImGui::SameLine(); ImGui::SliderFloat("Cutoff Frequency", hpCutoffFreq, BackBeat::SynthBase::FilterCutoffMin, BackBeat::SynthBase::FilterCutoffMax);
 			ImGui::Spacing();
 			ImGui::PopID();
 		}
@@ -308,10 +314,10 @@
 			static float* releaseDuration = &(m_SynthParams->engineParams->voiceParams->AmpEGParams->releaseDuration);
 			static float* sustain = &(m_SynthParams->engineParams->voiceParams->AmpEGParams->sustainValue);
 			ImGui::SeparatorText("Amp Envelope Generator");
-			ImGui::Text("    "); ImGui::SameLine(); ImGui::SliderFloat("Attack ", attackDuration, EG1_ATTACK_TIME_MIN, EG1_ATTACK_TIME_MAX);
-			ImGui::Text("    "); ImGui::SameLine(); ImGui::SliderFloat("Decay  ", decayDuration, EG1_DECAY_TIME_MIN, EG1_DECAY_TIME_MAX);
-			ImGui::Text("    "); ImGui::SameLine(); ImGui::SliderFloat("Release", releaseDuration, EG1_RELEASE_TIME_MIN, EG1_RELEASE_TIME_MAX);
-			ImGui::Text("    "); ImGui::SameLine(); ImGui::SliderFloat("Sustain", sustain, EG1_SUSTAIN_LEVEL_MIN, EG1_SUSTAIN_LEVEL_MAX);
+			ImGui::Text("    "); ImGui::SameLine(); ImGui::SliderFloat("Attack ", attackDuration, BackBeat::SynthBase::EG1AttackTimeMin, BackBeat::SynthBase::EG1AttackTimeMax);
+			ImGui::Text("    "); ImGui::SameLine(); ImGui::SliderFloat("Decay  ", decayDuration, BackBeat::SynthBase::EG1DecayTimeMin, BackBeat::SynthBase::EG1DecayTimeMax);
+			ImGui::Text("    "); ImGui::SameLine(); ImGui::SliderFloat("Release", releaseDuration, BackBeat::SynthBase::EG1ReleaseTimeMin, BackBeat::SynthBase::EG1ReleaseTimeMax);
+			ImGui::Text("    "); ImGui::SameLine(); ImGui::SliderFloat("Sustain", sustain, BackBeat::SynthBase::EG1SustainLevelMin, BackBeat::SynthBase::EG1SustainLevelMax);
 			ImGui::Spacing();
 			ImGui::PopID();
 		}
@@ -324,11 +330,13 @@
 
 			static int octave1 = 0;
 			ImGui::Text("Octave: %d", octave1); ImGui::SameLine();
-			if (ImGui::SmallButton("+")) {
+			if (ImGui::SmallButton("+")) 
+			{
 				if (octave1 < 2)
 					octave1++;
 			} ImGui::SameLine();
-			if (ImGui::SmallButton("-")) {
+			if (ImGui::SmallButton("-")) 
+			{
 				if (octave1 > -2)
 					octave1--;
 			}
@@ -388,11 +396,13 @@
 
 			static int octave2 = 0;
 			ImGui::Text("Octave: %d", octave2); ImGui::SameLine();
-			if (ImGui::SmallButton("+")) {
+			if (ImGui::SmallButton("+")) 
+			{
 				if (octave2 < 2)
 					octave2++;
 			} ImGui::SameLine();
-			if (ImGui::SmallButton("-")) {
+			if (ImGui::SmallButton("-")) 
+			{
 				if (octave2 > -2)
 					octave2--;
 			}
@@ -452,11 +462,13 @@
 
 			static int octave3 = 0;
 			ImGui::Text("Octave: %d", octave3); ImGui::SameLine();
-			if (ImGui::SmallButton("+")) {
+			if (ImGui::SmallButton("+")) 
+			{
 				if (octave3 < 2)
 					octave3++;
 			} ImGui::SameLine();
-			if (ImGui::SmallButton("-")) {
+			if (ImGui::SmallButton("-")) 
+			{
 				if (octave3 > -2)
 					octave3--;
 			}
@@ -516,11 +528,13 @@
 
 			static int octave4 = 0;
 			ImGui::Text("Octave: %d", octave4); ImGui::SameLine();
-			if (ImGui::SmallButton("+")) {
+			if (ImGui::SmallButton("+")) 
+			{
 				if (octave4 < 2)
 					octave4++;
 			} ImGui::SameLine();
-			if (ImGui::SmallButton("-")) {
+			if (ImGui::SmallButton("-"))
+			{
 				if (octave4 > -2)
 					octave4--;
 			}

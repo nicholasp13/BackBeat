@@ -3,14 +3,14 @@
 #include "TPTLPFilterCore.h"
 namespace BackBeat {
 
-	TPTLPFilterCore::TPTLPFilterCore(UINT32 sampleRate, UINT32 bufferSize, std::shared_ptr<float[]> buffer, std::shared_ptr<FilterParameters> params)
+	TPTLPFilterCore::TPTLPFilterCore(unsigned int sampleRate, unsigned int bufferSize, std::shared_ptr<float[]> buffer, std::shared_ptr<FilterParameters> params)
 		:
 		m_SampleRate(sampleRate),
 		m_OutputBufferSize(bufferSize),
 		m_OutputBuffer(buffer),
 		m_Input(std::make_unique<Modulator>(bufferSize)),
 		m_Gain(1.0f),
-		m_CutoffFreq(FILTER_CUTOFF_MAX),
+		m_CutoffFreq(SynthBase::FilterCutoffMax),
 		m_Resonance(0.0f),
 		m_Type(ModuleType::LowPassFilter),
 		m_Params(params),
@@ -26,7 +26,7 @@ namespace BackBeat {
 
 	}
 
-	void TPTLPFilterCore::Reset(UINT32 sampleRate)
+	void TPTLPFilterCore::Reset(unsigned int sampleRate)
 	{
 
 	}
@@ -35,7 +35,7 @@ namespace BackBeat {
 	{
 		m_IsOn = m_Params->isOn;
 		// TODO: Evaluate prewarping vs not in a visualizier
-		if (!Audio::EqualsFloat(m_CutoffFreq, m_Params->cutoff, DELTA_CENTS_HZ))
+		if (!Audio::EqualsFloat(m_CutoffFreq, m_Params->cutoff, SynthBase::DeltaCentsHertz))
 		{
 			// No prewarping
 			m_CutoffFreq = m_Params->cutoff / m_SampleRate;
@@ -44,18 +44,20 @@ namespace BackBeat {
 		}
 	}
 
-	void TPTLPFilterCore::Render(UINT32 numSamples)
+	void TPTLPFilterCore::Render(unsigned int numSamples)
 	{
 		Update();
 
 		// NOTE: Will be controlled by cutoff frequency later
-		if (m_IsOn) {
+		if (m_IsOn) 
+		{
 			float x = 0.0f;
 			float y = 0.0f;
 			float v = 0.0f;
 
-			for (UINT32 i = 0; i < numSamples * STEREO; i++) {
-				if (i % 2 == 0) {
+			for (unsigned int i = 0; i < numSamples * Audio::Stereo; i++) {
+				if (i % 2 == 0) 
+				{
 					x = m_OutputBuffer[i];
 					v = (x - m_S) * m_G;
 					y = v + m_S;

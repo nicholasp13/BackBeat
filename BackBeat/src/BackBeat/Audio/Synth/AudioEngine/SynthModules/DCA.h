@@ -6,12 +6,12 @@ namespace BackBeat {
 	class DCA : public SynthModule
 	{
 	public:
-		DCA(UINT32 bufferSize, std::shared_ptr<float[]> buffer, std::shared_ptr<DCAParameters> params);
+		DCA(unsigned int bufferSize, std::shared_ptr<float[]> buffer, std::shared_ptr<DCAParameters> params);
 		~DCA();
 
-		virtual void Reset(UINT32 sampleRate);
+		virtual void Reset(unsigned int sampleRate);
 		virtual void Update();
-		virtual void Render(UINT32 numSamples);
+		virtual void Render(unsigned int numSamples);
 		virtual void DoNoteOn(NoteEvent event);
 		virtual void DoNoteOff(NoteEvent event);
 
@@ -20,7 +20,7 @@ namespace BackBeat {
 		ModuleType GetType() { return m_Type; }
 
 	private:
-		UINT32 m_Position;
+		unsigned int m_Position;
 		float m_LeftAmp;
 		float m_RightAmp;
 		

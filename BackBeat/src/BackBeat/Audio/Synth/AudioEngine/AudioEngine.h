@@ -25,7 +25,7 @@
 #include "BackBeat/Audio/Synth/AudioEngine/SynthVoices/SynthVoice.h"
 namespace BackBeat {
 
-#define MAX_VOICES 16
+	constexpr unsigned int MaxVoices = 12;
 
 	class AudioEngine
 	{
@@ -35,21 +35,21 @@ namespace BackBeat {
 		
 		void Stop();
 
-		virtual void Reset(UINT32 sampleRate);
+		virtual void Reset(unsigned int sampleRate);
 		virtual void Render(std::shared_ptr<RenderInfo> info);
 		virtual void SetParam(); // TODO: Implement if needed
 		virtual std::shared_ptr<EngineParameters> GetParam();
 		virtual void ProcessMIDIEvent(MIDIEvent event);
 
 	private:
-		UINT32 m_NumVoices;
-		UINT32 m_OutputBufferPosition;
+		unsigned int m_NumVoices;
+		unsigned int m_OutputBufferPosition;
 		float m_VoiceFactor;
 		AudioProps m_Props;
 
 		std::shared_ptr<float[]> m_Buffer;
 		std::shared_ptr<EngineParameters> m_Params;
-		std::unique_ptr<SynthVoice> m_Voices[MAX_VOICES];
+		std::unique_ptr<SynthVoice> m_Voices[MaxVoices];
 		std::queue<MIDIEvent> m_MIDIEvents;
 
 		void InitVoices();

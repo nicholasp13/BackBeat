@@ -3,11 +3,11 @@
 #include "AudioEngine.h"
 namespace BackBeat {
 
-	// TODO: Change UINT32 to unsigned long
-	//       Finely tune volume
+	// TODO: Finely tune volume
 
 	AudioEngine::AudioEngine(AudioProps props)
 		: 
+		m_NumVoices(MaxVoices),
 		m_Buffer(std::make_shared<float[]>(props.sampleRate)), 
 		m_OutputBufferPosition(0),
 		m_Props(props)
@@ -29,36 +29,38 @@ namespace BackBeat {
 			.data2 = 0x00,
 		};
 
-		for (UINT32 i = 0; i < m_NumVoices; i++)
+		for (unsigned int i = 0; i < m_NumVoices; i++)
 				m_Voices[i]->ProcessMIDIEvent(noteOff);
 	}
 
-	void AudioEngine::Reset(UINT32 sampleRate)
+	void AudioEngine::Reset(unsigned int sampleRate)
 	{
-		for (UINT32 i = 0; i < m_NumVoices; i++)
+		for (unsigned int i = 0; i < m_NumVoices; i++)
 			m_Voices[i]->Reset(sampleRate);
 	}
 
 	void AudioEngine::Render(std::shared_ptr<RenderInfo> info)
 	{
 		float volume = m_Params->volume;
-		UINT32 numSamples = info->GetSamplesToRender();
-		UINT32 bufferSize = info->GetBufferSize();
+		unsigned int numSamples = info->GetSamplesToRender();
+		unsigned int bufferSize = info->GetBufferSize();
 		std::shared_ptr<float[]> outputBuffer = info->GetBuffer();
 
-		Audio::FlushBuffer(m_Buffer, numSamples, STEREO, 0.0f);
+		Audio::FlushBuffer(m_Buffer, numSamples, Audio::Stereo, 0.0f);
 
-		while (!info->MIDIEventsEmpty()) {
+		while (!info->MIDIEventsEmpty()) 
+		{
 			ProcessMIDIEvent(info->PopMIDIEvent());
 		}
 
-		for (UINT32 i = 0; i < m_NumVoices; i++) {
-			if (m_Voices[i]->IsActive()) {
+		for (unsigned int i = 0; i < m_NumVoices; i++) {
+			if (m_Voices[i]->IsActive()) 
+			{
 				m_Voices[i]->Render(numSamples);
 			}
 		}
 
-		for (UINT32 j = 0; j < numSamples * 2; j++) {
+		for (unsigned int j = 0; j < numSamples * 2; j++) {
 			outputBuffer[j] = m_Buffer[j] * m_VoiceFactor * volume;
 			m_OutputBufferPosition = (m_OutputBufferPosition + 1) % bufferSize;
 		}
@@ -80,16 +82,19 @@ namespace BackBeat {
 		int channel = 0;
 		bool noteOn = SynthBase::IsNoteOn(event);
 
-		for (UINT32 i = 0; i < m_NumVoices; i++) {
-			if (event.data1 == m_Voices[i]->GetNote()) {
+		for (unsigned int i = 0; i < m_NumVoices; i++) {
+			if (event.data1 == m_Voices[i]->GetNote()) 
+			{
 				m_Voices[i]->ProcessMIDIEvent(event);
 				return;
 			}
 		}
 
-		if (noteOn) {
-			for (UINT j = 0; j < m_NumVoices; j++) {
-				if (!m_Voices[j]->IsActive()) {
+		if (noteOn) 
+		{
+			for (unsigned int j = 0; j < m_NumVoices; j++) {
+				if (!m_Voices[j]->IsActive()) 
+				{
 					m_Voices[j]->ProcessMIDIEvent(event);
 					return;
 				}
@@ -102,10 +107,9 @@ namespace BackBeat {
 	// Custom for each engine. Current engine for a basic synth piano
 	void AudioEngine::InitVoices()
 	{
-		m_NumVoices = 13;
 		m_VoiceFactor = 2.0f / (float)m_NumVoices; // NOTE: This is arbitrary and needs more fine tuning
 
-		for (UINT32 i = 0; i < m_NumVoices; i++)
+		for (unsigned int i = 0; i < m_NumVoices; i++)
 			m_Voices[i] = std::make_unique<SynthVoice>(m_Props.sampleRate, m_Buffer, m_Params->voiceParams);
 	}
 	 
@@ -117,20 +121,20 @@ namespace BackBeat {
 		DCAParams->rightAmp = 1.0f;
 
 		auto AmpEGParams = std::make_shared<EGParameters>();
-		AmpEGParams->attackDuration = EG1_ATTACK_TIME_DEFAULT;
-		AmpEGParams->decayDuration = EG1_DECAY_TIME_DEFAULT;
-		AmpEGParams->releaseDuration = EG1_RELEASE_TIME_DEFAULT;
-		AmpEGParams->sustainValue = EG1_SUSTAIN_LEVEL_DEFAULT;
+		AmpEGParams->attackDuration = SynthBase::EG1AttackTimeDefault;
+		AmpEGParams->decayDuration = SynthBase::EG1DecayTimeDefault;
+		AmpEGParams->releaseDuration = SynthBase::EG1ReleaseTimeDefault;
+		AmpEGParams->sustainValue = SynthBase::EG1SustainLevelDefault;
 		
 		auto EGParams = std::make_shared<EGParameters>();
-		EGParams->attackDuration = EG1_ATTACK_TIME_DEFAULT;
-		EGParams->decayDuration = EG1_DECAY_TIME_DEFAULT;
-		EGParams->releaseDuration = EG1_RELEASE_TIME_DEFAULT;
-		EGParams->sustainValue = EG1_SUSTAIN_LEVEL_DEFAULT;
+		EGParams->attackDuration = SynthBase::EG1AttackTimeDefault;
+		EGParams->decayDuration = SynthBase::EG1DecayTimeDefault;
+		EGParams->releaseDuration = SynthBase::EG1ReleaseTimeDefault;
+		EGParams->sustainValue = SynthBase::EG1SustainLevelDefault;
 		
 		auto LFOParams1 = std::make_shared<LFOParameters>();
-		LFOParams1->amp = LFO_ATT_DEFAULT;
-		LFOParams1->hertz = LFO_FREQ_DEFAULT;
+		LFOParams1->amp = SynthBase::LFOAttentuationDefault;
+		LFOParams1->hertz = SynthBase::LFOFrequencyDefault;
 		LFOParams1->wave = WaveType::Sin;
 
 		auto OSCParams1 = std::make_shared<OscParameters>();
@@ -155,11 +159,11 @@ namespace BackBeat {
 
 		auto LPFilterParams = std::make_shared<FilterParameters>();
 		LPFilterParams->isOn = false;
-		LPFilterParams->cutoff = FILTER_CUTOFF_MAX;
+		LPFilterParams->cutoff = SynthBase::FilterCutoffMax;
 
 		auto HPFilterParams = std::make_shared<FilterParameters>();
 		HPFilterParams->isOn = false;
-		HPFilterParams->cutoff = FILTER_CUTOFF_MIN;
+		HPFilterParams->cutoff = SynthBase::FilterCutoffMin;
 
 		auto modMatrixParams = std::make_shared<ModMatrixParameters>();
 

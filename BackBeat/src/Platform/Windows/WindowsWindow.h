@@ -6,7 +6,7 @@
 #include "BackBeat/Core/Window.h"
 namespace BackBeat {
 
-#define NUM_LOGOS 4
+	constexpr unsigned int NumLogos = 4;
 
 	class WindowsWindow : public Window
 	{
@@ -44,7 +44,7 @@ namespace BackBeat {
 		};
 
 		WindowData m_Data;
-		unsigned char* m_Icons[NUM_LOGOS];
-		GLFWimage m_Images[NUM_LOGOS];
+		unsigned char* m_Icons[NumLogos];
+		GLFWimage m_Images[NumLogos];
 	};
 }

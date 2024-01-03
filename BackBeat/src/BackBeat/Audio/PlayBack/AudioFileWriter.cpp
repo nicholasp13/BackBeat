@@ -11,9 +11,9 @@ namespace BackBeat {
 		{
 			const bool bigEndian = Audio::IsBigEndian();
 			// Write the header chunk
-			char header[WAV_HEADER_SIZE];
+			char header[Audio::WAVHeaderSize];
 			const int headerSizeOffset = 8;
-			unsigned long size = WAV_HEADER_SIZE + WAV_FMT_SIZE + WAV_DATA_SIZE + dataSize - headerSizeOffset;
+			unsigned long size = Audio::WAVHeaderSize + Audio::WAVFormatSize + Audio::WAVDataSize + dataSize - headerSizeOffset;
 			auto sizePtr = reinterpret_cast<char*>(&size);
 			
 			header[0] = 'R';
@@ -44,10 +44,10 @@ namespace BackBeat {
 			header[10] = 'V';
 			header[11] = 'E';
 
-			file.write(header, WAV_HEADER_SIZE);
+			file.write(header, Audio::WAVHeaderSize);
 
 			// Write the format subchunk
-			char format[WAV_FMT_SIZE];
+			char format[Audio::WAVFormatSize];
 			const int formatSize = 4;
 			const int audioFormat = 8;
 			const int numChannels = 10;
@@ -135,10 +135,10 @@ namespace BackBeat {
 				format[bitDepth + 1] = bDepthPtr[1];
 			}
 
-			file.write(format, WAV_FMT_SIZE);
+			file.write(format, Audio::WAVFormatSize);
 
 			// Write the data subchunk
-			char dataSubchunk[WAV_DATA_SIZE];
+			char dataSubchunk[Audio::WAVDataSize];
 			const int dataSizePos = 4;
 			unsigned long dSize = dataSize;
 			auto dSizePtr = reinterpret_cast<char*>(&dSize);
@@ -161,7 +161,7 @@ namespace BackBeat {
 				dataSubchunk[dataSizePos + 2] = dSizePtr[2];
 				dataSubchunk[dataSizePos + 3] = dSizePtr[3];
 			}
-			file.write(dataSubchunk, WAV_DATA_SIZE);
+			file.write(dataSubchunk, Audio::WAVDataSize);
 
 			file.close();
 			return true;

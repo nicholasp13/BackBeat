@@ -66,13 +66,13 @@ namespace BackBeat {
 	class SynthVoice
 	{
 	public:
-		SynthVoice(UINT32 sampleRate, std::shared_ptr<float[]> outputBuffer, std::shared_ptr<VoiceParameters> params);
+		SynthVoice(unsigned int sampleRate, std::shared_ptr<float[]> outputBuffer, std::shared_ptr<VoiceParameters> params);
 		~SynthVoice();
 
 		// Virtual for implementation of subclasses if needed
-		virtual void Reset(UINT32 sampleRate);
+		virtual void Reset(unsigned int sampleRate);
 		virtual void Update();
-		virtual void Render(UINT32 numSamples);
+		virtual void Render(unsigned int numSamples);
 		virtual void ProcessMIDIEvent(MIDIEvent event);
 
 		virtual int GetChannel() { return m_Channel; }
@@ -80,7 +80,7 @@ namespace BackBeat {
 		virtual bool IsActive() { return m_Actice; }
 
 	private:
-		UINT32 m_SampleRate;
+		unsigned int m_SampleRate;
 		bool m_Actice;
 		int m_Channel;
 		byte m_NotePressed;

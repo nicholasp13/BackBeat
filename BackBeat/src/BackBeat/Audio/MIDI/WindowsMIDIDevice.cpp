@@ -31,7 +31,6 @@ namespace BackBeat {
 		case (MIM_DATA):
 		{
 			device->MIDIInput(param1, param2);
-			// device->Yell();
 			break;
 		}
 
@@ -180,8 +179,8 @@ namespace BackBeat {
 		
 		// This byte is either CHANNEL_1_NOTE_ON or CHANNEL_1_NOTE_OFF | NOTE: This might change with multiple MIDI devices plugged in
 		event.status = (byte)((part1 & 0x000000FF));
-		event.data1 =  (byte)((part1 & 0x0000FF00) >> BYTE_BIT_SIZE);
-		event.data2 = (byte)((part1 & 0x00FF0000) >> BYTE_BIT_SIZE * 2);
+		event.data1 =  (byte)((part1 & 0x0000FF00) >> Audio::ByteBitSize);
+		event.data2 = (byte)((part1 & 0x00FF0000) >> Audio::ByteBitSize * 2);
 		
 		m_Output->In(event);
 	}

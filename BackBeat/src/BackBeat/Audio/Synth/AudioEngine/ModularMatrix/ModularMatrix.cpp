@@ -37,9 +37,9 @@ namespace BackBeat {
 	
 	}
 	
-	void ModularMatrix::RunModMatrix(UINT32 numSamples)
+	void ModularMatrix::RunModMatrix(unsigned int numSamples)
 	{
-		UINT32 totalSamples = numSamples * STEREO;
+		unsigned int totalSamples = numSamples * Audio::Stereo;
 		float sourceIntensity = 0.0f;
 		float destinationIntensity = 0.0f;
 		float channelIntensity = 0.0f;
@@ -47,20 +47,20 @@ namespace BackBeat {
 		std::shared_ptr<float[]> srcOutputBuffer;
 		std::shared_ptr<float[]> destinationInputBuffer;
 
-		for (UINT32 i = 0; i < NumModDestinations; i++)
+		for (unsigned int i = 0; i < NumModDestinations; i++)
 		{
 			destination = m_Params->modDestinationsCols[i];
 			destinationIntensity = destination.intensity;
 			destinationInputBuffer = m_ModDestinations[i];
 
-			for (UINT32 j = 0; j < NumModSources; j++)
+			for (unsigned int j = 0; j < NumModSources; j++)
 			{
 				if (!destination.channelOn[j])
 					break;
 				sourceIntensity = m_Params->modSourcesRows[j].intensity;
 				channelIntensity = m_Params->channelIntensity[j];
 				srcOutputBuffer = m_ModSources[j];
-				for (UINT32 k = 0; k < totalSamples; k++)
+				for (unsigned int k = 0; k < totalSamples; k++)
 				{
 					// NOTE: Amp modulators are multiplicative and input modulators are additive. Implementation subject to change
 					destinationInputBuffer[k] += srcOutputBuffer[k] 

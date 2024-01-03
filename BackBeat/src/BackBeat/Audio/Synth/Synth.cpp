@@ -29,14 +29,21 @@ namespace BackBeat {
 	void Synth::InitSynth()
 	{
 		m_Running = false;
+		
+		const unsigned short format = 3;
+		const unsigned short numChannels = 2;
+		const unsigned long sampleRate = 48000;
+		const unsigned long byteRate = 384000;
+		const unsigned short blockAlign = 8;
+		const unsigned short bitDepth = 32;
 		m_Props = {
 			.bigEndian = Audio::IsBigEndian(),
-			.format =      3,
-			.numChannels = STEREO,
-			.sampleRate =  SYNTH_SAMPLE_RATE,
-			.byteRate =    SYNTH_BYTE_RATE,
-			.blockAlign =  SYNTH_BLOCK_ALIGN,
-			.bitDepth =    SYNTH_BIT_DEPTH, 
+			.format =      format,
+			.numChannels = numChannels,
+			.sampleRate =  sampleRate,
+			.byteRate =    byteRate,
+			.blockAlign =  blockAlign,
+			.bitDepth =    bitDepth, 
 			.fileSize =    0
 		};
 

@@ -45,7 +45,7 @@ namespace BackBeat {
 		{
 			auto temp = new byte[actualBytes];
 			m_Track->Render(temp, actualBytes);
-			if (numChannels == STEREO)
+			if (numChannels == Audio::Stereo)
 			{
 				MonoToStereo(actualBytes, props.bitDepth, temp, m_Output);
 			}
@@ -88,9 +88,9 @@ namespace BackBeat {
 
 	void PlayerProcessor::MonoToStereo(unsigned int numBytes, unsigned int bitDepth, byte* mBuffer, byte* sBuffer)
 	{
-		unsigned int byteDepth = bitDepth / BYTE_BIT_SIZE;
+		unsigned int byteDepth = bitDepth / Audio::ByteBitSize;
 		unsigned int sPos = 0;
-		unsigned int sIncrement = byteDepth * STEREO;
+		unsigned int sIncrement = byteDepth * Audio::Stereo;
 
 		for (unsigned int i = 0; i < numBytes; i += byteDepth) {
 			for (unsigned int j = 0; j < byteDepth; j++) {
@@ -104,9 +104,9 @@ namespace BackBeat {
 	// NOTE: Untested
 	void PlayerProcessor::StereoToMono(unsigned int numBytes, unsigned int bitDepth, byte* sBuffer, byte* mBuffer)
 	{
-		unsigned int byteDepth = bitDepth / BYTE_BIT_SIZE;
+		unsigned int byteDepth = bitDepth / Audio::ByteBitSize;
 		unsigned int sPos = 0;
-		unsigned int sIncrement = byteDepth * STEREO;
+		unsigned int sIncrement = byteDepth * Audio::Stereo;
 
 		for (unsigned int i = 0; i < numBytes; i += byteDepth) {
 			for (unsigned int j = 0; j < byteDepth; j++) {

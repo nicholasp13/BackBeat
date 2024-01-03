@@ -3,7 +3,7 @@
 #include "LinearEGCore.h"
 namespace BackBeat {
 
-	LinearEGCore::LinearEGCore(UINT32 sampleRate, UINT32 bufferSize, std::shared_ptr<EGParameters> params)
+	LinearEGCore::LinearEGCore(unsigned int sampleRate, unsigned int bufferSize, std::shared_ptr<EGParameters> params)
 		:
 		m_SampleRate(sampleRate),
 		m_InputPosition(0),
@@ -27,7 +27,7 @@ namespace BackBeat {
 
 	}
 
-	void LinearEGCore::Reset(UINT32 sampleRate)
+	void LinearEGCore::Reset(unsigned int sampleRate)
 	{
 
 	}
@@ -38,40 +38,47 @@ namespace BackBeat {
 		float decayDuration = m_Params->decayDuration * m_ScalarNote;
 		float releaseDuration = m_Params->releaseDuration;
 		m_SustainValue = m_Params->sustainValue;
-		if (attackDuration <= 0) {
+		if (attackDuration <= 0) 
+		{
 			m_AttackIncrement = 1.0f;
 		}
-		else {
+		else 
+		{
 			m_AttackIncrement = 1.0f / m_SampleRate / attackDuration;
 		}
 
-		if (decayDuration <= 0) {
+		if (decayDuration <= 0) 
+		{
 			m_DecayDecrement = 1.0f - m_SustainValue;
 		}
-		else {
+		else 
+		{
 			m_DecayDecrement = (1.0f - m_SustainValue) / m_SampleRate / decayDuration;
 		}
 
-		if (releaseDuration <= 0) {
+		if (releaseDuration <= 0) 
+		{
 			m_ReleaseDecrement = 1.0f;
 		}
-		else {
+		else 
+		{
 			m_ReleaseDecrement = 1.0f / m_SampleRate / releaseDuration;
 		}
 	}
 
-	void LinearEGCore::Render(UINT32 numSamples)
+	void LinearEGCore::Render(unsigned int numSamples)
 	{
 		Update();
 
-		UINT32 totalSamples = numSamples * STEREO;
+		unsigned int totalSamples = numSamples * Audio::Stereo;
 		auto outputBuffer = m_Output->GetBuffer();
 
-		for (UINT32 i = 0; i < totalSamples; i+= STEREO)
+		for (unsigned int i = 0; i < totalSamples; i+= Audio::Stereo)
 		{
-			for (UINT32 j = 0; j < STEREO; j++)
+			for (unsigned int j = 0; j < Audio::Stereo; j++)
 			{
-				if (j == 0) {
+				if (j == 0) 
+				{
 					switch (m_State)
 					{
 

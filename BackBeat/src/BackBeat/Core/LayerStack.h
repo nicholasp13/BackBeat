@@ -22,7 +22,7 @@ namespace BackBeat {
 
 	private:
 		LAYERS m_Layers;
-		UINT m_LayerInsertIndex;
+		unsigned int m_LayerInsertIndex;
 	};
 }
 

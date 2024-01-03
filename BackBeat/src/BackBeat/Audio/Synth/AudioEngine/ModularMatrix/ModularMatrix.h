@@ -16,7 +16,7 @@ namespace BackBeat {
 		void AddModDestination(std::shared_ptr<float[]> destination, ModDestinations index);
 		void ClearModSource(ModSources index);
 		void ClearModDestination(ModDestinations index);
-		void RunModMatrix(UINT32 numSamples);
+		void RunModMatrix(unsigned int numSamples);
 
 		std::shared_ptr<ModMatrixParameters> GetParams() { return m_Params; }
 

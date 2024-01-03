@@ -7,12 +7,12 @@ namespace BackBeat {
 	class LFOCore : public ModuleCore
 	{
 	public:
-		LFOCore(UINT32 sampleRate, UINT32 bufferSize, std::shared_ptr<LFOParameters> params);
+		LFOCore(unsigned int sampleRate, unsigned int bufferSize, std::shared_ptr<LFOParameters> params);
 		~LFOCore();
 
-		virtual void Reset(UINT32 sampleRate);
+		virtual void Reset(unsigned int sampleRate);
 		virtual void Update();
-		virtual void Render(UINT32 numSamples);
+		virtual void Render(unsigned int numSamples);
 		virtual void DoNoteOn(NoteEvent event);
 		virtual void DoNoteOff(NoteEvent event);
 
@@ -20,9 +20,9 @@ namespace BackBeat {
 		std::shared_ptr<float[]> GetOutputBuffer() { return m_Output->GetBuffer(); }
 
 	private:
-		UINT32 m_SampleRate;
-		UINT32 m_Position;
-		UINT32 m_WaveSize;
+		unsigned int m_SampleRate;
+		unsigned int m_Position;
+		unsigned int m_WaveSize;
 		float m_Amp;
 		float m_Hertz;
 		WaveType m_WaveType;

@@ -4,6 +4,7 @@
 #include <map>
 
 #include "BackBeat/Audio/Synth/SynthBase.h"
+#include "BackBeat/Audio/MIDI/MIDICodes.h"
 #include "BackBeat/Events/KeyEvent.h"
 #include "RenderInfo.h"
 namespace BackBeat {
