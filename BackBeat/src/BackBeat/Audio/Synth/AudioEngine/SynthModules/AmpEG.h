@@ -20,8 +20,8 @@ namespace BackBeat {
 		virtual void DoNoteOn(NoteEvent event);
 		virtual void DoNoteOff(NoteEvent event);
 
-		virtual std::shared_ptr<float[]> GetBuffer() { return m_InputBuffer; }
-		virtual EGState GetState() { return m_Core->GetState(); }
+		inline virtual std::shared_ptr<float[]> GetBuffer() { return m_InputBuffer; }
+		inline virtual EGState GetState() { return m_Core->GetState(); }
 
 	private:
 		std::shared_ptr<LinearEGCore> m_Core; 

@@ -14,13 +14,13 @@ namespace BackBeat {
 
 		void PlayTrack(Track* track);
 
-		virtual AudioProps GetProperties() { return m_Track->GetProps(); };
-		virtual AudioBus* GetBus() { return nullptr; };
-		virtual void* GetOutputBuffer() { return m_Output; };
-		virtual bool IsOn() { return m_On; }
+		inline virtual AudioProps GetProperties() { return m_Track->GetProps(); };
+		inline virtual AudioBus* GetBus() { return nullptr; };
+		inline virtual void* GetOutputBuffer() { return m_Output; };
+		inline virtual bool IsOn() { return m_On; }
 	
-		void On() { m_On = true; }
-		void Off() { m_On = false; }
+		inline void On() { m_On = true; }
+		inline void Off() { m_On = false; }
 
 	private:
 		bool m_On;

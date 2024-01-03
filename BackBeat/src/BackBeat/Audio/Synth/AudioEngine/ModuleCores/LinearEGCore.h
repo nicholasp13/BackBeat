@@ -26,10 +26,10 @@ namespace BackBeat {
 		virtual void DoNoteOn(NoteEvent event);
 		virtual void DoNoteOff(NoteEvent event);
 
-		virtual std::shared_ptr<float[]> GetInputBuffer() { return m_Input->GetBuffer(); }
-		virtual std::shared_ptr<float[]> GetOutputBuffer() { return m_Output->GetBuffer(); }
+		inline virtual std::shared_ptr<float[]> GetInputBuffer() { return m_Input->GetBuffer(); }
+		inline virtual std::shared_ptr<float[]> GetOutputBuffer() { return m_Output->GetBuffer(); }
 
-		EGState GetState() { return m_State; }
+		inline EGState GetState() { return m_State; }
 	
 	private:
 		unsigned int m_SampleRate;

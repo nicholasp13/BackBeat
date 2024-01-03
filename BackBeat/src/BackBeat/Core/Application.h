@@ -21,11 +21,10 @@ namespace BackBeat {
 		void PushLayer(Layer* layer);
 		void PushOverlay(Layer* layer);
 
-		ImGuiLayer* GetImGuiLayer() { return m_ImGuiLayer; }
+		inline ImGuiLayer* GetImGuiLayer() { return m_ImGuiLayer; }
+		inline Window& GetWindow() { return *m_Window; }
 
-		Window& GetWindow() { return *m_Window; }
-
-		static Application& Get() { return *s_Instance; }
+		inline static Application& Get() { return *s_Instance; }
 
 	private:
 		bool OnWindowClose(WindowCloseEvent& e);

@@ -22,10 +22,10 @@ namespace BackBeat {
 		virtual void SetOutput(std::shared_ptr<MIDIInputHandler> output);
 
 		// NOTE: Getters for other MIDI device data not implemented
-		virtual std::string GetDeviceName(UINT index) { return m_Devices[index].GetName(); }
-		virtual UINT GetNumDevices() { return m_NumDevices; }
-		virtual bool IsOpen(UINT index) { return m_Devices[index].IsOpen(); };
-		virtual bool IsRunning() { return (m_RunID >= 0); }
+		inline virtual std::string GetDeviceName(UINT index) { return m_Devices[index].GetName(); }
+		inline virtual UINT GetNumDevices() { return m_NumDevices; }
+		inline virtual bool IsOpen(UINT index) { return m_Devices[index].IsOpen(); };
+		inline virtual bool IsRunning() { return (m_RunID >= 0); }
 
 	private:
 		bool m_OutputSet;

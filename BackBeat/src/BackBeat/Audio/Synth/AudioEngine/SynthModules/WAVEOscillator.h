@@ -18,8 +18,8 @@ namespace BackBeat {
 		virtual void DoNoteOn(NoteEvent event);
 		virtual void DoNoteOff(NoteEvent event);
 
-		virtual std::shared_ptr<float[]> GetBuffer() { return m_Core->GetBuffer(); }
-		std::shared_ptr<float[]> GetModInputBuffer() { return m_Core->GetInputBuffer(); }
+		inline virtual std::shared_ptr<float[]> GetBuffer() { return m_Core->GetBuffer(); }
+		inline std::shared_ptr<float[]> GetModInputBuffer() { return m_Core->GetInputBuffer(); }
 
 	private:
 		std::shared_ptr<WaveOscCore> m_Core;

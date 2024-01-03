@@ -15,10 +15,10 @@ namespace BackBeat {
 		SynthEventHandler(std::shared_ptr<RenderInfo> renderInfo);
 		~SynthEventHandler();
 
-		std::shared_ptr<EventHandlerParameters> GetParams() { return m_Params; }
-
 		bool HandleEvent(Event& event);
 		bool AddEvent(KeyCode key, MIDIEvent note);
+
+		inline std::shared_ptr<EventHandlerParameters> GetParams() { return m_Params; }
 
 	private:
 

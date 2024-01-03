@@ -13,7 +13,7 @@ namespace BackBeat {
 		MIDIInputHandler(std::shared_ptr<RenderInfo> renderInfo);
 		~MIDIInputHandler();
 
-		void In(MIDIEvent event) { m_RenderInfo->PushMIDIEvent(event); }
+		inline void In(MIDIEvent event) { m_RenderInfo->PushMIDIEvent(event); }
 
 	private:
 		std::shared_ptr<RenderInfo> m_RenderInfo;

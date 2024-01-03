@@ -17,8 +17,8 @@ namespace BackBeat {
 		virtual void Start();
 		virtual void Stop();
 
-		virtual bool IsRendering() { return m_Rendering; }
-		virtual std::shared_ptr<Mixer> GetMixer() { return m_Mixer; };
+		inline virtual bool IsRendering() { return m_Rendering; }
+		inline virtual std::shared_ptr<Mixer> GetMixer() { return m_Mixer; };
 
 	private:
 		bool m_Rendering;

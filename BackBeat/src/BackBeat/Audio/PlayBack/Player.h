@@ -33,11 +33,11 @@ namespace BackBeat {
 		void SetEnd(unsigned int end);
 		void SetVolume(float vol);
 
-		void Play() { m_PlayerProcessor->On(); }
-		void Pause() { m_PlayerProcessor->Off(); }
-		bool IsLoaded() { return m_SelectedTrack != nullptr; }
-		bool IsPlaying() { return m_PlayerProcessor->IsOn(); }
-		std::shared_ptr<PlayerProcessor> GetProc() { return m_PlayerProcessor; }
+		inline void Play() { m_PlayerProcessor->On(); }
+		inline void Pause() { m_PlayerProcessor->Off(); }
+		inline bool IsLoaded() { return m_SelectedTrack != nullptr; }
+		inline bool IsPlaying() { return m_PlayerProcessor->IsOn(); }
+		inline std::shared_ptr<PlayerProcessor> GetProc() { return m_PlayerProcessor; }
 
 	private:
 		Track* m_SelectedTrack;

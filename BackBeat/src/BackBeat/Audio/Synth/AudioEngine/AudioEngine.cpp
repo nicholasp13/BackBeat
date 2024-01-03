@@ -70,8 +70,8 @@ namespace BackBeat {
 	void AudioEngine::SetParam() // TODO: Implement if needed
 	{
 
-	}
 
+	}
 	std::shared_ptr<EngineParameters> AudioEngine::GetParam()
 	{
 		return m_Params;

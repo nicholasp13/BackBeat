@@ -15,9 +15,9 @@ namespace BackBeat {
 		virtual void DoNoteOn(NoteEvent event);
 		virtual void DoNoteOff(NoteEvent event);
 
-		std::shared_ptr<float[]> GetBuffer() { return m_Buffer; }
-		std::shared_ptr<float[]> GetInputBuffer() { return m_ModInput->GetBuffer(); }
-		ModuleType GetType() { return m_Type; }
+		inline std::shared_ptr<float[]> GetBuffer() { return m_Buffer; }
+		inline std::shared_ptr<float[]> GetInputBuffer() { return m_ModInput->GetBuffer(); }
+		inline ModuleType GetType() { return m_Type; }
 
 	private:
 		unsigned int m_Position;

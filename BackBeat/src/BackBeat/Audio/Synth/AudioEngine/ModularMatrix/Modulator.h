@@ -11,7 +11,7 @@ namespace BackBeat {
 
 		void FlushBuffer(unsigned int numSamples, float defaultValue);
 
-		std::shared_ptr<float[]> GetBuffer() { return m_Buffer; }
+		inline std::shared_ptr<float[]> GetBuffer() { return m_Buffer; }
 		
 	private:
 		unsigned int m_BufferSize;

@@ -12,10 +12,9 @@ namespace BackBeat {
 		AudioBus(AudioProps props, BusDirection direction);
 		~AudioBus();
 
-		AudioBuffer* GetBuffer() { return &m_Buffer; }
-		unsigned int GetBufferSize() { return m_Buffer.GetSize(); }
-
-		virtual BusDirection GetDirection() { return m_Direction; }
+		inline AudioBuffer* GetBuffer() { return &m_Buffer; }
+		inline unsigned int GetBufferSize() { return m_Buffer.GetSize(); }
+		inline virtual BusDirection GetDirection() { return m_Direction; }
 
 	private:
 		BusDirection m_Direction;

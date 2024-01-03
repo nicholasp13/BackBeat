@@ -18,12 +18,11 @@ namespace BackBeat {
 		virtual bool Close();
 		virtual void Run();
 		virtual void Stop();
-
-		virtual void SetOutput(std::shared_ptr<MIDIInputHandler> output) { m_Output = output; }
-		virtual std::string GetName() { return m_Name; }
-		virtual bool IsOpen() { return m_Open; }
-
 		void MIDIInput(DWORD_PTR part1, DWORD_PTR part2);
+
+		inline virtual void SetOutput(std::shared_ptr<MIDIInputHandler> output) { m_Output = output; }
+		inline virtual std::string GetName() { return m_Name; }
+		inline virtual bool IsOpen() { return m_Open; }
 
 	private:
 		bool m_Open;

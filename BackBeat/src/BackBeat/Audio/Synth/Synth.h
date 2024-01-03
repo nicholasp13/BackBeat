@@ -49,12 +49,12 @@ namespace BackBeat {
 		void Start();
 		void Stop();
 
-		boolean IsRunning() { return m_Running; }
-		AudioProps GetProps() { return m_Props; }
-		std::shared_ptr<SynthEventHandler> GetEventHandler() { return m_Handler; }
-		std::shared_ptr<MIDIInputHandler> GetMIDIInput() { return m_MIDIInput; }
-		std::shared_ptr<SynthParameters> GetParams() { return m_Params; }
-		std::shared_ptr<SynthProcessor> GetProcessor() { return m_Proc; }
+		inline boolean IsRunning() { return m_Running; }
+		inline AudioProps GetProps() { return m_Props; }
+		inline std::shared_ptr<SynthEventHandler> GetEventHandler() { return m_Handler; }
+		inline std::shared_ptr<MIDIInputHandler> GetMIDIInput() { return m_MIDIInput; }
+		inline std::shared_ptr<SynthParameters> GetParams() { return m_Params; }
+		inline std::shared_ptr<SynthProcessor> GetProcessor() { return m_Proc; }
 	
 	private:
 		boolean m_Running;

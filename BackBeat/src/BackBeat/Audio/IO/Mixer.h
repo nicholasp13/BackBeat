@@ -18,10 +18,8 @@ namespace BackBeat {
 
 	private:
 		unsigned int m_NumProcs;
-
 		AudioProps m_Props;
 		std::shared_ptr <AudioProcessor> m_Proc;
-
 		std::vector < std::shared_ptr<AudioProcessor> > m_Procs;
 		
 		float GetTypeRatio(unsigned short bitDepth1, unsigned short bitDepth2);

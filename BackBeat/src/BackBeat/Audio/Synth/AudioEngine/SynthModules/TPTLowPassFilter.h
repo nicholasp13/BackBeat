@@ -16,7 +16,7 @@ namespace BackBeat {
 		virtual void DoNoteOn(NoteEvent event);
 		virtual void DoNoteOff(NoteEvent event);
 
-		virtual std::shared_ptr<float[]> GetBuffer() { return m_Core->GetInputBuffer(); }
+		inline virtual std::shared_ptr<float[]> GetBuffer() { return m_Core->GetInputBuffer(); }
 
 	private:
 		std::shared_ptr<TPTLPFilterCore> m_Core;
