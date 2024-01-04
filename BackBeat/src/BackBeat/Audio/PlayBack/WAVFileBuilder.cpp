@@ -1,10 +1,10 @@
 #include "bbpch.h"
 
-#include "AudioFileBuilder.h"
+#include "WAVFileBuilder.h"
 #include "BackBeat/Core/FileDialog.h"
 namespace BackBeat {
 
-	bool AudioFileBuilder::BuildWAVFile(Track* track, unsigned int start, unsigned int end)
+	bool WAVFileBuilder::BuildWAVFile(Track* track, unsigned int start, unsigned int end)
 	{
 		if (!track)
 			return false;
@@ -32,7 +32,7 @@ namespace BackBeat {
 			{
 				dataIncrement = (dataSize + filePosition) <= fileSize ? dataSize : (fileSize - filePosition);
 				track->Render((byte*)data, dataIncrement);
-				success = AudioFileWriter::WriteWAVFileData(filePath, data, dataIncrement, filePosition);
+				success = AudioFileWriter::WriteAudioFileData(filePath, data, dataIncrement);
 				filePosition += dataIncrement;
 			}
 			delete[size] data;

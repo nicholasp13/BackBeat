@@ -92,13 +92,6 @@ namespace BackBeat {
 		return Audio::GetTime(timeTotal);
 	}
 
-	// NOTE: Not used and may be deleted (only used for testing but is currently uneeded)
-	float Track::GetProgress()
-	{
-		float progress = ((float)m_Position - (float)m_Info.dataZero) / (float)m_Info.dataSize;
-		return progress;
-	}
-
 	void Track::SetPosition(unsigned int position)
 	{
 		unsigned int offset = position % m_Info.props.blockAlign;
@@ -169,19 +162,15 @@ namespace BackBeat {
 
 		case (Audio::Int24BitSize):
 		{
-			auto buffer = reinterpret_cast<byte*>(output);
-			int24 src = int24();
-			byte srcBytes[Audio::Int24ByteSize];
-			for (unsigned int i = 0; i < numBytes; i+= Audio::Int24ByteSize) {
-				for (unsigned int j = 0; j < Audio::Int24ByteSize; j++) {
-					srcBytes[2 - j] = buffer[i + j];
-				}
-				src = int24(srcBytes[0], srcBytes[1], srcBytes[2]);
-				src = int24(src.ToFloat() * m_Volume);
-				output[i] = src[2];
-				output[i + 1] = src [1];
-				output[i + 2] = src[0];
+			int24* intBuffer = int24::GetInt24Buffer(output, numSamples, m_Info.props.bigEndian);
+			for (unsigned int i = 0; i < numSamples; i++) {
+				intBuffer[i] = int24((float)intBuffer[i] * m_Volume);
 			}
+
+			byte* byteBuffer = int24::GetByteBuffer(intBuffer, numSamples, m_Info.props.bigEndian);
+			Audio::CopyInputToOutput(output, byteBuffer, numSamples * Audio::Int24ByteSize);
+			delete[] intBuffer;
+			delete[] byteBuffer;
 			break;
 		}
 

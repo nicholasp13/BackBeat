@@ -3,10 +3,10 @@
 #include "BackBeat/Audio/Audio.h"
 namespace BackBeat {
 
-	class FileReader
+	class AudioFileReader
 	{
 	public:
-		static AudioInfo CreateFile(std::string fileName);
+		static AudioInfo ReadFile(std::string fileName);
 		
 	private:
 		static AudioInfo ReadMP3Header(std::string filePath, unsigned int size);

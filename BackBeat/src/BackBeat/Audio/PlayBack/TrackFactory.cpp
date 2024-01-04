@@ -1,12 +1,12 @@
 #include "bbpch.h"
 
-#include "FileReader.h"
+#include "BackBeat/Audio/Helpers/AudioFileReader.h"
 #include "TrackFactory.h"
 namespace BackBeat {
 
 	Track* TrackFactory::BuildTrack(std::string filePath)
 	{
-		AudioInfo info = FileReader::CreateFile(filePath);
+		AudioInfo info = AudioFileReader::ReadFile(filePath);
 		if (info.type != none) {
 			Track* track = new Track(info);
 			return track;

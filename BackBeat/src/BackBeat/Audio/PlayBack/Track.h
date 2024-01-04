@@ -13,7 +13,6 @@ namespace BackBeat {
 		
 		TimeMinSec GetTime();
 		TimeMinSec GetLength();
-		float GetProgress();
 		void SetPosition(unsigned int position);
 		void SetStart(unsigned int start);
 		void SetEnd(unsigned int end);

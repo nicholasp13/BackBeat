@@ -65,7 +65,7 @@
 							unsigned int position = m_Player.GetPosition();
 							unsigned int startPosition = m_Player.GetStartPosition();
 							unsigned int endPosition = m_Player.GetEndPosition();
-							BackBeat::AudioFileBuilder::BuildWAVFile(m_Player.GetTrack(), startPosition, endPosition);
+							BackBeat::WAVFileBuilder::BuildWAVFile(m_Player.GetTrack(), startPosition, endPosition);
 							m_Player.SetPosition(position);
 						}
 					}

@@ -2,10 +2,10 @@
 
 #include "BackBeat/Audio/Audio.h"
 #include "BackBeat/Core/Core.h"
-#include "FileReader.h"
+#include "AudioFileReader.h"
 namespace BackBeat {
 
-	AudioInfo FileReader::CreateFile(std::string filePath)
+	AudioInfo AudioFileReader::ReadFile(std::string filePath)
 	{
 		unsigned long size = 0;
 		char header[Audio::WAVHeaderSize];
@@ -47,7 +47,7 @@ namespace BackBeat {
 
 
 	// TODO: CREATE INITIALIZE AFTER CREATING MP3 decoder
-	AudioInfo FileReader::ReadMP3Header(std::string filePath, unsigned int size)
+	AudioInfo AudioFileReader::ReadMP3Header(std::string filePath, unsigned int size)
 	{
 		return AudioInfo();
 	}
@@ -56,7 +56,7 @@ namespace BackBeat {
 	// based on that info
 	// NOTE: WAV file headers are standardized and this function will fail if the WAV file
 	//       is not properly formatted
-	AudioInfo FileReader::ReadWAVHeader(std::string filePath, unsigned int size)
+	AudioInfo AudioFileReader::ReadWAVHeader(std::string filePath, unsigned int size)
 	{
 		char data;
 		std::ifstream file;
