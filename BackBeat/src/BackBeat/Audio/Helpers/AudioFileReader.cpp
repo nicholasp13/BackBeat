@@ -8,7 +8,7 @@ namespace BackBeat {
 	AudioInfo AudioFileReader::ReadFile(std::string filePath)
 	{
 		unsigned long size = 0;
-		char header[Audio::WAVHeaderSize];
+		char header[Audio::WAVHeaderSize] = {};
 		std::ifstream file;
 
 		// TODO: Implement Function to get mp3 file header info
@@ -18,10 +18,14 @@ namespace BackBeat {
 			file.read(header, Audio::WAVHeaderSize);
 			file.close();
 
-			char temp1 = header[3];
-			char temp2 = header[4];
-			header[3] = '\0';
-			header[4] = '\0';
+			const unsigned int headerPosition = 3;
+			const unsigned int sampleHeaderPosition = 6;
+			char temp1 = header[headerPosition];
+			char temp2 = header[headerPosition + 1];
+			char temp3 = header[sampleHeaderPosition];
+			header[headerPosition] = '\0';
+			header[headerPosition + 1] = '\0';
+			header[sampleHeaderPosition] = '\0';
 			
 			if (std::strcmp(Audio::MP3, header) == 0)
 			{
@@ -31,15 +35,34 @@ namespace BackBeat {
 			
 			if (std::strcmp(Audio::WAV, header) == 0)
 			{
-				header[4] = temp2;
-				if (Audio::IsBigEndian()) {
-					size = *reinterpret_cast<unsigned long int*>(header + 4);
+				header[headerPosition + 1] = temp2;
+				if (Audio::IsBigEndian()) 
+				{
+					size = *reinterpret_cast<unsigned long int*>(header + headerPosition + 1);
 				}
-				else {
-					size = Audio::EndianConverterLong(header[4], header[5],
-						header[6], header[7]);
+				else 
+				{
+					size = Audio::EndianConverterLong(header[headerPosition + 1], header[headerPosition + 2],
+						header[headerPosition + 3], header[headerPosition + 4]);
 				}
-				return ReadWAVHeader(filePath, size);
+				return ReadHeader(filePath, size, wav);
+			}
+
+			header[headerPosition] = temp1;
+			header[headerPosition + 1] = temp2;
+			if (std::strcmp(Audio::SAMPLE, header) == 0)
+			{
+				header[sampleHeaderPosition] = temp3;
+				if (Audio::IsBigEndian()) 
+				{
+					size = *reinterpret_cast<unsigned long int*>(header + sampleHeaderPosition);
+				}
+				else 
+				{
+					size = Audio::EndianConverterLong(header[sampleHeaderPosition], header[sampleHeaderPosition + 1],
+						header[sampleHeaderPosition + 2], header[sampleHeaderPosition + 3]);
+				}
+				return ReadHeader(filePath, size, sample);
 			}
 		}
 		return AudioInfo();
@@ -52,36 +75,53 @@ namespace BackBeat {
 		return AudioInfo();
 	}
 
-	// Gets relevant info from headers on WAV files and creates WavData pointer
+	// Gets relevant info from headers on WAV and SAMPLE files and creates WavData pointer
 	// based on that info
 	// NOTE: WAV file headers are standardized and this function will fail if the WAV file
 	//       is not properly formatted
-	AudioInfo AudioFileReader::ReadWAVHeader(std::string filePath, unsigned int size)
+	AudioInfo AudioFileReader::ReadHeader(std::string filePath, unsigned int size, FileType type)
 	{
 		char data;
 		std::ifstream file;
 		AudioProps props = AudioProps();
 		AudioInfo info = AudioInfo();
-		info.type = none;
+		info.type = type;
 		props.fileSize = size;
 		file.open(filePath, std::ios::binary);
 		
-		file.seekg(3);
-		file.get(data); 
-		props.bigEndian = (data == 'X');
+		if (!file.is_open())
+			return info;
+
+		if (info.type == wav)
+		{
+			file.seekg(3);
+			file.get(data);
+			props.bigEndian = (data == 'X');
+		}
+		else if (info.type == sample)
+		{
+			props.bigEndian = false;
+		}
+		else
+		{
+			file.close();
+			return info;
+		}
 
 		int fmtPosition = -1;
-		char fmt[4];
+		char fmt[4] = {};
 		fmt[3] = '\0';
 		for (unsigned int i = 0; i < size; i++)
 		{
 			file.seekg(i);
 			file.get(data);
 
-			if (data == 'f' && i + Audio::WAVFormatSize < size) {
+			if (data == 'f' && i + Audio::WAVFormatSize < size) 
+			{
 				file.seekg(i);
 				file.read(fmt, 3);
-				if (std::strcmp("fmt", fmt) == 0) {
+				if (std::strcmp("fmt", fmt) == 0) 
+				{
 					fmtPosition = i;
 					break;
 				}
@@ -89,7 +129,10 @@ namespace BackBeat {
 		}
 
 		if (fmtPosition < 0)
+		{
+			file.close();
 			return info;
+		}
 
 		file.seekg(fmtPosition);
 		char fileProps[Audio::WAVFormatSize];
@@ -114,7 +157,8 @@ namespace BackBeat {
 			props.blockAlign = (unsigned short)fileProps[blockAlign];
 			props.bitDepth = (unsigned short)fileProps[bitDepth];
 		}
-		else {
+		else 
+		{
 			props.format = Audio::EndianConverterShort(fileProps[audioFormat], fileProps[audioFormat + 1]);
 			props.numChannels = Audio::EndianConverterShort(fileProps[numChannels], fileProps[numChannels + 1]);
 			props.sampleRate = Audio::EndianConverterLong(fileProps[sampleRate], fileProps[sampleRate + 1],
@@ -127,17 +171,19 @@ namespace BackBeat {
 
 		unsigned int dataPosition = 0;
 		const int dataChunkPos = 4;
-		char dataChunk[Audio::WAVDataSize];
+		char dataChunk[Audio::WAVDataSize] = {};
 		dataChunk[dataChunkPos] = '\0';
 		for (unsigned int j = fmtPosition; j < size; j++)
 		{
 			file.seekg(j);
 			file.get(data);
 
-			if (data == 'd' && j + Audio::WAVFormatSize < size) {
+			if (data == 'd' && j + Audio::WAVFormatSize < size) 
+			{
 				file.seekg(j);
 				file.read(dataChunk, 4);
-				if (std::strcmp("data", dataChunk) == 0) {
+				if (std::strcmp("data", dataChunk) == 0) 
+				{
 					file.seekg(j);
 					file.read(dataChunk, Audio::WAVDataSize);
 					unsigned int dataSize = 0;
@@ -147,12 +193,12 @@ namespace BackBeat {
 					{
 						dataSize = *reinterpret_cast<unsigned int*>(dataChunk);
 					}
-					else {
+					else 
+					{
 						dataSize = Audio::EndianConverterLong(dataChunk[dataChunkPos], dataChunk[dataChunkPos + 1],
 							dataChunk[dataChunkPos + 2], dataChunk[dataChunkPos + 3]);
 					}
 					std::string fileName = std::filesystem::path(filePath).stem().string();
-					info.type = wav;
 					info.filePath = filePath;
 					info.name = fileName;
 					info.props = props;

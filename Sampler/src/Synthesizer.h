@@ -24,6 +24,7 @@ public:
 	void Open();
 	void Close();
 
+	inline bool IsOpen() { return m_Open; }
 	inline std::shared_ptr<BackBeat::SynthProcessor> GetSynthProc() { return m_Synth.GetProcessor(); }
 
 private:

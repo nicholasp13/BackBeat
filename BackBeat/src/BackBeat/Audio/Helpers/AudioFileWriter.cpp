@@ -12,7 +12,7 @@ namespace BackBeat {
 		{
 			const bool bigEndian = Audio::IsBigEndian();
 			// Write the header chunk
-			char header[Audio::WAVHeaderSize];
+			char header[Audio::WAVHeaderSize] = {};
 			const int headerSizeOffset = 8;
 			unsigned long size = Audio::WAVTotalHeaderSize + dataSize - headerSizeOffset;
 			auto sizePtr = reinterpret_cast<char*>(&size);
@@ -344,9 +344,6 @@ namespace BackBeat {
 			file.close();
 			return true;
 		}
-		else
-		{
-			return false;
-		}
+		return false;
 	}
 }

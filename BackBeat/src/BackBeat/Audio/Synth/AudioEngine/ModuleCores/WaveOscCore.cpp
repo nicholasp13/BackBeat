@@ -74,10 +74,10 @@ namespace BackBeat {
 	void WaveOscCore::InitWave()
 	{
 		float freq = m_Hertz * m_Params->octave;
-		if (freq > SynthBase::G_9)
-			freq = SynthBase::G_9;
-		else if (freq < SynthBase::C_Minus1)
-			freq = SynthBase::C_Minus1;
+		if (freq > SynthBase::G9Frequency)
+			freq = SynthBase::G9Frequency;
+		else if (freq < SynthBase::CMinus1Frequency)
+			freq = SynthBase::CMinus1Frequency;
 		m_Position = 0;
 		m_WaveSize = (unsigned int)(m_SampleRate / freq);
 		m_WaveType = m_Params->wave;

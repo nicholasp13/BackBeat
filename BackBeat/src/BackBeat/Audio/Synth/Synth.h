@@ -37,7 +37,7 @@
 #include "BackBeat/Audio/Synth/AudioEngine/AudioEngine.h"
 #include "BackBeat/Audio/Synth/SynthIO/SynthProcessor.h"
 #include "BackBeat/Audio/Synth/SynthIO/SynthEventHandler.h"
-#include "BackBeat/Audio/Synth/SynthIO/MIDIInputHandler.h"
+#include "BackBeat/Audio/MIDI/MIDIInputHandler.h"
 namespace BackBeat {
 
 	class Synth
@@ -49,7 +49,7 @@ namespace BackBeat {
 		void Start();
 		void Stop();
 
-		inline boolean IsRunning() { return m_Running; }
+		inline bool IsRunning() { return m_Running; }
 		inline AudioProps GetProps() { return m_Props; }
 		inline std::shared_ptr<SynthEventHandler> GetEventHandler() { return m_Handler; }
 		inline std::shared_ptr<MIDIInputHandler> GetMIDIInput() { return m_MIDIInput; }
@@ -57,13 +57,12 @@ namespace BackBeat {
 		inline std::shared_ptr<SynthProcessor> GetProcessor() { return m_Proc; }
 	
 	private:
-		boolean m_Running;
-		unsigned int m_SamplesToRender;
+		bool m_Running;
 		unsigned long m_SleepTime;
 		AudioProps m_Props;
 
 		std::shared_ptr<AudioEngine> m_Engine;
-		std::shared_ptr <SynthProcessor> m_Proc;
+		std::shared_ptr<SynthProcessor> m_Proc;
 		std::shared_ptr<SynthEventHandler> m_Handler;
 		std::shared_ptr<MIDIInputHandler> m_MIDIInput;
 		std::shared_ptr<SynthParameters> m_Params;

@@ -15,11 +15,14 @@
 		m_Synth.Init();
 		m_AudioRenderer.GetMixer()->SetProc(m_Synth.GetSynthProc());
 		m_AudioRenderer.GetMixer()->SetProc(m_Player.GetProc());
+		m_AudioRenderer.GetMixer()->SetProc(m_SamplerController.GetSamplerGetProcessor());
+		m_AudioRenderer.GetMixer()->SetProc(m_SamplerController.GetTrackGetProcessor());
 		m_AudioRenderer.Start();
 	}
 
 	void MainLayer::OnDetach()
 	{
+		m_SamplerController.Close();
 		m_Synth.Close();
 		m_Player.Close();
 		m_AudioRenderer.Stop();
@@ -27,14 +30,19 @@
 	
 	void MainLayer::OnUpdate()
 	{
+		m_SamplerController.Update();
 		m_Synth.Update();
 		m_Player.Update();
 	}
 
 	void MainLayer::OnEvent(BackBeat::Event& event) 
 	{
-		m_Synth.OnEvent(event);
-		m_Player.OnEvent(event);
+		if (m_SamplerController.IsOpen())
+			m_SamplerController.OnEvent(event);
+		if (m_Synth.IsOpen())
+			m_Synth.OnEvent(event);
+		if (m_Player.IsOpen())
+			m_Player.OnEvent(event);
 
 		BackBeat::EventDispatcher dispatcher(event);
 		dispatcher.Dispatch<BackBeat::KeyPressedEvent>(BIND_EVENT_FN(MainLayer::OnKeyEvent));
@@ -74,6 +82,7 @@
 					}
 					ImGui::EndMenu();
 				}
+
 				if (ImGui::BeginMenu("Synth"))
 				{
 					if (ImGui::MenuItem("Open"))
@@ -82,12 +91,23 @@
 					}
 					ImGui::EndMenu();
 				}
+
+				if (ImGui::BeginMenu("Sampler"))
+				{
+					if (ImGui::MenuItem("Open"))
+					{
+						m_SamplerController.Open();
+					}
+					ImGui::EndMenu();
+				}
+
 				ImGui::EndMenuBar();
 			}
 
 			ImGui::End();
 		}
 
+		m_SamplerController.ImGuiRender();
 		m_Synth.ImGuiRender();
 		m_Player.ImGuiRender();
 	}

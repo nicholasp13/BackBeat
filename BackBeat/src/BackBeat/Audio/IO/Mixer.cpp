@@ -26,10 +26,10 @@ namespace BackBeat {
 				continue;
 			m_Procs[i]->ProcessSamples(numSamples, m_Props.sampleRate, m_Props.numChannels); // TODO: Multithread this call
 		}
-		// Flush data buffer
-		for (unsigned int k = 0; k < numSamples * m_Props.blockAlign; k++) {
-			data[k] = (byte)0x00;
-		}
+
+		unsigned int totalSamples = numSamples * m_Props.blockAlign;
+		byte defaultVal = 0x00;
+		Audio::FlushBufferT(data, &defaultVal, totalSamples);
 
 		for (unsigned int i = 0; i < m_Procs.size(); i++) {
 			if (!m_Procs[i]->IsOn())

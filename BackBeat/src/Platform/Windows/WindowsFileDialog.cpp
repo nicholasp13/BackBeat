@@ -11,7 +11,6 @@ namespace BackBeat {
 
 	std::string FileDialog::OpenFile(const char* filter)
 	{
-
 		OPENFILENAMEA fileName;
 		CHAR sizeFile[260] = { 0 };
 		CHAR currentDir[256] = { 0 };

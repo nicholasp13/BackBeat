@@ -3,7 +3,7 @@
 #include "bbpch.h"
 
 #include "BackBeat/Audio/Audio.h"
-#include "BackBeat/Audio/Synth/SynthIO/MIDIInputHandler.h"
+#include "MIDIInputHandler.h"
 #include "MIDICodes.h"
 namespace BackBeat {
 	

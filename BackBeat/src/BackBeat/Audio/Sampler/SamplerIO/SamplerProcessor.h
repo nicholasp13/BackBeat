@@ -2,14 +2,14 @@
 
 #include "BackBeat/Audio/IO/RenderInfo.h"
 #include "BackBeat/Audio/IO/AudioProcessor.h"
-#include "BackBeat/Audio/Synth/AudioEngine/AudioEngine.h"
+#include "BackBeat/Audio/Sampler/SamplerEngine/SamplerEngine.h"
 namespace BackBeat {
 
-	class SynthProcessor : public AudioProcessor
+	class SamplerProcessor : public AudioProcessor
 	{
 	public:
-		SynthProcessor(AudioProps props, std::shared_ptr<AudioEngine> engine);
-		~SynthProcessor();
+		SamplerProcessor(AudioProps props, std::shared_ptr<SamplerEngine> engine);
+		~SamplerProcessor();
 
 		virtual void ProcessSamples(unsigned int numSamples, unsigned int sampleRate, unsigned int numChannels);
 
@@ -30,9 +30,9 @@ namespace BackBeat {
 
 		AudioProps m_Props;
 		AudioBus m_Bus;
-		
+
 		std::shared_ptr<RenderInfo> m_Info;
-		std::shared_ptr<AudioEngine> m_Engine;
+		std::shared_ptr<SamplerEngine> m_Engine;
 	};
 
 }

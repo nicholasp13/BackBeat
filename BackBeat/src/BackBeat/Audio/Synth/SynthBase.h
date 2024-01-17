@@ -1,7 +1,6 @@
 #pragma once
 
 #include "BackBeat/Audio/Audio.h"
-#include "BackBeat/Audio/MIDI/MIDICodes.h"
 #include "BackBeat/Core/Log.h"
 #include "BackBeat/Core/Timer.h"
 #include "SynthParameters.h"
@@ -25,22 +24,22 @@ namespace BackBeat {
 
 		// MUSIC NOTES in hertz
 		// Lowest note
-		constexpr float C_Minus1 = 8.176f;
+		constexpr float CMinus1Frequency = 8.176f;
 		// Middle/4th octave notes and in hertz)
-		constexpr float C_4       = 261.6f;
-		constexpr float CSharp_4  = 277.2f;
-		constexpr float D_4       = 293.7f;
-		constexpr float DSharp_4  = 311.1f;
-		constexpr float E_4       = 329.6f;
-		constexpr float F_4       = 349.2f;
-		constexpr float FSharp_4  = 370.0f;
-		constexpr float G_4       = 392.0f;
-		constexpr float GSharp_4  = 415.0f;
-		constexpr float A_4       = 440.0f;
-		constexpr float ASharp_4  = 466.2f;
-		constexpr float B_4       = 493.9f;
+		constexpr float C4Frequency      = 261.6f;
+		constexpr float CSharp4Frequency = 277.2f;
+		constexpr float D4Frequency      = 293.7f;
+		constexpr float DSharp4Frequency = 311.1f;
+		constexpr float E4Frequency      = 329.6f;
+		constexpr float F4Frequency      = 349.2f;
+		constexpr float FSharp4Frequency = 370.0f;
+		constexpr float G4Frequency      = 392.0f;
+		constexpr float GSharp4Frequency = 415.0f;
+		constexpr float A4Frequency      = 440.0f;
+		constexpr float ASharp4Frequency = 466.2f;
+		constexpr float B4Frequency      = 493.9f;
 		// Highest note
-		constexpr float G_9       = 12543.9f;
+		constexpr float G9Frequency      = 12543.9f;
 
 		// -------- CONSTANTS FOR PARAMETERS --------- //
 		// MIDI Manufacturer's Association (MMA) min, max, and default values for Downloadable Sounds (DLS)
@@ -126,21 +125,15 @@ namespace BackBeat {
 			return timePos * SamplesPerMS;
 		}
 
-		static boolean IsNoteOn(MIDIEvent event)
-		{
-			return (event.status <= MIDI::ChannelOn_16 && event.status >= MIDI::ChannelOn_1);
-		}
-
-
 		static int GetMidiChannel(MIDIEvent event, boolean noteOn)
 		{
 			if (noteOn)
 			{
-				return (int)event.status - (int)MIDI::ChannelOn_1 + 1;
+				return (int)event.status - (int)MIDI::ChannelOn1 + 1;
 			}
 			else 
 			{
-				return (int)event.status - (int)MIDI::ChannelOff_1 + 1;
+				return (int)event.status - (int)MIDI::ChannelOff1 + 1;
 			}
 		}
 
@@ -152,7 +145,7 @@ namespace BackBeat {
 		// Note num to pitch: (A4_Freq) * 2 ^ ((noteNum - A4_Num) / 12)
 		static float MIDIToFreq(byte midiNote)
 		{
-			return A_4 * pow(2.0f, ((float)midiNote - (float)MIDI::A_4) / 12.0f);
+			return A4Frequency * pow(2.0f, ((float)midiNote - (float)MIDI::A4) / 12.0f);
 		}
 
 		static NoteEvent ConvertEvent(MIDIEvent event)
@@ -165,11 +158,11 @@ namespace BackBeat {
 				.velocity = event.data2
 			};
 
-			nEvent.noteOn = IsNoteOn(event);
+			nEvent.noteOn = Audio::IsNoteOn(event);
 			nEvent.channel = GetMidiChannel(event, nEvent.noteOn);
 
-			if (event.data1 > MIDI::G_9)
-				nEvent.note = G_9;
+			if (event.data1 > MIDI::G9)
+				nEvent.note = G9Frequency;
 			else
 				nEvent.note = MIDIToFreq(event.data1);
 

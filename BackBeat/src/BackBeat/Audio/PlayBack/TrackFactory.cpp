@@ -7,10 +7,8 @@ namespace BackBeat {
 	Track* TrackFactory::BuildTrack(std::string filePath)
 	{
 		AudioInfo info = AudioFileReader::ReadFile(filePath);
-		if (info.type != none) {
-			Track* track = new Track(info);
-			return track;
-		}
+		if (info.type == wav)
+			return new Track(info);
 
 		return nullptr;
 	}

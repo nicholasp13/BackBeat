@@ -2,6 +2,8 @@
 
 #include <queue>
 
+// TODO: Refactor as only MIDIInputHandler is needed
+
 #include "BackBeat/Audio/Synth/SynthBase.h"
 #include "BackBeat/Audio/IO/AudioBuffer.h"
 namespace BackBeat {

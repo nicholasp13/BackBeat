@@ -7,7 +7,7 @@ namespace BackBeat {
 
 	AudioEngine::AudioEngine(AudioProps props)
 		: 
-		m_NumVoices(MaxVoices),
+		m_NumVoices(SynthMaxVoices),
 		m_Buffer(std::make_shared<float[]>(props.sampleRate)), 
 		m_OutputBufferPosition(0),
 		m_Props(props)
@@ -72,6 +72,7 @@ namespace BackBeat {
 
 
 	}
+
 	std::shared_ptr<EngineParameters> AudioEngine::GetParam()
 	{
 		return m_Params;
@@ -79,8 +80,7 @@ namespace BackBeat {
 
 	void AudioEngine::ProcessMIDIEvent(MIDIEvent event)
 	{
-		int channel = 0;
-		bool noteOn = SynthBase::IsNoteOn(event);
+		bool noteOn = Audio::IsNoteOn(event);
 
 		for (unsigned int i = 0; i < m_NumVoices; i++) {
 			if (event.data1 == m_Voices[i]->GetNote()) 

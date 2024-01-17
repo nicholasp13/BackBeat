@@ -1,5 +1,6 @@
 #pragma once
 
+#include "BackBeat/Audio/MIDI/MIDICodes.h"
 #include "BackBeat/Core/Core.h"
 namespace BackBeat {
 
@@ -73,6 +74,7 @@ namespace BackBeat {
 	struct TimeMinSec {
 		unsigned int minutes;
 		unsigned int seconds;
+		unsigned int milliseconds;
 	};
 
 	// NOTE: May want to move this to a Helpers.h file in the Helpers folder for better organization, not much sense to have these functions here
@@ -142,7 +144,6 @@ namespace BackBeat {
 			return (float)(value);
 		}
 
-		// Note: Not currently used as most buffers need either to recast/type convert or are shared pointers
 		template<typename T>
 		static void CopyInputToOutput(T inputBuffer, T outputBuffer, unsigned int bytesToCopy)
 		{
@@ -153,6 +154,13 @@ namespace BackBeat {
 		{
 			for (unsigned int i = 0; i < numSamples * numChannels; i++)
 				buffer[i] = defaultValue;
+		}
+
+		template<typename T>
+		static void FlushBufferT(T buffer, T defaultValue, unsigned int num)
+		{
+			for (unsigned int i = 0; i < num; i++)
+				buffer[i] = *defaultValue;
 		}
 
 		// Taken from IBM developer
@@ -170,7 +178,29 @@ namespace BackBeat {
 			unsigned int seconds = (unsigned int)((unsigned int)totalSeconds % 60);
 			time.minutes = minutes;
 			time.seconds = seconds;
+			time.milliseconds = 0;
 			return time;
+		}
+
+		static TimeMinSec SamplesToMs(unsigned int numSamples, unsigned int sampleRate)
+		{
+			TimeMinSec time = TimeMinSec();
+			unsigned int sampleRateMs = sampleRate / 1000;
+			unsigned int ms = (unsigned int)((float)numSamples / float(sampleRateMs));
+			time.minutes = 0;
+			time.seconds = 0;
+			time.milliseconds = ms;
+			return time;
+		}
+
+		static unsigned int MsToSamples(unsigned int ms, unsigned int sampleRate)
+		{
+			return ms * sampleRate / 1000;
+		}
+
+		static bool IsNoteOn(MIDIEvent event)
+		{
+			return (event.status <= MIDI::ChannelOn16 && event.status >= MIDI::ChannelOn1);
 		}
 
 		static float GetTypeRatio(unsigned short bitDepth1, unsigned short bitDepth2)

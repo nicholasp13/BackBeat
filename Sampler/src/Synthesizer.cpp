@@ -11,6 +11,7 @@
 		m_Synth.Stop();
 	}
 
+	// TODO: This should not be called by main layer but by constructor
 	void Synthesizer::Init()
 	{
 		// Initializing synth
@@ -63,10 +64,7 @@
 		dispatcher.Dispatch<BackBeat::MouseButtonPressedEvent>(BIND_EVENT_FN(Synthesizer::OnMouseButtonEvent));
 
 		if (m_Synth.IsRunning() && m_KeyboardActive) 
-		{
-			m_SynthEventHandler->HandleEvent(event);
-			event.Handled = true;
-		}
+			event.Handled = m_SynthEventHandler->HandleEvent(event);
 	}
 	
 	// TODO: Change sliders to match DLS 1 scaling

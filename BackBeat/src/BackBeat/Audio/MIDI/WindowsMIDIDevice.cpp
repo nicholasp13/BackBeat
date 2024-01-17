@@ -182,7 +182,7 @@ namespace BackBeat {
 		event.data1 =  (byte)((part1 & 0x0000FF00) >> Audio::ByteBitSize);
 		event.data2 = (byte)((part1 & 0x00FF0000) >> Audio::ByteBitSize * 2);
 		
-		m_Output->In(event);
+		m_Output->Push(event);
 	}
 
 }
