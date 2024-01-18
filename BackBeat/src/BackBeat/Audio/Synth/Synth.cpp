@@ -16,13 +16,13 @@ namespace BackBeat {
 	void Synth::Start()
 	{
 		m_Running = true;
-		m_Proc->On();
+		m_Processor->On();
 	}
 
 	void Synth::Stop()
 	{
 		m_Running = false;
-		m_Proc->Off();
+		m_Processor->Off();
 		m_Engine->Stop();
 	}
 
@@ -48,9 +48,9 @@ namespace BackBeat {
 		};
 
 		m_Engine = std::make_shared<AudioEngine>(m_Props);
-		m_Proc = std::make_shared<SynthProcessor>(m_Props, m_Engine);
-		m_Handler = std::make_shared<SynthEventHandler>(m_Proc->GetInfo());
-		m_MIDIInput = std::make_shared<MIDIInputHandler>(m_Proc->GetInfo());
+		m_Processor = std::make_shared<SynthProcessor>(m_Props, m_Engine);
+		m_Handler = std::make_shared<SynthEventHandler>(m_Processor->GetInfo());
+		m_MIDIInput = std::make_shared<MIDIInputHandler>(m_Processor->GetInfo());
 		m_Params = std::make_shared<SynthParameters>(m_Engine->GetParam(), m_Handler->GetParams());
 	}
 

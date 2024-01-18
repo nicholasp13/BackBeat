@@ -54,7 +54,7 @@ namespace BackBeat {
 		inline std::shared_ptr<SynthEventHandler> GetEventHandler() { return m_Handler; }
 		inline std::shared_ptr<MIDIInputHandler> GetMIDIInput() { return m_MIDIInput; }
 		inline std::shared_ptr<SynthParameters> GetParams() { return m_Params; }
-		inline std::shared_ptr<SynthProcessor> GetProcessor() { return m_Proc; }
+		inline std::shared_ptr<SynthProcessor> GetProcessor() { return m_Processor; }
 	
 	private:
 		bool m_Running;
@@ -62,7 +62,7 @@ namespace BackBeat {
 		AudioProps m_Props;
 
 		std::shared_ptr<AudioEngine> m_Engine;
-		std::shared_ptr<SynthProcessor> m_Proc;
+		std::shared_ptr<SynthProcessor> m_Processor;
 		std::shared_ptr<SynthEventHandler> m_Handler;
 		std::shared_ptr<MIDIInputHandler> m_MIDIInput;
 		std::shared_ptr<SynthParameters> m_Params;

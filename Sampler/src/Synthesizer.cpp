@@ -1,9 +1,10 @@
 #include "Synthesizer.h"
 
 	Synthesizer::Synthesizer()
-		: m_Open(false), m_KeyboardActive(true), m_DevicesOpen(0), m_NumMIDIDevices(0)
+		: m_Open(false), m_KeyboardActive(true)
 	{
-
+		m_SynthEventHandler = m_Synth.GetEventHandler();
+		m_SynthParams = m_Synth.GetParams();
 	}
 
 	Synthesizer::~Synthesizer()
@@ -11,49 +12,11 @@
 		m_Synth.Stop();
 	}
 
-	// TODO: This should not be called by main layer but by constructor
-	void Synthesizer::Init()
-	{
-		// Initializing synth
-		m_SynthEventHandler = m_Synth.GetEventHandler();
-		m_SynthParams = m_Synth.GetParams();
-
-		// Initializing MIDI input device manager
-		m_NumMIDIDevices = m_MIDIDeviceManager.GetNumDevices();
-		for (unsigned int i = 0; i < m_NumMIDIDevices; i++) {
-			m_DeviceNames.push_back(m_MIDIDeviceManager.GetDeviceName(i));
-		}
-		m_MIDIDeviceManager.SetOutput(m_Synth.GetMIDIInput());
-	}
-
 	void Synthesizer::Update()
 	{
 		if (!m_Open)
 			m_Synth.Stop();
 
-		// Update MDIDevices
-		{
-			// TODO: Check if MIDIDevices changes during runtime
-
-			for (unsigned int i = 0; i < m_NumMIDIDevices; i++) {
-				if ((m_DevicesOpen & (unsigned int)0x01 << i) != 0) 
-				{
-					if (!m_MIDIDeviceManager.IsOpen(i)) 
-					{
-						m_Synth.Stop();
-						m_MIDIDeviceManager.OpenDevice(i);
-						m_MIDIDeviceManager.RunDevice(i);
-						m_Synth.Start();
-					}
-				}
-				else if (m_MIDIDeviceManager.IsOpen(i))
-				{
-					m_Synth.Stop();
-					m_MIDIDeviceManager.CloseDevice(i);
-					m_Synth.Start();
-				}
-			}
-		}
 	}
 
 	void Synthesizer::OnEvent(BackBeat::Event& event)
@@ -131,36 +94,10 @@
 						}
 						ImGui::EndMenu();
 					}
+					
+					// TODO: Add MIDIDevice controls
+					
 
-					// MIDIDevices
-					if (ImGui::BeginMenu("MIDI Devices"))
-					{
-						if (m_NumMIDIDevices == 0) 
-						{
-							ImGui::BeginDisabled();
-							if (ImGui::MenuItem("No devices detected"))
-							{
-
-							}
-							ImGui::EndDisabled();
-						}
-
-						for (unsigned int i = 0; i < m_NumMIDIDevices; i++) {
-
-							// TODO: Test multiple MIDI devices and if MIDI devices change number
-							static bool s_DeviceOpen = m_MIDIDeviceManager.IsOpen(i);
-
-							if (ImGui::BeginMenu(m_DeviceNames[i].c_str()))
-							{
-								if (ImGui::MenuItem("Set Active", "", &s_DeviceOpen))
-								{
-									m_DevicesOpen ^= (unsigned int)0x01 << i;
-								}
-								ImGui::EndMenu();
-							}
-						}
-						ImGui::EndMenu();
-					}
 					ImGui::EndMenu();
 				}
 				ImGui::EndMenuBar();

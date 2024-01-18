@@ -181,8 +181,9 @@ namespace BackBeat {
 		event.status = (byte)((part1 & 0x000000FF));
 		event.data1 =  (byte)((part1 & 0x0000FF00) >> Audio::ByteBitSize);
 		event.data2 = (byte)((part1 & 0x00FF0000) >> Audio::ByteBitSize * 2);
-		
-		m_Output->Push(event);
+
+		for (auto itr = m_Outputs.begin(); itr != m_Outputs.end(); itr++)
+			(*itr)->Push(event);
 	}
 
 }

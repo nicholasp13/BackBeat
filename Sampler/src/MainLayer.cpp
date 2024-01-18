@@ -1,7 +1,7 @@
 #include "MainLayer.h"
 
 	MainLayer::MainLayer(BackBeat::Window* window)
-		: Layer("MainLayer"), m_Window(window)
+		: Layer("MainLayer"), m_Window(window), m_NumMIDIDevices(0)
 	{
 	}
 
@@ -12,12 +12,19 @@
 
 	void MainLayer::OnAttach()
 	{
-		m_Synth.Init();
-		m_AudioRenderer.GetMixer()->SetProc(m_Synth.GetSynthProc());
-		m_AudioRenderer.GetMixer()->SetProc(m_Player.GetProc());
-		m_AudioRenderer.GetMixer()->SetProc(m_SamplerController.GetSamplerGetProcessor());
-		m_AudioRenderer.GetMixer()->SetProc(m_SamplerController.GetTrackGetProcessor());
+		m_AudioRenderer.GetMixer()->PushProcessor(m_Synth.GetSynthProc());
+		m_AudioRenderer.GetMixer()->PushProcessor(m_Player.GetProc());
+		m_AudioRenderer.GetMixer()->PushProcessor(m_SamplerController.GetSamplerGetProcessor());
+		m_AudioRenderer.GetMixer()->PushProcessor(m_SamplerController.GetTrackGetProcessor());
 		m_AudioRenderer.Start();
+
+		m_MIDIDeviceManager.PushOutput(m_Synth.GetMIDIInput());
+		m_MIDIDeviceManager.PushOutput(m_SamplerController.GetMIDIInput());
+
+		m_NumMIDIDevices = m_MIDIDeviceManager.GetNumDevices();
+		for (unsigned int i = 0; i < m_NumMIDIDevices; i++) {
+			m_DeviceNames.push_back(m_MIDIDeviceManager.GetDeviceName(i));
+		}
 	}
 
 	void MainLayer::OnDetach()
@@ -26,6 +33,7 @@
 		m_Synth.Close();
 		m_Player.Close();
 		m_AudioRenderer.Stop();
+		m_MIDIDeviceManager.CloseAll();
 	}
 	
 	void MainLayer::OnUpdate()
@@ -74,6 +82,52 @@
 			// Render MenuBar
 			if (ImGui::BeginMenuBar())
 			{
+				if (ImGui::BeginMenu("Menu"))
+				{
+					// MIDIDevices
+					if (ImGui::BeginMenu("MIDI Devices"))
+					{
+						if (m_NumMIDIDevices == 0)
+						{
+							ImGui::BeginDisabled();
+							if (ImGui::MenuItem("No devices detected"))
+							{
+
+							}
+							ImGui::EndDisabled();
+						}
+
+						for (unsigned int i = 0; i < m_NumMIDIDevices; i++) {
+
+							// TODO: Test multiple MIDI devices and if MIDI devices change number
+							bool s_DeviceOpen = m_MIDIDeviceManager.IsOpen(i);
+
+							if (ImGui::BeginMenu(m_DeviceNames[i].c_str()))
+							{
+								if (ImGui::MenuItem("Set Active", "", &s_DeviceOpen))
+								{
+									if (s_DeviceOpen)
+									{
+										m_MIDIDeviceManager.OpenDevice(i);
+										m_MIDIDeviceManager.RunDevice(i);
+									}
+									else
+									{
+										m_MIDIDeviceManager.StopDevice();
+										m_MIDIDeviceManager.CloseDevice(i);
+									}
+								}
+								
+								ImGui::EndMenu();
+							}
+						}
+						
+						ImGui::EndMenu();
+					}
+					
+					ImGui::EndMenu();
+				}
+
 				if (ImGui::BeginMenu("Player"))
 				{
 					if (ImGui::MenuItem("Open"))

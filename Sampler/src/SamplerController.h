@@ -22,6 +22,7 @@ public:
 	void Close();
 
 	inline bool IsOpen() { return m_Open; }
+	inline std::shared_ptr<BackBeat::MIDIInputHandler> GetMIDIInput() { return m_Sampler.GetMIDIInput(); }
 	inline std::shared_ptr<BackBeat::PlayerProcessor> GetTrackGetProcessor() { return m_TrackPlayer.GetProc(); }
 	inline std::shared_ptr<BackBeat::SamplerProcessor> GetSamplerGetProcessor() { return m_Sampler.GetProcessor(); }
 

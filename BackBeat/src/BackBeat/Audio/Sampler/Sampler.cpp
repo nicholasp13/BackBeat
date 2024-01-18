@@ -16,13 +16,13 @@ namespace BackBeat {
 	void Sampler::Start()
 	{
 		m_Running = true;
-		m_Proc->On();
+		m_Processor->On();
 	}
 
 	void Sampler::Stop()
 	{
 		m_Running = false;
-		m_Proc->Off();
+		m_Processor->Off();
 		m_Engine->Stop();
 	}
 
@@ -46,9 +46,9 @@ namespace BackBeat {
 			.fileSize = 0
 		};
 		m_Engine = std::make_shared<SamplerEngine>(m_Props);
-		m_Proc = std::make_shared<SamplerProcessor>(m_Props, m_Engine);
+		m_Processor = std::make_shared<SamplerProcessor>(m_Props, m_Engine);
 		m_Programmer = std::make_shared<SampleProgrammer>(m_Props);
-		m_MIDIInput = std::make_shared<MIDIInputHandler>(m_Proc->GetInfo());
+		m_MIDIInput = std::make_shared<MIDIInputHandler>(m_Processor->GetInfo());
 		m_Handler = std::make_shared<SamplerEventHandler>();
 		
 		// SamplerEventHandler Key controls are 1 - 9, 0 keys

@@ -19,7 +19,7 @@ namespace BackBeat {
 		virtual bool StopDevice();
 		virtual bool CloseAll();
 
-		virtual void SetOutput(std::shared_ptr<MIDIInputHandler> output);
+		virtual void PushOutput(std::shared_ptr<MIDIInputHandler> output);
 
 		// NOTE: Getters for other MIDI device data not implemented
 		inline virtual std::string GetDeviceName(UINT index) { return m_Devices[index].GetName(); }

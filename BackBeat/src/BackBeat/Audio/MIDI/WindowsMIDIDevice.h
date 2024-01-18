@@ -20,7 +20,7 @@ namespace BackBeat {
 		virtual void Stop();
 		void MIDIInput(DWORD_PTR part1, DWORD_PTR part2);
 
-		inline virtual void SetOutput(std::shared_ptr<MIDIInputHandler> output) { m_Output = output; }
+		inline virtual void PushOutput(std::shared_ptr<MIDIInputHandler> output) { m_Outputs.push_back(output); }
 		inline virtual std::string GetName() { return m_Name; }
 		inline virtual bool IsOpen() { return m_Open; }
 
@@ -33,7 +33,7 @@ namespace BackBeat {
 		// Windows handler of MIDIDevice filled by midiInOpen()
 		HMIDIIN m_DeviceHandle;
 
-		std::shared_ptr<MIDIInputHandler> m_Output;
+		std::vector< std::shared_ptr<MIDIInputHandler> > m_Outputs;
 	};
 
 }

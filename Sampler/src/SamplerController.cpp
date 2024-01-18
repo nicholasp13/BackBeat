@@ -1,7 +1,5 @@
 #include "SamplerController.h"
 
-// TODO: Add MIDI Device control
-
 	SamplerController::SamplerController()
 		: 
 		m_Open(false), 
@@ -142,6 +140,7 @@
 
 			if (ImGui::BeginMenu("Devices"))
 			{
+				// Keyboard
 				if (ImGui::BeginMenu("Keyboard"))
 				{
 					if (ImGui::MenuItem("Set Active", "", &m_KeyboardActive))
@@ -152,38 +151,7 @@
 					ImGui::EndMenu();
 				}
 
-				// MIDIDevices
-				if (ImGui::BeginMenu("MIDI Devices"))
-				{
-					if (m_NumMIDIDevices == 0)
-					{
-						ImGui::BeginDisabled();
-						if (ImGui::MenuItem("No devices detected"))
-						{
-
-						}
-						ImGui::EndDisabled();
-					}
-
-					for (unsigned int i = 0; i < m_NumMIDIDevices; i++) {
-
-						// TODO: Test multiple MIDI devices and if MIDI devices change number
-						static bool s_DeviceOpen = m_MIDIDeviceManager.IsOpen(i);
-
-						if (ImGui::BeginMenu(m_DeviceNames[i].c_str()))
-						{
-							if (ImGui::MenuItem("Set Active", "", &s_DeviceOpen))
-							{
-								m_DevicesOpen ^= (unsigned int)0x01 << i;
-							}
-
-							ImGui::EndMenu();
-						}
-
-					}
-
-					ImGui::EndMenu();
-				}
+				// TODO: Add MIDIDevice controls
 
 				ImGui::EndMenu();
 			}
@@ -193,8 +161,9 @@
 
 	}
 
-	// TODO: Make each pad its own large square button/widget that left click plays the sample and right click opens
-	//       a menu to program the pad
+	// TODO: - Make each pad its own large square button/widget that left click plays the sample and right click opens
+	//         a menu to program the pad
+	//       - Add volume/pan control for each sample
 	void SamplerController::RenderSamplerPads()
 	{
 		auto sampleProgrammer = m_Sampler.GetProgrammer();
@@ -251,6 +220,20 @@
 		const float height = 200.0f;
 		ImGui::SetNextWindowSize(ImVec2(width, height));
 
+		const unsigned int charLimit = 80;
+		static char trackName[charLimit];
+		static std::string sampleName = "";
+		static bool trackSet = false;
+		static bool isLooping = false;
+		static int zero = 0;
+		static int start = 0;
+		static int end = 0;
+		static int size = 0;
+		static int startMs = 0;
+		static int endMs = 0;
+		static int bytesPerMs = 0;
+		float byteRate = 0.0f;
+
 		if (m_CreatingSample)
 		{
 			ImGui::OpenPopup(CreatingSampleID);
@@ -259,20 +242,6 @@
 
 		if (ImGui::BeginPopup(CreatingSampleID))
 		{
-			const unsigned int charLimit = 80;
-			static char trackName[charLimit];
-			static std::string sampleName = "";
-			static bool trackSet = false;
-			static bool isLooping = false;
-			static int zero = 0;
-			static int start = 0;
-			static int end = 0;
-			static int size = 0;
-			static int startMs = 0;
-			static int endMs = 0;
-			static int bytesPerMs = 0;
-			float byteRate = 0.0f;
-
 			ImGui::SeparatorText("Sample Creator");
 
 			// Open button
@@ -561,21 +530,31 @@
 		{
 			m_TrackPlayer.Stop();
 			m_TrackPlayer.ClearTrack();
+			strcpy_s(trackName, "");
+			zero = 0;
+			start = 0;
+			end = 0;
+			size = 0;
+			bytesPerMs = 0;
+			startMs = 0;
+			endMs = 0;
+			m_CreatingSample = false;
+			trackSet = false;
 		}
 	}
 
 	void SamplerController::RenderNoteProgrammer()
 	{
+		static int newCode = 0;
+
 		if (m_ProgrammingNote)
 		{
 			ImGui::OpenPopup(ProgrammingNoteID);
 			m_ProgrammingNote = false;
 		}
-
 		if (ImGui::BeginPopup(ProgrammingNoteID))
 		{
 			int code = (int)m_Sampler.GetProgrammer()->GetPadNote(m_PadToProgram - 1);
-			static int newCode = 0;
 			const unsigned int charLimit = 80;
 			static char padNameLabel[charLimit];
 			static std::string padName = "";
@@ -598,12 +577,37 @@
 				ImGui::CloseCurrentPopup();
 			} 
 			ImGui::SameLine();
+
 			if (ImGui::SmallButton("Clear"))
 			{
 				m_Sampler.GetProgrammer()->ClearNote(m_PadToProgram - 1);
 			}
+			ImGui::SameLine();
 
+			// MIDI Input Popup
+			if (ImGui::SmallButton("Press MIDI Key"))
+			{
+				ImGui::OpenPopup("MIDIKeyInput");
+				m_Sampler.GetMIDIInput()->ClearEvent();
+			}
+			if (ImGui::BeginPopup("MIDIKeyInput"))
+			{
+				ImGui::Text("Press MIDI Key");
+				
+				if (m_Sampler.GetMIDIInput()->IsKeyPresssed())
+				{
+					newCode = (int)m_Sampler.GetMIDIInput()->GetLastKeyPressed();
+					ImGui::CloseCurrentPopup();
+				}
+
+				ImGui::EndPopup();
+			}
 			ImGui::EndPopup();
+		}
+
+		if (!ImGui::IsPopupOpen(ProgrammingNoteID))
+		{
+			newCode = 0;
 		}
 	}
 
@@ -620,7 +624,6 @@
 		ImGui::PushStyleColor(ImGuiCol_MenuBarBg, IM_COL32(99, 115, 91, 255)); count++;
 
 		// Window colors
-		ImGui::PushStyleColor(ImGuiCol_WindowBg, IM_COL32(49, 56, 44, 255)); count++;
 		ImGui::PushStyleColor(ImGuiCol_Border, IM_COL32(99, 115, 91, 255)); count++;
 
 		// Table colors
