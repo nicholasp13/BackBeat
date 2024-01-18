@@ -44,7 +44,7 @@ namespace BackBeat {
 		sampleProps.format = format;
 		sampleProps.sampleRate = sampleRate;
 		sampleProps.byteRate = byteRate;
-		sampleProps.blockAlign = 8;
+		sampleProps.blockAlign = blockAlign;
 		sampleProps.bitDepth = Audio::FloatBitSize;
 		sampleProps.fileSize = Audio::SAMPLETotalHeaderSize + dataSize;
 
@@ -83,14 +83,14 @@ namespace BackBeat {
 				case(Audio::ByteBitSize):
 				{
 					Audio::TranslateDataToFloat((byte*)trackData, (float*)sampleData, 
-						sampleProps.bitDepth, Audio::Stereo, numSamples);
+						trackProps.bitDepth, Audio::Stereo, numSamples);
 					break;
 				}
 
 				case(Audio::Int16BitSize):
 				{
 					Audio::TranslateDataToFloat((signed short*)trackData, (float*)sampleData,
-						sampleProps.bitDepth, Audio::Stereo, numSamples);
+						trackProps.bitDepth, Audio::Stereo, numSamples);
 					break;
 				}
 
@@ -99,7 +99,7 @@ namespace BackBeat {
 					int24* intBuffer = int24::GetInt24Buffer((byte*)trackData, numSamples * sampleProps.numChannels, 
 						sampleProps.bigEndian);
 					Audio::TranslateDataToFloat(intBuffer, (float*)sampleData,
-						sampleProps.bitDepth, Audio::Stereo, numSamples);
+						trackProps.bitDepth, Audio::Stereo, numSamples);
 					delete[] intBuffer;
 					break;
 				}
@@ -107,14 +107,14 @@ namespace BackBeat {
 				case(Audio::FloatBitSize):
 				{
 					Audio::TranslateDataToFloat((float*)trackData, (float*)sampleData,
-						sampleProps.bitDepth, Audio::Stereo, numSamples);
+						trackProps.bitDepth, Audio::Stereo, numSamples);
 					break;
 				}
 
 				case(Audio::DoubleBitSize):
 				{
 					Audio::TranslateDataToFloat((double*)trackData, (float*)sampleData,
-						sampleProps.bitDepth, Audio::Stereo, numSamples);
+						trackProps.bitDepth, Audio::Stereo, numSamples);
 					break;
 				}
 				default:
