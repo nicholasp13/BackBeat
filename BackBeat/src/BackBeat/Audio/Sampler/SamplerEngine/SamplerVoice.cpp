@@ -52,8 +52,18 @@ namespace BackBeat {
 
 	void SamplerVoice::DoNoteOn(NoteEvent event)
 	{
-		m_SamplerModule->DoNoteOn(event);
-		m_DCA->DoNoteOn(event);
+		if (m_SamplerModule->IsLooping() && m_SamplerModule->IsActive())
+		{
+			m_SamplerModule->DoNoteOff(event);
+			m_DCA->DoNoteOff(event);
+			return;
+		}
+		else
+		{
+			m_SamplerModule->DoNoteOn(event);
+			m_DCA->DoNoteOn(event);
+			return;
+		}
 	}
 
 	void SamplerVoice::DoNoteOff(NoteEvent event)

@@ -171,6 +171,7 @@
 		static char sampleNameLabel[charLimit];
 		static std::string sampleName = "";
 		static char padNameLable[charLimit];
+		static char loopID[charLimit];
 		int padCode = 0;
 
 		ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing();
@@ -185,6 +186,8 @@
 			ImGui::TableNextColumn();
 
 			sprintf_s(padNameLable, "PAD #%d", i + 1);
+			ImGui::PushID(padNameLable);
+
 			ImGui::SeparatorText(padNameLable);
 			ImGui::Spacing();
 
@@ -207,6 +210,19 @@
 				ImGui::Text("KEYBIND: %d", i + 1);
 			else
 				ImGui::Text("KEYBIND: 0");
+
+			ImGui::Spacing();
+
+			// Loop
+			bool looping = sampleProgrammer->IsLooping(i);
+			if (ImGui::Checkbox("Loop", &looping))
+			{
+				if (looping)
+					sampleProgrammer->LoopOn(i);
+				else
+					sampleProgrammer->LoopOff(i);
+			}
+			ImGui::PopID();
 
 			ImGui::Spacing();
 		}

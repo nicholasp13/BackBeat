@@ -17,14 +17,18 @@ namespace BackBeat {
 		virtual void DoNoteOff(NoteEvent event);
 		
 		bool IsActive();
+		void LoopOn();
+		void LoopOff();
 		void SetSample(Sample* newSample);
 		std::string GetName();
 
+		inline bool IsLooping() { return m_Looping; }
 		inline bool IsSampleSet() { return (m_Sample != nullptr); }
 		inline void ClearSample() { m_Sample = nullptr; }
 		inline virtual std::shared_ptr<float[]> GetBuffer() { return m_Output; }
 
 	private:
+		bool m_Looping;
 		unsigned int m_SampleRate;
 		Sample* m_Sample;
 		float* m_Input;

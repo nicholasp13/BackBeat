@@ -17,6 +17,9 @@ namespace BackBeat {
 		void SetNote(MIDICode newNote);
 		void SetSample(Sample* newSample);
 
+		inline void LoopOn() { m_Engine->LoopOn(m_Index); }
+		inline void LoopOff() { m_Engine->LoopOff(m_Index); }
+		inline bool IsLooping() { return m_Engine->IsLooping(m_Index); }
 		inline MIDICode GetNote() { return m_MIDINote; }
 		inline std::string GetName() { return m_Name; }
 

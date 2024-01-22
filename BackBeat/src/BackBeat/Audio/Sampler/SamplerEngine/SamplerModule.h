@@ -16,6 +16,10 @@ namespace BackBeat {
 		virtual void DoNoteOn(NoteEvent event);
 		virtual void DoNoteOff(NoteEvent event);
 
+		inline void LoopOn() { m_Core->LoopOn(); }
+		inline void LoopOff() { m_Core->LoopOff(); }
+		inline bool IsLooping() { return m_Core->IsLooping(); }
+		inline bool IsActive() { return m_Core->IsActive(); }
 		inline void SetSample(Sample* newSample) { m_Core->SetSample(newSample); }
 		inline std::string GetName() { return m_Core->GetName(); }
 		inline std::shared_ptr<SamplerCore> GetCore() { return m_Core; }

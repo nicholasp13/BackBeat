@@ -18,6 +18,9 @@ namespace BackBeat {
 		inline void AddSamplerPad(std::shared_ptr<SamplerPad> newPad) { m_SamplePads.push_back(newPad); }
 		inline void ClearNote(unsigned int index) { m_SamplePads[index]->ClearNote(); }
 		inline void ClearSample(unsigned int index) { m_SamplePads[index]->ClearSample(); }
+		inline void LoopOn(unsigned int index) { m_SamplePads[index]->LoopOn(); }
+		inline void LoopOff(unsigned int index) { m_SamplePads[index]->LoopOff(); }
+		inline bool IsLooping(unsigned int index) { return m_SamplePads[index]->IsLooping(); }
 		inline MIDICode GetPadNote(unsigned int index) { return m_SamplePads[index]->GetNote(); }
 		inline std::string GetPadName(unsigned int index) { return m_SamplePads[index]->GetName(); }
 		inline unsigned int GetNumPads() { return m_NumSamplePads; }

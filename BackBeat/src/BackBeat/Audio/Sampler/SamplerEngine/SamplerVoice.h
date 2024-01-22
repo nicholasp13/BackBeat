@@ -19,6 +19,9 @@ namespace BackBeat {
 		inline void ClearMIDINote() { m_MIDINote = MIDI::NoteOff; }
 		inline void ClearSample() { m_SamplerModule->GetCore()->ClearSample(); }
 		inline bool IsActive() { return m_SamplerModule->GetCore()->IsActive(); }
+		inline void LoopOn() { m_SamplerModule->LoopOn(); }
+		inline void LoopOff() { m_SamplerModule->LoopOff(); }
+		inline bool IsLooping() { return m_SamplerModule->IsLooping(); }
 		inline void SetMIDINote(MIDICode newNote) { m_MIDINote = newNote; }
 		inline void SetSample(Sample* newSample) { m_SamplerModule->GetCore()->SetSample(newSample); }
 		inline MIDICode GetMIDINote() { return m_MIDINote; }
