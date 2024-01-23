@@ -107,7 +107,7 @@ namespace BackBeat {
 	// Custom for each engine. Current engine for a basic synth piano
 	void AudioEngine::InitVoices()
 	{
-		m_VoiceFactor = 2.0f / (float)m_NumVoices; // NOTE: This is arbitrary and needs more fine tuning
+		m_VoiceFactor = 2.0f / (float)m_NumVoices; // 2.0f to offset panning
 
 		for (unsigned int i = 0; i < m_NumVoices; i++)
 			m_Voices[i] = std::make_unique<SynthVoice>(m_Props.sampleRate, m_Buffer, m_Params->voiceParams);
@@ -119,6 +119,7 @@ namespace BackBeat {
 		auto DCAParams = std::make_shared<DCAParameters>();
 		DCAParams->leftAmp = 1.0f;
 		DCAParams->rightAmp = 1.0f;
+		DCAParams->volume = 1.0f;
 
 		auto AmpEGParams = std::make_shared<EGParameters>();
 		AmpEGParams->attackDuration = SynthBase::EG1AttackTimeDefault;

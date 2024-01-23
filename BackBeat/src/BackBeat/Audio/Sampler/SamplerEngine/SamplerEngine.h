@@ -6,6 +6,7 @@
 #include "SamplerVoice.h"
 namespace BackBeat {
 
+	// TODO: Expand to 12 or 16 voices
 	constexpr unsigned int SamplerMaxVoices = 10;
 
 	class SamplerEngine

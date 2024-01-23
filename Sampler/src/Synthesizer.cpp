@@ -145,7 +145,7 @@
 			ImGui::Spacing();
 
 			static float pan = BackBeat::SynthBase::PanDefault; // Note: Actually .70 in DLS 1
-			static float defaultAmp = 0.50f;
+			const float defaultAmp = 0.50f;
 			ImGui::Text("Panning"); ImGui::SameLine();
 			if (ImGui::SmallButton("Reset"))
 				pan = 0.0f;

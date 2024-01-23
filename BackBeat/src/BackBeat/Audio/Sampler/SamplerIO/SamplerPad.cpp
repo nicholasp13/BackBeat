@@ -12,7 +12,7 @@ namespace BackBeat {
 		m_MIDIInputHandler(midiInputHandler),
 		m_Engine(samplerEngine)
 	{
-
+		m_DCAParameters = m_Engine->GetParam(index);
 	}
 
 	SamplerPad::~SamplerPad()

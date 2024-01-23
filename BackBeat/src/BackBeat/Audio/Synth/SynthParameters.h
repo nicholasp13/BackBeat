@@ -46,6 +46,7 @@ namespace BackBeat {
 	{
 		float leftAmp;
 		float rightAmp;
+		float volume;
 	};
 
 	struct EGParameters

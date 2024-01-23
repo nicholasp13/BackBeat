@@ -22,6 +22,7 @@ namespace BackBeat {
 		inline bool IsLooping() { return m_Engine->IsLooping(m_Index); }
 		inline MIDICode GetNote() { return m_MIDINote; }
 		inline std::string GetName() { return m_Name; }
+		inline std::shared_ptr<DCAParameters> GetDCAParameters() { return m_DCAParameters; }
 
 	private:
 		unsigned int m_Index;
@@ -29,6 +30,7 @@ namespace BackBeat {
 		std::string m_Name;
 		std::shared_ptr<MIDIInputHandler> m_MIDIInputHandler;
 		std::shared_ptr<SamplerEngine> m_Engine;
+		std::shared_ptr<DCAParameters> m_DCAParameters;
 	};
 
 }

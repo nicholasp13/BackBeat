@@ -72,7 +72,8 @@ namespace BackBeat {
 
 	void SamplerEngine::InitVoices()
 	{
-		m_VoiceFactor = 1.0f;
+		// Offset pan
+		m_VoiceFactor = 2.0f;
 
 		for (unsigned int i = 0; i < m_NumVoices; i++)
 			m_Voices[i] = std::make_unique<SamplerVoice>(m_Props.sampleRate, m_Buffer, m_Params[i]);
@@ -85,6 +86,7 @@ namespace BackBeat {
 			auto DCAParams = std::make_shared<DCAParameters>();
 			DCAParams->leftAmp = 1.0f;
 			DCAParams->rightAmp = 1.0f;
+			DCAParams->volume = 1.0f;
 			m_Params.push_back(DCAParams);
 		}
 	}

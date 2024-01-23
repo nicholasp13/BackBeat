@@ -50,7 +50,7 @@
 		float x = mainViewport->WorkPos.x;
 		float y = mainViewport->WorkPos.y;
 		ImGui::SetNextWindowPos(ImVec2(x, y), ImGuiCond_FirstUseEver);
-		ImGui::SetNextWindowSize(ImVec2(900.0f, 300.0f), ImGuiCond_Once);
+		ImGui::SetNextWindowSize(ImVec2(1000.0f, 650.0f), ImGuiCond_Once);
 		// Sampler flags
 		ImGuiWindowFlags sampler_window_flags = 0;
 		sampler_window_flags |= ImGuiWindowFlags_NoCollapse;
@@ -163,7 +163,6 @@
 
 	// TODO: - Make each pad its own large square button/widget that left click plays the sample and right click opens
 	//         a menu to program the pad
-	//       - Add volume/pan control for each sample
 	void SamplerController::RenderSamplerPads()
 	{
 		auto sampleProgrammer = m_Sampler.GetProgrammer();
@@ -180,7 +179,7 @@
 		table_flags |= ImGuiTableFlags_RowBg;
 		table_flags |= ImGuiTableFlags_BordersH;
 		table_flags |= ImGuiTableFlags_BordersV;
-		ImGui::BeginTable("SampleEditor", 5, table_flags, ImVec2(0.0f, 0.0f), 0.0f);
+		ImGui::BeginTable("SampleEditor", 4, table_flags, ImVec2(0.0f, 0.0f), 0.0f);
 
 		for (unsigned int i = 0; i < m_NumPads; i++) {
 			ImGui::TableNextColumn();
@@ -222,8 +221,25 @@
 				else
 					sampleProgrammer->LoopOff(i);
 			}
-			ImGui::PopID();
+			ImGui::Spacing();
 
+			// Volume controls
+			float* volume = &(sampleProgrammer->GetSamplePad(i)->GetDCAParameters()->volume);
+			ImGui::Text("    "); ImGui::SameLine(); ImGui::SliderFloat("Volume", volume, 0.0f, 1.0f);
+			ImGui::Spacing();
+
+			// Sample Pad DCA/panning controls
+			const float defaultAmp = 0.5f;
+			float pan = (sampleProgrammer->GetSamplePad(i)->GetDCAParameters()->rightAmp - 
+				sampleProgrammer->GetSamplePad(i)->GetDCAParameters()->leftAmp) / 2;
+			ImGui::Text("Panning"); ImGui::SameLine();
+			if (ImGui::SmallButton("Reset"))
+				pan = 0.0f;
+			ImGui::Text("Left"); ImGui::SameLine(); ImGui::SliderFloat("Right", &pan, BackBeat::SynthBase::PanMin, BackBeat::SynthBase::PanMax);
+			sampleProgrammer->GetSamplePad(i)->GetDCAParameters()->leftAmp = defaultAmp - pan;
+			sampleProgrammer->GetSamplePad(i)->GetDCAParameters()->rightAmp = defaultAmp + pan;
+
+			ImGui::PopID();
 			ImGui::Spacing();
 		}
 
