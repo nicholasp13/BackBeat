@@ -1,5 +1,7 @@
 #include "SamplerController.h"
 
+// TODO: Create ImGui Pad widget and Pad control popup/window
+
 	SamplerController::SamplerController()
 		: 
 		m_Open(false), 
@@ -47,10 +49,12 @@
 			m_Sampler.Start();
 
 		const ImGuiViewport* mainViewport = ImGui::GetMainViewport();
+		const float width = 1000.0f;
+		const float height = 600.0f;
 		float x = mainViewport->WorkPos.x;
 		float y = mainViewport->WorkPos.y;
 		ImGui::SetNextWindowPos(ImVec2(x, y), ImGuiCond_FirstUseEver);
-		ImGui::SetNextWindowSize(ImVec2(1000.0f, 650.0f), ImGuiCond_Once);
+		ImGui::SetNextWindowSize(ImVec2(width, height), ImGuiCond_Once);
 		// Sampler flags
 		ImGuiWindowFlags sampler_window_flags = 0;
 		sampler_window_flags |= ImGuiWindowFlags_NoCollapse;
@@ -197,6 +201,8 @@
 			ImGui::Text("   NAME:"); ImGui::SameLine();
 			ImGui::Text(sampleNameLabel);
 
+			// Keybinds
+			const unsigned int numCodes = 10;
 			if (padCode == BackBeat::MIDI::NoteOff)
 				ImGui::Text("   NOTE: NOTE OFF");
 			else
@@ -204,11 +210,12 @@
 				ImGui::Text("   NOTE:"); ImGui::SameLine();
 				ImGui::Text(BackBeat::MIDI::MIDINoteNames[padCode]);
 			}
-
-			if (i < m_NumPads - 1)
+			if (i < numCodes - 1)
 				ImGui::Text("KEYBIND: %d", i + 1);
-			else
+			else if (i == numCodes - 1)
 				ImGui::Text("KEYBIND: 0");
+			else
+				ImGui::Text("KEYBIND: F%d", i - numCodes + 1);
 
 			ImGui::Spacing();
 

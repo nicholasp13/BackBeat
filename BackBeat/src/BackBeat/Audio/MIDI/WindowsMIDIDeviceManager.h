@@ -1,5 +1,8 @@
 #pragma once
 
+// TODO: Add ability to check when devices are plugged and unplugged 
+//       (Use Windows IMMDeviceEnumerator::EnumAudioEndpoints method)
+
 #include "WindowsMIDIDevice.h"
 #include "MIDIDeviceManager.h"
 namespace BackBeat {
