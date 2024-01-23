@@ -51,15 +51,19 @@ namespace BackBeat {
 		m_MIDIInput = std::make_shared<MIDIInputHandler>(m_Processor->GetInfo());
 		m_Handler = std::make_shared<SamplerEventHandler>();
 		
-		// SamplerEventHandler Key controls are 1 - 9, 0 keys
-		const KeyCode code = Key::D1;
+		// Key event controls
+		const KeyCode numCode = Key::D1;
+		const KeyCode fCode = Key::F1;
+		const unsigned int totalNumCodes = 10;
 		for (unsigned int i = 0; i < SamplerMaxVoices; i++) {
 			auto newPad = std::make_shared<SamplerPad>(m_MIDIInput, m_Engine, i);
 			m_Programmer->AddSamplerPad(newPad);
-			if (i < SamplerMaxVoices - 1)
-				m_Handler->AddSamplerPad(newPad, code + i);
-			else
+			if (i < totalNumCodes - 1)
+				m_Handler->AddSamplerPad(newPad, numCode + i);   // Keys '1' - '9'
+			else if (i == totalNumCodes - 1)
 				m_Handler->AddSamplerPad(newPad, Key::D0);
+			else
+				m_Handler->AddSamplerPad(newPad, fCode + i - totalNumCodes);   // Keys 'F1' - 'F6'
 		}
 	}
 
