@@ -3,13 +3,7 @@
 #include <cmath>
 
 #include "BackBeat/Audio/Synth/SynthBase.h"
-#include "BackBeat/Audio/Audio.h"
-#include "BackBeat/Core/Core.h"
 #include "Wave.h"
-
-// TODO:
-// * Additional custom Waves for custom sounds
-// Static class to return a Waveform.
 namespace BackBeat {
 
 	void Wave::GetSinWave(float* buffer, unsigned int bufferSize, unsigned int numChannels)

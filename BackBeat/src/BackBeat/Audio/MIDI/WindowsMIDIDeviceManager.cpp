@@ -82,10 +82,10 @@ namespace BackBeat {
 		return true;
 	}
 
-	void WindowsMIDIDeviceManager::SetOutput(std::shared_ptr<MIDIInputHandler> output)
+	void WindowsMIDIDeviceManager::PushOutput(std::shared_ptr<MIDIInputHandler> output)
 	{
 		for (UINT i = 0; i < m_NumDevices; i++) {
-			m_Devices[i].SetOutput(output);
+			m_Devices[i].PushOutput(output);
 		}
 		m_OutputSet = true;
 	}

@@ -1,9 +1,5 @@
 #pragma once
 
-// TODO:
-//     - Add more waveforms (i.e. use FFT of samples to find wave forms that make up unique sounds and create functions
-//     that create those sounds using a sum of those waves)
-//     - Find better folder for this static class
 namespace BackBeat {
 
 	enum class WaveType

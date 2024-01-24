@@ -19,7 +19,8 @@ class Playback
 		void Open();
 		void Close();
 
-		std::shared_ptr<BackBeat::PlayerProcessor> GetProc() { return m_Player.GetProc(); }
+		inline bool IsOpen() { return m_Open; }
+		inline std::shared_ptr<BackBeat::PlayerProcessor> GetProc() { return m_Player.GetProc(); }
 
 	private:
 		bool m_Open;

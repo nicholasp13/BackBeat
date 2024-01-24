@@ -2,6 +2,8 @@
 
 #include "bbpch.h"
 
+// TODO: Add multiple outputs
+
 #include "MIDIDevice.h"
 namespace BackBeat {
 
@@ -20,7 +22,7 @@ namespace BackBeat {
 		virtual unsigned int GetNumDevices() { return 0; };
 		virtual bool IsRunning() { return false; };
 		virtual bool IsOpen(unsigned int index) { return false; };
-		virtual void SetOutput(std::shared_ptr<MIDIInputHandler> output) {};
+		virtual void PushOutput(std::shared_ptr<MIDIInputHandler> output) {};
 	};
 
 }

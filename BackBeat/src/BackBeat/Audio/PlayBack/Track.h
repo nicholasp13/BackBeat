@@ -13,21 +13,19 @@ namespace BackBeat {
 		
 		TimeMinSec GetTime();
 		TimeMinSec GetLength();
-		float GetProgress();
 		void SetPosition(unsigned int position);
 		void SetStart(unsigned int start);
 		void SetEnd(unsigned int end);
 
-		bool IsDone() { return m_Done; }
-		unsigned int GetSize() { return m_Info.dataSize; }
-		unsigned int GetPosition() { return m_Position - m_Info.dataZero; }
-		unsigned int GetStart() { return m_StartPosition - m_Info.dataZero; }
-		unsigned int GetEnd() { return m_EndPosition - m_Info.dataZero; }
-		std::string GetName() { return m_Info.name; }
-		AudioProps GetProps() { return m_Info.props; }
-		AudioInfo GetInfo() { return m_Info; }
-
-		void SetVolume(float vol) { m_Volume = vol; }
+		inline bool IsDone() { return m_Done; }
+		inline unsigned int GetSize() { return m_Info.dataSize; }
+		inline unsigned int GetPosition() { return m_Position - m_Info.dataZero; }
+		inline unsigned int GetStart() { return m_StartPosition - m_Info.dataZero; }
+		inline unsigned int GetEnd() { return m_EndPosition - m_Info.dataZero; }
+		inline std::string GetName() { return m_Info.name; }
+		inline AudioProps GetProps() { return m_Info.props; }
+		inline AudioInfo GetInfo() { return m_Info; }
+		inline void SetVolume(float vol) { m_Volume = vol; }
 
 	private:
 		bool m_Done;

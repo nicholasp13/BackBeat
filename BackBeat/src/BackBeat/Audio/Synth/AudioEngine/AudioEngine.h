@@ -21,11 +21,11 @@
 #include <queue>
 
 #include "BackBeat/Audio/Synth/SynthBase.h"
-#include "BackBeat/Audio/Synth/SynthIO/RenderInfo.h"
+#include "BackBeat/Audio/IO/RenderInfo.h"
 #include "BackBeat/Audio/Synth/AudioEngine/SynthVoices/SynthVoice.h"
 namespace BackBeat {
 
-	constexpr unsigned int MaxVoices = 12;
+	constexpr unsigned int SynthMaxVoices = 12;
 
 	class AudioEngine
 	{
@@ -49,7 +49,7 @@ namespace BackBeat {
 
 		std::shared_ptr<float[]> m_Buffer;
 		std::shared_ptr<EngineParameters> m_Params;
-		std::unique_ptr<SynthVoice> m_Voices[MaxVoices];
+		std::unique_ptr<SynthVoice> m_Voices[SynthMaxVoices];
 		std::queue<MIDIEvent> m_MIDIEvents;
 
 		void InitVoices();

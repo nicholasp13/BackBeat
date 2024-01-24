@@ -3,7 +3,7 @@
 #include "bbpch.h"
 
 #include "BackBeat/Audio/Audio.h"
-#include "BackBeat/Audio/Synth/SynthIO/MIDIInputHandler.h"
+#include "MIDIInputHandler.h"
 #include "MIDICodes.h"
 namespace BackBeat {
 	
@@ -16,7 +16,7 @@ namespace BackBeat {
 		virtual void Run() {};
 		virtual void Stop() {};
 
-		virtual void SetOutput(std::shared_ptr<MIDIInputHandler> output) {};
+		virtual void PushOutput(std::shared_ptr<MIDIInputHandler> output) {};
 		virtual std::string GetName() { return std::string(); };
 		virtual bool IsOpen() { return false; };
 		

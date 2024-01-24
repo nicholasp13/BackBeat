@@ -60,7 +60,7 @@ namespace BackBeat {
 		m_DCA->Render(numSamples);
 
 		for (unsigned int i = 0; i < numSamples * Audio::Stereo; i++) {
-			m_OutputBuffer[i] += (m_InputBuffer[i]);
+			m_OutputBuffer[i] += m_InputBuffer[i];
 		}
 
 		if (m_AmpEG->GetState() == EGState::Off)

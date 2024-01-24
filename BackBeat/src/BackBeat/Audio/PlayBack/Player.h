@@ -17,27 +17,29 @@ namespace BackBeat {
 		void Start();
 		void Stop();
 		void LoadTrack(std::string filePath);
-		
+		void ClearTrack();
+
 		TimeMinSec GetTime();
 		TimeMinSec GetLength();
 		unsigned int GetByteRate();
+		unsigned int GetNumChannels();
 		unsigned int GetPosition(); 
 		unsigned int GetSampleRate();
 		unsigned int GetSize();
 		unsigned int GetStartPosition();
 		unsigned int GetEndPosition();
-		Track* GetTrack();
 		std::string GetTrackName();
 		void SetPosition(unsigned int pos);
 		void SetStart(unsigned int start);
 		void SetEnd(unsigned int end);
 		void SetVolume(float vol);
-
-		void Play() { m_PlayerProcessor->On(); }
-		void Pause() { m_PlayerProcessor->Off(); }
-		bool IsLoaded() { return m_SelectedTrack != nullptr; }
-		bool IsPlaying() { return m_PlayerProcessor->IsOn(); }
-		std::shared_ptr<PlayerProcessor> GetProc() { return m_PlayerProcessor; }
+		
+		inline void Play() { m_PlayerProcessor->On(); }
+		inline void Pause() { m_PlayerProcessor->Off(); }
+		inline bool IsLoaded() { return m_SelectedTrack != nullptr; }
+		inline bool IsPlaying() { return m_PlayerProcessor->IsOn(); }
+		inline std::shared_ptr<PlayerProcessor> GetProc() { return m_PlayerProcessor; }
+		inline Track* GetTrack() { return m_SelectedTrack; }
 
 	private:
 		Track* m_SelectedTrack;

@@ -7,15 +7,15 @@
 #include <BackBeat/Core/EntryPoint.h>
 
 #include "MainLayer.h"
-class Sampler : public BackBeat::Application
+class SamplerApp : public BackBeat::Application
 {
 public:
-	Sampler()
+	SamplerApp()
 	{
 		PushLayer(new MainLayer(&this->GetWindow()));
 	}
 
-	~Sampler()
+	~SamplerApp()
 	{
 	}
 
@@ -23,5 +23,5 @@ public:
 
 BackBeat::Application* BackBeat::CreateApplication()
 {
-	return new Sampler();
+	return new SamplerApp();
 }

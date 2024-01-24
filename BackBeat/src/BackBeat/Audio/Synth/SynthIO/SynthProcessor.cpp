@@ -17,7 +17,7 @@ namespace BackBeat {
 
 	SynthProcessor::~SynthProcessor()
 	{
-		delete[m_Props.sampleRate] m_Output;
+		delete[] m_Output;
 	}
 
 	void SynthProcessor::ProcessSamples(unsigned int numSamples, unsigned int sampleRate, unsigned int numChannels)
@@ -27,21 +27,24 @@ namespace BackBeat {
 		if (numSamples * m_Props.numChannels > m_Bus.GetBufferSize())
 			return;
 
-		m_Info->SetSamplesToRender(numSamples); // NOTE: numSamples should be scaled with the target sampleRate
+		m_Info->SetSamplesToRender(numSamples);
 		m_Engine->Render(m_Info);
 
 		// NOTE: Synth's should always be a floating point (or a double) and this is assumed and not checked
 		float* targetBuffer = reinterpret_cast<float*>(m_Output);
 		auto srcBuffer = m_Bus.GetBuffer()->GetBuffer();
-		if (m_Props.sampleRate == sampleRate) {
-			if (numChannels == Audio::Stereo) {
+		if (m_Props.sampleRate == sampleRate) 
+		{
+			if (numChannels == Audio::Stereo) 
+			{
 				for (unsigned int i = 0; i < numSamples * m_Props.numChannels; i += m_Props.numChannels) {
 					for (unsigned int j = 0; j < m_Props.numChannels; j++) {
 						targetBuffer[i + j] = (float)srcBuffer[i + j];
 					}
 				}
 			}
-			else {
+			else 
+			{
 				unsigned int index = 0;
 				for (unsigned int i = 0; i < numSamples * m_Props.numChannels; i += m_Props.numChannels) {
 					targetBuffer[i] = srcBuffer[index];

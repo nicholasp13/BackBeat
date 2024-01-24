@@ -18,7 +18,7 @@ namespace BackBeat {
 		void ClearModDestination(ModDestinations index);
 		void RunModMatrix(unsigned int numSamples);
 
-		std::shared_ptr<ModMatrixParameters> GetParams() { return m_Params; }
+		inline std::shared_ptr<ModMatrixParameters> GetParams() { return m_Params; }
 
 	private:
 		std::shared_ptr<ModMatrixParameters> m_Params;

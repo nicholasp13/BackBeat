@@ -1,6 +1,6 @@
 #pragma once
 
-#include "RenderInfo.h"
+#include "BackBeat/Audio/IO/RenderInfo.h"
 #include "BackBeat/Audio/IO/AudioProcessor.h"
 #include "BackBeat/Audio/Synth/AudioEngine/AudioEngine.h"
 namespace BackBeat {
@@ -18,10 +18,11 @@ namespace BackBeat {
 		virtual void* GetOutputBuffer() { return m_Output; }
 		virtual bool IsOn() { return m_On; }
 
-		void On() { m_On = true; }
 		void Off();
-		AudioBuffer* GetBuffer() { return m_Bus.GetBuffer(); }
-		std::shared_ptr<RenderInfo> GetInfo() { return m_Info; }
+
+		inline void On() { m_On = true; }
+		inline AudioBuffer* GetBuffer() { return m_Bus.GetBuffer(); }
+		inline std::shared_ptr<RenderInfo> GetInfo() { return m_Info; }
 
 	private:
 		bool m_On;

@@ -1,7 +1,7 @@
 #pragma once
 
 // Takes all audio processors output busses and mixes them into on renderer
-// Performs all sample rate and data conversions
+// Performs data conversions
 
 #include "BackBeat/Audio/Audio.h"
 #include "AudioProcessor.h"
@@ -14,16 +14,12 @@ namespace BackBeat {
 		~Mixer();
 
 		void GetData(byte* data, unsigned int numSamples);
-		void SetProc(std::shared_ptr<AudioProcessor> proc);
+		void PushProcessor(std::shared_ptr<AudioProcessor> processor);
 
 	private:
-		unsigned int m_NumProcs;
-
+		unsigned int m_NumProcessors;
 		AudioProps m_Props;
-		std::shared_ptr <AudioProcessor> m_Proc;
-
-		std::vector < std::shared_ptr<AudioProcessor> > m_Procs;
+		std::vector < std::shared_ptr<AudioProcessor> > m_Processors;
 		
-		float GetTypeRatio(unsigned short bitDepth1, unsigned short bitDepth2);
 	};
 }

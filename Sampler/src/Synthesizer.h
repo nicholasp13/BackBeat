@@ -17,29 +17,24 @@ public:
 	Synthesizer();
 	~Synthesizer();
 
-	void Init();
 	void Update();
 	void OnEvent(BackBeat::Event& event);
 	void ImGuiRender();
 	void Open();
 	void Close();
 
-	std::shared_ptr<BackBeat::SynthProcessor> GetSynthProc() { return m_Synth.GetProcessor(); }
+	inline bool IsOpen() { return m_Open; }
+	inline std::shared_ptr<BackBeat::MIDIInputHandler> GetMIDIInput() { return m_Synth.GetMIDIInput(); }
+	inline std::shared_ptr<BackBeat::SynthProcessor> GetSynthProc() { return m_Synth.GetProcessor(); }
 
 private:
 	bool m_Open;
 	bool m_KeyboardActive;
-	unsigned int m_DevicesOpen;
-	unsigned int m_NumMIDIDevices;
 
 	// Synth
 	BackBeat::Synth m_Synth;
 	std::shared_ptr<BackBeat::SynthParameters> m_SynthParams;
-
-	// Synth IO
-	BackBeat::WindowsMIDIDeviceManager m_MIDIDeviceManager;
 	std::shared_ptr<BackBeat::SynthEventHandler> m_SynthEventHandler;
-	std::vector<std::string> m_DeviceNames;
 
 	bool OnKeyEvent(BackBeat::KeyPressedEvent& event);
 	bool OnMouseButtonEvent(BackBeat::MouseButtonPressedEvent& event);

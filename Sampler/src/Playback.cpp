@@ -1,5 +1,7 @@
 #include "Playback.h"
 
+// TODO: Remove wav file editing
+
 	Playback::Playback()
 		: m_Open(false)
 	{
@@ -57,22 +59,7 @@
 						m_Player.Pause();
 						m_Player.LoadTrack(BackBeat::FileDialog::OpenFile("WAV Files (*.wav)\0*.wav\0"));
 					}
-					if (m_Player.IsLoaded())
-					{
-						if (ImGui::MenuItem("Save"))
-						{
-							m_Player.Pause();
-							unsigned int position = m_Player.GetPosition();
-							unsigned int startPosition = m_Player.GetStartPosition();
-							unsigned int endPosition = m_Player.GetEndPosition();
-							BackBeat::AudioFileBuilder::BuildWAVFile(m_Player.GetTrack(), startPosition, endPosition);
-							m_Player.SetPosition(position);
-						}
-					}
-					else
-					{
-						ImGui::MenuItem("Save", NULL, false, false);
-					}
+
 					ImGui::EndMenu();
 				}
 				ImGui::EndMenuBar();
@@ -100,7 +87,7 @@
 			BackBeat::TimeMinSec trackTime = m_Player.GetTime();
 			BackBeat::TimeMinSec trackLength = m_Player.GetLength();
 			
-			int pos1 = m_Player.GetPosition();
+			int position = m_Player.GetPosition();
 			int size = m_Player.GetSize();
 			static bool wasPlaying = false;
 			ImGui::Text("%d:%02d", trackTime.minutes, trackTime.seconds); ImGui::SameLine();
@@ -113,14 +100,14 @@
 			if (m_Player.IsLoaded()) 
 			{
 				ImGui::PushID("Seekbar");
-				if (BackBeat::ImGuiWidgets::ImGuiSeekBarInt("##", &pos1, m_Player.GetSize(), "", ImGuiSliderFlags(0))) 
+				if (BackBeat::ImGuiWidgets::ImGuiSeekBarInt("##", &position, m_Player.GetSize(), "", ImGuiSliderFlags(0))) 
 				{
 					if (m_Player.IsPlaying()) 
 					{
 						m_Player.Pause();
 						wasPlaying = true;
 					}
-					m_Player.SetPosition(pos1);
+					m_Player.SetPosition(position);
 				}
 				if (ImGui::IsItemDeactivated() && wasPlaying) 
 				{
@@ -128,23 +115,6 @@
 					wasPlaying = false;
 				}
 				ImGui::SameLine(); ImGui::Text("%d:%02d", trackLength.minutes, trackLength.seconds);
-				ImGui::PopID();
-
-				ImGui::PushID("TrackEditor");
-				const int zero = 0;
-				float byteRate = (float)m_Player.GetByteRate();
-				static int start = 0;
-				static int end = size;
-				BackBeat::TimeMinSec startTime = BackBeat::Audio::GetTime((float)start / byteRate);
-				BackBeat::TimeMinSec endTime = BackBeat::Audio::GetTime((float)end / byteRate);
-				ImGui::Text("%d:%02d", startTime.minutes, startTime.seconds); ImGui::SameLine();
-				if (BackBeat::ImGuiWidgets::ImGuiTrackEditor("##", &start, &end, &zero, &size, "", ImGuiSliderFlags(0))) 
-				{
-					m_Player.SetStart(start);
-					m_Player.SetEnd(end);
-				}
-				ImGui::SameLine(); ImGui::Text("%d:%02d", endTime.minutes, endTime.seconds);
-
 				ImGui::PopID();
 			}
 			else 
@@ -156,12 +126,6 @@
 				ImGui::SameLine(); ImGui::Text("%d:%02d", trackLength.minutes, trackLength.seconds);
 				ImGui::PopID();
 
-				// Renders an empty, uninteractable track editor
-				ImGui::PushID("EmptyTrackEditor");
-				ImGui::Text("%d:%02d", 0, 0); ImGui::SameLine();
-				BackBeat::ImGuiWidgets::ImGuiTrackEditor("##", &temp, &temp, &temp, &temp, "", ImGuiSliderFlags(0));
-				ImGui::SameLine(); ImGui::Text("%d:%02d", 0, 0);
-				ImGui::PopID();
 			}
 
 			ImGui::Spacing();

@@ -9,8 +9,8 @@ namespace BackBeat {
 		AudioBuffer(unsigned int bufferSize);
 		~AudioBuffer();
 
-		unsigned int GetSize() { return m_Size; }
-		std::shared_ptr<float[]> GetBuffer() { return m_Buffer; }
+		inline unsigned int GetSize() { return m_Size; }
+		inline std::shared_ptr<float[]> GetBuffer() { return m_Buffer; }
 
 	private:
 		unsigned int m_Size;

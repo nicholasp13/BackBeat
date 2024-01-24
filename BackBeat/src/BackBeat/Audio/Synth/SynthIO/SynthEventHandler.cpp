@@ -36,33 +36,33 @@ namespace BackBeat {
 	{
 		// WHITE KEYS: 'ASDFGHJK'
 		AddEvent(Key::A, 
-			MIDIEvent(MIDI::ChannelOn_1, MIDI::C_4, MIDI::MaxVelocity));
+			MIDIEvent(MIDI::ChannelOn1, MIDI::C4, MIDI::MaxVelocity));
 		AddEvent(Key::S,
-			MIDIEvent(MIDI::ChannelOn_1, MIDI::D_4, MIDI::MaxVelocity));
+			MIDIEvent(MIDI::ChannelOn1, MIDI::D4, MIDI::MaxVelocity));
 		AddEvent(Key::D,
-			MIDIEvent(MIDI::ChannelOn_1, MIDI::E_4, MIDI::MaxVelocity));
+			MIDIEvent(MIDI::ChannelOn1, MIDI::E4, MIDI::MaxVelocity));
 		AddEvent(Key::F,
-			MIDIEvent(MIDI::ChannelOn_1, MIDI::F_4, MIDI::MaxVelocity));
+			MIDIEvent(MIDI::ChannelOn1, MIDI::F4, MIDI::MaxVelocity));
 		AddEvent(Key::G,
-			MIDIEvent(MIDI::ChannelOn_1, MIDI::G_4, MIDI::MaxVelocity));
+			MIDIEvent(MIDI::ChannelOn1, MIDI::G4, MIDI::MaxVelocity));
 		AddEvent(Key::H,
-			MIDIEvent(MIDI::ChannelOn_1, MIDI::A_4, MIDI::MaxVelocity));
+			MIDIEvent(MIDI::ChannelOn1, MIDI::A4, MIDI::MaxVelocity));
 		AddEvent(Key::J,
-			MIDIEvent(MIDI::ChannelOn_1, MIDI::B_4, MIDI::MaxVelocity));
+			MIDIEvent(MIDI::ChannelOn1, MIDI::B4, MIDI::MaxVelocity));
 		AddEvent(Key::K,
-			MIDIEvent(MIDI::ChannelOn_1, MIDI::C_5, MIDI::MaxVelocity));
+			MIDIEvent(MIDI::ChannelOn1, MIDI::C5, MIDI::MaxVelocity));
 
 		// BLACK KEYS: 'WE TYU'
 		AddEvent(Key::W,
-			MIDIEvent(MIDI::ChannelOn_1, MIDI::CSharp_4, MIDI::MaxVelocity));
+			MIDIEvent(MIDI::ChannelOn1, MIDI::CSharp4, MIDI::MaxVelocity));
 		AddEvent(Key::E,
-			MIDIEvent(MIDI::ChannelOn_1, MIDI::DSharp_4, MIDI::MaxVelocity));
+			MIDIEvent(MIDI::ChannelOn1, MIDI::DSharp4, MIDI::MaxVelocity));
 		AddEvent(Key::T,
-			MIDIEvent(MIDI::ChannelOn_1, MIDI::FSharp_4, MIDI::MaxVelocity));
+			MIDIEvent(MIDI::ChannelOn1, MIDI::FSharp4, MIDI::MaxVelocity));
 		AddEvent(Key::Y,
-			MIDIEvent(MIDI::ChannelOn_1, MIDI::GSharp_4, MIDI::MaxVelocity));
+			MIDIEvent(MIDI::ChannelOn1, MIDI::GSharp4, MIDI::MaxVelocity));
 		AddEvent(Key::U,
-			MIDIEvent(MIDI::ChannelOn_1, MIDI::ASharp_4, MIDI::MaxVelocity));
+			MIDIEvent(MIDI::ChannelOn1, MIDI::ASharp4, MIDI::MaxVelocity));
 	}
 
 	// Note: Does not set event.Handled to true in case application wants to 
@@ -79,8 +79,8 @@ namespace BackBeat {
 		MIDIEvent mEvent = m_MIDIMap[event.GetKeyCode()];
 		mEvent.data1 += octave;
 		mEvent.data2 = m_Params->noteVelocity;
-		if (mEvent.data1 > MIDI::G_9)
-			mEvent.data1 = MIDI::G_9;
+		if (mEvent.data1 > MIDI::G9)
+			mEvent.data1 = MIDI::G9;
 		m_RenderInfo->PushMIDIEvent(mEvent);
 		return true;
 	}
@@ -96,8 +96,8 @@ namespace BackBeat {
 		mEvent.status = SynthBase::GetChannelOff(mEvent.status);
 		mEvent.data1 += octave;
 		mEvent.data2 = m_Params->noteVelocity;
-		if (mEvent.data1 > MIDI::G_9)
-			mEvent.data1 = MIDI::G_9;
+		if (mEvent.data1 > MIDI::G9)
+			mEvent.data1 = MIDI::G9;
 		m_RenderInfo->PushMIDIEvent(mEvent);
 		return true;
 	}

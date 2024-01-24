@@ -75,9 +75,9 @@ namespace BackBeat {
 		virtual void Render(unsigned int numSamples);
 		virtual void ProcessMIDIEvent(MIDIEvent event);
 
-		virtual int GetChannel() { return m_Channel; }
-		virtual byte GetNote() { return m_NotePressed; }
-		virtual bool IsActive() { return m_Actice; }
+		inline virtual int GetChannel() { return m_Channel; }
+		inline virtual byte GetNote() { return m_NotePressed; }
+		inline virtual bool IsActive() { return m_Actice; }
 
 	private:
 		unsigned int m_SampleRate;

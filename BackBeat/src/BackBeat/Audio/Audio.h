@@ -1,7 +1,6 @@
 #pragma once
 
-// TODO: Change macro constants to constexpr
-
+#include "BackBeat/Audio/MIDI/MIDICodes.h"
 #include "BackBeat/Core/Core.h"
 namespace BackBeat {
 
@@ -32,7 +31,8 @@ namespace BackBeat {
 	enum FileType {
 		none = 0,
 		wav,
-		mp3
+		mp3,
+		sample
 	};
 
 	struct AudioProps {
@@ -74,6 +74,7 @@ namespace BackBeat {
 	struct TimeMinSec {
 		unsigned int minutes;
 		unsigned int seconds;
+		unsigned int milliseconds;
 	};
 
 	// NOTE: May want to move this to a Helpers.h file in the Helpers folder for better organization, not much sense to have these functions here
@@ -93,14 +94,19 @@ namespace BackBeat {
 		// AUDIOFILE CONSTANTS
 		constexpr unsigned int Mono               = 1;
 		constexpr unsigned int Stereo             = 2;
+		constexpr auto MP3 = "ID3";
+		// WAV files
 		constexpr unsigned int WAVHeaderSize      = 12;
 		constexpr unsigned int WAVFormatSize      = 24;
 		constexpr unsigned int WAVDataSize        = 8;
 		constexpr unsigned int WAVTotalHeaderSize = 44;
-
-		// AUDIO FILE STRINGS
-		constexpr auto MP3 = "ID3";
 		constexpr auto WAV = "RIF";
+		// SAMPLE files
+		constexpr unsigned int SAMPLEHeaderSize      = 10;
+		constexpr unsigned int SAMPLEFormatSize      = 24;
+		constexpr unsigned int SAMPLEDataSize        = 8;
+		constexpr unsigned int SAMPLETotalHeaderSize = 42;
+		const auto SAMPLE = "SAMPLE";
 
 		static unsigned short EndianConverterShort(char num1, char num2)
 		{
@@ -138,7 +144,6 @@ namespace BackBeat {
 			return (float)(value);
 		}
 
-		// Note: Not currently used as most buffers need either to recast/type convert or are shared pointers
 		template<typename T>
 		static void CopyInputToOutput(T inputBuffer, T outputBuffer, unsigned int bytesToCopy)
 		{
@@ -149,6 +154,13 @@ namespace BackBeat {
 		{
 			for (unsigned int i = 0; i < numSamples * numChannels; i++)
 				buffer[i] = defaultValue;
+		}
+
+		template<typename T>
+		static void FlushBufferT(T buffer, T defaultValue, unsigned int num)
+		{
+			for (unsigned int i = 0; i < num; i++)
+				buffer[i] = *defaultValue;
 		}
 
 		// Taken from IBM developer
@@ -166,7 +178,176 @@ namespace BackBeat {
 			unsigned int seconds = (unsigned int)((unsigned int)totalSeconds % 60);
 			time.minutes = minutes;
 			time.seconds = seconds;
+			time.milliseconds = 0;
 			return time;
+		}
+
+		static TimeMinSec SamplesToMs(unsigned int numSamples, unsigned int sampleRate)
+		{
+			TimeMinSec time = TimeMinSec();
+			unsigned int sampleRateMs = sampleRate / 1000;
+			unsigned int ms = (unsigned int)((float)numSamples / float(sampleRateMs));
+			time.minutes = 0;
+			time.seconds = 0;
+			time.milliseconds = ms;
+			return time;
+		}
+
+		static unsigned int MsToSamples(unsigned int ms, unsigned int sampleRate)
+		{
+			return ms * sampleRate / 1000;
+		}
+
+		static bool IsNoteOn(MIDIEvent event)
+		{
+			return (event.status <= MIDI::ChannelOn16 && event.status >= MIDI::ChannelOn1);
+		}
+
+		static float GetTypeRatio(unsigned short bitDepth1, unsigned short bitDepth2)
+		{
+			float max1 = 1.0f;
+			float max2 = 1.0f;
+			switch (bitDepth1)
+			{
+
+			case (ByteBitSize):
+			{
+				max1 = INT8_MAX;
+				break;
+			}
+
+			case (Int16BitSize):
+			{
+				max1 = INT16_MAX;
+				break;
+			}
+
+			case (Int24BitSize):
+			{
+				max1 = Int24Max;
+				break;
+			}
+
+			case (FloatBitSize):
+			{
+				max1 = 1.0f;
+				break;
+			}
+
+			case (DoubleBitSize):
+			{
+				max1 = 1.0f;
+				break;
+			}
+
+			default:
+			{
+				return 0.0f;
+			}
+
+			}
+
+			switch (bitDepth2)
+			{
+
+			case (ByteBitSize):
+			{
+				max2 = INT8_MAX;
+				break;
+			}
+
+			case (Int16BitSize):
+			{
+				max2 = INT16_MAX;
+				break;
+			}
+
+			case (Int24BitSize):
+			{
+				max2 = Int24Max;
+				break;
+			}
+
+			case (FloatBitSize):
+			{
+				max2 = 1.0f;
+				break;
+			}
+
+			case (DoubleBitSize):
+			{
+				max2 = 1.0f;
+				break;
+			}
+
+			default:
+			{
+				return 0.0f;
+			}
+
+			}
+
+			return max1 / max2;
+		}
+
+		template<typename T>
+		static void TranslateDataToByte(T inBuffer, byte* outBuffer, unsigned int inBitDepth,
+			unsigned int numChannels, unsigned int numSamples)
+		{
+			float depthRatio = GetTypeRatio(FloatBitSize, inBitDepth);
+
+			for (unsigned int i = 0; i < numSamples * numChannels; i += numChannels)
+			{
+				for (unsigned int j = 0; j < numChannels; j++)
+				{
+					outBuffer[i + j] += (byte)((float)(inBuffer[i + j]) * depthRatio);
+				}
+			}
+		}
+
+		template<typename T>
+		static void TranslateDataToShort(T inBuffer, signed short* outBuffer, unsigned int inBitDepth,
+			unsigned int numChannels, unsigned int numSamples)
+		{
+			float depthRatio = GetTypeRatio(FloatBitSize, inBitDepth);
+
+			for (unsigned int i = 0; i < numSamples * numChannels; i += numChannels)
+			{
+				for (unsigned int j = 0; j < numChannels; j++)
+				{
+					outBuffer[i + j] += (signed short)((float)(inBuffer[i + j]) * depthRatio);
+				}
+			}
+		}
+
+		template<typename T>
+		static void TranslateDataToFloat(T inBuffer, float* outBuffer, unsigned int inBitDepth,
+			unsigned int numChannels, unsigned int numSamples)
+		{
+			float depthRatio = GetTypeRatio(FloatBitSize, inBitDepth);
+
+			for (unsigned int i = 0; i < numSamples * numChannels; i += numChannels)
+			{
+				for (unsigned int j = 0; j < numChannels; j++)
+				{
+					outBuffer[i + j] += (float)(inBuffer[i + j]) * depthRatio;
+				}
+			}
+		}
+
+		template<typename T>
+		static void TranslateDataToDouble(T inBuffer, double* outBuffer, unsigned int inBitDepth,
+			unsigned int numChannels, unsigned int numSamples)
+		{
+			float depthRatio = GetTypeRatio(FloatBitSize, inBitDepth);
+
+			for (unsigned int i = 0; i < numSamples * numChannels; i += numChannels)
+			{
+				for (unsigned int j = 0; j < numChannels; j++)
+				{
+					outBuffer[i + j] += (double)(inBuffer[i + j]) * (double)depthRatio;
+				}
+			}
 		}
 	}
 }

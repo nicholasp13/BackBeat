@@ -25,7 +25,7 @@ namespace BackBeat {
 		virtual void DoNoteOn(NoteEvent event);
 		virtual void DoNoteOff(NoteEvent event);
 
-		std::shared_ptr<float[]> GetInputBuffer() { return m_Input->GetBuffer(); }
+		inline std::shared_ptr<float[]> GetInputBuffer() { return m_Input->GetBuffer(); }
 
 	private:
 		bool m_IsOn; // NOTE: Current implementation does not follow DLS 2 specifications where it states that the m_CutOffFreq be set to 0x7FFFFFFF for no low pass filter

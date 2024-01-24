@@ -1,7 +1,7 @@
 #include "MainLayer.h"
 
 	MainLayer::MainLayer(BackBeat::Window* window)
-		: Layer("MainLayer"), m_Window(window)
+		: Layer("MainLayer"), m_Window(window), m_NumMIDIDevices(0)
 	{
 	}
 
@@ -12,29 +12,45 @@
 
 	void MainLayer::OnAttach()
 	{
-		m_Synth.Init();
-		m_AudioRenderer.GetMixer()->SetProc(m_Synth.GetSynthProc());
-		m_AudioRenderer.GetMixer()->SetProc(m_Player.GetProc());
+		m_AudioRenderer.GetMixer()->PushProcessor(m_Synth.GetSynthProc());
+		m_AudioRenderer.GetMixer()->PushProcessor(m_Player.GetProc());
+		m_AudioRenderer.GetMixer()->PushProcessor(m_SamplerController.GetSamplerGetProcessor());
+		m_AudioRenderer.GetMixer()->PushProcessor(m_SamplerController.GetTrackGetProcessor());
 		m_AudioRenderer.Start();
+
+		m_MIDIDeviceManager.PushOutput(m_Synth.GetMIDIInput());
+		m_MIDIDeviceManager.PushOutput(m_SamplerController.GetMIDIInput());
+
+		m_NumMIDIDevices = m_MIDIDeviceManager.GetNumDevices();
+		for (unsigned int i = 0; i < m_NumMIDIDevices; i++) {
+			m_DeviceNames.push_back(m_MIDIDeviceManager.GetDeviceName(i));
+		}
 	}
 
 	void MainLayer::OnDetach()
 	{
+		m_SamplerController.Close();
 		m_Synth.Close();
 		m_Player.Close();
 		m_AudioRenderer.Stop();
+		m_MIDIDeviceManager.CloseAll();
 	}
 	
 	void MainLayer::OnUpdate()
 	{
+		m_SamplerController.Update();
 		m_Synth.Update();
 		m_Player.Update();
 	}
 
 	void MainLayer::OnEvent(BackBeat::Event& event) 
 	{
-		m_Synth.OnEvent(event);
-		m_Player.OnEvent(event);
+		if (m_SamplerController.IsOpen())
+			m_SamplerController.OnEvent(event);
+		if (m_Synth.IsOpen())
+			m_Synth.OnEvent(event);
+		if (m_Player.IsOpen())
+			m_Player.OnEvent(event);
 
 		BackBeat::EventDispatcher dispatcher(event);
 		dispatcher.Dispatch<BackBeat::KeyPressedEvent>(BIND_EVENT_FN(MainLayer::OnKeyEvent));
@@ -66,6 +82,52 @@
 			// Render MenuBar
 			if (ImGui::BeginMenuBar())
 			{
+				if (ImGui::BeginMenu("Menu"))
+				{
+					// MIDIDevices
+					if (ImGui::BeginMenu("MIDI Devices"))
+					{
+						if (m_NumMIDIDevices == 0)
+						{
+							ImGui::BeginDisabled();
+							if (ImGui::MenuItem("No devices detected"))
+							{
+
+							}
+							ImGui::EndDisabled();
+						}
+
+						for (unsigned int i = 0; i < m_NumMIDIDevices; i++) {
+
+							// TODO: Test multiple MIDI devices and if MIDI devices change number
+							bool s_DeviceOpen = m_MIDIDeviceManager.IsOpen(i);
+
+							if (ImGui::BeginMenu(m_DeviceNames[i].c_str()))
+							{
+								if (ImGui::MenuItem("Set Active", "", &s_DeviceOpen))
+								{
+									if (s_DeviceOpen)
+									{
+										m_MIDIDeviceManager.OpenDevice(i);
+										m_MIDIDeviceManager.RunDevice(i);
+									}
+									else
+									{
+										m_MIDIDeviceManager.StopDevice();
+										m_MIDIDeviceManager.CloseDevice(i);
+									}
+								}
+								
+								ImGui::EndMenu();
+							}
+						}
+						
+						ImGui::EndMenu();
+					}
+					
+					ImGui::EndMenu();
+				}
+
 				if (ImGui::BeginMenu("Player"))
 				{
 					if (ImGui::MenuItem("Open"))
@@ -74,6 +136,7 @@
 					}
 					ImGui::EndMenu();
 				}
+
 				if (ImGui::BeginMenu("Synth"))
 				{
 					if (ImGui::MenuItem("Open"))
@@ -82,12 +145,23 @@
 					}
 					ImGui::EndMenu();
 				}
+
+				if (ImGui::BeginMenu("Sampler"))
+				{
+					if (ImGui::MenuItem("Open"))
+					{
+						m_SamplerController.Open();
+					}
+					ImGui::EndMenu();
+				}
+
 				ImGui::EndMenuBar();
 			}
 
 			ImGui::End();
 		}
 
+		m_SamplerController.ImGuiRender();
 		m_Synth.ImGuiRender();
 		m_Player.ImGuiRender();
 	}

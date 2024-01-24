@@ -223,4 +223,44 @@ namespace BackBeat {
 		return false;
 	}
 
+	int24* int24::GetInt24Buffer(byte* buffer, unsigned int numInts, bool bigEndian)
+	{
+		int24 src = int24();
+		unsigned int position = 0;
+		int24* targetBuffer = new int24[numInts];
+
+		for (unsigned int i = 0; i < numInts; i ++) {
+			if (bigEndian)
+				src = int24(buffer[position], buffer[position + 1], buffer[position + 2]);
+			else
+				src = int24(buffer[position + 2], buffer[position + 1], buffer[position]);
+			targetBuffer[i] = src;
+			position += Audio::Int24ByteSize;
+		}
+		return targetBuffer;
+	}
+
+	byte* int24::GetByteBuffer(int24* buffer, unsigned int numInts, bool bigEndian)
+	{
+		byte* targetBuffer = new byte[numInts * Audio::Int24ByteSize];
+		unsigned int position = 0;
+
+		for (unsigned int i = 0; i < numInts; i++) {
+			if (bigEndian)
+			{
+				targetBuffer[position] = buffer[i][0];
+				targetBuffer[position + 1] = buffer[i][1];
+				targetBuffer[position + 2] = buffer[i][2];
+			}
+			else
+			{
+				targetBuffer[position] = buffer[i][2];
+				targetBuffer[position + 1] = buffer[i][1];
+				targetBuffer[position + 2] = buffer[i][0];
+			}
+			position += Audio::Int24ByteSize;
+		}
+		return targetBuffer;
+	}
+
 }

@@ -41,6 +41,13 @@ namespace BackBeat {
 		m_SelectedTrack = TrackFactory::BuildTrack(filePath);
 	}
 
+	void Player::ClearTrack()
+	{
+		m_PlayerProcessor->Off();
+		delete m_SelectedTrack;
+		m_SelectedTrack = nullptr;
+	}
+
 	TimeMinSec Player::GetTime()
 	{
 		if (m_SelectedTrack)
@@ -62,6 +69,13 @@ namespace BackBeat {
 		return 1;
 	}
 
+	unsigned int Player::GetNumChannels()
+	{
+		if (m_SelectedTrack)
+			return m_SelectedTrack->GetProps().numChannels;
+		return 0;
+	}
+
 	unsigned int Player::GetPosition()
 	{
 		if (m_SelectedTrack)
@@ -81,13 +95,6 @@ namespace BackBeat {
 		if (m_SelectedTrack)
 			return m_SelectedTrack->GetSize();
 		return 0;
-	}
-
-	Track* Player::GetTrack()
-	{
-		if (m_SelectedTrack)
-			return m_SelectedTrack;
-		return nullptr;
 	}
 
 	unsigned int Player::GetStartPosition()
