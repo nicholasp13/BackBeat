@@ -10,7 +10,7 @@ namespace BackBeat {
 	{
 		float samplesIncrement = ConvertRadians(SynthBase::CircleDegrees / (float)bufferSize);
 
-		for (unsigned int i = 0; i < bufferSize; i+= numChannels) {
+		for (unsigned int i = 0; i < bufferSize; i += numChannels) {
 			for (unsigned int j = 0; j < numChannels; j++)
 				buffer[i + j] = sin(i * samplesIncrement);
 		}
@@ -20,7 +20,7 @@ namespace BackBeat {
 	{
 		float samplesIncrement = 2.0f / float(bufferSize);
 
-		for (unsigned int i = 0; i < bufferSize; i+= numChannels) {
+		for (unsigned int i = 0; i < bufferSize; i += numChannels) {
 			for (unsigned int j = 0; j < numChannels; j++)
 				buffer[i + j] = i * samplesIncrement - 1.0f;
 		}
@@ -64,9 +64,11 @@ namespace BackBeat {
 			}
 		}
 	}
-
+	
+	// NOTE: Might want this in another file for greater access or change into a static function if not needed anywhere else
 	float Wave::ConvertRadians(float degrees)
 	{
 		return (degrees * SynthBase::Pi) / 180;
 	}
+
 }
