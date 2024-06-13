@@ -48,7 +48,7 @@ namespace BackBeat {
 			file.write(header, Audio::WAVHeaderSize);
 
 			// Write the format subchunk
-			char format[Audio::WAVFormatSize];
+			char format[Audio::WAVFormatSize] = {};
 			const int formatSize = 4;
 			const int audioFormat = 8;
 			const int numChannels = 10;
@@ -139,7 +139,7 @@ namespace BackBeat {
 			file.write(format, Audio::WAVFormatSize);
 
 			// Write the data subchunk
-			char dataSubchunk[Audio::WAVDataSize];
+			char dataSubchunk[Audio::WAVDataSize] = {};
 			const int dataSizePos = 4;
 			unsigned long dSize = dataSize;
 			auto dSizePtr = reinterpret_cast<char*>(&dSize);

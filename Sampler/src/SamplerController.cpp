@@ -1,7 +1,9 @@
 #include "SamplerController.h"
 
-// TODO: Create ImGui Pad widget and Pad control popup/window
+// TODO: - Create ImGui Pad widget and Pad control popup/window
+//       - Fix panning volume level
 
+// NOTE: Current panning settings currently make the sample quieter compared to when the sample splicer makes them.
 	SamplerController::SamplerController()
 		: 
 		m_Open(false), 
