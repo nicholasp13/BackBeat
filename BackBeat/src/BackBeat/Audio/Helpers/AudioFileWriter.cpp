@@ -3,7 +3,6 @@
 #include "AudioFileWriter.h"
 namespace BackBeat {
 
-	// TODO: Add {} to all array inits
 	bool AudioFileWriter::WriteWAVFileHeader(std::string filePath, AudioProps props, unsigned long dataSize)
 	{
 		std::ofstream file;

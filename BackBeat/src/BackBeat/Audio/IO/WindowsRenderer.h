@@ -3,7 +3,6 @@
 #include <mmdeviceapi.h>
 #include <Audioclient.h>
 
-
 #include "BackBeat/Audio/Audio.h"
 #include "Renderer.h"
 namespace BackBeat {
