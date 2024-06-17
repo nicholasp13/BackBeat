@@ -8,7 +8,6 @@
 #include "Sample.h"
 namespace BackBeat {
 
-	// TODO: Make a namespace
 	namespace SampleBuilder
 	{
 		void SaveSample(Track* track, unsigned int start, unsigned int end);

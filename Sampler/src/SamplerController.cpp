@@ -432,10 +432,11 @@
 					if (trackSet)
 					{
 						int zoomIncrement = (int)byteRate;
-						float trackSize = (float)m_TrackPlayer.GetSize();
-						zero = unsigned int(zero - zoomIncrement);
-						size = (unsigned int)((float)size + zoomIncrement > (float)trackSize
-							? (float)trackSize : (float)size + zoomIncrement);
+						int trackSize = (int)m_TrackPlayer.GetSize();
+						zero = zoomIncrement > zero 
+							? 0 : (zero - zoomIncrement);
+						size = (size + zoomIncrement) > trackSize
+							? trackSize : (size + zoomIncrement);
 					}
 				}
 				ImGui::PopID();
