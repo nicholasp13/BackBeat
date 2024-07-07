@@ -3,6 +3,7 @@
 #include <mmdeviceapi.h>
 #include <Audioclient.h>
 
+#include "Platform/Windows/Windows.h"
 #include "BackBeat/Audio/Audio.h"
 #include "Renderer.h"
 namespace BackBeat {
@@ -26,7 +27,7 @@ namespace BackBeat {
 		AudioProps m_Props;
 		std::shared_ptr<Mixer> m_Mixer;
 
-		// Windows members
+		// Windows API members
 		REFERENCE_TIME m_ActualBufferDuration;
 		IAudioClient* m_AudioClient;
 		IMMDeviceEnumerator* m_Enumerator;
