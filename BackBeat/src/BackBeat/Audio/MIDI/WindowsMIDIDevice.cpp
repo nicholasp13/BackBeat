@@ -2,8 +2,7 @@
 
 #include "MMSystem.h"
 
-// TODO: Create function/macro for MMERROR
-//       Create function for MIDI errors
+// TODO: Create function(s) for MIDI messages and errors
 #include "BackBeat/Core/Timer.h"
 #include "WindowsMIDIDevice.h"
 namespace BackBeat {
@@ -121,9 +120,12 @@ namespace BackBeat {
 				reinterpret_cast<DWORD_PTR>(this),
 				CALLBACK_FUNCTION
 		);
-		// CHECK_FAILURE(mr);
+		CHECK_FAILURE_MMRESULT(mr);
 
 		m_Open = true;
+		return m_Open;
+
+	FailureExit:
 		return m_Open;
 	}
 
@@ -133,9 +135,12 @@ namespace BackBeat {
 
 		// NOTE: If using midiInAddBuffer(), return all buffers before calling midiInClose() (not used)
 		mr = midiInClose(m_DeviceHandle);
-		// CHECK_FAILURE(mr);
+		CHECK_FAILURE_MMRESULT(mr);
 
 		m_Open = false;
+		return m_Open;
+
+	FailureExit:
 		return m_Open;
 	}
 
@@ -144,13 +149,19 @@ namespace BackBeat {
 		if (!m_Open)
 			return;
 		MMRESULT mr = midiInStart(m_DeviceHandle);
-		// CHECK_FAILURE(mr);
+		CHECK_FAILURE_MMRESULT(mr);
+
+	FailureExit:
+		;
 	}
 
 	void WindowsMIDIDevice::Stop()
 	{
 		MMRESULT mr = midiInStop(m_DeviceHandle);
-		// CHECK_FAILURE(mr);
+		CHECK_FAILURE_MMRESULT(mr);
+
+	FailureExit:
+		;
 	}
 
 	void WindowsMIDIDevice::MIDIInput(DWORD_PTR part1, DWORD_PTR part2)

@@ -51,43 +51,43 @@ namespace BackBeat {
 		BYTE* data = nullptr;
 
 		hr = m_AudioClient->GetCurrentPadding(&padding);
-		CHECK_FAILURE(hr);
+		CHECK_FAILURE_HRESULT(hr);
 
 		framesAvailable = (m_BufferSize - padding);
 
 		hr = m_ClientRenderer->GetBuffer(framesAvailable, &data);
-		CHECK_FAILURE(hr);
+		CHECK_FAILURE_HRESULT(hr);
 
 		m_Mixer->GetData(data, framesAvailable);
 
 		hr = m_ClientRenderer->ReleaseBuffer(framesAvailable, flags);
-		CHECK_FAILURE(hr);
+		CHECK_FAILURE_HRESULT(hr);
 
 		hr = m_AudioClient->Start();
-		CHECK_FAILURE(hr);
+		CHECK_FAILURE_HRESULT(hr);
 
 		while (m_Rendering)
 		{
 			Sleep(sleepTime);
 
 			hr = m_AudioClient->GetCurrentPadding(&padding);
-			CHECK_FAILURE(hr);
+			CHECK_FAILURE_HRESULT(hr);
 
 			framesAvailable = m_BufferSize - padding;
 
 			hr = m_ClientRenderer->GetBuffer(framesAvailable, &data);
-			CHECK_FAILURE(hr);
+			CHECK_FAILURE_HRESULT(hr);
 
 			m_Mixer->GetData(data, framesAvailable);
 
 			hr = m_ClientRenderer->ReleaseBuffer(framesAvailable, flags);
-			CHECK_FAILURE(hr);
+			CHECK_FAILURE_HRESULT(hr);
 
 		}
 		Sleep(sleepTime);
 
 		hr = m_AudioClient->Stop();
-		CHECK_FAILURE(hr);
+		CHECK_FAILURE_HRESULT(hr);
 
 		return; 
 
@@ -101,7 +101,7 @@ namespace BackBeat {
 		REFERENCE_TIME bufferDuration = 0;
 
 		hr = CoInitializeEx(NULL, COINITBASE_MULTITHREADED);
-		CHECK_FAILURE(hr);
+		CHECK_FAILURE_HRESULT(hr);
 
 		hr = CoCreateInstance(
 			Windows::CLSID_MMDeviceEnumerator,
@@ -109,19 +109,19 @@ namespace BackBeat {
 			CLSCTX_ALL,
 			Windows::IID_IMMDeviceEnumerator,
 			(void**)&m_Enumerator);
-		CHECK_FAILURE(hr);
+		CHECK_FAILURE_HRESULT(hr);
 
 		hr = m_Enumerator->GetDefaultAudioEndpoint(eRender, eMultimedia, &m_Device);
-		CHECK_FAILURE(hr);
+		CHECK_FAILURE_HRESULT(hr);
 
 		hr = m_Device->Activate(Windows::IID_IAudioClient, CLSCTX_ALL, NULL, (void**)&m_AudioClient);
-		CHECK_FAILURE(hr);
+		CHECK_FAILURE_HRESULT(hr);
 
 		hr = m_AudioClient->GetMixFormat(&m_DeviceProps);
-		CHECK_FAILURE(hr);
+		CHECK_FAILURE_HRESULT(hr);
 
 		hr = m_AudioClient->GetDevicePeriod(NULL, &bufferDuration);
-		CHECK_FAILURE(hr);
+		CHECK_FAILURE_HRESULT(hr);
 
 		hr = m_AudioClient->Initialize(
 			AUDCLNT_SHAREMODE_SHARED,
@@ -131,13 +131,13 @@ namespace BackBeat {
 			m_DeviceProps,
 			NULL
 		);
-		CHECK_FAILURE(hr);
+		CHECK_FAILURE_HRESULT(hr);
 
 		hr = m_AudioClient->GetBufferSize(&m_BufferSize);
-		CHECK_FAILURE(hr);
+		CHECK_FAILURE_HRESULT(hr);
 
 		hr = m_AudioClient->GetService(Windows::IID_IAudioRenderClient, (void**)&m_ClientRenderer);
-		CHECK_FAILURE(hr);
+		CHECK_FAILURE_HRESULT(hr);
 
 		m_ActualBufferDuration = (REFERENCE_TIME)bufferDuration * m_BufferSize
 			/ m_DeviceProps->nSamplesPerSec;

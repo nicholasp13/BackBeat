@@ -1,10 +1,7 @@
 #pragma once
 #pragma comment(lib, "winmm.lib")
 
-// NOTE: Windows API allows System exclusive messaging via buffers. This is not necessary but may be implemented later
-#include <mmeapi.h>
-#include <mmdeviceapi.h>
-
+#include "Platform/Windows/Windows.h"
 #include "MIDIDevice.h"
 namespace BackBeat {
 

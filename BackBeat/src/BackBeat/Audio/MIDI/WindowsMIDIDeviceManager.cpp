@@ -109,12 +109,16 @@ namespace BackBeat {
 			//       - A - Is regular char for the device name
 			//       - W - Is wChar for the device name
 			mr = midiInGetDevCapsA(i, (LPMIDIINCAPSA)(&deviceInfo), sizeof(deviceInfo));
-			// CHECK_FAILURE(mr);
+			CHECK_FAILURE_MMRESULT(mr);
 
 			name = reinterpret_cast<char*>(deviceInfo.szPname);
 			m_DeviceInfo.push_back(deviceInfo);
 			m_Devices.push_back(WindowsMIDIDevice(i, name));
+
 		}
+
+	FailureExit:
+		;
 	}
 
 }
