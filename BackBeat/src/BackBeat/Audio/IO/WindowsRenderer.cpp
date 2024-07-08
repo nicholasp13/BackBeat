@@ -144,13 +144,8 @@ namespace BackBeat {
 
 		// Refactor into a function
 		m_Props.bigEndian = Audio::IsBigEndian();
-		m_Props.format = m_DeviceProps->wFormatTag;
-		m_Props.numChannels = m_DeviceProps->nChannels;
-		m_Props.sampleRate = m_DeviceProps->nSamplesPerSec;
-		m_Props.byteRate = m_DeviceProps->nAvgBytesPerSec;
-		m_Props.blockAlign = m_DeviceProps->nBlockAlign;
-		m_Props.bitDepth = m_DeviceProps->wBitsPerSample;
 		m_Props.fileSize = 0;
+		Windows::AudioPropsConversion(m_DeviceProps, &m_Props);
 
 		m_Mixer = std::make_shared<Mixer>(m_Props);
 

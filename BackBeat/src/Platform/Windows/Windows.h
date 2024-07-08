@@ -5,6 +5,7 @@
 #include <mmeapi.h>
 
 #include "BackBeat/Core/Log.h"
+#include "BackBeat/Audio/Audio.h"
 namespace BackBeat {
 
 	namespace Windows {
@@ -20,8 +21,24 @@ namespace BackBeat {
 		constexpr CLSID CLSID_MMDeviceEnumerator = __uuidof(MMDeviceEnumerator);
 		constexpr IID IID_IMMDeviceEnumerator = __uuidof(IMMDeviceEnumerator);
 		constexpr REFIID IID_IAudioRenderClient = __uuidof(IAudioRenderClient);
+		constexpr IID IID_IAudioCaptureClient = __uuidof(IAudioCaptureClient);
 
 		// ---- Helper static functions ---- //
+
+		// Converts Windows struct for the format of audio into BackBeat AudioProps
+		static void AudioPropsConversion(tWAVEFORMATEX* wProps, AudioProps* bbProps)
+		{
+			if (!wProps || !bbProps)
+				return;
+
+			bbProps->format = (unsigned short)wProps->wFormatTag;
+			bbProps->numChannels = (unsigned short)wProps->nChannels;
+			bbProps->sampleRate = (unsigned long)wProps->nSamplesPerSec;
+			bbProps->byteRate = (unsigned long)wProps->nAvgBytesPerSec;
+			bbProps->blockAlign = (unsigned short)wProps->nBlockAlign;
+			bbProps->bitDepth = (unsigned short)wProps->wBitsPerSample;
+			bbProps->fileSize = (unsigned short)wProps->cbSize;
+		}
 
 		// Checks result with possible Windows error codes and logs which error was found
 		// Returns true if the result was successful, else returns false as an error was found
@@ -46,7 +63,8 @@ namespace BackBeat {
 			// Windows API Function(s): 
 			// CoCreateInstance(), GetDefaultAudioEndpoint(), IMMDevice::Activate(), IAudioClient::GetMixFormat(),
 			// IAudioClient::GetDevicePeriod(), IAudioClient::Initialize(), IAudioClient::GetBufferSize(),
-			// IAudioClient::GetService(), IAudioClient::GetCurrentPadding(), IAudioRenderClient::GetBuffer()
+			// IAudioClient::GetService(), IAudioClient::GetCurrentPadding(), IAudioRenderClient::GetBuffer(),
+			// IAudioCaptureClient::GetNextPacketSize(), IAudioCaptureClient::GetBuffer()
 			case (E_POINTER):
 			{
 				BB_CORE_ERROR("Windows Error E_POINTER has occured.");
@@ -105,22 +123,25 @@ namespace BackBeat {
 				return false;
 			}
 
+			// TODO: Create way to deal with this error, possibly handled at the macro with a call to a Reset() function
 			// Windows API Function(s): 
 			// IMMDevice::Activate(), IAudioClient::GetMixFormat(), IAudioClient::GetDevicePeriod(),
 			// IAudioClient::Initialize(), IAudioClient::GetBufferSize(), IAudioClient::GetService(),
 			// IAudioClient::GetCurrentPadding(), IAudioClient::Start(), IAudioRenderClient::GetBuffer(),
-			// IAudioRenderClient::ReleaseBuffer()
+			// IAudioRenderClient::ReleaseBuffer(), IAudioCaptureClient::GetNextPacketSize(),
+			// IAudioCaptureClient::GetBuffer(), IAudioCaptureClient::ReleaseBuffer()
 			case (AUDCLNT_E_DEVICE_INVALIDATED):
 			{
 				BB_CORE_ERROR("Windows Error AUDCLNT_E_DEVICE_INVALIDATED has occured");
-				return false;
+				return true; // NOTE: Set to true for now, but will change in the future
 			}
 
 			// Windows API Function(s): 
 			// IAudioClient::GetMixFormat(), IAudioClient::GetDevicePeriod(), IAudioClient::Initialize(),
 			// IAudioClient::GetBufferSize(), IAudioClient::GetService(), IAudioClient::GetCurrentPadding(),
 			// IAudioClient::Start(), IAudioClient::Stop(), IAudioRenderClient::GetBuffer(),
-			// IAudioRenderClient::ReleaseBuffer()
+			// IAudioRenderClient::ReleaseBuffer(), IAudioCaptureClient::GetNextPacketSize(),
+			// IAudioCaptureClient::GetBuffer(), IAudioCaptureClient::ReleaseBuffer()
 			case (AUDCLNT_E_SERVICE_NOT_RUNNING):
 			{
 				BB_CORE_ERROR("Windows Error AUDCLNT_E_SERVICE_NOT_RUNNING has occured");
@@ -227,7 +248,7 @@ namespace BackBeat {
 				return false;
 			}
 
-			// Windows API Function(s): IAudioRenderClient::GetBuffer()
+			// Windows API Function(s): IAudioRenderClient::GetBuffer(), IAudioCaptureClient::GetBuffer()
 			case (AUDCLNT_E_BUFFER_ERROR):
 			{
 				BB_CORE_ERROR("Windows Error AUDCLNT_E_BUFFER_ERROR has occured");
@@ -241,24 +262,33 @@ namespace BackBeat {
 				return false;
 			}
 
-			// Windows API Function(s): IAudioRenderClient::GetBuffer(), IAudioRenderClient::ReleaseBuffer()
+			// Windows API Function(s): 
+			// IAudioRenderClient::GetBuffer(), IAudioRenderClient::ReleaseBuffer(), IAudioCaptureClient::GetBuffer(),
+			// IAudioCaptureClient::ReleaseBuffer()
 			case (AUDCLNT_E_OUT_OF_ORDER):
 			{
 				BB_CORE_ERROR("Windows Error AUDCLNT_E_OUT_OF_ORDER has occured");
 				return false;
 			}
 
-			// Windows API Function(s): IAudioRenderClient::GetBuffer()
+			// Windows API Function(s): IAudioRenderClient::GetBuffer(), IAudioCaptureClient::GetBuffer()
 			case (AUDCLNT_E_BUFFER_OPERATION_PENDING):
 			{
 				BB_CORE_ERROR("Windows Error AUDCLNT_E_BUFFER_OPERATION_PENDING has occured");
 				return false;
 			}
 
-			// Windows API Function(s): IAudioRenderClient::ReleaseBuffer()
+			// Windows API Function(s): IAudioRenderClient::ReleaseBuffer(), IAudioCaptureClient::ReleaseBuffer()
 			case (AUDCLNT_E_INVALID_SIZE):
 			{
 				BB_CORE_ERROR("Windows Error AUDCLNT_E_INVALID_SIZE has occured");
+				return false;
+			}
+
+			// IAudioCaptureClient::GetBuffer()
+			case (AUDCLNT_S_BUFFER_EMPTY):
+			{
+				BB_CORE_ERROR("Windows Error AUDCLNT_S_BUFFER_EMPTY has occured");
 				return false;
 			}
 
