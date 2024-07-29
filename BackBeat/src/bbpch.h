@@ -16,6 +16,7 @@
 #include <filesystem>
 #include <queue>
 #include <algorithm>
+#include <cstdio>
 
 #ifdef BB_PLATFORM_WINDOWS
 	#include <Windows.h>

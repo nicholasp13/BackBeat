@@ -26,6 +26,8 @@ namespace BackBeat {
 		// ---- Helper static functions ---- //
 
 		// Converts Windows struct for the format of audio into BackBeat AudioProps
+		// NOTE: FormatTag does not properly return the correct value in some cases
+		//       so use Audio header file to find proper format for props
 		static void AudioPropsConversion(tWAVEFORMATEX* wProps, AudioProps* bbProps)
 		{
 			if (!wProps || !bbProps)

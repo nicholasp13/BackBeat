@@ -25,6 +25,7 @@ namespace BackBeat {
 	WindowsRenderer::~WindowsRenderer()
 	{
 		Stop();
+		ReleaseAll();
 	}
 
 	void WindowsRenderer::Start()
@@ -95,6 +96,19 @@ namespace BackBeat {
 		m_Rendering = false;
 	}
 
+	void WindowsRenderer::ReleaseAll()
+	{
+		CoTaskMemFree(m_DeviceProps);
+		if (m_Enumerator != NULL)
+			m_Enumerator->Release();
+		if (m_Device != NULL)
+			m_Device->Release();
+		if (m_AudioClient != NULL)
+			m_AudioClient->Release();
+		if (m_ClientRenderer != NULL)
+			m_ClientRenderer->Release();
+	}
+
 	void WindowsRenderer::InitRenderer()
 	{
 		HRESULT hr;
@@ -139,21 +153,18 @@ namespace BackBeat {
 		hr = m_AudioClient->GetService(Windows::IID_IAudioRenderClient, (void**)&m_ClientRenderer);
 		CHECK_FAILURE_HRESULT(hr);
 
+		// Sets other members after Windows members are successfuly initialized
 		m_ActualBufferDuration = (REFERENCE_TIME)bufferDuration * m_BufferSize
 			/ m_DeviceProps->nSamplesPerSec;
-
-		// Refactor into a function
 		m_Props.bigEndian = Audio::IsBigEndian();
 		m_Props.fileSize = 0;
 		Windows::AudioPropsConversion(m_DeviceProps, &m_Props);
-
 		m_Mixer = std::make_shared<Mixer>(m_Props);
 
-	// NOTE: This is here to make sure CHECK_FAILURE macro works. Code will be added if needed to avoid bugs when
-	//       a Windows API error occurs i.e. audio does not work if any of the checks fail so there needs to be a
-	//       way to reset it
+		return;
+
 	FailureExit:
-		;
+		ReleaseAll();
 	}
 
 }

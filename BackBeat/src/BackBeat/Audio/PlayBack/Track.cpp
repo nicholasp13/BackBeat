@@ -13,7 +13,7 @@ namespace BackBeat {
 		m_Volume(1.0f),
 		m_Info(info)
 	{
-
+		
 	}
 
 	Track::~Track()
@@ -78,7 +78,6 @@ namespace BackBeat {
 
 	TimeMinSec Track::GetTime()
 	{
-		TimeMinSec time = TimeMinSec();
 		AudioProps props = m_Info.props;
 		float timeTotal = (float)((m_Position - m_Info.dataZero) / props.byteRate);
 		return Audio::GetTime(timeTotal);
@@ -86,7 +85,6 @@ namespace BackBeat {
 
 	TimeMinSec Track::GetLength()
 	{
-		TimeMinSec time = TimeMinSec();
 		AudioProps props = m_Info.props;
 		float timeTotal = (float)(m_Info.dataSize / props.byteRate);
 		return Audio::GetTime(timeTotal);

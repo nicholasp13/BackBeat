@@ -1,5 +1,7 @@
 #include "MainLayer.h"
 
+// TODO: Put all Sampler objects into a Sampler namespace for clarity, consistent style, and organization
+
 	MainLayer::MainLayer(BackBeat::Window* window)
 		: Layer("MainLayer"), m_Window(window), m_NumMIDIDevices(0)
 	{
@@ -32,6 +34,7 @@
 		m_SamplerController.Close();
 		m_Synth.Close();
 		m_Player.Close();
+		m_Recorder.Close();
 		m_AudioRenderer.Stop();
 		m_MIDIDeviceManager.CloseAll();
 	}
@@ -41,16 +44,24 @@
 		m_SamplerController.Update();
 		m_Synth.Update();
 		m_Player.Update();
+		m_Recorder.Update();
 	}
 
+	// TODO: Add checks to see if any of the objects set event.Handled = true
 	void MainLayer::OnEvent(BackBeat::Event& event) 
 	{
+		// NOTE: This is a set priority list for controls. There are no repeated keys so this does not caause any problems
+		//       but future implementations might want to have the priority set by time opened newest to oldest or have
+		//       MainLayer keep track and set all key bindings (the latter seams easier and more useful in allowing for custom
+		//       keys).
 		if (m_SamplerController.IsOpen())
 			m_SamplerController.OnEvent(event);
 		if (m_Synth.IsOpen())
 			m_Synth.OnEvent(event);
 		if (m_Player.IsOpen())
 			m_Player.OnEvent(event);
+		if (m_Recorder.IsOpen())
+			m_Recorder.OnEvent(event);
 
 		BackBeat::EventDispatcher dispatcher(event);
 		dispatcher.Dispatch<BackBeat::KeyPressedEvent>(BIND_EVENT_FN(MainLayer::OnKeyEvent));
@@ -155,6 +166,15 @@
 					ImGui::EndMenu();
 				}
 
+				if (ImGui::BeginMenu("Recorder"))
+				{
+					if (ImGui::MenuItem("Open"))
+					{
+						m_Recorder.Open();
+					}
+					ImGui::EndMenu();
+				}
+
 				ImGui::EndMenuBar();
 			}
 
@@ -164,6 +184,7 @@
 		m_SamplerController.ImGuiRender();
 		m_Synth.ImGuiRender();
 		m_Player.ImGuiRender();
+		m_Recorder.ImGuiRender();
 	}
 
 	bool MainLayer::OnKeyEvent(BackBeat::KeyPressedEvent& event)

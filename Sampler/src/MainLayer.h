@@ -12,6 +12,7 @@
 #include <GLFW/glfw3.h>
 
 #include "Playback.h"
+#include "Recorder.h"
 #include "SamplerController.h"
 #include "Synthesizer.h"
 class MainLayer : public BackBeat::Layer
@@ -34,6 +35,7 @@ class MainLayer : public BackBeat::Layer
 		SamplerController m_SamplerController;
 		Synthesizer m_Synth;
 		Playback m_Player;
+		BBSampler::Recorder m_Recorder;
 		BackBeat::WindowsRenderer m_AudioRenderer;
 		BackBeat::WindowsMIDIDeviceManager m_MIDIDeviceManager;
 

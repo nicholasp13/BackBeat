@@ -36,6 +36,7 @@ namespace BackBeat {
 		tWAVEFORMATEX* m_DeviceProps;
 
 		void Render();
+		void ReleaseAll();
 		void InitRenderer();
 	};
 }

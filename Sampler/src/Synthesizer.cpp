@@ -1,5 +1,9 @@
 #include "Synthesizer.h"
 
+// TODO: Fix bug where changing the general octave range causes the note to hold forever if the original octave 
+//       is not returned to by the user. (NOTE: MIDI Devices handle this by not changing the MIDINote of keys that are
+//       currently pressed when the MIDI user changes the octave range on his MIDI device)
+
 	Synthesizer::Synthesizer()
 		: m_Open(false), m_KeyboardActive(true)
 	{

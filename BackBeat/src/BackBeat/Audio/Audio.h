@@ -149,6 +149,7 @@ namespace BackBeat {
 			return !p[0] == 1;
 		}
 
+		// Gets time in minutes and seconds only. TODO: Refactor to reflect specific time units returned
 		static TimeMinSec GetTime(float totalSeconds)
 		{
 			TimeMinSec time = TimeMinSec();
@@ -181,6 +182,22 @@ namespace BackBeat {
 			return (event.status <= MIDI::ChannelOn16 && event.status >= MIDI::ChannelOn1);
 		}
 
+		// Return values:
+		// 1 is uncompressed, pcm with 2's complement bit representation 
+		// 3 is uncompressed, pcm with floating point bit representation 
+		// All other numbers indicate some kind of compression (It is defaulted to 0 as that is 
+		static unsigned short GetAudioFormat(unsigned short bitDepth, bool compressed)
+		{
+			// Compression is currently unhandled by BackBeat and therefore returns 0 without further checks (t
+			if (compressed)
+				return 0;
+			else if (bitDepth == FloatBitSize)
+				return 3;
+			else
+				return 1;
+		}
+
+		// NOTE: Uses macros defined in stdint.h for int 8 and int 16 types. This does not currently cause any issues. 
 		static float GetTypeRatio(unsigned short bitDepth1, unsigned short bitDepth2)
 		{
 			float max1 = 1.0f;

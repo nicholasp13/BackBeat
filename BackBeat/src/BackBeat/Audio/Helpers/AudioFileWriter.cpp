@@ -345,4 +345,20 @@ namespace BackBeat {
 		}
 		return false;
 	}
+
+	bool AudioFileWriter::WriteAudioFileSilence(std::string filePath, unsigned int numBytes)
+	{
+		const char zero = (char)0;
+		std::ofstream file;
+		file.open(filePath, std::ios::binary | std::ios::app);
+		if (file.is_open())
+		{
+			for (unsigned int i = 0; i < numBytes; i++)
+				file.put(zero);
+			
+			file.close();
+			return true;
+		}
+		return false;
+	}
 }

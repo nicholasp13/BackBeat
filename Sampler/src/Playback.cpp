@@ -157,13 +157,10 @@
 		if (m_Player.IsLoaded() && event.GetKeyCode() == BackBeat::Key::Space)
 		{
 			if (!m_Player.IsPlaying()) 
-			{
 				m_Player.Start();
-			}
 			else 
-			{
 				m_Player.Pause();
-			}
+
 			event.Handled = true;
 			return true;
 		}
