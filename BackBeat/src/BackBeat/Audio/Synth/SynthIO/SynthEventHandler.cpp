@@ -76,7 +76,7 @@ namespace BackBeat {
 
 		byte octave = (m_Params->octave - 4) * SynthBase::NotesInOctave;
 
-		MIDIEvent mEvent = m_MIDIMap[event.GetKeyCode()];
+		MIDIEvent mEvent = m_MIDIMap[event.GetKeyCode()]; // TODO: Change to .at() instead as it safer practice
 		mEvent.data1 += octave;
 		mEvent.data2 = m_Params->noteVelocity;
 		if (mEvent.data1 > MIDI::G9)

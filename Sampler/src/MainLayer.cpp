@@ -14,19 +14,30 @@
 
 	void MainLayer::OnAttach()
 	{
-		m_AudioRenderer.GetMixer()->PushProcessor(m_Synth.GetSynthProc());
-		m_AudioRenderer.GetMixer()->PushProcessor(m_Player.GetProc());
-		m_AudioRenderer.GetMixer()->PushProcessor(m_SamplerController.GetSamplerGetProcessor());
-		m_AudioRenderer.GetMixer()->PushProcessor(m_SamplerController.GetTrackGetProcessor());
+		auto mixer = m_AudioRenderer.GetMixer();
+		auto recorderMgr = m_Recorder.GetRecorderMgr();
+		auto synthProc = m_Synth.GetSynthProc();
+		auto synthID = synthProc->GetID();
+
+		// Prepare Mixer
+		mixer->PushProcessor(synthProc);
+		mixer->PushProcessor(m_Player.GetProc());
+		mixer->PushProcessor(m_SamplerController.GetSamplerGetProcessor());
+		mixer->PushProcessor(m_SamplerController.GetTrackGetProcessor());
+		mixer->AddRecordingManager(recorderMgr);
 		m_AudioRenderer.Start();
 
+		// Prepare MIDI devices
 		m_MIDIDeviceManager.PushOutput(m_Synth.GetMIDIInput());
 		m_MIDIDeviceManager.PushOutput(m_SamplerController.GetMIDIInput());
-
 		m_NumMIDIDevices = m_MIDIDeviceManager.GetNumDevices();
 		for (unsigned int i = 0; i < m_NumMIDIDevices; i++) {
 			m_DeviceNames.push_back(m_MIDIDeviceManager.GetDeviceName(i));
 		}
+
+		// Prepare Recorders
+		m_Recorder.SetSynthID(synthID);
+		recorderMgr->AddRecorder(synthID, synthProc->GetProperties());
 	}
 
 	void MainLayer::OnDetach()

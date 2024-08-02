@@ -7,8 +7,10 @@ namespace BackBeat {
 	public:
 		UUID();
 		UUID(unsigned long long id);
+		UUID(const UUID&) = default;
 
 		inline operator unsigned long long() const { return m_ID; }
+
 	private:
 		unsigned long long m_ID;
 	};

@@ -13,7 +13,6 @@ namespace BackBeat {
 		void Record(char* data, unsigned int numFrames);
 		void Reset();
 		void Reset(AudioProps props);
-		void Reset(std::string filePath, AudioProps props);
 		void GetData(char* buffer, unsigned long numBytes, unsigned long position);
 		TimeMinSec GetLengthMinSecs();
 		
@@ -26,7 +25,6 @@ namespace BackBeat {
 		AudioProps m_Props;
 
 		void Delete();
-		void CreateTempFile();
 	};
 
 }

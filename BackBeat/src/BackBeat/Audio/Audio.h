@@ -6,6 +6,7 @@ namespace BackBeat {
 
 	typedef unsigned char byte;
 
+	// TODO: CHANGE TO ENUM CLASS FOR BETTER CLARIFICATION AND STYLE
 	enum FileType {
 		none = 0,
 		wav,

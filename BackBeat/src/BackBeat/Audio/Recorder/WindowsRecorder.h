@@ -1,5 +1,6 @@
 #pragma once
 
+#include "BackBeat/Core/UUID.h"
 #include "Platform/Windows/Windows.h"
 #include "Recorder.h"
 namespace BackBeat {
@@ -7,21 +8,23 @@ namespace BackBeat {
 	class WindowsRecorder : public Recorder
 	{
 	public:
-		WindowsRecorder(std::string tempFilePath);
+		WindowsRecorder();
 		~WindowsRecorder();
 
 		virtual void Start();
 		virtual void Stop();
 		virtual void Reset(); 
+		virtual void Reset(AudioProps props);
 		virtual bool SaveWAV(std::string filePath);
 		
 		inline virtual TimeMinSec GetLengthMinSec() { return m_Recording.GetLengthMinSecs(); }
+		inline virtual RecorderType GetType() { return RecorderType::windows; }
 		inline virtual bool IsRecording() { return m_IsRecording; }
-		inline virtual void SetTempPath(std::string filePath) {} // TODO: Finish
 
 	private:
 		bool m_IsRecording;
 		std::thread m_Thread;
+		UUID m_ID;
 		AudioProps m_AudioProps;
 		Recording m_Recording;
 

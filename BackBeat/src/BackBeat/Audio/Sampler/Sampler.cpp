@@ -29,6 +29,7 @@ namespace BackBeat {
 	void Sampler::InitSampler()
 	{
 		m_Running = false;
+
 		const unsigned short format = 3;
 		const unsigned short numChannels = 2;
 		const unsigned long sampleRate = 48000;

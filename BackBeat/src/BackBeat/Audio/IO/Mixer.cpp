@@ -27,21 +27,26 @@ namespace BackBeat {
 			m_Processors[i]->ProcessSamples(numSamples, m_Props.sampleRate, m_Props.numChannels); // TODO: Multithread this call
 		}
 
-		unsigned int totalSamples = numSamples * m_Props.blockAlign;
+		bool recording = false;
+		if (m_RecordingManager)
+			recording = m_RecordingManager->IsRecording();
+
+		unsigned int totalBytes = numSamples * m_Props.blockAlign;
 		byte defaultVal = 0x00;
-		Audio::FlushBufferT(data, &defaultVal, totalSamples);
+		Audio::FlushBufferT(data, &defaultVal, totalBytes);
 
 		for (unsigned int i = 0; i < m_Processors.size(); i++) {
 			if (!m_Processors[i]->IsOn())
 				continue;
 
+			auto inBuffer = m_Processors[i]->GetOutputBuffer();
 			AudioProps inProps = m_Processors[i]->GetProperties();
 			switch (inProps.bitDepth)
 			{
 
 			case (Audio::ByteBitSize):
 			{
-				auto srcBuffer = reinterpret_cast<byte*>(m_Processors[i]->GetOutputBuffer());
+				auto srcBuffer = reinterpret_cast<byte*>(inBuffer);
 				if (m_Props.bitDepth == Audio::ByteBitSize)
 					Audio::TranslateDataToByte(srcBuffer, (byte*)data, inProps.bitDepth, m_Props.numChannels, numSamples);
 				else if (m_Props.bitDepth == Audio::Int16BitSize)
@@ -59,7 +64,7 @@ namespace BackBeat {
 
 			case (Audio::Int16BitSize):
 			{
-				auto srcBuffer = reinterpret_cast<signed short*>(m_Processors[i]->GetOutputBuffer());
+				auto srcBuffer = reinterpret_cast<signed short*>(inBuffer);
 				if (m_Props.bitDepth == Audio::ByteBitSize)
 					Audio::TranslateDataToByte(srcBuffer, (byte*)data, inProps.bitDepth, m_Props.numChannels, numSamples);
 				else if (m_Props.bitDepth == Audio::Int16BitSize)
@@ -77,7 +82,7 @@ namespace BackBeat {
 
 			case (Audio::Int24BitSize):
 			{
-				auto buffer = reinterpret_cast<byte*>(m_Processors[i]->GetOutputBuffer());
+				auto buffer = reinterpret_cast<byte*>(inBuffer);
 				int24* srcBuffer = int24::GetInt24Buffer(buffer, numSamples * m_Props.numChannels, inProps.bigEndian);
 				if (m_Props.bitDepth == Audio::ByteBitSize)
 					Audio::TranslateDataToByte(srcBuffer, (byte*)data, inProps.bitDepth, m_Props.numChannels, numSamples);
@@ -97,7 +102,7 @@ namespace BackBeat {
 
 			case (Audio::FloatBitSize):
 			{
-				auto srcBuffer = reinterpret_cast<float*>(m_Processors[i]->GetOutputBuffer());
+				auto srcBuffer = reinterpret_cast<float*>(inBuffer);
 				if (m_Props.bitDepth == Audio::ByteBitSize)
 					Audio::TranslateDataToByte(srcBuffer, (byte*)data, inProps.bitDepth, m_Props.numChannels, numSamples);
 				else if (m_Props.bitDepth == Audio::Int16BitSize)
@@ -115,7 +120,7 @@ namespace BackBeat {
 
 			case (Audio::DoubleBitSize):
 			{
-				auto srcBuffer = reinterpret_cast<double*>(m_Processors[i]->GetOutputBuffer());
+				auto srcBuffer = reinterpret_cast<double*>(inBuffer);
 				if (m_Props.bitDepth == Audio::ByteBitSize)
 					Audio::TranslateDataToByte(srcBuffer, (byte*)data, inProps.bitDepth, m_Props.numChannels, numSamples);
 				else if (m_Props.bitDepth == Audio::Int16BitSize)
@@ -139,6 +144,11 @@ namespace BackBeat {
 
 			}
 
+			if (recording)
+			{
+				auto id = m_Processors[i]->GetID();
+				m_RecordingManager->Record(id, inBuffer, numSamples * inProps.numChannels);
+			}
 		}
 
 	}

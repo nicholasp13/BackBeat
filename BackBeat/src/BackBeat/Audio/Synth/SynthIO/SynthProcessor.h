@@ -8,13 +8,14 @@ namespace BackBeat {
 	class SynthProcessor : public AudioProcessor
 	{
 	public:
-		SynthProcessor(AudioProps props, std::shared_ptr<AudioEngine> engine);
+		SynthProcessor(AudioProps props, std::shared_ptr<AudioEngine> engine, UUID id);
 		~SynthProcessor();
 
 		virtual void ProcessSamples(unsigned int numSamples, unsigned int sampleRate, unsigned int numChannels);
 
 		virtual AudioProps GetProperties() { return m_Props; }
 		virtual AudioBus* GetBus() { return &m_Bus; }
+		virtual UUID GetID() { return m_ID; }
 		virtual void* GetOutputBuffer() { return m_Output; }
 		virtual bool IsOn() { return m_On; }
 
@@ -27,9 +28,9 @@ namespace BackBeat {
 	private:
 		bool m_On;
 		float* m_Output;
-
 		AudioProps m_Props;
 		AudioBus m_Bus;
+		UUID m_ID;
 		
 		std::shared_ptr<RenderInfo> m_Info;
 		std::shared_ptr<AudioEngine> m_Engine;

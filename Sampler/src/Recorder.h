@@ -25,10 +25,14 @@ namespace BBSampler {
 		void Close();
 
 		inline bool IsOpen() { return m_Open; }
+		inline std::shared_ptr<BackBeat::RecorderManager> GetRecorderMgr() { return m_RecorderMgr; }
+		inline void SetSynthID(BackBeat::UUID id) { m_SynthID = id; }
 
 	private:
 		bool m_Open;
+		BackBeat::UUID m_SynthID;
 		BackBeat::WindowsRecorder m_WindowsRecorder;
+		std::shared_ptr<BackBeat::RecorderManager> m_RecorderMgr;
 
 		bool OnKeyEvent(BackBeat::KeyPressedEvent& event);
 		bool OnMouseButtonEvent(BackBeat::MouseButtonPressedEvent& event);

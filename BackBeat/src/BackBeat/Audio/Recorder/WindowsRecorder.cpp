@@ -22,13 +22,14 @@
 #include "WindowsRecorder.h"  
 namespace BackBeat {
 
-	WindowsRecorder::WindowsRecorder(std::string tempFilePath)
+	WindowsRecorder::WindowsRecorder()
 		: 
 		m_IsRecording(false), 
 		m_AudioProps(AudioProps()), 
-		m_Recording(tempFilePath, m_AudioProps),
+		m_Recording(std::to_string(unsigned long long(m_ID)) , m_AudioProps),
 		m_BufferSize(0)
 	{
+
 		InitWindowsClient();
 	}
 
@@ -55,6 +56,11 @@ namespace BackBeat {
 	{
 		if (!m_IsRecording)
 			m_Recording.Reset();
+	}
+	void WindowsRecorder::Reset(AudioProps props)
+	{
+		if (!m_IsRecording)
+			m_Recording.Reset(props);
 	}
 
 	bool WindowsRecorder::SaveWAV(std::string filePath)

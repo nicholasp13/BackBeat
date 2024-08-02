@@ -3,7 +3,7 @@
 #include <queue>
 #include <map>
 
-// TODO: Chane RenderInfo to MIDIInputHandler
+// TODO: Change RenderInfo to MIDIInputHandler
 
 #include "BackBeat/Audio/Synth/SynthBase.h"
 #include "BackBeat/Audio/MIDI/MIDICodes.h"

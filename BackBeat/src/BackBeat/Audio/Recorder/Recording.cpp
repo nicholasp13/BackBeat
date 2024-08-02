@@ -10,7 +10,7 @@ namespace BackBeat {
 		m_TempPath(filePath), 
 		m_Props(props)
 	{
-		CreateTempFile();
+		
 	}
 
 	Recording::~Recording()
@@ -88,22 +88,12 @@ namespace BackBeat {
 	void Recording::Reset()
 	{
 		Delete();
-		CreateTempFile();
 	}
 
 	void Recording::Reset(AudioProps props)
 	{
 		Delete();
 		m_Props = props;
-		CreateTempFile();
-	}
-
-	void Recording::Reset(std::string filePath, AudioProps props)
-	{
-		Delete();
-		m_TempPath = filePath;
-		m_Props = props;
-		CreateTempFile();
 	}
 
 	// TODO: TEST IN WINDOWS RECORDER PLAYER
@@ -138,13 +128,6 @@ namespace BackBeat {
 	{
 		std::remove(m_TempPath.c_str());
 		m_Size = 0;
-	}
-
-	void Recording::CreateTempFile()
-	{
-		std::ofstream file;
-		file.open(m_TempPath, std::ios::binary);
-		file.close();
 	}
 
 }
