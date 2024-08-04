@@ -10,14 +10,14 @@ namespace BackBeat {
 		PlayerProcessor();
 		~PlayerProcessor();
 
-		virtual void ProcessSamples(unsigned int numSamples, unsigned int sampleRate, unsigned int numChannels);
+		virtual void ProcessSamples(unsigned int numSamples, unsigned int sampleRate, unsigned int numChannels) override;
 
 		void PlayTrack(Track* track);
 
-		inline virtual AudioProps GetProperties() { return m_Track->GetProps(); };
-		inline virtual AudioBus* GetBus() { return nullptr; };
-		inline virtual void* GetOutputBuffer() { return m_Output; };
-		inline virtual bool IsOn() { return m_On; }
+		inline virtual AudioProps GetProperties() override { return m_Track->GetProps(); };
+		inline virtual AudioBus* GetBus() override { return nullptr; };
+		inline virtual void* GetOutputBuffer() override { return m_Output; };
+		inline virtual bool IsOn() override { return m_On; }
 	
 		inline void On() { m_On = true; }
 		inline void Off() { m_On = false; }

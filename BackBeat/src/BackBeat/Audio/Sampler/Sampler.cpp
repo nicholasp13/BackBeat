@@ -51,6 +51,7 @@ namespace BackBeat {
 		m_Programmer = std::make_shared<SampleProgrammer>(m_Props);
 		m_MIDIInput = std::make_shared<MIDIInputHandler>(m_Processor->GetInfo());
 		m_Handler = std::make_shared<SamplerEventHandler>();
+		m_Params = std::make_shared<SamplerParameters>(m_Engine->GetParams());
 		
 		// Key event controls
 		const KeyCode numCode = Key::D1;

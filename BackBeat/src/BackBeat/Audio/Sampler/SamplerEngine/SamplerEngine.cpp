@@ -32,6 +32,7 @@ namespace BackBeat {
 
 	void SamplerEngine::Render(std::shared_ptr<RenderInfo> info)
 	{
+		float volume = m_Params->volume;
 		unsigned int numSamples = info->GetSamplesToRender();
 		unsigned int bufferSize = info->GetBufferSize();
 		std::shared_ptr<float[]> outputBuffer = info->GetBuffer();
@@ -51,7 +52,7 @@ namespace BackBeat {
 		}
 
 		for (unsigned int j = 0; j < numSamples * Audio::Stereo; j++) {
-			outputBuffer[j] = m_Buffer[j] * m_VoiceFactor;
+			outputBuffer[j] = m_Buffer[j] * m_VoiceFactor * volume;
 			m_OutputBufferPosition = (m_OutputBufferPosition + 1) % bufferSize;
 		}
 	}
@@ -76,18 +77,21 @@ namespace BackBeat {
 		m_VoiceFactor = 2.0f;
 
 		for (unsigned int i = 0; i < m_NumVoices; i++)
-			m_Voices[i] = std::make_unique<SamplerVoice>(m_Props.sampleRate, m_Buffer, m_Params[i]);
+			m_Voices[i] = std::make_unique<SamplerVoice>(m_Props.sampleRate, m_Buffer, m_Params->DCAParams[i]);
 	}
 
 	void SamplerEngine::InitParameters()
 	{
+		m_Params = std::make_shared<SamplerEngineParameters>();
+		m_Params->volume = 1.0f;
+
 		for (unsigned int i = 0; i < m_NumVoices; i++)
 		{
 			auto DCAParams = std::make_shared<DCAParameters>();
 			DCAParams->leftAmp = 1.0f;
 			DCAParams->rightAmp = 1.0f;
 			DCAParams->volume = 1.0f;
-			m_Params.push_back(DCAParams);
+			m_Params->DCAParams.push_back(DCAParams);
 		}
 	}
 }

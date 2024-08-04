@@ -11,13 +11,13 @@ namespace BackBeat {
 		SynthProcessor(AudioProps props, std::shared_ptr<AudioEngine> engine, UUID id);
 		~SynthProcessor();
 
-		virtual void ProcessSamples(unsigned int numSamples, unsigned int sampleRate, unsigned int numChannels);
+		virtual void ProcessSamples(unsigned int numSamples, unsigned int sampleRate, unsigned int numChannels) override;
 
-		virtual AudioProps GetProperties() { return m_Props; }
-		virtual AudioBus* GetBus() { return &m_Bus; }
-		virtual UUID GetID() { return m_ID; }
-		virtual void* GetOutputBuffer() { return m_Output; }
-		virtual bool IsOn() { return m_On; }
+		virtual AudioProps GetProperties() override { return m_Props; }
+		virtual AudioBus* GetBus() override { return &m_Bus; }
+		virtual UUID GetID() override { return m_ID; }
+		virtual void* GetOutputBuffer() override { return m_Output; }
+		virtual bool IsOn() override { return m_On; }
 
 		void Off();
 
