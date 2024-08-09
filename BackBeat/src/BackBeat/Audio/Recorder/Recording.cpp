@@ -83,6 +83,11 @@ namespace BackBeat {
 			if (success)
 				m_Size += numBytes;
 		}
+		if (m_Track)
+		{
+			m_Track->SetDataSize(m_Size);
+			m_Track->SetEnd(m_Size);
+		}
 	}
 
 	void Recording::Reset()
@@ -96,26 +101,20 @@ namespace BackBeat {
 		m_Props = props;
 	}
 
-	// TODO: TEST IN WINDOWS RECORDER PLAYER
-	// NOTES: 
-	//  - Position is indexed by bytes not by samples or audio frames.
-	//  - Function caller is tasked to make sure that numBytes is not greater than the buffer size
-	void Recording::GetData(char* buffer, unsigned long numBytes, unsigned long position)
+	void Recording::CreateTrack()
 	{
-		if (!buffer)
-			return;
-		if (position > m_Size)
+		if (m_Track)
 			return;
 
-		unsigned long actualNumBytes = position + numBytes < m_Size ? numBytes : m_Size - position;
-		std::ifstream file;
-		file.open(m_TempPath, std::ios::binary);
-		if (!file.is_open())
-			return;
-
-		file.seekg(position);
-		file.getline(buffer, actualNumBytes);
-		
+		AudioInfo info = {
+			.type = FileType::sample, // TODO: CHANGE TO recording after fixed enum class
+			.name = m_TempPath,
+			.filePath = m_TempPath,
+			.props = m_Props,
+			.dataZero = 0,
+			.dataSize = m_Size
+		};
+		m_Track = std::make_shared<Track>(info);
 	}
 
 	TimeMinSec Recording::GetLengthMinSecs()
@@ -128,6 +127,8 @@ namespace BackBeat {
 	{
 		std::remove(m_TempPath.c_str());
 		m_Size = 0;
+		if (m_Track)
+			m_Track->SetDataSize(m_Size);
 	}
 
 }

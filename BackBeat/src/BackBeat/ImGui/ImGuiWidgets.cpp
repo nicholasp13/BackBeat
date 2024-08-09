@@ -89,7 +89,25 @@ namespace BackBeat {
 	// NOTE: - Future implementation might want the track to keep playing while visually the seek bar changes
 	//           and only when the bar is released then the position is changed. (This does not work as either
 	//           the bar does not update while the track plays but does change only when released OR the
-	//           bar does not move or change with the track position)
+	//           bar does not move or change with the track position) The following example code shows an
+	//           implementation that avoids the constant audio playing while the user is using the seekbar().
+	//  ---- Example Code ----
+	// ImGui::PushID("Seekbar");
+	// if (BackBeat::ImGuiWidgets::ImGuiSeekBarInt("##", &position, m_Player->GetSize(), "", ImGuiSliderFlags(0)))
+	// {
+	//     if (m_Player->IsPlaying())
+	//	   {
+	//	       m_Player->Pause();
+	//	       wasPlaying = true;
+	//	   }
+	//	   m_Player->SetPosition(position);
+	// }
+	// if (ImGui::IsItemDeactivated() && wasPlaying)
+	// {
+	//     m_Player->Play();
+	//	   wasPlaying = false;
+	// }
+	//  ----------------------
 	// COLORS:
 	//     - Frame rectangle    - ImGui::GetColorU32(g.ActiveId == id ? ImGuiCol_FrameBgActive : ImGuiCol_FrameBg)
 	//     - Progress rectangle - ImGuiCol_FrameBgHovered

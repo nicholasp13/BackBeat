@@ -70,6 +70,14 @@ namespace BackBeat {
 		return false;
 	}
 
+	std::shared_ptr<Track> WindowsRecorder::GetRecordingTrack()
+	{
+		if (m_IsRecording)
+			return nullptr;
+		m_Recording.CreateTrack();
+		return m_Recording.GetTrack();
+	}
+
 	void WindowsRecorder::Record()
 	{
 		HRESULT hr = S_OK;

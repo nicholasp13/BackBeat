@@ -47,7 +47,7 @@ namespace BackBeat {
 			.fileSize = 0
 		};
 		m_Engine = std::make_shared<SamplerEngine>(m_Props);
-		m_Processor = std::make_shared<SamplerProcessor>(m_Props, m_Engine);
+		m_Processor = std::make_shared<SamplerProcessor>(m_Props, m_Engine, m_ID);
 		m_Programmer = std::make_shared<SampleProgrammer>(m_Props);
 		m_MIDIInput = std::make_shared<MIDIInputHandler>(m_Processor->GetInfo());
 		m_Handler = std::make_shared<SamplerEventHandler>();

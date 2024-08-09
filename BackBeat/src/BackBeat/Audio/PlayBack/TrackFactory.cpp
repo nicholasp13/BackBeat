@@ -4,11 +4,11 @@
 #include "TrackFactory.h"
 namespace BackBeat {
 
-	Track* TrackFactory::BuildTrack(std::string filePath)
+	std::shared_ptr<Track> TrackFactory::BuildTrack(std::string filePath)
 	{
 		AudioInfo info = AudioFileReader::ReadFile(filePath);
-		if (info.type == wav)
-			return new Track(info);
+		if (info.type == FileType::wav)
+			return std::make_shared<Track>(info);
 
 		return nullptr;
 	}

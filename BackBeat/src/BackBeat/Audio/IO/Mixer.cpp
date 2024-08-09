@@ -144,6 +144,8 @@ namespace BackBeat {
 
 			}
 
+			// FIXME: This call to record lags Synth enough to ruin the audio. 
+			//        Need to implement some sort of multithreading in regards to Creating, Rendering, Recording audio data
 			if (recording)
 			{
 				auto id = m_Processors[i]->GetID();

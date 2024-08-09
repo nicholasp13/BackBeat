@@ -6,12 +6,12 @@ namespace BackBeat {
 
 	typedef unsigned char byte;
 
-	// TODO: CHANGE TO ENUM CLASS FOR BETTER CLARIFICATION AND STYLE
-	enum FileType {
+	enum class FileType {
 		none = 0,
 		wav,
 		mp3,
-		sample
+		sample,
+		recordingTemp
 	};
 
 	struct AudioProps {

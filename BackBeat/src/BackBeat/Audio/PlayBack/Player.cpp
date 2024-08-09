@@ -4,7 +4,7 @@
 namespace BackBeat {
 
 	Player::Player()
-		: m_SelectedTrack(nullptr), m_PlayerProcessor(std::make_shared<PlayerProcessor>())
+		: m_On(false), m_SelectedTrack(nullptr), m_PlayerProcessor(std::make_shared<PlayerProcessor>())
 	{
 
 	}
@@ -12,18 +12,24 @@ namespace BackBeat {
 	Player::~Player()
 	{
 		m_PlayerProcessor->Off();
-		delete m_SelectedTrack;
+	}
+
+	void Player::Off()
+	{
+		m_On = false;
+		m_PlayerProcessor->Off();
 	}
 
 	void Player::Start()
 	{
+		if (!m_On)
+			return;
 		if (m_PlayerProcessor->IsOn())
 			return;
 		if (!m_SelectedTrack)
 			return;
 		if (m_SelectedTrack->IsDone())
 			m_SelectedTrack->SetPosition(0);
-		m_PlayerProcessor->PlayTrack(m_SelectedTrack);
 		m_PlayerProcessor->On();
 	}
 
@@ -34,18 +40,32 @@ namespace BackBeat {
 			m_SelectedTrack->SetPosition(0);
 	}
 
+	void Player::Play()
+	{
+		if (!m_On)
+			return;
+		m_PlayerProcessor->On();
+	}
+
 	void Player::LoadTrack(std::string filePath)
 	{
 		m_PlayerProcessor->Off();
-		delete m_SelectedTrack;
 		m_SelectedTrack = TrackFactory::BuildTrack(filePath);
+		m_PlayerProcessor->PlayTrack(m_SelectedTrack);
+	}
+
+	void Player::LoadTrack(std::shared_ptr<Track> track)
+	{
+		m_PlayerProcessor->Off();
+		m_SelectedTrack = track;
+		m_PlayerProcessor->PlayTrack(m_SelectedTrack);
 	}
 
 	void Player::ClearTrack()
 	{
 		m_PlayerProcessor->Off();
-		delete m_SelectedTrack;
 		m_SelectedTrack = nullptr;
+		m_PlayerProcessor->ClearTrack();
 	}
 
 	TimeMinSec Player::GetTime()

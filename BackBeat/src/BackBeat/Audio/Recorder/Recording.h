@@ -1,6 +1,7 @@
 #pragma once
 
 #include "BackBeat/Audio/Audio.h" 
+#include "BackBeat/Audio/PlayBack/Track.h"
 namespace BackBeat {
 
 	class Recording
@@ -13,18 +14,22 @@ namespace BackBeat {
 		void Record(char* data, unsigned int numFrames);
 		void Reset();
 		void Reset(AudioProps props);
-		void GetData(char* buffer, unsigned long numBytes, unsigned long position);
+		void CreateTrack();
 		TimeMinSec GetLengthMinSecs();
 		
 		inline AudioProps GetProps() { return m_Props; }
 		inline unsigned long GetSize() { return m_Size; }
+		inline std::shared_ptr<Track> GetTrack() { return m_Track; }
 
 	private:
 		unsigned long m_Size;
 		std::string m_TempPath;
 		AudioProps m_Props;
+		std::shared_ptr<Track> m_Track;
 
+	private:
 		void Delete();
+
 	};
 
 }

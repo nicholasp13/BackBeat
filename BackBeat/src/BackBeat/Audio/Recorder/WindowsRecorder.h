@@ -11,15 +11,18 @@ namespace BackBeat {
 		WindowsRecorder();
 		~WindowsRecorder();
 
-		virtual void Start();
-		virtual void Stop();
-		virtual void Reset(); 
-		virtual void Reset(AudioProps props);
-		virtual bool SaveWAV(std::string filePath);
+		virtual void Start() override;
+		virtual void Stop() override;
+		virtual void Reset() override; 
+		virtual void Reset(AudioProps props) override;
+		virtual bool SaveWAV(std::string filePath) override;
+		virtual std::shared_ptr<Track> GetRecordingTrack() override;
 		
-		inline virtual TimeMinSec GetLengthMinSec() { return m_Recording.GetLengthMinSecs(); }
-		inline virtual RecorderType GetType() { return RecorderType::windows; }
 		inline virtual bool IsRecording() { return m_IsRecording; }
+		inline virtual TimeMinSec GetLengthMinSec() override { return m_Recording.GetLengthMinSecs(); }
+		inline virtual RecorderType GetType() override { return RecorderType::windows; }
+		inline virtual UUID GetID() override { return m_ID; }
+
 
 	private:
 		bool m_IsRecording;
@@ -37,6 +40,7 @@ namespace BackBeat {
 		IAudioCaptureClient* m_CaptureClient;
 		WAVEFORMATEX* m_DeviceProps;
 
+	private:
 		void Record();
 		void ReleaseAll();
 		void InitWindowsClient();

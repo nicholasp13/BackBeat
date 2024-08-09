@@ -5,7 +5,7 @@ namespace BackBeat {
 
 	AudioRecorder::AudioRecorder(std::string tempFilePath, AudioProps props)
 		:
-		m_IsRecording(false),
+		m_On(false),
 		m_AudioProps(props),
 		m_Recording(tempFilePath, props)
 	{
@@ -18,42 +18,48 @@ namespace BackBeat {
 	}
 
 	// TODO: Change to inline if no extra lines are added
-	void AudioRecorder::Start()
+	void AudioRecorder::On()
 	{
-		m_IsRecording = true;
+		m_On = true;
 	}
 
 	// TODO: Change to inline if no extra lines are added
-	void AudioRecorder::Stop()
+	void AudioRecorder::Off()
 	{
-		m_IsRecording = false;
+		m_On = false;
 	}
 
 	void AudioRecorder::Reset()
 	{
-		if (!m_IsRecording)
+		if (!m_On)
 			m_Recording.Reset();
 	}
 
 	void AudioRecorder::Reset(AudioProps props)
 	{
-		if (!m_IsRecording)
+		if (!m_On)
 			m_Recording.Reset(props);
-	}
-
-	bool AudioRecorder::SaveWAV(std::string filePath)
-	{
-		if (!m_IsRecording)
-			return m_Recording.SaveWAV(filePath);
-		return false;
 	}
 
 	void AudioRecorder::Record(char* data, unsigned int numSamples)
 	{
-		if (!m_IsRecording)
+		if (!m_On)
 			return;
 		unsigned int numFrames = numSamples / m_AudioProps.numChannels;
 		m_Recording.Record(data, numFrames);
+	}
+
+	bool AudioRecorder::SaveWAV(std::string filePath)
+	{
+		if (!m_On)
+			return m_Recording.SaveWAV(filePath);
+		return false;
+	}
+
+	std::shared_ptr<Track> AudioRecorder::GetRecordingTrack()
+	{
+		m_Recording.CreateTrack();
+		return m_Recording.GetTrack();
 	}
 
 }

@@ -18,6 +18,7 @@ namespace BackBeat {
 
 		inline bool IsRunning() { return m_Running; }
 		inline AudioProps GetProps() { return m_Props; }
+		inline UUID GetID() { return m_ID; }
 		inline std::shared_ptr<SamplerEventHandler> GetEventHandler() { return m_Handler; }
 		inline std::shared_ptr<MIDIInputHandler> GetMIDIInput() { return m_MIDIInput; }
 		inline std::shared_ptr<SamplerProcessor> GetProcessor() { return m_Processor; }
@@ -29,6 +30,7 @@ namespace BackBeat {
 		bool m_Running;
 		unsigned long m_SleepTime;
 		AudioProps m_Props;
+		UUID m_ID;
 
 		std::shared_ptr<SamplerEngine> m_Engine;
 		std::shared_ptr<SamplerEventHandler> m_Handler;

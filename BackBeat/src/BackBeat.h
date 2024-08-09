@@ -21,7 +21,7 @@
 #include "BackBeat/Audio/IO/WAVFileBuilder.h"
 #include "BackBeat/Audio/IO/WindowsRenderer.h"
 #include "BackBeat/Audio/MIDI/WindowsMIDIDeviceManager.h"
-#include "BackBeat/Audio/PlayBack/Player.h"
+#include "BackBeat/Audio/PlayBack/PlayerManager.h"
 #include "BackBeat/Audio/Recorder/RecorderManager.h"
 #include "BackBeat/Audio/Recorder/WindowsRecorder.h"
 #include "BackBeat/Audio/Sampler/Sampler.h"

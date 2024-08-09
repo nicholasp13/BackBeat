@@ -5,6 +5,6 @@ namespace BackBeat {
 
 	namespace TrackFactory
 	{
-		Track* BuildTrack(std::string filePath);
+		std::shared_ptr<Track> BuildTrack(std::string filePath);
 	}
 }

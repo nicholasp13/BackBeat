@@ -10,7 +10,7 @@ namespace BackBeat {
 
 	namespace SampleBuilder
 	{
-		void SaveSample(Track* track, unsigned int start, unsigned int end);
+		void SaveSample(std::shared_ptr<Track> track, unsigned int start, unsigned int end);
 		Sample* BuildSample(std::string filePath);
 
 	};
