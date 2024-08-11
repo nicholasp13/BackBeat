@@ -7,6 +7,7 @@
 #include "BackBeat/Core/Application.h"
 #include "BackBeat/Core/Core.h"
 #include "BackBeat/Core/FileDialog.h"
+#include "BackBeat/Core/FileSystem.h"
 #include "BackBeat/Core/Input.h"
 #include "BackBeat/Core/KeyCodes.h"
 #include "BackBeat/Core/Layer.h"

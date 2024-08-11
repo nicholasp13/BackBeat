@@ -1,8 +1,12 @@
 #pragma once
 
+// Windows header files
 #include <mmdeviceapi.h>
 #include <Audioclient.h>
 #include <mmeapi.h>
+#include <ShlObj_core.h>
+
+#include <string>
 
 #include "BackBeat/Core/Log.h"
 #include "BackBeat/Audio/Audio.h"
@@ -380,6 +384,38 @@ namespace BackBeat {
 			}
 
 			}
+		}
+
+		// Gets local app data file folder
+		static std::string GetLocalAppFileDirectory()
+		{
+			const int size = 260;
+			HRESULT hr = S_OK;
+			int trueSize = 0;
+			PWSTR wPath = NULL;
+			char path[size] = {};
+			char defaultChar = ' ';
+
+			// TODO: Add expanations to this function
+			hr = SHGetKnownFolderPath(
+				FOLDERID_LocalAppData,
+				0,
+				NULL,
+				&wPath
+				);
+			// TODO: Add function into error comment headers
+			if (!CheckFailureHR(hr))
+				return std::string();
+
+			// TODO: Add expanations to this function
+			trueSize = WideCharToMultiByte(CP_ACP, 0, wPath, -1, path, size, &defaultChar, NULL);
+			if (trueSize == 0)
+			{
+				BB_CORE_ERROR("Error getting file dir: {0}", trueSize);
+				return std::string();
+			}
+			std::string filePath(path, trueSize);
+			return filePath;
 		}
 
 // ---- Windows Macros ---- //
