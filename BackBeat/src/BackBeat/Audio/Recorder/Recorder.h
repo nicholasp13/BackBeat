@@ -8,6 +8,7 @@ namespace BackBeat {
 	{
 		none = 0,
 		audio,
+		device,
 		windows
 	};
 

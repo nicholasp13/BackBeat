@@ -23,6 +23,20 @@ namespace BackBeat {
 		unsigned short blockAlign;  // numChannels * bitDepth / 8
 		unsigned short bitDepth;
 		unsigned long fileSize;
+
+		// fileSize is irrelevant in nearly every case (every case in BackBeat) and is not checked here
+		bool operator == (AudioProps props)
+		{
+			return (bigEndian == props.bigEndian)
+				&& (format == props.format)
+				&& (numChannels == props.numChannels)
+				&& (sampleRate == props.sampleRate)
+				&& (byteRate == props.byteRate)
+				&& (blockAlign == props.blockAlign)
+				&& (bitDepth == props.bitDepth);
+		}
+
+		inline bool operator != (AudioProps props) { return !(*this == props); }
 	};
 
 	struct AudioInfo {

@@ -15,23 +15,22 @@ namespace BackBeat {
 		WindowsMIDIDeviceManager();
 		~WindowsMIDIDeviceManager();
 
-		// NOTE: Might not use bool return values
-		virtual bool OpenDevice(UINT index);
-		virtual bool CloseDevice(UINT index);
-		virtual bool RunDevice(UINT index);
-		virtual bool StopDevice();
-		virtual bool CloseAll();
-
-		virtual void PushOutput(std::shared_ptr<MIDIInputHandler> output);
+		virtual bool OpenDevice(UINT index) override;
+		virtual bool CloseDevice(UINT index) override;
+		virtual bool RunDevice(UINT index) override;
+		virtual bool StopDevice() override;
+		virtual bool CloseAll() override;
+		virtual void PushOutput(std::shared_ptr<MIDIInputHandler> output) override;
+		virtual void DeleteOutput(UUID id) override;
 
 		// NOTE: Getters for other MIDI device data not implemented
-		inline virtual std::string GetDeviceName(UINT index) { return m_Devices[index].GetName(); }
-		inline virtual UINT GetNumDevices() { return m_NumDevices; }
-		inline virtual bool IsOpen(UINT index) { return m_Devices[index].IsOpen(); };
-		inline virtual bool IsRunning() { return (m_RunID >= 0); }
+		inline virtual std::string GetDeviceName(UINT index) override { return m_Devices[index].GetName(); }
+		inline virtual UINT GetNumDevices() override { return m_NumDevices; }
+		inline virtual bool IsOpen(UINT index) override { return m_Devices[index].IsOpen(); };
+		inline virtual bool IsRunning() override { return (m_RunID >= 0); }
 
 	private:
-		bool m_OutputSet;
+		unsigned int m_NumOutputsSet;
 		UINT m_NumDevices;
 		// Set to -1 if no devices are running
 		int m_RunID;
@@ -47,9 +46,9 @@ namespace BackBeat {
 		// } MIDIINCAPS;
 		std::vector<MIDIINCAPSA> m_DeviceInfo;
 		std::vector<WindowsMIDIDevice> m_Devices;
-
 		std::shared_ptr<MIDIInputHandler> m_Output;
 
+	private:
 		void InitDevices();
 	};
 }

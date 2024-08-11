@@ -164,6 +164,19 @@ namespace BackBeat {
 		;
 	}
 
+	void WindowsMIDIDevice::DeleteOutput(UUID id)
+	{
+		for (unsigned int i = 0; i < m_Outputs.size(); i++)
+		{
+			if (id == m_Outputs[i]->GetID())
+			{
+				m_Outputs.erase(m_Outputs.begin() + i);
+				return;
+			}
+		}
+		return;
+	}
+
 	void WindowsMIDIDevice::MIDIInput(DWORD_PTR part1, DWORD_PTR part2)
 	{
 		MIDIEvent event = {

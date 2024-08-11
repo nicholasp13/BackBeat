@@ -5,7 +5,7 @@ namespace BackBeat {
 
 	WindowsMIDIDeviceManager::WindowsMIDIDeviceManager()
 		:
-		m_OutputSet(false),
+		m_NumOutputsSet(0),
 		m_NumDevices(0),
 		m_RunID(-1)
 	{
@@ -20,7 +20,7 @@ namespace BackBeat {
 
 	bool WindowsMIDIDeviceManager::OpenDevice(UINT index)
 	{
-		if (!m_OutputSet) {
+		if (m_NumOutputsSet == 0) {
 			BB_CORE_ERROR("SET MIDI DEVICE OUTPUT");
 			return false;
 		}
@@ -32,7 +32,7 @@ namespace BackBeat {
 
 	bool WindowsMIDIDeviceManager::CloseDevice(UINT index)
 	{
-		if (!m_OutputSet) {
+		if (m_NumOutputsSet == 0) {
 			BB_CORE_ERROR("SET MIDI DEVICE OUTPUT");
 			return false;
 		}
@@ -44,7 +44,7 @@ namespace BackBeat {
 
 	bool WindowsMIDIDeviceManager::RunDevice(UINT index)
 	{
-		if (!m_OutputSet) {
+		if (m_NumOutputsSet == 0) {
 			BB_CORE_ERROR("SET MIDI DEVICE OUTPUT");
 			return false;
 		}
@@ -66,6 +66,8 @@ namespace BackBeat {
 
 	bool WindowsMIDIDeviceManager::StopDevice()
 	{
+		if (m_RunID < 0)
+			return true;
 		m_Devices[m_RunID].Stop();
 		m_Devices[m_RunID].Close();
 		m_RunID = -1;
@@ -84,10 +86,21 @@ namespace BackBeat {
 
 	void WindowsMIDIDeviceManager::PushOutput(std::shared_ptr<MIDIInputHandler> output)
 	{
+		if (!output)
+			return;
 		for (UINT i = 0; i < m_NumDevices; i++) {
 			m_Devices[i].PushOutput(output);
 		}
-		m_OutputSet = true;
+		m_NumOutputsSet = m_Devices[0].GetNumOutputs();
+	}
+
+	void WindowsMIDIDeviceManager::DeleteOutput(UUID id)
+	{
+		for (UINT i = 0; i < m_NumDevices; i++) {
+			m_Devices[i].DeleteOutput(id);
+		}
+		if (m_NumDevices > 0)
+			m_NumOutputsSet = m_Devices[0].GetNumOutputs();
 	}
 
 	void WindowsMIDIDeviceManager::InitDevices()

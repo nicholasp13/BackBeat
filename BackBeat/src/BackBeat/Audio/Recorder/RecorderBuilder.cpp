@@ -3,14 +3,30 @@
 #include "RecorderBuilder.h"
 namespace BackBeat {
 
+	static std::string s_FileDirectory = "";
+	static std::string s_FileType = "";
+
 	std::shared_ptr<AudioRecorder> RecorderBuilder::BuildRecorder(UUID id, AudioProps props) 
 	{
-		// NOTE: Empty strings for now but will possibly change in the future whem it's decided where user files will go
-		const std::string fileDirectory = "";
-		const std::string fileType = "";
-		std::string fileName = std::to_string(unsigned long long(id));
-		std::string filePath = fileDirectory + fileName + fileType;
+		std::string filePath = GetFilePath(id);
 		return std::make_shared<AudioRecorder>(filePath, props);
+	}
+
+	std::string RecorderBuilder::GetFilePath(UUID id)
+	{
+		std::string fileName = id.ToString();
+		std::string filePath = s_FileDirectory.c_str() + fileName + s_FileType.c_str();
+		return filePath;
+	}
+
+	void RecorderBuilder::SetFileDirectory(std::string dir)
+	{
+		s_FileDirectory = dir;
+	}
+
+	void RecorderBuilder::SetFileType(std::string type)
+	{
+		s_FileType = type;
 	}
 
 }

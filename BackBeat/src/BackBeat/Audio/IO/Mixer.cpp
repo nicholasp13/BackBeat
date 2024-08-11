@@ -5,7 +5,7 @@
 namespace BackBeat {
 
 	Mixer::Mixer(AudioProps props)
-		: m_NumProcessors(0), m_Props(props), m_Processors(std::vector< std::shared_ptr<AudioProcessor> >())
+		: m_Props(props), m_Processors(std::vector< std::shared_ptr<AudioProcessor> >())
 	{
 
 	}
@@ -155,8 +155,15 @@ namespace BackBeat {
 
 	}
 
-	void Mixer::PushProcessor(std::shared_ptr<AudioProcessor> processor)
+	void Mixer::DeleteProcessor(UUID id)
 	{
-		m_Processors.push_back(processor);
+		for (auto it = m_Processors.begin(); it != m_Processors.end(); it++)
+		{
+			if ((*it)->GetID() == id)
+			{
+				m_Processors.erase(it);
+				return;
+			}
+		}
 	}
 }

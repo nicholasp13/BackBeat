@@ -69,7 +69,16 @@ namespace BackBeat {
 	// TODO: Finish when adding delete functionality to GUI
 	void PlayerManager::Delete(UUID id)
 	{
-
+		for (auto it = m_Players.begin(); it != m_Players.end(); it++)
+		{
+			if ((*it)->GetID() == id)
+			{
+				(*it)->Stop();
+				(*it)->ClearTrack();
+				m_Players.erase(it);
+				return;
+			}
+		}
 	}
 
 	std::shared_ptr<Player> PlayerManager::Find(UUID id)

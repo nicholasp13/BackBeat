@@ -67,7 +67,6 @@ namespace BackBeat {
 	// numFrames = numSamples / numChannels
 	void Recording::Record(char* data, unsigned int numFrames)
 	{
-		// TODO: Check if frames include the number of samples
 		unsigned int numBytes = numFrames * m_Props.blockAlign;
 
 		// If data is nullptr then silence is recordeded instead of samples from data
@@ -115,6 +114,26 @@ namespace BackBeat {
 			.dataSize = m_Size
 		};
 		m_Track = std::make_shared<Track>(info);
+	}
+
+	void Recording::ClearTrack()
+	{
+		m_Track = nullptr;
+		m_TempPath = "";
+		m_Size = 0;
+	}
+
+	void Recording::SetTrack(std::shared_ptr<Track> track)
+	{
+		if (!track)
+			return;
+		auto newProps = track->GetProps();
+		if (newProps != m_Props)
+			return;
+
+		m_Size = track->GetSize();
+		m_TempPath = track->GetInfo().filePath;
+		m_Track = track;
 	}
 
 	TimeMinSec Recording::GetLengthMinSecs()

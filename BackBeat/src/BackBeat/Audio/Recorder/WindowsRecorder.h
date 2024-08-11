@@ -2,15 +2,16 @@
 
 #include "BackBeat/Core/UUID.h"
 #include "Platform/Windows/Windows.h"
-#include "Recorder.h"
+#include "DeviceRecorder.h"
 namespace BackBeat {
 
-	class WindowsRecorder : public Recorder
+	class WindowsRecorder : public DeviceRecorder
 	{
 	public:
 		WindowsRecorder();
 		~WindowsRecorder();
 
+		// Recorder functions
 		virtual void Start() override;
 		virtual void Stop() override;
 		virtual void Reset() override; 
@@ -23,6 +24,10 @@ namespace BackBeat {
 		inline virtual RecorderType GetType() override { return RecorderType::windows; }
 		inline virtual UUID GetID() override { return m_ID; }
 
+		// DeviceRecorder functions
+		inline virtual void SetRecordingTrack(std::shared_ptr<Track> track) override { m_Recording.SetTrack(track); }
+		inline virtual void ClearTrack() override { m_Recording.ClearTrack(); }
+		inline virtual AudioProps GetProps() override { return m_AudioProps; }
 
 	private:
 		bool m_IsRecording;

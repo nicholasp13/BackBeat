@@ -15,7 +15,7 @@ namespace BackBeat {
 
 	PlayerProcessor::~PlayerProcessor()
 	{
-		delete[m_BufferSize](m_Output);
+		delete[]m_Output;
 	}
 
 	void PlayerProcessor::ProcessSamples(unsigned int numSamples, unsigned int sampleRate, unsigned int numChannels)
@@ -106,6 +106,7 @@ namespace BackBeat {
 	{
 		m_On = false;
 		delete[m_BufferSize](m_Output);
+		m_Output = nullptr;
 		m_Track = nullptr;
 	}
 

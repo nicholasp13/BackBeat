@@ -4,7 +4,7 @@
 namespace BackBeat {
 
 	RecorderManager::RecorderManager()
-		: m_Recording(false), m_ActiveID(UUID(0u))
+		: m_Recording(false), m_ActiveID(UUID(0u)), m_ActiveDeviceTrackID(UUID(0u))
 	{
 
 	}
@@ -36,7 +36,6 @@ namespace BackBeat {
 		m_Recorders.at(m_ActiveID)->Stop();
 	}
 
-	// TODO: Make inline if not expanded on
 	std::shared_ptr<Recorder> RecorderManager::AddRecorder(UUID id, AudioProps props)
 	{
 		auto recorder = RecorderBuilder::BuildRecorder(id, props);
@@ -44,8 +43,7 @@ namespace BackBeat {
 		return recorder;
 	}
 
-	// TODO: Make inline if not expanded on
-	void RecorderManager::AddDeviceRecorder(std::shared_ptr<Recorder> recorder)
+	void RecorderManager::AddDeviceRecorder(std::shared_ptr<DeviceRecorder> recorder)
 	{
 		if (m_DeviceRecorder)
 			return;
@@ -97,5 +95,19 @@ namespace BackBeat {
 		m_Recorders.at(id)->Off();
 		m_Recorders.at(id)->Stop();
 		m_ActiveID = UUID(0);
+	}
+
+	void RecorderManager::SetDeviceRecorderTrack(UUID trackID, std::shared_ptr<Track> track)
+	{
+		if (!track)
+			return;
+		m_DeviceRecorder->SetRecordingTrack(track);
+		m_ActiveDeviceTrackID = trackID;
+	}
+
+	void RecorderManager::ClearDeviceTrack()
+	{
+		m_DeviceRecorder->ClearTrack();
+		m_ActiveDeviceTrackID = UUID(0u);
 	}
 }

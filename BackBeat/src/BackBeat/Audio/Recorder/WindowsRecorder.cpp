@@ -29,7 +29,6 @@ namespace BackBeat {
 		m_Recording(std::to_string(unsigned long long(m_ID)) , m_AudioProps),
 		m_BufferSize(0)
 	{
-
 		InitWindowsClient();
 	}
 

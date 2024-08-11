@@ -15,6 +15,8 @@ namespace BackBeat {
 		void Reset();
 		void Reset(AudioProps props);
 		void CreateTrack();
+		void ClearTrack();
+		void SetTrack(std::shared_ptr<Track> track);
 		TimeMinSec GetLengthMinSecs();
 		
 		inline AudioProps GetProps() { return m_Props; }
