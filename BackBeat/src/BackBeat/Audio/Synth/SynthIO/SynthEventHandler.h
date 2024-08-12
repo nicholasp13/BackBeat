@@ -3,8 +3,6 @@
 #include <queue>
 #include <map>
 
-// TODO: Change RenderInfo to MIDIInputHandler
-
 #include "BackBeat/Audio/Synth/SynthBase.h"
 #include "BackBeat/Audio/MIDI/MIDICodes.h"
 #include "BackBeat/Events/KeyEvent.h"

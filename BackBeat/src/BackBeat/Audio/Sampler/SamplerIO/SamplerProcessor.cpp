@@ -1,6 +1,6 @@
 #include "bbpch.h"
 
-// NOTE/TODO: Class is exactly the same as Synth processor might retool the Engine class into an abstract class
+// NOTE: Class is exactly the same as Synth processor might retool the Engine class into an abstract class
 
 #include "SamplerProcessor.h"
 namespace BackBeat {

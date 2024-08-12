@@ -2,8 +2,6 @@
 
 #include "bbpch.h"
 
-// TODO: Add multiple outputs
-
 #include "MIDIDevice.h"
 namespace BackBeat {
 

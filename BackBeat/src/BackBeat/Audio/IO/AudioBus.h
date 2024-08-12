@@ -13,8 +13,9 @@ namespace BackBeat {
 		~AudioBus();
 
 		inline AudioBuffer* GetBuffer() { return &m_Buffer; }
-		inline unsigned int GetBufferSize() { return m_Buffer.GetSize(); }
-		inline virtual BusDirection GetDirection() { return m_Direction; }
+
+		inline virtual unsigned int GetBufferSize() override { return m_Buffer.GetSize(); }
+		inline virtual BusDirection GetDirection() override { return m_Direction; }
 
 	private:
 		BusDirection m_Direction;

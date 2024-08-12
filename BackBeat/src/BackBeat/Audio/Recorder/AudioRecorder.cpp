@@ -17,18 +17,6 @@ namespace BackBeat {
 		
 	}
 
-	// TODO: Change to inline if no extra lines are added
-	void AudioRecorder::On()
-	{
-		m_On = true;
-	}
-
-	// TODO: Change to inline if no extra lines are added
-	void AudioRecorder::Off()
-	{
-		m_On = false;
-	}
-
 	void AudioRecorder::Reset()
 	{
 		if (!m_On)

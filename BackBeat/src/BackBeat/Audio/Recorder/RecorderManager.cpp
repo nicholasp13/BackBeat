@@ -20,7 +20,6 @@ namespace BackBeat {
 			return;
 		if (m_ActiveID == UUID(0))
 			return;
-		// m_Recorders.at(m_ActiveID)->On();
 		m_Recorders.at(m_ActiveID)->Start();
 		m_Recording = true;
 	}
@@ -109,5 +108,14 @@ namespace BackBeat {
 	{
 		m_DeviceRecorder->ClearTrack();
 		m_ActiveDeviceTrackID = UUID(0u);
+	}
+
+	void RecorderManager::DeleteRecorder(UUID id)
+	{ 
+		if (m_ActiveID == id)
+			m_ActiveID = UUID(0);
+		m_Recorders.at(id)->Off();
+		m_Recorders.at(id)->Stop();
+		m_Recorders.erase(id); 
 	}
 }

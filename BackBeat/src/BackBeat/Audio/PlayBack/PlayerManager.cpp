@@ -1,5 +1,8 @@
 #include "bbpch.h"
 
+// NOTE: This is only partially implemented as the complete version will check the size and/or state of each player
+//       and update accordingly. Currently this class does not pause or stop by itself when all the players are done playing
+
 #include "PlayerManager.h"
 namespace BackBeat {
 
@@ -66,7 +69,6 @@ namespace BackBeat {
 		return player;
 	}
 
-	// TODO: Finish when adding delete functionality to GUI
 	void PlayerManager::Delete(UUID id)
 	{
 		for (auto it = m_Players.begin(); it != m_Players.end(); it++)

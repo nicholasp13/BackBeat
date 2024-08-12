@@ -28,12 +28,13 @@ namespace BackBeat {
 		void SetRecorderInactive(UUID id);
 		void SetDeviceRecorderTrack(UUID trackID, std::shared_ptr<Track> track);
 		void ClearDeviceTrack();
+		void DeleteRecorder(UUID id);
 
-		inline void DeleteRecorder(UUID id) { m_Recorders.erase(id); }
+		inline void ResetRecorder(UUID id) { m_Recorders.at(id)->Reset(); }
 		inline bool IsOn(UUID id) { return m_ActiveID == id; }
 		inline bool IsDeviceTrackOn(UUID id) { return m_ActiveDeviceTrackID == id; }
 		inline bool IsRecording() { return m_Recording; }
-		inline bool IsDeviceRecording() { return m_DeviceRecorder->IsRecording(); } // TODO: Put in .cpp file to check if 
+		inline bool IsDeviceRecording() { return m_DeviceRecorder->IsRecording(); }
 		inline std::shared_ptr<DeviceRecorder> GetDeviceRecorder() { return m_DeviceRecorder; }
 		
 	private:

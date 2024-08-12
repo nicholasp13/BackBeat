@@ -14,14 +14,14 @@ namespace BackBeat {
 		AmpEG(unsigned int sampleRate, unsigned int bufferSize, std::shared_ptr<float[]> DCABuffer, std::shared_ptr<EGParameters> params);
 		~AmpEG();
 
-		virtual void Reset(unsigned int sampleRate);
-		virtual void Update();
-		virtual void Render(unsigned int numSamples);
-		virtual void DoNoteOn(NoteEvent event);
-		virtual void DoNoteOff(NoteEvent event);
+		virtual void Reset(unsigned int sampleRate) override;
+		virtual void Update() override;
+		virtual void Render(unsigned int numSamples) override;
+		virtual void DoNoteOn(NoteEvent event) override;
+		virtual void DoNoteOff(NoteEvent event) override;
 
-		inline virtual std::shared_ptr<float[]> GetBuffer() { return m_InputBuffer; }
-		inline virtual EGState GetState() { return m_Core->GetState(); }
+		inline virtual std::shared_ptr<float[]> GetBuffer() override { return m_InputBuffer; }
+		inline virtual EGState GetState() override { return m_Core->GetState(); }
 
 	private:
 		std::shared_ptr<LinearEGCore> m_Core; 

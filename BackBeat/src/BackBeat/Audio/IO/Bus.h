@@ -13,7 +13,6 @@ namespace BackBeat {
 	class Bus
 	{
 	public:
-
 		virtual unsigned int GetBufferSize() { return 0; }
 		virtual BusDirection GetDirection() { return BusDirection::Input; }
 		virtual bool IsActive() { return true; }

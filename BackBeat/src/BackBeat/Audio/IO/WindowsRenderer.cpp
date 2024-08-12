@@ -1,7 +1,6 @@
 #include "bbpch.h"
 
 // TODO: 
-//     - Delete Window API members in deconstructor
 //     - Fix bug where changing the audio output device on PC stops audio from rendering 
 //       by at least warning the user (this happens at the error Window API error message)
 

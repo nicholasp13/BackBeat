@@ -1,54 +1,63 @@
-#include "SamplerController.h"
-
 // TODO: - Create ImGui Pad widget and Pad control popup/window
 //       - Fix panning volume level
 
 // NOTE: Current panning settings currently make the sample quieter compared to when the sample splicer makes them.
-	SamplerController::SamplerController()
-		: 
-		m_Open(false), 
-		m_KeyboardActive(true), 
-		m_CreatingSample(false), 
+
+#include "Sampler.h"
+namespace Exampler {
+
+	Sampler::Sampler(std::shared_ptr<BackBeat::RecorderManager> recorderMgr)
+		:
+		m_Open(false),
+		m_KeyboardActive(true),
+		m_CreatingSample(false),
 		m_ProgrammingNote(false),
-		m_DevicesOpen(0), 
+		m_DevicesOpen(0),
 		m_NumMIDIDevices(0),
-		m_PadToProgram(0)
+		m_PadToProgram(0),
+		m_RecordingPlayer(nullptr),
+		m_RecorderMgr(recorderMgr)
 	{
 		m_NumPads = m_Sampler.GetProgrammer()->GetNumPads();
 	}
 
-	SamplerController::~SamplerController()
+	Sampler::~Sampler()
 	{
 		m_Sampler.Stop();
+		m_RecordingPlayer->Stop();
 	}
 
-	void SamplerController::Update()
+	void Sampler::Update()
 	{
-		if (!m_Open)
-			m_Sampler.Stop();
+		
 	}
 
-	void SamplerController::OnEvent(BackBeat::Event& event)
+	void Sampler::OnEvent(BackBeat::Event& event)
 	{
 		BackBeat::EventDispatcher dispatcher(event);
 
-		dispatcher.Dispatch<BackBeat::KeyPressedEvent>(BIND_EVENT_FN(SamplerController::OnKeyEvent));
-		dispatcher.Dispatch<BackBeat::MouseButtonPressedEvent>(BIND_EVENT_FN(SamplerController::OnMouseButtonEvent));
+		dispatcher.Dispatch<BackBeat::KeyPressedEvent>(BIND_EVENT_FN(Sampler::OnKeyEvent));
+		dispatcher.Dispatch<BackBeat::MouseButtonPressedEvent>(BIND_EVENT_FN(Sampler::OnMouseButtonEvent));
 
 		if (m_Sampler.IsRunning() && m_KeyboardActive)
 			event.Handled = m_Sampler.GetEventHandler()->HandleEvent(event);
 	}
-	
-	void SamplerController::ImGuiRender()
+
+	void Sampler::ImGuiRender()
 	{
+		auto samplerID = m_Sampler.GetID();
+		unsigned int count = SetSamplerColors();
+
+		ImGui::PushID(samplerID.ToString().c_str());
+
+		RenderCanvasEntity();
+
 		if (!m_Open)
 		{
-			m_TrackPlayer.Pause();
-			m_Sampler.Stop();
+			ImGui::PopStyleColor(count);
+			ImGui::PopID();
 			return;
 		}
-		if (!m_Sampler.IsRunning())
-			m_Sampler.Start();
 
 		const ImGuiViewport* mainViewport = ImGui::GetMainViewport();
 		const float width = 1000.0f;
@@ -63,50 +72,171 @@
 		sampler_window_flags |= ImGuiWindowFlags_MenuBar;
 		sampler_window_flags |= ImGuiWindowFlags_NoResize;
 
-		unsigned int count = SetSamplerColors();
-
-		ImGui::Begin("Sampler", &m_Open, sampler_window_flags);
+		// Creates a label ID for ImGui::Begin() that avoids collision to other ImGui::Begin() calls with the same name
+		const std::string hashDivider = "###";
+		std::string labelID = m_Name.c_str() + hashDivider + samplerID.ToString();
+		ImGui::Begin(labelID.c_str(), &m_Open, sampler_window_flags);
 
 		RenderMenuBar();
 		RenderSamplerPads();
-
 		// PopUps
 		RenderSampleCreator();
 		RenderNoteProgrammer();
 
 		ImGui::End();
-
 		ImGui::PopStyleColor(count);
+		ImGui::PopID();
 	}
 
-	void SamplerController::Open()
+	void Sampler::Delete(
+		BackBeat::PlayerManager* playerMgr,
+		std::shared_ptr<BackBeat::RecorderManager> recorderMgr,
+		std::shared_ptr<BackBeat::Mixer> mixer,
+		BackBeat::WindowsMIDIDeviceManager* midiDeviceManager)
 	{
-		m_Open = true;
-		m_Sampler.Start();
-	}
+		auto synthID = m_Sampler.GetID();
+		auto trackPlayerID = m_RecordingPlayer->GetID();
+		auto midiInputID = m_Sampler.GetMIDIInput()->GetID();
 
-	void SamplerController::Close()
-	{
-		m_Open = false;
 		m_Sampler.Stop();
-		m_TrackPlayer.Stop();
+		m_RecordingPlayer->Stop();
+
+		playerMgr->Delete(m_RecordingPlayer->GetID());
+		recorderMgr->DeleteRecorder(synthID);
+		mixer->DeleteProcessor(synthID);
+		mixer->DeleteProcessor(trackPlayerID);
+		midiDeviceManager->DeleteOutput(midiInputID);
 	}
 
-	bool SamplerController::OnKeyEvent(BackBeat::KeyPressedEvent& event)
+	void Sampler::RenderCanvasEntity()
 	{
-		return true;
+		auto samplerID = m_Sampler.GetID();
+
+		ImGui::PushID(samplerID.ToString().c_str());
+		ImGui::Spacing();
+		ImGui::SeparatorText(m_Name.c_str());
+
+		if (!m_Sampler.IsRunning())
+		{
+			if (ImGui::Button("On "))
+				On();
+		}
+		else
+		{
+			if (ImGui::Button("Off"))
+			{
+				m_RecorderMgr->SetRecorderInactive(samplerID);
+				Off();
+			}
+		}
+		ImGui::SameLine();
+
+		if (ImGui::Button("Open"))
+			Open();
+
+		// Render Recorder controls
+		{
+			if (!m_RecorderMgr->IsOn(samplerID))
+			{
+				if (ImGui::Button("Record On", ImVec2(125, 20)))
+				{
+					if (!m_RecorderMgr->IsRecording())
+					{
+						On();
+						m_RecorderMgr->SetRecorderActive(samplerID);		
+					}
+				}
+			}
+			else
+			{
+				if (ImGui::Button("Record Off", ImVec2(125, 20)))
+					if (!m_RecorderMgr->IsRecording())
+						m_RecorderMgr->SetRecorderInactive(samplerID);
+			}
+			ImGui::SameLine();
+
+		}
+
+		// Render Recording Track Player controls
+		{
+			if (m_RecordingPlayer && m_RecordingPlayer->GetSize() > 0)
+			{
+				if (!m_RecordingPlayer->IsOn())
+				{
+					if (ImGui::Button("Play Recording On "))
+						m_RecordingPlayer->On();
+				}
+				else
+				{
+					if (ImGui::Button("Play Recording Off"))
+						m_RecordingPlayer->Off();
+				} ImGui::SameLine();
+
+				if (ImGui::Button("Clear Recording"))
+					if (!m_RecorderMgr->IsOn(samplerID))
+						m_RecorderMgr->ResetRecorder(samplerID);
+
+
+				BackBeat::TimeMinSec trackTime = m_RecordingPlayer->GetTime();
+				BackBeat::TimeMinSec trackLength = m_RecordingPlayer->GetLength();
+
+				int position = m_RecordingPlayer->GetPosition();
+				int size = m_RecordingPlayer->GetSize();
+				static bool wasPlaying = false;
+				ImGui::Text("%d:%02d", trackTime.minutes, trackTime.seconds); ImGui::SameLine();
+
+				// Placeholder for future implementation of a custom ImGui::Timeline widget
+				ImGui::PushID("Seekbar");
+				if (BackBeat::ImGuiWidgets::ImGuiSeekBarInt("##", &position, m_RecordingPlayer->GetSize(), "", ImGuiSliderFlags(0)))
+				{
+					if (m_RecordingPlayer->IsPlaying())
+					{
+						m_RecordingPlayer->Pause();
+						wasPlaying = true;
+					}
+					m_RecordingPlayer->SetPosition(position);
+				}
+				if (ImGui::IsItemDeactivated() && wasPlaying)
+				{
+					m_RecordingPlayer->Play();
+					wasPlaying = false;
+				}
+				ImGui::SameLine(); ImGui::Text("%d:%02d", trackLength.minutes, trackLength.seconds);
+				ImGui::PopID();
+
+			}
+			else
+			{
+				if (ImGui::Button("Play Recording On "))
+				{
+				} ImGui::SameLine();
+				if (ImGui::Button("Clear Recording"))
+				{ 
+				}
+
+				// Renders an empty, uninteractable seek bar if no track is loaded
+				ImGui::PushID("EmptySeekbar");
+				int temp = 0;
+				ImGui::Text("%d:%02d", 0, 0); ImGui::SameLine();
+				BackBeat::ImGuiWidgets::ImGuiSeekBarInt("##", &temp, 10000, "", ImGuiSliderFlags(0)); ImGui::SameLine();
+				ImGui::Text("%d:%02d", 0, 0);
+				ImGui::PopID();
+
+			}
+			ImGui::Spacing();
+
+		}
+
+		float* volume = &(m_Sampler.GetEngineParams()->volume);
+		ImGui::Text("    "); ImGui::SameLine();
+		BackBeat::ImGuiWidgets::ImGuiSeekBarFloat("Volume", volume, 1.0f, "", ImGuiSliderFlags(0));
+		
+		ImGui::Spacing();
+		ImGui::PopID();
 	}
 
-	bool SamplerController::OnMouseButtonEvent(BackBeat::MouseButtonPressedEvent& event)
+	void Sampler::RenderMenuBar()
 	{
-		return true;
-	}
-
-	void SamplerController::RenderMenuBar()
-	{
-		static unsigned int padIndex = 0;
-		bool programNote = false;
-
 		if (ImGui::BeginMenuBar())
 		{
 			if (ImGui::BeginMenu("Menu"))
@@ -114,6 +244,7 @@
 				if (ImGui::MenuItem("Create Sample"))
 				{
 					m_CreatingSample = true;
+					m_TrackPlayer.Start();
 				}
 
 				if (ImGui::BeginMenu("Program Pad"))
@@ -157,8 +288,6 @@
 					ImGui::EndMenu();
 				}
 
-				// TODO: Add MIDIDevice controls
-
 				ImGui::EndMenu();
 			}
 
@@ -169,7 +298,7 @@
 
 	// TODO: - Make each pad its own large square button/widget that left click plays the sample and right click opens
 	//         a menu to program the pad
-	void SamplerController::RenderSamplerPads()
+	void Sampler::RenderSamplerPads()
 	{
 		auto sampleProgrammer = m_Sampler.GetProgrammer();
 		const unsigned int charLimit = 80;
@@ -239,7 +368,7 @@
 
 			// Sample Pad DCA/panning controls
 			const float defaultAmp = 0.5f;
-			float pan = (sampleProgrammer->GetSamplePad(i)->GetDCAParameters()->rightAmp - 
+			float pan = (sampleProgrammer->GetSamplePad(i)->GetDCAParameters()->rightAmp -
 				sampleProgrammer->GetSamplePad(i)->GetDCAParameters()->leftAmp) / 2;
 			ImGui::Text("Panning"); ImGui::SameLine();
 			if (ImGui::SmallButton("Reset"))
@@ -255,7 +384,7 @@
 		ImGui::EndTable();
 	}
 
-	void SamplerController::RenderSampleCreator()
+	void Sampler::RenderSampleCreator()
 	{
 		const float width = 900.0f;
 		const float height = 200.0f;
@@ -281,6 +410,7 @@
 			m_CreatingSample = false;
 		}
 
+		ImGui::PushStyleColor(ImGuiCol_PopupBg, IM_COL32(147, 157, 169, 255));
 		if (ImGui::BeginPopup(CreatingSampleID))
 		{
 			ImGui::SeparatorText("Sample Creator");
@@ -433,7 +563,7 @@
 					{
 						int zoomIncrement = (int)byteRate;
 						int trackSize = (int)m_TrackPlayer.GetSize();
-						zero = zoomIncrement > zero 
+						zero = zoomIncrement > zero
 							? 0 : (zero - zoomIncrement);
 						size = (size + zoomIncrement) > trackSize
 							? trackSize : (size + zoomIncrement);
@@ -567,6 +697,7 @@
 
 			ImGui::EndPopup();
 		}
+		ImGui::PopStyleColor(1);
 
 		if (!ImGui::IsPopupOpen(CreatingSampleID))
 		{
@@ -585,7 +716,7 @@
 		}
 	}
 
-	void SamplerController::RenderNoteProgrammer()
+	void Sampler::RenderNoteProgrammer()
 	{
 		static int newCode = 0;
 
@@ -604,7 +735,7 @@
 			sprintf_s(padNameLabel, "Pad #%d", m_PadToProgram);
 
 			ImGui::SeparatorText(padNameLabel);
-			
+
 			ImGui::Text("Current Note:"); ImGui::SameLine();
 			if (code == (int)BackBeat::MIDI::NoteOff)
 				ImGui::Text("OFF");
@@ -617,7 +748,7 @@
 			{
 				m_Sampler.GetProgrammer()->ProgramNote(m_PadToProgram - 1, (BackBeat::MIDICode)newCode);
 				ImGui::CloseCurrentPopup();
-			} 
+			}
 			ImGui::SameLine();
 
 			if (ImGui::SmallButton("Clear"))
@@ -635,7 +766,7 @@
 			if (ImGui::BeginPopup("MIDIKeyInput"))
 			{
 				ImGui::Text("Press MIDI Key");
-				
+
 				if (m_Sampler.GetMIDIInput()->IsKeyPresssed())
 				{
 					newCode = (int)m_Sampler.GetMIDIInput()->GetLastKeyPressed();
@@ -653,32 +784,28 @@
 		}
 	}
 
-	// Sampler color codes:
-	// Table background:  #1D2618
-	// Window background: #31382c
-	// Menu bar:          #63735b
-	// Progress bar:      #86E03D
-	unsigned int SamplerController::SetSamplerColors()
+	unsigned int Sampler::SetSamplerColors()
 	{
 		unsigned int count = 0;
 
 		// MenuBar colors
-		ImGui::PushStyleColor(ImGuiCol_MenuBarBg, IM_COL32(99, 115, 91, 255)); count++;
+		ImGui::PushStyleColor(ImGuiCol_MenuBarBg, IM_COL32(91, 115, 109, 255)); count++;
 
 		// Window colors
-		ImGui::PushStyleColor(ImGuiCol_Border, IM_COL32(99, 115, 91, 255)); count++;
+		ImGui::PushStyleColor(ImGuiCol_Border, IM_COL32(91, 115, 109, 255)); count++;
 
 		// Table colors
-		ImGui::PushStyleColor(ImGuiCol_TableRowBg, IM_COL32(29, 38, 24, 255)); count++;
-		ImGui::PushStyleColor(ImGuiCol_TableRowBgAlt, IM_COL32(29, 38, 24, 255)); count++;
-		ImGui::PushStyleColor(ImGuiCol_TableBorderStrong, IM_COL32(49, 56, 44, 255)); count++;
-		ImGui::PushStyleColor(ImGuiCol_TableBorderLight, IM_COL32(49, 56, 44, 255)); count++;
+		ImGui::PushStyleColor(ImGuiCol_TableRowBg, IM_COL32(24, 38, 39, 255)); count++;
+		ImGui::PushStyleColor(ImGuiCol_TableRowBgAlt, IM_COL32(24, 38, 39, 255)); count++;
+		ImGui::PushStyleColor(ImGuiCol_TableBorderStrong, IM_COL32(44, 56, 59, 255)); count++;
+		ImGui::PushStyleColor(ImGuiCol_TableBorderLight, IM_COL32(44, 56, 59, 255)); count++;
 
 		// Misc colors
-		ImGui::PushStyleColor(ImGuiCol_Separator, IM_COL32(99, 115, 91, 255)); count++;
-		ImGui::PushStyleColor(ImGuiCol_PlotHistogram, IM_COL32(134, 224, 61, 255)); count++;
-		ImGui::PushStyleColor(ImGuiCol_SliderGrab, IM_COL32(134, 224, 61, 255)); count++;
-		ImGui::PushStyleColor(ImGuiCol_SliderGrabActive, IM_COL32(134, 224, 61, 255)); count++;
+		ImGui::PushStyleColor(ImGuiCol_Separator, IM_COL32(99, 115, 101, 255)); count++;
+		ImGui::PushStyleColor(ImGuiCol_PlotHistogram, IM_COL32(61, 224, 144, 255)); count++;
+		ImGui::PushStyleColor(ImGuiCol_SliderGrab, IM_COL32(61, 224, 144, 255)); count++;
+		ImGui::PushStyleColor(ImGuiCol_SliderGrabActive, IM_COL32(61, 224, 144, 255)); count++;
 
 		return count;
 	}
+}

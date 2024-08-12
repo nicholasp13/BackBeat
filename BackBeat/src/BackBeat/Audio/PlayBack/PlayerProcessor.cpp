@@ -98,7 +98,7 @@ namespace BackBeat {
 			return;
 		delete[m_BufferSize](m_Output);
 		m_Track = track;
-		m_BufferSize = track->GetProps().sampleRate; // TODO: Check this should probably be byte rate
+		m_BufferSize = track->GetProps().byteRate; // NOTE: This buffer size might be too big and can make it smaller
 		m_Output = new byte[m_BufferSize];
 	}
 

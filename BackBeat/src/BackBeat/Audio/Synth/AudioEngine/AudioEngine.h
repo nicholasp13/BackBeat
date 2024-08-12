@@ -52,6 +52,7 @@ namespace BackBeat {
 		std::unique_ptr<SynthVoice> m_Voices[SynthMaxVoices];
 		std::queue<MIDIEvent> m_MIDIEvents;
 
+	private:
 		void InitVoices();
 		void InitParameters();
 	};

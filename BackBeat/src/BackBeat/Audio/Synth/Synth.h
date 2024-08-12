@@ -69,6 +69,7 @@ namespace BackBeat {
 		std::shared_ptr<MIDIInputHandler> m_MIDIInput;
 		std::shared_ptr<SynthParameters> m_Params;
 
+	private:
 		void InitSynth();
 		void Run();
 	};

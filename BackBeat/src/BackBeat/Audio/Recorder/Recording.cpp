@@ -106,7 +106,7 @@ namespace BackBeat {
 			return;
 
 		AudioInfo info = {
-			.type = FileType::sample, // TODO: CHANGE TO recording after fixed enum class
+			.type = FileType::sample,
 			.name = m_TempPath,
 			.filePath = m_TempPath,
 			.props = m_Props,

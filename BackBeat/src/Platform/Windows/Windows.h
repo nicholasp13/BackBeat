@@ -79,7 +79,7 @@ namespace BackBeat {
 
 			// Windows API Function(s): 
 			// GetDefaultAudioEndpoint(), IMMDevice::Activate(), IAudioClient::Initialize(),
-			// IAudioRenderClient::ReleaseBuffer()
+			// IAudioRenderClient::ReleaseBuffer(), SHGetKnownFolderPath()
 			case (E_INVALIDARG):
 			{
 				BB_CORE_ERROR("Windows Error E_INVALIDARG has occured.");
@@ -105,6 +105,13 @@ namespace BackBeat {
 			case (E_NOINTERFACE):
 			{
 				BB_CORE_ERROR("Windows Error E_NOINTERFACE has occured");
+				return false;
+			}
+
+			// Windows API Function(s): SHGetKnownFolderPath()
+			case (E_FAIL):
+			{
+				BB_CORE_ERROR("Windows Error E_FAIL has occured");
 				return false;
 			}
 
@@ -396,22 +403,39 @@ namespace BackBeat {
 			char path[size] = {};
 			char defaultChar = ' ';
 
-			// TODO: Add expanations to this function
+			// SHGetKnownFolderPath(
+			//     REFKNOWNFOLDERID    rfid,     // ID for folder
+			//     DWORD               dwFlags,
+			//     HANDLE              htoken,   // ID for user, if NULL uses current user's folder
+			//     PWSTR               *ppszPath // Pointer to wchar_t[] where the folder path is outputted
+			// );
+			// Returns S_OK on success, E_FAIL or E_INVALIDARD if failed
+			// Flags used in dwFlags: https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/ne-shlobj_core-known_folder_flag-
 			hr = SHGetKnownFolderPath(
 				FOLDERID_LocalAppData,
 				0,
 				NULL,
 				&wPath
 				);
-			// TODO: Add function into error comment headers
 			if (!CheckFailureHR(hr))
 				return std::string();
 
-			// TODO: Add expanations to this function
+			// int WideCharToMultiByte(
+			//     UINT                               CodePage,         // Code for the type of conversion
+			//     DWORD                              dwFlags,          //
+			//     _In_NLS_string_(cchWideChar)LPCWCH lpWideCharStr,    // Pointer to unicode string to convert
+			//     int                                cchWideChar,      // Size of lpWideCharStr, -1 if the function should process the whole string
+			//     LPSTR                              lpMultiByteStr,   // Pointer to where the converted string will be stored
+			//     int                                cbMultiByte,      // Size in bytes of lpMultiByteStr
+			//	   LPCCH                              lpDefaultChar,    // Default char used if there is no proper translated char
+			//     LPBOOL                             lpUsedDefaultChar // Optional pointer to a bool that tells the user if a default char was used in translation
+			// );
+			// Returns the size of the translated string, returns 0 if an error occured
+			// Flags used in dwFlags: https://learn.microsoft.com/en-us/windows/win32/api/stringapiset/nf-stringapiset-widechartomultibyte
 			trueSize = WideCharToMultiByte(CP_ACP, 0, wPath, -1, path, size, &defaultChar, NULL);
 			if (trueSize == 0)
 			{
-				BB_CORE_ERROR("Error getting file dir: {0}", trueSize);
+				BB_CORE_ERROR("Error getting file directory: {0}", trueSize);
 				return std::string();
 			}
 			std::string filePath(path, trueSize);

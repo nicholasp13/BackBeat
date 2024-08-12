@@ -88,25 +88,6 @@ namespace BackBeat {
 		return false;
 	}
 
-	// TODO: Check if this can change into an inline
-	void SamplerCore::LoopOn()
-	{
-		m_Looping = true;
-		if (m_Sample)
-		{
-
-		}
-	}
-
-	void SamplerCore::LoopOff()
-	{
-		m_Looping = false;
-		if (m_Sample)
-		{
-
-		}
-	}
-
 	void SamplerCore::SetSample(Sample* newSample)
 	{
 		delete m_Sample;
