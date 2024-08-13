@@ -1,7 +1,8 @@
 # ![BackBeat](BackBeat/assets/logos/BackbeatLogo_NoFilter_32x32.png?raw=true "BackBeat")  BackBeat
 
 Currently a music application engine for Windows 10/11 written in C++.
-Currently implements a basic polyphonic synth, a sampler, and WAV file playback as shown in the example _Sampler_ application
+Currently implements a basic polyphonic synth and a sampler both with recording capabilities,
+recording audio devices like mics using Windows API, and WAV file playback as shown in the example _Exampler_ application
 
 ## Goals
 The goal is to create an open source, simple digital audio workstation (DAW) with the ability to easily customize sounds and interface
@@ -10,26 +11,29 @@ The goal is to create an open source, simple digital audio workstation (DAW) wit
 - Sampler with the ability to cut and program your own samples with control over panning and volume of each individual sample
 - Playback of WAV files of all bit depths and 48k sample rate
 - MIDI input device support for both Synthesizer and Sampler
+- Recording audio from devices such as mics and instruments through Windows API and recording BackBeat objects like Sampler and Synth
+- GUI using ImGui to fully control, add, and delete BackBeat objects during runtime
 ### Upcoming features:
-- Fast Fourier Transform for use in filters, pitch shifting, audio visualizing, etc.
-- Recording audio input devices like mics, e-drums, electric guitars, etc.
-- Recording and writing audio WAV files using the existing BackBeat implementated instruments or own audio input devices
+- Multithreading different audio functions like creating samples, rendering, recording, visualizing, etc. for better performance and reducing artifacting in audio streams
+- Audio Visualization
+- Serialization to save configuration of BackBeat objects and other misc. settings
 ### Planned features:
 - Modular Matrix for interactive GUI implementation to customize synth sounds
 - Add downsampling and upsampling to support different sample rates (only 48k sample rate supported currently)
 - Other Synth modes including monophonic, legatto, gliding, etc.
 - Add support to play MP3 file
-- Linux support and other random features as necessary or personally desired
+- 2D Renderer for custom sprites and animations for audio visualization
+- Linux support
 
 ## How To Use
 Note: Developed soley on Windows with Visual Studios 2022, other IDEs untested and may not work. Other audio setups also untested and may not work.
-Set `Sampler` as Startup project to run and make sure to clone recursively. If not, use `git submodule update --init` to clone submodules.
+Set `Exampler` as Startup project to run and make sure to clone recursively. If not, use `git submodule update --init` to clone submodules.
 1. Clone repository with
 	- `git clone --recursive https://github.com/nicholasp13/BackBeat.git`
  	- Using Visual Studios 2022 `Clone a repository` with `https://github.com/nicholasp13/BackBeat.git`
 2. Run [GenerateProject.bat](https://github.com/nicholasp13/BackBeat/blob/main/GenerateProject.bat)
 3. Run `BackBeat.sln` in Visual Studios 2022.
-4. Run _Sampler_ as startup project
+4. Run _Exampler_ as startup project
 
 ## How To Run Unit Tests on Visual Studios 2022
 1. `Tools` -> `NuGet Package Manager` -> `Manage NuGet Packages for Solution...`
