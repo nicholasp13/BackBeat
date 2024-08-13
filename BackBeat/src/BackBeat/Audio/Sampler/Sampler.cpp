@@ -29,6 +29,7 @@ namespace BackBeat {
 	void Sampler::InitSampler()
 	{
 		m_Running = false;
+
 		const unsigned short format = 3;
 		const unsigned short numChannels = 2;
 		const unsigned long sampleRate = 48000;
@@ -46,10 +47,11 @@ namespace BackBeat {
 			.fileSize = 0
 		};
 		m_Engine = std::make_shared<SamplerEngine>(m_Props);
-		m_Processor = std::make_shared<SamplerProcessor>(m_Props, m_Engine);
+		m_Processor = std::make_shared<SamplerProcessor>(m_Props, m_Engine, m_ID);
 		m_Programmer = std::make_shared<SampleProgrammer>(m_Props);
 		m_MIDIInput = std::make_shared<MIDIInputHandler>(m_Processor->GetInfo());
 		m_Handler = std::make_shared<SamplerEventHandler>();
+		m_Params = std::make_shared<SamplerParameters>(m_Engine->GetParams());
 		
 		// Key event controls
 		const KeyCode numCode = Key::D1;

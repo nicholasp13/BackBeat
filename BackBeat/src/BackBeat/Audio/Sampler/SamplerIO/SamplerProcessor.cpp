@@ -1,16 +1,17 @@
 #include "bbpch.h"
 
-// NOTE/TODO: Class is exactly the same as Synth processor might retool the Engine class into an abstract class
+// NOTE: Class is exactly the same as Synth processor might retool the Engine class into an abstract class
 
 #include "SamplerProcessor.h"
 namespace BackBeat {
 
-	SamplerProcessor::SamplerProcessor(AudioProps props, std::shared_ptr<SamplerEngine> engine)
+	SamplerProcessor::SamplerProcessor(AudioProps props, std::shared_ptr<SamplerEngine> engine, UUID id)
 		:
 		m_On(false),
 		m_Output(new float[props.sampleRate]),
 		m_Props(props),
 		m_Bus(props, BusDirection::Output),
+		m_ID(id),
 		m_Engine(engine),
 		m_Info(std::make_shared<RenderInfo>(m_Bus.GetBuffer()))
 	{

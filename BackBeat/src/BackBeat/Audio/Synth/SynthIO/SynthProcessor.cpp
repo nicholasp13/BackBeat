@@ -3,16 +3,17 @@
 #include "SynthProcessor.h"
 namespace BackBeat {
 
-	SynthProcessor::SynthProcessor(AudioProps props, std::shared_ptr<AudioEngine> engine)
+	SynthProcessor::SynthProcessor(AudioProps props, std::shared_ptr<AudioEngine> engine, UUID id)
 		: 
 		m_On(false),
 		m_Output(new float[props.sampleRate]),
 		m_Props(props), 
-		m_Bus(props, BusDirection::Output), 
+		m_Bus(props, BusDirection::Output),
+		m_ID(id),
 		m_Engine(engine),
 		m_Info(std::make_shared<RenderInfo>(m_Bus.GetBuffer()))
 	{
-
+		
 	}
 
 	SynthProcessor::~SynthProcessor()

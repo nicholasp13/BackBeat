@@ -1,6 +1,6 @@
 workspace "BackBeat"
 	architecture "x64"
-	startproject "Sampler"
+	startproject "Exampler"
 
 	configurations
 	{
@@ -79,8 +79,8 @@ project "BackBeat"
 		optimize "on"
 
 
-project "Sampler"
-	location "Sampler"
+project "Exampler"
+	location "Exampler"
 	kind "ConsoleApp"
 	language "C++"
 	cppdialect "C++20"

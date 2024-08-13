@@ -45,7 +45,7 @@ namespace BackBeat {
 					size = Audio::EndianConverterLong(header[headerPosition + 1], header[headerPosition + 2],
 						header[headerPosition + 3], header[headerPosition + 4]);
 				}
-				return ReadHeader(filePath, size, wav);
+				return ReadHeader(filePath, size, FileType::wav);
 			}
 
 			header[headerPosition] = temp1;
@@ -62,7 +62,7 @@ namespace BackBeat {
 					size = Audio::EndianConverterLong(header[sampleHeaderPosition], header[sampleHeaderPosition + 1],
 						header[sampleHeaderPosition + 2], header[sampleHeaderPosition + 3]);
 				}
-				return ReadHeader(filePath, size, sample);
+				return ReadHeader(filePath, size, FileType::sample);
 			}
 		}
 		return AudioInfo();
@@ -92,13 +92,13 @@ namespace BackBeat {
 		if (!file.is_open())
 			return info;
 
-		if (info.type == wav)
+		if (info.type == FileType::wav)
 		{
 			file.seekg(3);
 			file.get(data);
 			props.bigEndian = (data == 'X');
 		}
-		else if (info.type == sample)
+		else if (info.type == FileType::sample)
 		{
 			props.bigEndian = false;
 		}

@@ -9,8 +9,7 @@ namespace BackBeat {
 		Track(AudioInfo info);
 		~Track();
 
-		bool Render(byte* output, unsigned int numBytes);
-		
+		bool Render(byte* output, unsigned int numBytes);	
 		TimeMinSec GetTime();
 		TimeMinSec GetLength();
 		void SetPosition(unsigned int position);
@@ -23,9 +22,11 @@ namespace BackBeat {
 		inline unsigned int GetStart() { return m_StartPosition - m_Info.dataZero; }
 		inline unsigned int GetEnd() { return m_EndPosition - m_Info.dataZero; }
 		inline std::string GetName() { return m_Info.name; }
+		inline std::string GetFilePath() { return m_Info.filePath; }
 		inline AudioProps GetProps() { return m_Info.props; }
 		inline AudioInfo GetInfo() { return m_Info; }
 		inline void SetVolume(float vol) { m_Volume = vol; }
+		inline void SetDataSize(unsigned int size) { m_Info.dataSize = size; } // NOTE: This should ONLY be used by the Recording class
 
 	private:
 		bool m_Done;
@@ -35,6 +36,8 @@ namespace BackBeat {
 		float m_Volume;
 		AudioInfo m_Info;
 
+	private:
 		void MultiplyVolume(byte* output, unsigned int numBytes);
+
 	};
 }

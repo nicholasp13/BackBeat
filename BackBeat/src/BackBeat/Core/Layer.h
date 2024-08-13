@@ -12,7 +12,7 @@ namespace BackBeat {
 
 		virtual void OnAttach() {}
 		virtual void OnDetach() {}
-		virtual void OnUpdate() {} // TODO: Add time parameter to test performance
+		virtual void OnUpdate() {} // TODO: Add delta time
 		virtual void OnEvent(Event& event) {}
 		virtual void OnImGuiRender() {}
 

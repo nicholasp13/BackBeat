@@ -10,11 +10,11 @@ namespace BackBeat {
 		SamplerModule(unsigned int sampleRate, std::shared_ptr<float[]> buffer);
 		~SamplerModule();
 
-		virtual void Reset(unsigned int sampleRate);
-		virtual void Update();
-		virtual void Render(unsigned int numSamples);
-		virtual void DoNoteOn(NoteEvent event);
-		virtual void DoNoteOff(NoteEvent event);
+		virtual void Reset(unsigned int sampleRate) override;
+		virtual void Update() override;
+		virtual void Render(unsigned int numSamples) override;
+		virtual void DoNoteOn(NoteEvent event) override;
+		virtual void DoNoteOff(NoteEvent event) override;
 
 		inline void LoopOn() { m_Core->LoopOn(); }
 		inline void LoopOff() { m_Core->LoopOff(); }

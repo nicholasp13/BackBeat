@@ -14,9 +14,12 @@ namespace BackBeat {
 		Player();
 		~Player();
 
+		void Off();
 		void Start();
 		void Stop();
+		void Play();// { m_PlayerProcessor->On(); }
 		void LoadTrack(std::string filePath);
+		void LoadTrack(std::shared_ptr<Track> track);
 		void ClearTrack();
 
 		TimeMinSec GetTime();
@@ -34,15 +37,20 @@ namespace BackBeat {
 		void SetEnd(unsigned int end);
 		void SetVolume(float vol);
 		
-		inline void Play() { m_PlayerProcessor->On(); }
-		inline void Pause() { m_PlayerProcessor->Off(); }
+		inline void On() { m_On = true; }
+		void Pause() { m_PlayerProcessor->Off(); }
+		// inline void Off() { m_On = false; }
+		inline void Reset() { Stop(); }
+		inline bool IsOn() { return m_On; }
 		inline bool IsLoaded() { return m_SelectedTrack != nullptr; }
 		inline bool IsPlaying() { return m_PlayerProcessor->IsOn(); }
 		inline std::shared_ptr<PlayerProcessor> GetProc() { return m_PlayerProcessor; }
-		inline Track* GetTrack() { return m_SelectedTrack; }
+		inline std::shared_ptr<Track> GetTrack() { return m_SelectedTrack; }
+		inline UUID GetID() { return m_PlayerProcessor->GetID(); }
 
 	private:
-		Track* m_SelectedTrack;
+		bool m_On;
+		std::shared_ptr<Track> m_SelectedTrack;
 		std::shared_ptr<PlayerProcessor> m_PlayerProcessor;
 
 	};

@@ -1,4 +1,5 @@
 .vs/
 bin/
 bin-init/
+packages/
 BackBeat.sln

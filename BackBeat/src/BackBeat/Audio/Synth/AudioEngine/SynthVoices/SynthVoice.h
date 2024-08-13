@@ -102,7 +102,7 @@ namespace BackBeat {
 		std::unique_ptr<TPTHighPassFilter> m_HPFilter;
 
 		// TODO: Implement filterEG and modulation matrix
-
+	private:
 		void DoNoteOn(NoteEvent event);
 		void DoNoteOff(NoteEvent event);
 		void InitModules();

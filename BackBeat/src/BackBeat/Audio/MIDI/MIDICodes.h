@@ -2,8 +2,6 @@
 
 // -------- CONSTANTS FOR MIDI EVENTS --------- //
 // Website: https://midi.org/specifications/midi-reference-tables/
-// TODO: Put these constants into an enum like the Mouse and Key codes
-//       Add other constants as needed
 
 namespace BackBeat
 {

@@ -8,11 +8,10 @@
 #include "Sample.h"
 namespace BackBeat {
 
-	class SampleBuilder
+	namespace SampleBuilder
 	{
-	public:
-		static void SaveSample(Track* track, unsigned int start, unsigned int end);
-		static Sample* BuildSample(std::string filePath);
+		void SaveSample(std::shared_ptr<Track> track, unsigned int start, unsigned int end);
+		Sample* BuildSample(std::string filePath);
 
 	};
 } 

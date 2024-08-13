@@ -15,7 +15,7 @@ namespace BackBeat {
 
 	PlayerProcessor::~PlayerProcessor()
 	{
-		delete[m_BufferSize](m_Output);
+		delete[]m_Output;
 	}
 
 	void PlayerProcessor::ProcessSamples(unsigned int numSamples, unsigned int sampleRate, unsigned int numChannels)
@@ -78,12 +78,36 @@ namespace BackBeat {
 			m_On = false;
 	}
 
-	void PlayerProcessor::PlayTrack(Track* track)
+	AudioProps PlayerProcessor::GetProperties()
 	{
+		if (!m_Track)
+			return AudioProps();
+		return m_Track->GetProps();
+	}
+
+	void PlayerProcessor::On()
+	{
+		if (!m_Track)
+			return;
+		m_On = true;
+	}
+
+	void PlayerProcessor::PlayTrack(std::shared_ptr<Track> track)
+	{
+		if (!track)
+			return;
 		delete[m_BufferSize](m_Output);
 		m_Track = track;
-		m_BufferSize = track->GetProps().sampleRate;
+		m_BufferSize = track->GetProps().byteRate; // NOTE: This buffer size might be too big and can make it smaller
 		m_Output = new byte[m_BufferSize];
+	}
+
+	void PlayerProcessor::ClearTrack()
+	{
+		m_On = false;
+		delete[m_BufferSize](m_Output);
+		m_Output = nullptr;
+		m_Track = nullptr;
 	}
 
 	void PlayerProcessor::MonoToStereo(unsigned int numBytes, unsigned int bitDepth, byte* mBuffer, byte* sBuffer)

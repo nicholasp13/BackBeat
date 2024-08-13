@@ -3,7 +3,7 @@
 #include "SampleBuilder.h"
 namespace BackBeat {
 
-	void SampleBuilder::SaveSample(Track* track, unsigned int start, unsigned int end)
+	void SampleBuilder::SaveSample(std::shared_ptr<Track> track, unsigned int start, unsigned int end)
 	{
 		if (!track)
 			return;
@@ -11,7 +11,7 @@ namespace BackBeat {
 			return;
 
 		AudioInfo trackInfo = track->GetInfo();
-		if (trackInfo.type != wav)
+		if (trackInfo.type != FileType::wav)
 			return;
 
 		AudioProps trackProps = trackInfo.props;
@@ -138,7 +138,7 @@ namespace BackBeat {
 	Sample* SampleBuilder::BuildSample(std::string filePath)
 	{
 		AudioInfo info = AudioFileReader::ReadFile(filePath);
-		if (info.type == sample)
+		if (info.type == FileType::sample)
 			return new Sample(info);
 
 		return nullptr;

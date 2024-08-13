@@ -3,10 +3,8 @@
 #include "Track.h"
 namespace BackBeat {
 
-	class TrackFactory
+	namespace TrackFactory
 	{
-	public:
-		static Track* BuildTrack(std::string filePath);
-
-	};
+		std::shared_ptr<Track> BuildTrack(std::string filePath);
+	}
 }

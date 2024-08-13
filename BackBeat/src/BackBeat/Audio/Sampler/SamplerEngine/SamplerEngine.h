@@ -3,6 +3,7 @@
 #include <queue>
 
 #include "BackBeat/Audio/IO/RenderInfo.h"
+#include "BackBeat/Audio/Sampler/SamplerParameters.h"
 #include "SamplerVoice.h"
 namespace BackBeat {
 
@@ -20,7 +21,8 @@ namespace BackBeat {
 		virtual void Render(std::shared_ptr<RenderInfo> info);
 		virtual void ProcessMIDIEvent(MIDIEvent event);
 
-		inline virtual std::shared_ptr<DCAParameters> GetParam(unsigned int index) { return m_Params[index]; }
+		inline virtual std::shared_ptr<DCAParameters> GetDCAParams(unsigned int index) { return m_Params->DCAParams[index]; }
+		inline virtual std::shared_ptr<SamplerEngineParameters> GetParams() { return m_Params; }
 
 		inline void ClearMIDINote(unsigned int index) { m_Voices[index]->ClearMIDINote(); }
 		inline void ClearSample(unsigned int index) { m_Voices[index]->ClearSample(); }
@@ -38,7 +40,8 @@ namespace BackBeat {
 		AudioProps m_Props;
 
 		std::shared_ptr<float[]> m_Buffer;
-		std::vector< std::shared_ptr<DCAParameters> > m_Params;
+		std::shared_ptr<SamplerEngineParameters> m_Params;
+		// std::vector< std::shared_ptr<DCAParameters> > m_Params;
 		std::unique_ptr<SamplerVoice> m_Voices[SamplerMaxVoices];
 		std::queue<MIDIEvent> m_MIDIEvents;
 

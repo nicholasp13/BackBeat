@@ -4,35 +4,14 @@
 #include "BackBeat/Core/Core.h"
 namespace BackBeat {
 
-// ---- WINDOWS MACROS ---- //
-// REFERENCE_TIME time units per second and per millisecond
-#define REFTIMES_PER_SECOND    10000000
-#define REFTIMES_PER_MILLISEC  10000
-
-// BackBeat HRESULT FAILURE CODES
-#define PLAY_FAILURE (HRESULT)1001
-#define LOAD_FAILURE (HRESULT)1002
-#define MIX_FAILURE  (HRESULT)1003
-
-// NOTE: ONLY USED FOR WINDOWS API
-// TODO: Expand/Make another CHECK_FAILURE for MMRESULT (Midi Input device Windows error messages) 
-#define CHECK_FAILURE( hr ) \
-	if (hr == PLAY_FAILURE) \
-	{ BB_CORE_ERROR("{0} FAILED TO PLAY", hr);  return; } \
-	else if (hr == LOAD_FAILURE) \
-	{ BB_CORE_ERROR("{0} FAILED TO LOAD", hr); return; } \
-	else if (hr == MIX_FAILURE) \
-	{ BB_CORE_ERROR("{0} FAILED TO MIX", hr); return;} \
-	else if (FAILED(hr) != S_OK) \
-	{ BB_CORE_ERROR("{0} WINDOWS WASAPI API FAILURE", hr); return; }
-
 	typedef unsigned char byte;
 
-	enum FileType {
+	enum class FileType {
 		none = 0,
 		wav,
 		mp3,
-		sample
+		sample,
+		recordingTemp
 	};
 
 	struct AudioProps {
@@ -44,6 +23,20 @@ namespace BackBeat {
 		unsigned short blockAlign;  // numChannels * bitDepth / 8
 		unsigned short bitDepth;
 		unsigned long fileSize;
+
+		// fileSize is irrelevant in nearly every case (every case in BackBeat) and is not checked here
+		bool operator == (AudioProps props)
+		{
+			return (bigEndian == props.bigEndian)
+				&& (format == props.format)
+				&& (numChannels == props.numChannels)
+				&& (sampleRate == props.sampleRate)
+				&& (byteRate == props.byteRate)
+				&& (blockAlign == props.blockAlign)
+				&& (bitDepth == props.bitDepth);
+		}
+
+		inline bool operator != (AudioProps props) { return !(*this == props); }
 	};
 
 	struct AudioInfo {
@@ -171,6 +164,7 @@ namespace BackBeat {
 			return !p[0] == 1;
 		}
 
+		// Gets time in minutes and seconds only. TODO: Refactor to reflect specific time units returned
 		static TimeMinSec GetTime(float totalSeconds)
 		{
 			TimeMinSec time = TimeMinSec();
@@ -203,6 +197,22 @@ namespace BackBeat {
 			return (event.status <= MIDI::ChannelOn16 && event.status >= MIDI::ChannelOn1);
 		}
 
+		// Return values:
+		// 1 is uncompressed, pcm with 2's complement bit representation 
+		// 3 is uncompressed, pcm with floating point bit representation 
+		// All other numbers indicate some kind of compression (It is defaulted to 0 as that is 
+		static unsigned short GetAudioFormat(unsigned short bitDepth, bool compressed)
+		{
+			// Compression is currently unhandled by BackBeat and therefore returns 0 without further checks (t
+			if (compressed)
+				return 0;
+			else if (bitDepth == FloatBitSize)
+				return 3;
+			else
+				return 1;
+		}
+
+		// NOTE: Uses macros defined in stdint.h for int 8 and int 16 types. This does not currently cause any issues. 
 		static float GetTypeRatio(unsigned short bitDepth1, unsigned short bitDepth2)
 		{
 			float max1 = 1.0f;
