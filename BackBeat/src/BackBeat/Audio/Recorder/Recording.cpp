@@ -1,6 +1,6 @@
 #include "bbpch.h"
 
-#include "BackBeat/Audio/Helpers/AudioFileWriter.h"
+#include "BackBeat/Audio/FileIO/AudioFileWriter.h"
 #include "Recording.h"
 namespace BackBeat {
 
@@ -15,7 +15,7 @@ namespace BackBeat {
 
 	Recording::~Recording()
 	{
-		Delete();
+		
 	}
 
 	bool Recording::SaveWAV(std::string filePath)
@@ -51,6 +51,7 @@ namespace BackBeat {
 			return false;
 		}
 
+		// TODO: Fix this (works its just stupid/slow)
 		for (unsigned long i = 0; i < dataSize; i++)
 		{
 			srcFile.seekg(i);
@@ -67,6 +68,9 @@ namespace BackBeat {
 	// numFrames = numSamples / numChannels
 	void Recording::Record(char* data, unsigned int numFrames)
 	{
+		if (!m_Track)
+			return;
+
 		unsigned int numBytes = numFrames * m_Props.blockAlign;
 
 		// If data is nullptr then silence is recordeded instead of samples from data
@@ -82,11 +86,9 @@ namespace BackBeat {
 			if (success)
 				m_Size += numBytes;
 		}
-		if (m_Track)
-		{
-			m_Track->SetDataSize(m_Size);
-			m_Track->SetEnd(m_Size);
-		}
+
+		m_Track->SetDataSize(m_Size);
+		m_Track->SetEnd(m_Size);
 	}
 
 	void Recording::Reset()
@@ -96,24 +98,8 @@ namespace BackBeat {
 
 	void Recording::Reset(AudioProps props)
 	{
-		Delete();
 		m_Props = props;
-	}
-
-	void Recording::CreateTrack()
-	{
-		if (m_Track)
-			return;
-
-		AudioInfo info = {
-			.type = FileType::sample,
-			.name = m_TempPath,
-			.filePath = m_TempPath,
-			.props = m_Props,
-			.dataZero = 0,
-			.dataSize = m_Size
-		};
-		m_Track = std::make_shared<Track>(info);
+		Reset();
 	}
 
 	void Recording::ClearTrack()
@@ -147,7 +133,12 @@ namespace BackBeat {
 		std::remove(m_TempPath.c_str());
 		m_Size = 0;
 		if (m_Track)
-			m_Track->SetDataSize(m_Size);
+		{
+			m_Track->SetPosition(0);
+			m_Track->SetStart(0);
+			m_Track->SetEnd(0);
+			m_Track->SetDataSize(0);
+		}
 	}
 
 }

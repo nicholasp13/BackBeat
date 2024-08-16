@@ -15,17 +15,22 @@ namespace Exampler {
 	class Sampler : public Entity
 	{
 	public:
-		Sampler(std::shared_ptr<BackBeat::RecorderManager> recorderMgr);
+		Sampler();
 		~Sampler();
 
 		virtual void Update() override;
 		virtual void OnEvent(BackBeat::Event& event) override;
 		virtual void ImGuiRender() override;
+		virtual void Add(
+			BackBeat::PlayerManager* playerMgr,
+			BackBeat::RecorderManager* recorderMgr,
+			BackBeat::Mixer* mixer,
+			BackBeat::MIDIDeviceManager* midiDeviceManager) override;
 		virtual void Delete(
 			BackBeat::PlayerManager* playerMgr,
-			std::shared_ptr<BackBeat::RecorderManager> recorderMgr,
-			std::shared_ptr<BackBeat::Mixer> mixer,
-			BackBeat::WindowsMIDIDeviceManager* midiDeviceManager) override;
+			BackBeat::RecorderManager* recorderMgr,
+			BackBeat::Mixer* mixer,
+			BackBeat::MIDIDeviceManager* midiDeviceManager) override;
 
 		inline virtual void Open() override { m_Open = true; }
 		inline virtual void Close() override { m_Open = false; }
@@ -57,7 +62,7 @@ namespace Exampler {
 		BackBeat::Player m_TrackPlayer;
 		BackBeat::Sampler m_Sampler;
 		std::shared_ptr<BackBeat::Player> m_RecordingPlayer;
-		std::shared_ptr<BackBeat::RecorderManager> m_RecorderMgr;
+		BackBeat::RecorderManager* m_RecorderMgr;
 
 	private:
 		void RenderCanvasEntity();

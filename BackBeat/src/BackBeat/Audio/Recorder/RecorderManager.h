@@ -7,9 +7,9 @@
 
 #include <unordered_map>
 
-#include "DeviceRecorder.h"
-#include "RecorderBuilder.h"
 #include "BackBeat/Core/UUID.h"
+#include "BackBeat/Audio/PlayBack/TrackFactory.h"
+#include "Recorder.h"
 namespace BackBeat {
 
 	class RecorderManager
@@ -18,34 +18,37 @@ namespace BackBeat {
 		RecorderManager();
 		~RecorderManager();
 
+		void Init(Recorder* recorder, Recorder* deviceRecorder);
 		void Start();
 		void Stop();
-		std::shared_ptr<Recorder> AddRecorder(UUID id, AudioProps props);
-		void AddDeviceRecorder(std::shared_ptr<DeviceRecorder> recorder);
-		void Record(UUID id, void* buffer, unsigned int numSamples);
-		std::shared_ptr<Recorder> GetRecorder(UUID id);
+		std::shared_ptr<Track> AddRecordingTrack(UUID id, RecorderType type);
+		void AddRecordingTrack(UUID id, std::shared_ptr<Track> track, RecorderType type);
 		void SetRecorderActive(UUID id);
 		void SetRecorderInactive(UUID id);
-		void SetDeviceRecorderTrack(UUID trackID, std::shared_ptr<Track> track);
-		void ClearDeviceTrack();
-		void DeleteRecorder(UUID id);
-
-		inline void ResetRecorder(UUID id) { m_Recorders.at(id)->Reset(); }
-		inline bool IsOn(UUID id) { return m_ActiveID == id; }
-		inline bool IsDeviceTrackOn(UUID id) { return m_ActiveDeviceTrackID == id; }
+		void SetRecordingTrack(UUID id);
+		void ClearTrack(UUID id);
+		void DeleteTrack(UUID id);
+		void ResetRecording(UUID id);
+		
+		inline bool IsActive(UUID id) { return m_ActiveID == id; }
 		inline bool IsRecording() { return m_Recording; }
-		inline bool IsDeviceRecording() { return m_DeviceRecorder->IsRecording(); }
-		inline std::shared_ptr<DeviceRecorder> GetDeviceRecorder() { return m_DeviceRecorder; }
+		inline Recorder* GetAudioRecorder() { return m_AudioRecorder; }
+		inline Recorder* GetDeviceRecorder() { return m_DeviceRecorder; }
 		
 	private:
 		bool m_Recording;
-		std::unordered_map<UUID, std::shared_ptr<Recorder>> m_Recorders;
-		std::shared_ptr<DeviceRecorder> m_DeviceRecorder;
+		bool m_Init;
+		Recorder* m_AudioRecorder;
+		Recorder* m_DeviceRecorder;
 		UUID m_ActiveID;
-		UUID m_ActiveDeviceTrackID;
+		std::unordered_map<UUID, std::shared_ptr<Track>> m_AudioRecordings;
+		std::unordered_map<UUID, std::shared_ptr<Track>> m_DeviceRecordings;
 
 	private:
-		inline bool Contains(UUID id) { return !(m_Recorders.find(id) == m_Recorders.end()); }
+		inline bool Contains(UUID id) { return (ContainsAudio(id) || ContainsDevice(id)); }
+		inline bool ContainsAudio(UUID id) { return m_AudioRecordings.find(id) != m_AudioRecordings.end(); }
+		inline bool ContainsDevice(UUID id) { return m_DeviceRecordings.find(id) != m_DeviceRecordings.end(); }
+
 	};
 
 }

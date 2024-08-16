@@ -7,7 +7,7 @@
 #include "Synthesizer.h"
 namespace Exampler {
 
-	Synthesizer::Synthesizer(std::shared_ptr<BackBeat::RecorderManager> recorderMgr)
+	Synthesizer::Synthesizer()
 		: 
 		m_Open(false), 
 		m_KeyboardActive(true),
@@ -23,7 +23,7 @@ namespace Exampler {
 		m_Octave3(0),
 		m_Octave4(0),
 		m_RecordingPlayer(nullptr),
-		m_RecorderMgr(recorderMgr)
+		m_RecorderMgr(nullptr)
 	{
 		m_SynthEventHandler = m_Synth.GetEventHandler();
 		m_SynthParams = m_Synth.GetParams();
@@ -548,11 +548,30 @@ namespace Exampler {
 		ImGui::PopID();
 	}
 
+	void Synthesizer::Add(
+		BackBeat::PlayerManager* playerMgr,
+		BackBeat::RecorderManager* recorderMgr,
+		BackBeat::Mixer* mixer,
+		BackBeat::MIDIDeviceManager* midiDeviceManager)
+	{
+		m_RecorderMgr = recorderMgr;
+		m_RecordingPlayer = playerMgr->AddNewPlayer();
+		auto synthProc = m_Synth.GetProcessor();
+		auto synthID = synthProc->GetID();
+
+		auto synthTrack = m_RecorderMgr->AddRecordingTrack(synthID, BackBeat::RecorderType::audio);
+		m_RecordingPlayer->LoadTrack(synthTrack);
+		
+		mixer->PushProcessor(synthProc);
+		mixer->PushProcessor(m_RecordingPlayer->GetProc());
+		midiDeviceManager->PushOutput(m_Synth.GetMIDIInput());
+	}
+
 	void Synthesizer::Delete(
 		BackBeat::PlayerManager* playerMgr,
-		std::shared_ptr<BackBeat::RecorderManager> recorderMgr,
-		std::shared_ptr<BackBeat::Mixer> mixer,
-		BackBeat::WindowsMIDIDeviceManager* midiDeviceManager)
+		BackBeat::RecorderManager* recorderMgr,
+		BackBeat::Mixer* mixer,
+		BackBeat::MIDIDeviceManager* midiDeviceManager)
 	{
 		auto synthID = m_Synth.GetID();
 		auto trackPlayerID = m_RecordingPlayer->GetID();
@@ -562,7 +581,7 @@ namespace Exampler {
 		m_RecordingPlayer->Stop();
 
 		playerMgr->Delete(m_RecordingPlayer->GetID());
-		recorderMgr->DeleteRecorder(synthID);
+		recorderMgr->DeleteTrack(synthID);
 		mixer->DeleteProcessor(synthID);
 		mixer->DeleteProcessor(trackPlayerID);
 		midiDeviceManager->DeleteOutput(midiInputID);
@@ -596,7 +615,7 @@ namespace Exampler {
 
 		// Render Recorder controls
 		{
-			if (!m_RecorderMgr->IsOn(synthID))
+			if (!m_RecorderMgr->IsActive(synthID))
 			{
 				if (ImGui::Button("Record On", ImVec2(125, 20)))
 				{
@@ -619,7 +638,8 @@ namespace Exampler {
 
 		// Render Recording Track Player controls
 		{
-			if (m_RecordingPlayer && m_RecordingPlayer->GetSize() > 0)
+			int trackSize = m_RecordingPlayer->GetSize();
+			if (m_RecordingPlayer && trackSize > 0)
 			{
 				if (!m_RecordingPlayer->IsOn())
 				{
@@ -633,20 +653,20 @@ namespace Exampler {
 				} ImGui::SameLine();
 
 				if (ImGui::Button("Clear Recording"))
-					if (!m_RecorderMgr->IsOn(synthID))
-						m_RecorderMgr->ResetRecorder(synthID);
+					if (!m_RecorderMgr->IsActive(synthID))
+						m_RecorderMgr->ResetRecording(synthID);
 
+				int position = m_RecordingPlayer->GetPosition();
+
+				static bool wasPlaying = false;
 				BackBeat::TimeMinSec trackTime = m_RecordingPlayer->GetTime();
 				BackBeat::TimeMinSec trackLength = m_RecordingPlayer->GetLength();
 
-				int position = m_RecordingPlayer->GetPosition();
-				int size = m_RecordingPlayer->GetSize();
-				static bool wasPlaying = false;
 				ImGui::Text("%d:%02d", trackTime.minutes, trackTime.seconds); ImGui::SameLine();
 
 				// Placeholder for future implementation of a custom ImGui::Timeline widget
 				ImGui::PushID("Seekbar");
-				if (BackBeat::ImGuiWidgets::ImGuiSeekBarInt("##", &position, m_RecordingPlayer->GetSize(), "", ImGuiSliderFlags(0)))
+				if (BackBeat::ImGuiWidgets::ImGuiSeekBarInt("##", &position, trackSize, "", ImGuiSliderFlags(0)))
 				{
 					if (m_RecordingPlayer->IsPlaying())
 					{

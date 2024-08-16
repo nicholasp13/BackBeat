@@ -14,21 +14,22 @@ namespace Exampler {
 	class RecordingTrack : public Entity
 	{
 	public:
-		RecordingTrack(
-			BackBeat::UUID recorderID, 
-			std::shared_ptr<BackBeat::Track> track,
-			std::shared_ptr<BackBeat::Player> player, 
-			std::shared_ptr<BackBeat::RecorderManager> recorderMgr);
+		RecordingTrack();
 		~RecordingTrack();
 
 		virtual void Update() override;
 		virtual void OnEvent(BackBeat::Event& event) override;
 		virtual void ImGuiRender() override;
+		virtual void Add(
+			BackBeat::PlayerManager* playerMgr,
+			BackBeat::RecorderManager* recorderMgr,
+			BackBeat::Mixer* mixer,
+			BackBeat::MIDIDeviceManager* midiDeviceManager) override;
 		virtual void Delete(
 			BackBeat::PlayerManager* playerMgr,
-			std::shared_ptr<BackBeat::RecorderManager> recorderMgr,
-			std::shared_ptr<BackBeat::Mixer> mixer,
-			BackBeat::WindowsMIDIDeviceManager* midiDeviceManager) override;
+			BackBeat::RecorderManager* recorderMgr,
+			BackBeat::Mixer* mixer,
+			BackBeat::MIDIDeviceManager* midiDeviceManager) override;
 
 		inline virtual void Open() override { };
 		inline virtual void Close() override { };
@@ -47,7 +48,7 @@ namespace Exampler {
 		BackBeat::UUID m_RecorderID;
 		std::shared_ptr<BackBeat::Track> m_Track;
 		std::shared_ptr<BackBeat::Player> m_Player;
-		std::shared_ptr<BackBeat::RecorderManager> m_RecorderMgr;
+		BackBeat::RecorderManager* m_RecorderMgr;
 
 	private:
 		unsigned int SetRecordingTrackColors();

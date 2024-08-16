@@ -18,7 +18,10 @@ namespace BackBeat {
 
 	Track::~Track()
 	{
-		
+		// NOTE: Usually the Recording class would delete its temp file during its destructrion
+		//       but this is a safeguard just in case its Track changes
+		if (m_Info.type == FileType::recordingTemp)
+			std::remove(m_Info.filePath.c_str());
 	}
 
 	// TODO: Implement endianness conversion if the track does not match the systems endianness

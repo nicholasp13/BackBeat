@@ -38,8 +38,7 @@ namespace BackBeat {
 		void SetVolume(float vol);
 		
 		inline void On() { m_On = true; }
-		void Pause() { m_PlayerProcessor->Off(); }
-		// inline void Off() { m_On = false; }
+		inline void Pause() { m_PlayerProcessor->Off(); }
 		inline void Reset() { Stop(); }
 		inline bool IsOn() { return m_On; }
 		inline bool IsLoaded() { return m_SelectedTrack != nullptr; }

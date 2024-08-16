@@ -20,12 +20,16 @@ namespace Exampler {
 		virtual void Update() {}
 		virtual void OnEvent(BackBeat::Event& event) {}
 		virtual void ImGuiRender() {}
+		virtual void Add(
+			BackBeat::PlayerManager* playerMgr,
+			BackBeat::RecorderManager* recorderMgr,
+			BackBeat::Mixer* mixer,
+			BackBeat::MIDIDeviceManager* midiDeviceManager) {}
 		virtual void Delete(
 			BackBeat::PlayerManager* playerMgr,
-			std::shared_ptr<BackBeat::RecorderManager> recorderMgr,
-			std::shared_ptr<BackBeat::Mixer> mixer,
-			BackBeat::WindowsMIDIDeviceManager* midiDeviceManager
-			) {}
+			BackBeat::RecorderManager* recorderMgr,
+			BackBeat::Mixer* mixer,
+			BackBeat::MIDIDeviceManager* midiDeviceManager) {}
 		virtual void Open() {}
 		virtual void Close() {}
 		virtual void On() {}

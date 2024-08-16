@@ -4,7 +4,7 @@
 *  Wrapper over RenderInfo so that only MIDI events can be inputted without exposing RenderInfo
 */
 
-#include "BackBeat/Audio/IO/RenderInfo.h"
+#include "BackBeat/Audio/Renderer/RenderInfo.h"
 #include "BackBeat/Core/UUID.h"
 namespace BackBeat {
 

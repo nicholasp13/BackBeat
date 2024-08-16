@@ -13,8 +13,9 @@ namespace BackBeat {
 		bool SaveWAV(std::string filePath);
 		void Record(char* data, unsigned int numFrames);
 		void Reset();
+		// NOTE: This Reset() would likely need to reformat data as most of the time users would not want
+		//       all their data to be wiped just because they changes props/settings.
 		void Reset(AudioProps props);
-		void CreateTrack();
 		void ClearTrack();
 		void SetTrack(std::shared_ptr<Track> track);
 		TimeMinSec GetLengthMinSecs();
@@ -31,7 +32,6 @@ namespace BackBeat {
 
 	private:
 		void Delete();
-
 	};
 
 }

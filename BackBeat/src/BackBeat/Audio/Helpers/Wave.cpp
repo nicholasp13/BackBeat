@@ -2,7 +2,7 @@
 
 #include <cmath>
 
-#include "BackBeat/Audio/Synth/SynthBase.h"
+#include "BackBeat/Audio/Instruments/Synth/SynthBase.h"
 #include "Wave.h"
 namespace BackBeat {
 

@@ -10,16 +10,25 @@ namespace BackBeat {
 		Timer() {};
 		~Timer() {};
 
-		void Start() {
+		void Start() 
+		{
 			m_Start = std::chrono::high_resolution_clock::now();
 		}
 
-		float GetTime() {
+		// Seconds
+		float GetTime() 
+		{
 			return std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - m_Start).count() * 0.001f * 0.001f * 0.001f;
 		}
 
-		float GetTimeMs() {
+		// Microseconds
+		float GetTimeMicro() {
 			return GetTime() * 1000.0f;
+		}
+
+		// NanoSeconds
+		float GetTimeNano() {
+			return (float)std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - m_Start).count();
 		}
 
 		void Reset() {

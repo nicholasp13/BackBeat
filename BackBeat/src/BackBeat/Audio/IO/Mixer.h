@@ -4,6 +4,7 @@
 // Performs data conversions
 
 #include "BackBeat/Audio/Audio.h"
+#include "BackBeat/Audio/IO/AudioSink.h"
 #include "BackBeat/Audio/Recorder/RecorderManager.h"
 #include "AudioProcessor.h"
 namespace BackBeat {
@@ -11,20 +12,23 @@ namespace BackBeat {
 	class Mixer
 	{
 	public:
-		Mixer(AudioProps props);
+		Mixer();
 		~Mixer();
 
-		void GetData(byte* data, unsigned int numSamples);
+		void Init(AudioProps props, AudioSink* sink);
+		void RenderData(byte* data, unsigned int numFrames);
 		void DeleteProcessor(UUID id);
 
+		inline void Reset() { m_Sink->Reset(); }
 		inline void PushProcessor(std::shared_ptr<AudioProcessor> processor) { m_Processors.push_back(processor); }
-		inline void AddRecordingManager(std::shared_ptr<RecorderManager> recordingManager) { m_RecordingManager = recordingManager; }
+		inline void AddRecordingManager(RecorderManager* recordingManager) { m_RecordingManager = recordingManager; }
 
 	private:
-		AudioProps m_Props;
 		UUID m_ID;
+		AudioProps m_Props;
+		AudioSink* m_Sink;
 		std::vector < std::shared_ptr<AudioProcessor> > m_Processors;
-		std::shared_ptr<RecorderManager> m_RecordingManager;
+		RecorderManager* m_RecordingManager;
 
 	};
 }
