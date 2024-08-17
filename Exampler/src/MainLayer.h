@@ -14,8 +14,8 @@ namespace Exampler {
 
 	// Arbitrarily chosen but should be decided based on RAM size/ memory usage
 	constexpr unsigned int       // Memory:
-		MaxSynths = 2,           // ~84 mb
-		MaxSamplers = 1, // ~10 mb
+		MaxSynths = 2,           // ~95 mb
+		MaxSamplers = 1,         // ~10 mb
 		MaxPlayback = 8,         //  ~0 mb
 		MaxRecordingDevices = 4; //  ~2 mb
 

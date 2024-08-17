@@ -9,13 +9,13 @@ namespace BackBeat {
 		:
 		m_SampleRate(sampleRate),
 		m_WaveSize((unsigned int)(sampleRate * Audio::Stereo / SynthBase::LFOFrequencyMin)),
-		m_Wave(new float[(unsigned int)(sampleRate * Audio::Stereo / SynthBase::LFOFrequencyMin)]),
 		m_Position(0),
 		m_Amp(1.0f),
 		m_Hertz(0.0f),
 		m_WaveType(params->wave),
 		m_Type(ModuleType::WaveOscCore),
 		m_Params(params),
+		m_Wave(new float[(unsigned int)(sampleRate * Audio::Stereo / SynthBase::LFOFrequencyMin)]),
 		m_Input(std::make_unique<Modulator>(bufferSize)),
 		m_Output(std::make_unique<Modulator>(bufferSize))
 	{
@@ -24,7 +24,7 @@ namespace BackBeat {
 
 	LFOCore::~LFOCore()
 	{
-		delete[] m_Wave;
+		
 	}
 
 	void LFOCore::Reset(unsigned int sampleRate)

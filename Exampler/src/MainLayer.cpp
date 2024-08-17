@@ -230,8 +230,8 @@ namespace Exampler {
 			bool limitRecorders = (m_NumRecorders < MaxRecordingDevices);
 			if (ImGui::MenuItem("Add Recording Track", "", false, limitRecorders))
 				AddRecordingTrack();
+			
 			ImGui::EndPopup();
-
 		}
 
 		ImGui::PopStyleColor(cCount);

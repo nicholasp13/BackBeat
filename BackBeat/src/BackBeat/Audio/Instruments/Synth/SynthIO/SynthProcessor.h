@@ -26,8 +26,10 @@ namespace BackBeat {
 		inline std::shared_ptr<RenderInfo> GetInfo() { return m_Info; }
 
 	private:
+		static const unsigned int s_BufferSize = 100000;
+
 		bool m_On;
-		float* m_Output;
+		float m_Output[s_BufferSize] = {};
 		AudioProps m_Props;
 		AudioBus m_Bus;
 		UUID m_ID;

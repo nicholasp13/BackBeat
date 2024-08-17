@@ -9,11 +9,11 @@ namespace BackBeat {
 		m_SampleRate(sampleRate),
 		m_Buffer(buffer),
 		m_WaveSize(sampleRate),
-		m_Wave(new float[sampleRate]),
 		m_Position(0),
 		m_Amp(1.0f),
 		m_Hertz(0.0f),
 		m_WaveType(params->wave),
+		m_Wave(new float[s_BufferSize]),
 		m_ModInput(std::make_unique<Modulator>(sampleRate)),
 		m_Type(ModuleType::WaveOscCore),
 		m_Params(params)
@@ -23,7 +23,7 @@ namespace BackBeat {
 
 	WaveOscCore::~WaveOscCore()
 	{
-		delete[m_WaveSize] m_Wave;
+		
 	}
 
 	void WaveOscCore::Reset(unsigned int sampleRate)

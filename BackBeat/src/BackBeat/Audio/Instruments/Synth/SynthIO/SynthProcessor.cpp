@@ -6,7 +6,6 @@ namespace BackBeat {
 	SynthProcessor::SynthProcessor(AudioProps props, std::shared_ptr<AudioEngine> engine, UUID id)
 		: 
 		m_On(false),
-		m_Output(new float[props.sampleRate]),
 		m_Props(props), 
 		m_Bus(props, BusDirection::Output),
 		m_ID(id),
@@ -18,7 +17,7 @@ namespace BackBeat {
 
 	SynthProcessor::~SynthProcessor()
 	{
-		delete[] m_Output;
+		
 	}
 
 	void SynthProcessor::ProcessSamples(unsigned int numSamples, unsigned int sampleRate, unsigned int numChannels)
@@ -40,7 +39,8 @@ namespace BackBeat {
 			{
 				for (unsigned int i = 0; i < numSamples * m_Props.numChannels; i += m_Props.numChannels) {
 					for (unsigned int j = 0; j < m_Props.numChannels; j++) {
-						targetBuffer[i + j] = (float)srcBuffer[i + j];
+						int index = i + j; // Added to get rid of error message
+						targetBuffer[index] = (float)srcBuffer[index];
 					}
 				}
 			}

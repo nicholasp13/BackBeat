@@ -1,5 +1,7 @@
 #pragma once
 
+// TODO:Make Sample a shared_ptr
+
 #include "BackBeat/Audio/Instruments/Synth/AudioEngine/ModuleCores/ModuleCore.h"
 #include "BackBeat/Audio/Instruments/Sampler/Sample.h"
 namespace BackBeat {
@@ -29,10 +31,12 @@ namespace BackBeat {
 		inline void ClearSample() { m_Sample = nullptr; }
 
 	private:
+		static const unsigned int s_BufferSize = 100000;
+
 		bool m_Looping;
 		unsigned int m_SampleRate;
 		Sample* m_Sample;
-		float* m_Input;
+		float m_Input[s_BufferSize];
 		std::shared_ptr<float[]> m_Output;
 
 	};

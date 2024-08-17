@@ -26,7 +26,7 @@ namespace BackBeat {
 
 		// Arbitrary restriction on SAMPLE size
 		const unsigned int maxSeconds = 10;
-		const unsigned int maxTime = sampleRate * Audio::FloatByteSize * maxSeconds;
+		const unsigned int maxTime = sampleRate * Audio::FloatByteSize * maxSeconds * trackProps.numChannels;
 		if (end - start > maxTime)
 			return;
 
@@ -51,9 +51,9 @@ namespace BackBeat {
 		bool success = AudioFileWriter::WriteSampleFileHeader(filePath, sampleProps, dataSize);
 		if (success)
 		{
-			const unsigned int trackIncrementSize = trackProps.byteRate;
+			const unsigned int trackIncrementSize = trackProps.byteRate / 20;
 			const unsigned int trackFileSize = trackSize + Audio::WAVTotalHeaderSize;
-			const unsigned int sampleDataIncrementSize = sampleProps.byteRate;
+			const unsigned int sampleDataIncrementSize = sampleProps.byteRate / 20;
 			unsigned int filePosition = Audio::WAVTotalHeaderSize;
 			unsigned int trackIncrement = trackIncrementSize;
 			unsigned int sampleDataIncrement = sampleDataIncrementSize;
@@ -130,6 +130,7 @@ namespace BackBeat {
 				success = AudioFileWriter::WriteAudioFileData(filePath, sampleData, sampleDataIncrement);
 				filePosition += trackIncrement;
 			}
+
 			delete[] trackData;
 			delete[] sampleData;
 		}

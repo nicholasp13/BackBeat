@@ -8,7 +8,7 @@ namespace BackBeat {
 		m_Looping(false),
 		m_Sample(nullptr),
 		m_SampleRate(sampleRate),
-		m_Input(new float[sampleRate]), 
+		m_Input(),
 		m_Output(buffer)
 	{
 
@@ -17,7 +17,6 @@ namespace BackBeat {
 	SamplerCore::~SamplerCore()
 	{
 		delete m_Sample;
-		delete[] m_Input;
 	}
 
 	void SamplerCore::Reset(unsigned int sampleRate)

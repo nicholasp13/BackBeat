@@ -20,6 +20,8 @@ namespace BackBeat {
 		inline std::shared_ptr<float[]> GetOutputBuffer() { return m_Output->GetBuffer(); }
 
 	private:
+		static const unsigned int s_BufferSize = 100000;
+
 		unsigned int m_SampleRate;
 		unsigned int m_Position;
 		unsigned int m_WaveSize;
@@ -29,7 +31,7 @@ namespace BackBeat {
 		ModuleType m_Type;
 
 		std::shared_ptr<LFOParameters> m_Params;
-		float* m_Wave;
+		std::shared_ptr<float[]> m_Wave;
 
 		std::unique_ptr<Modulator> m_Input;
 		std::unique_ptr<Modulator> m_Output;

@@ -25,10 +25,12 @@ namespace BackBeat {
 		inline void Off() { m_On = false; }
 
 	private:
+		static const unsigned int s_ActualBufferSize = 1000000;
+
 		bool m_On;
 		unsigned int m_BufferSize;
 		UUID m_ID;
-		byte* m_Output;
+		byte m_Output[s_ActualBufferSize];
 		std::shared_ptr<Track> m_Track;
 
 	private:
