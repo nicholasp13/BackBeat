@@ -47,7 +47,7 @@ namespace BackBeat {
 			.fileSize =    0
 		};
 
-		m_Engine = std::make_shared<AudioEngine>(m_Props);
+		m_Engine = std::make_shared<SynthEngine>(m_Props);
 		m_Processor = std::make_shared<SynthProcessor>(m_Props, m_Engine, m_ID);
 		m_Handler = std::make_shared<SynthEventHandler>(m_Processor->GetInfo());
 		m_MIDIInput = std::make_shared<MIDIInputHandler>(m_Processor->GetInfo());

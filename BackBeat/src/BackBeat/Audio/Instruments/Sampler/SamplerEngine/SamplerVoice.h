@@ -2,7 +2,7 @@
 
 #include "SamplerModule.h"
 #include "BackBeat/Audio/MIDI/MIDICodes.h"
-#include "BackBeat/Audio/Instruments/Synth/AudioEngine/SynthModules/DCA.h"
+#include "BackBeat/Audio/Instruments/Synth/SynthEngine/SynthModules/DCA.h"
 namespace BackBeat {
 
 	class SamplerVoice

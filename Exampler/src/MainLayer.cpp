@@ -10,7 +10,6 @@ namespace Exampler {
 	MainLayer::MainLayer(BackBeat::Window* window, BackBeat::AudioSystem* audio)
 		: 
 		Layer("MainLayer"), 
-		m_Window(window), 
 		m_NumMIDIDevices(0),
 		m_NumSynths(0),
 		m_NumSamplers(0),
@@ -18,6 +17,8 @@ namespace Exampler {
 		m_NumRecorders(0),
 		m_EtyToRename(nullptr),
 		m_EtyToDelete(nullptr),
+		m_Window(window),
+		m_Audio(audio),
 		m_PlayerMgr(audio->GetPlayerManager()),
 		m_RecorderMgr(audio->GetRecorderManager()),
 		m_AudioRenderer(audio->GetRenderer()),
@@ -398,7 +399,7 @@ namespace Exampler {
 	{
 		if (m_NumSynths >= MaxSynths)
 			return;
-		m_AudioRenderer->Stop();
+		m_Audio->Stop();
 
 		auto synth = std::make_shared<Synthesizer>();
 		synth->Add(m_PlayerMgr, m_RecorderMgr, m_AudioRenderer->GetMixer(), m_MIDIDeviceManager);
@@ -406,14 +407,14 @@ namespace Exampler {
 		synth->SetName(synthName);
 		m_Entities.push_back(synth);
 		
-		m_AudioRenderer->Start();
+		m_Audio->Start();
 	}
 
 	void MainLayer::AddSampler()
 	{
 		if (m_NumSamplers >= MaxSamplers)
 			return;
-		m_AudioRenderer->Stop();
+		m_Audio->Stop();
 
 		auto sampler = std::make_shared<Sampler>();
 		sampler->Add(m_PlayerMgr, m_RecorderMgr, m_AudioRenderer->GetMixer(), m_MIDIDeviceManager);
@@ -421,14 +422,14 @@ namespace Exampler {
 		sampler->SetName(samplerName);
 		m_Entities.push_back(sampler);
 
-		m_AudioRenderer->Start();
+		m_Audio->Start();
 	}
 
 	void MainLayer::AddPlaybackTrack()
 	{
 		if (m_NumPlayback >= MaxPlayback)
 			return;
-		m_AudioRenderer->Stop();
+		m_Audio->Stop();
 
 		auto playback = std::make_shared<PlaybackTrack>();
 		playback->Add(m_PlayerMgr, m_RecorderMgr, m_AudioRenderer->GetMixer(), m_MIDIDeviceManager);
@@ -436,14 +437,14 @@ namespace Exampler {
 		playback->SetName(playerName);
 		m_Entities.push_back(playback);
 
-		m_AudioRenderer->Start();
+		m_Audio->Start();
 	}
 
 	void MainLayer::AddRecordingTrack()
 	{
 		if (m_NumRecorders >= MaxRecordingDevices)
 			return;
-		m_AudioRenderer->Stop();
+		m_Audio->Stop();
 		m_RecorderMgr->Stop();
 
 		auto recordingTrack = std::make_shared<RecordingTrack>();
@@ -452,7 +453,7 @@ namespace Exampler {
 		recordingTrack->SetName(trackName);
 		m_Entities.push_back(recordingTrack);
 
-		m_AudioRenderer->Start();
+		m_Audio->Start();
 	}
 
 	bool MainLayer::OnKeyEvent(BackBeat::KeyPressedEvent& event)

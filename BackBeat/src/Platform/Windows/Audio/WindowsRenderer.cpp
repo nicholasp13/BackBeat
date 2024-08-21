@@ -6,6 +6,7 @@
 
 // NOTE: Setting a different output device on your Windows PC changes the props
 
+#include "BackBeat/Audio/Helpers/SpinSleeper.h"
 #include "WindowsRenderer.h"
 namespace BackBeat {
 
@@ -74,13 +75,10 @@ namespace BackBeat {
 		hr = m_AudioClient->GetMixFormat(&m_DeviceProps);
 		CHECK_FAILURE_HRESULT(hr);
 
-		hr = m_AudioClient->GetDevicePeriod(NULL, &bufferDuration);
-		CHECK_FAILURE_HRESULT(hr);
-
 		hr = m_AudioClient->Initialize(
 			AUDCLNT_SHAREMODE_SHARED,
 			0,
-			0,
+			bufferDuration,
 			0,
 			m_DeviceProps,
 			NULL
@@ -111,26 +109,50 @@ namespace BackBeat {
 	{
 		if (!m_Init)
 			return;
-
 		m_Rendering = true;
-		m_Thread = std::thread(&WindowsRenderer::Render, this);
 	}
 
 	void WindowsRenderer::Stop() 
 	{
-		m_Rendering = false; 
-		if (m_Thread.joinable())
-			m_Thread.join();
+		if (!m_Init)
+			return;
+		m_Rendering = false;
 	}
 
+	// NOTE: Have tried multiple different workflows with WASAPI and have found that trying to time Render() outside this
+	//       class/scope causes more trouble for what its worth in trying to sync the audio to minimize artifacting. 
+	//       Have found that interupting the WASAPI function calls even a little creates artifacting that would require
+	//       advanced synchronizing that ultimately is either impossible with current knowledge or not worth the benefit
+	//       of a larger seperation between BackBeat and WASAPI, and the theoretical boost in performance by seperating the threads.
 	void WindowsRenderer::Render()
 	{
+		BB_CORE_ERROR("WindowsRenderer ERROR: SHOULD BE RENDERED FREELY NOT IN A LOOP OUTSIDE OF THIS CLASS/SCOPE");
+	}
+
+	// TODO: Should just keep as class member and return in inline
+	long long WindowsRenderer::GetCycleTime()
+	{
+		if (!m_Init)
+			return 0;
+
+		long long time = (long long)(m_ActualBufferDuration) / Windows::ReftimesPerMillisecond / 2 * 1000000;
+		return time;
+	}
+
+	void WindowsRenderer::RenderFree()
+	{
+		SpinSleeper spinner;
+		Timer timer;
+		float time = 0.0f;
+		float lastTimeFrame = 0.0f;
+		float deltaTime = 0.0f;
+
 		HRESULT hr = S_OK;
 		UINT32 padding = 0;
 		INT32 position = 0;
 		DWORD flags = 0;
 		UINT32 framesAvailable = m_BufferSize;
-		DWORD sleepTime = (DWORD)(m_ActualBufferDuration / Windows::ReftimesPerMillisecond / 2);
+		nanoseconds sleepTime = (nanoseconds)(m_ActualBufferDuration) / Windows::ReftimesPerMillisecond / 2 * 1000000;
 		BYTE* data = nullptr;
 
 		hr = m_AudioClient->GetCurrentPadding(&padding);
@@ -149,9 +171,14 @@ namespace BackBeat {
 		hr = m_AudioClient->Start();
 		CHECK_FAILURE_HRESULT(hr);
 
+		// TODO: Put these timing calculations into the SpinSleeper class
+		timer.Start();
+		lastTimeFrame = timer.GetTimeNano();
 		while (m_Rendering)
 		{
-			Sleep(sleepTime);
+			time = timer.GetTimeNano();
+			spinner.Spin(sleepTime - nanoseconds(time - lastTimeFrame));
+			lastTimeFrame = timer.GetTimeNano();
 
 			hr = m_AudioClient->GetCurrentPadding(&padding);
 			CHECK_FAILURE_HRESULT(hr);
@@ -165,9 +192,7 @@ namespace BackBeat {
 
 			hr = m_ClientRenderer->ReleaseBuffer(framesAvailable, flags);
 			CHECK_FAILURE_HRESULT(hr);
-
 		}
-		Sleep(sleepTime);
 
 		hr = m_AudioClient->Stop();
 		CHECK_FAILURE_HRESULT(hr);

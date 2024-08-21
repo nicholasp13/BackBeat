@@ -12,7 +12,8 @@ namespace BackBeat {
 
 	WindowsAudioSystem::~WindowsAudioSystem()
 	{
-		
+		m_Renderer.Stop();
+		m_Thread.Stop();
 	}
 
 	void WindowsAudioSystem::Init(std::string projectName)
@@ -25,25 +26,23 @@ namespace BackBeat {
 
 		m_Renderer.Init();
 		m_Props = m_Renderer.GetProps();
-		m_RecordingSink.Init(m_Props);
-		m_Mixer.Init(m_Props, &m_RecordingSink);
-		m_Renderer.SetMixer(&m_Mixer);
+		m_Engine.Init(m_Props, &m_Renderer, &m_RecorderMgr, true);
 
-		m_AudioRecorder.Init(m_Props, &m_RecordingSink);
+		m_AudioRecorder.Init(m_Props, m_Engine.GetRecordingSink());
 		m_DeviceRecorder.Init();
 		m_RecorderMgr.Init(&m_AudioRecorder, &m_DeviceRecorder);
-		m_Mixer.AddRecordingManager(&m_RecorderMgr);
-
 	}
 
 	void WindowsAudioSystem::Start()
 	{
-		m_Renderer.Start();
+		std::function<void()> callback = std::bind(&AudioEngine::Callback, &m_Engine);
+		m_Thread.Start(callback, m_Renderer.GetCycleTime(), true);
 	}
 
 	void WindowsAudioSystem::Stop()
 	{
 		m_Renderer.Stop();
+		m_Thread.Stop(); 
 	}
 
 }

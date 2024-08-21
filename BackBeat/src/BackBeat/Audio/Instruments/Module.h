@@ -3,10 +3,10 @@
 // TODO: Create function get a vector/array of string names of ModuleCores to expose to GUI
 
 #include "BackBeat/Audio/Instruments/Synth/SynthBase.h"
-#include "BackBeat/Audio/Instruments/Synth/AudioEngine/ModuleCores/ModuleCore.h"
+#include "ModuleCore.h"
 namespace BackBeat {
 
-	class SynthModule
+	class Module
 	{
 	public:
 		virtual void Reset(unsigned int sampleRate) {};

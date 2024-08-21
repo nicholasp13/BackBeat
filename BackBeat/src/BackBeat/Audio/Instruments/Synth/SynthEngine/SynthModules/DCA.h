@@ -1,9 +1,9 @@
 #pragma once
 
-#include "SynthModule.h"
+#include "BackBeat/Audio/Instruments/Module.h"
 namespace BackBeat {
 
-	class DCA : public SynthModule
+	class DCA : public Module
 	{
 	public:
 		DCA(unsigned int bufferSize, std::shared_ptr<float[]> buffer, std::shared_ptr<DCAParameters> params);

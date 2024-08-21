@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ModuleCore.h"
+#include "BackBeat/Audio/Instruments/ModuleCore.h"
 #include "BackBeat/Audio/Helpers/Wave.h"
 #include "BackBeat/Audio/Instruments/Synth/SynthBase.h"
 namespace BackBeat {

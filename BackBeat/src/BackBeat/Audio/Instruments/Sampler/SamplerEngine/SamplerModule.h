@@ -1,10 +1,10 @@
 #pragma once
 
 #include "SamplerCore.h"
-#include "BackBeat/Audio/Instruments/Synth/AudioEngine/SynthModules/SynthModule.h"
+#include "BackBeat/Audio/Instruments/Module.h"
 namespace BackBeat {
 
-	class SamplerModule : public SynthModule
+	class SamplerModule : public Module
 	{
 	public:
 		SamplerModule(unsigned int sampleRate, std::shared_ptr<float[]> buffer);

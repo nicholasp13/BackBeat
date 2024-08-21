@@ -3,7 +3,7 @@
 #include "SynthProcessor.h"
 namespace BackBeat {
 
-	SynthProcessor::SynthProcessor(AudioProps props, std::shared_ptr<AudioEngine> engine, UUID id)
+	SynthProcessor::SynthProcessor(AudioProps props, std::shared_ptr<SynthEngine> engine, UUID id)
 		: 
 		m_On(false),
 		m_Props(props), 
@@ -31,7 +31,6 @@ namespace BackBeat {
 		m_Engine->Render(m_Info);
 
 		// NOTE: Synth's should always be a floating point (or a double) and this is assumed and not checked
-		float* targetBuffer = reinterpret_cast<float*>(m_Output);
 		auto srcBuffer = m_Bus.GetBuffer()->GetBuffer();
 		if (m_Props.sampleRate == sampleRate) 
 		{
@@ -40,7 +39,7 @@ namespace BackBeat {
 				for (unsigned int i = 0; i < numSamples * m_Props.numChannels; i += m_Props.numChannels) {
 					for (unsigned int j = 0; j < m_Props.numChannels; j++) {
 						int index = i + j; // Added to get rid of error message
-						targetBuffer[index] = (float)srcBuffer[index];
+						m_Output[index] = (float)srcBuffer[index];
 					}
 				}
 			}
@@ -48,13 +47,13 @@ namespace BackBeat {
 			{
 				unsigned int index = 0;
 				for (unsigned int i = 0; i < numSamples * m_Props.numChannels; i += m_Props.numChannels) {
-					targetBuffer[i] = srcBuffer[index];
+					m_Output[i] = srcBuffer[index];
 					index += m_Props.numChannels;
 				}
 			}
 		}
 
-		// NOTE: For Synths we should use the AudioEngine Reset() function to reset sample rate instead
+		// NOTE: For Synths we should use the SynthEngine Reset() function to reset sample rate instead
 		//       of upsampling and downsampling
 		bool downSampling = (m_Props.sampleRate > sampleRate);
 		if (downSampling) {

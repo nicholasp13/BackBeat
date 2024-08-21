@@ -44,6 +44,7 @@ namespace Exampler {
 
 		// BackBeat members
 		BackBeat::Window* m_Window;
+		BackBeat::AudioSystem* m_Audio;
 		BackBeat::PlayerManager* m_PlayerMgr;
 		BackBeat::RecorderManager* m_RecorderMgr;
 		BackBeat::Renderer* m_AudioRenderer;

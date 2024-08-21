@@ -83,7 +83,7 @@ namespace Exampler {
 		const std::string hashDivider = "###";
 		std::string labelID = m_Name.c_str() + hashDivider + synthID.ToString();
 		ImGui::Begin(labelID.c_str(), &m_Open, synth_window_flags);
-		
+
 		// Render MenuBar
 		{
 			// TODO: Add options after features are added i.e. Menu with 'Save' to save Synth config

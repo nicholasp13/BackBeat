@@ -2,9 +2,16 @@
 
 #include "bbpch.h"
 
-// NOTE: Most parameters' ranges are defined in the SynthBase.h file and are based on the
+// NOTE(s): - Most parameters' ranges are defined in the SynthBase.h file and are based on the
 //       MIDI Manufacturer's Association (MMA) Downloadable Sounds (DLS) Specification level 1 and 2
 //       documents
+//          - Should try and make all of these std::atomic (First attempt did not go well as while
+//       it compiled the way I handled GUI by just turning pointers into variables on the stack
+//       which is WRITTEN BY the atomic, then WRITTEN BY the ImGui::Widget(), and then WRITES TO
+//       the atomic. This caused audio to stop working when the ImGui window for the respective BBObject's
+//       was rendered. The audio renderer was still going but audio wasn't being produced. Next try,
+//       either make the variables part of the class and keep them as pointers in the widgets, OR
+//       retest the old way but going into the debugger to see what happens to the atomic values)
 
 #include "BackBeat/Audio/Helpers/Wave.h"
 namespace BackBeat {
@@ -19,18 +26,21 @@ namespace BackBeat {
 		NumModSources = 4
 	};
 
-	enum ModDestinations {
+	enum ModDestinations
+	{
 		DestOsc1 = 0,
 		DestOsc2 = 1,
 		DestDCA = 2,
 		NumModDestinations = 3
 	};
 
-	struct ModularSource {
+	struct ModularSource 
+	{
 		float intensity;
 	};
 
-	struct ModularDestination {
+	struct ModularDestination 
+	{
 		float intensity;
 		bool channelOn[NumModSources];
 	};
@@ -95,7 +105,7 @@ namespace BackBeat {
 		std::shared_ptr<OscParameters> OscParams2;
 		std::shared_ptr<OscParameters> OscParams3;
 		std::shared_ptr<OscParameters> OscParams4;
-		std::shared_ptr<FilterParameters> LPFilterParams; 
+		std::shared_ptr<FilterParameters> LPFilterParams;
 		std::shared_ptr<FilterParameters> HPFilterParams;
 		std::shared_ptr<ModMatrixParameters> ModMatrixParams;
 	};

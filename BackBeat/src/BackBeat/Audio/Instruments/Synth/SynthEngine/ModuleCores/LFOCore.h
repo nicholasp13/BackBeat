@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ModuleCore.h"
+#include "BackBeat/Audio/Instruments/ModuleCore.h"
 namespace BackBeat {
 
 	// NOTE: Might not need to fill entire modulator array with values since LFO values vary little due to low freq

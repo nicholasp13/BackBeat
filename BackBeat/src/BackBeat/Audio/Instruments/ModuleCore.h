@@ -3,7 +3,7 @@
 // TODO: Add string names to module cores to expose the cores to GUI
 
 #include "bbpch.h"
-#include "BackBeat/Audio/Instruments/Synth/AudioEngine/ModularMatrix/Modulator.h"
+#include "BackBeat/Audio/Instruments/Synth/SynthEngine/ModularMatrix/Modulator.h"
 #include "BackBeat/Audio/Instruments/Synth/SynthBase.h"
 namespace BackBeat {
 

@@ -35,7 +35,7 @@
 #include "SynthBase.h"
 #include "BackBeat/Audio/Audio.h"
 #include "BackBeat/Audio/MIDI/MIDIInputHandler.h"
-#include "BackBeat/Audio/Instruments/Synth/AudioEngine/AudioEngine.h"
+#include "BackBeat/Audio/Instruments/Synth/SynthEngine/SynthEngine.h"
 #include "BackBeat/Audio/Instruments/Synth/SynthIO/SynthProcessor.h"
 #include "BackBeat/Audio/Instruments/Synth/SynthIO/SynthEventHandler.h"
 namespace BackBeat {
@@ -63,7 +63,7 @@ namespace BackBeat {
 		AudioProps m_Props;
 		UUID m_ID;
 
-		std::shared_ptr<AudioEngine> m_Engine;
+		std::shared_ptr<SynthEngine> m_Engine;
 		std::shared_ptr<SynthProcessor> m_Processor;
 		std::shared_ptr<SynthEventHandler> m_Handler;
 		std::shared_ptr<MIDIInputHandler> m_MIDIInput;

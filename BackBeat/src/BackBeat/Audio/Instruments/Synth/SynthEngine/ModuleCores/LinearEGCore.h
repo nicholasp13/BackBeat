@@ -2,7 +2,7 @@
 
 // TODO: Create an EGCore interface
 
-#include "ModuleCore.h"
+#include "BackBeat/Audio/Instruments/ModuleCore.h"
 namespace BackBeat {
 
 	enum class EGState

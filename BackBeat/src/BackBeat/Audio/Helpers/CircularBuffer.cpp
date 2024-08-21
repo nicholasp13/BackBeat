@@ -19,13 +19,13 @@ namespace BackBeat {
 
 	bool CircularBuffer::Write(float* data, unsigned int num)
 	{
-		if (num > MaxBufferSize)
+		if (num > s_MaxBufferSize)
 			return false;
 
-		unsigned int newPos = (m_HeadsIndex + num) % ActualSize;
-		if (m_HeadsIndex < m_TailsIndex && newPos >= m_TailsIndex)
+		unsigned int newPos = (m_HeadsIndex.load() + num) % s_ArraySize;
+		if (m_HeadsIndex.load() < m_TailsIndex && newPos >= m_TailsIndex)
 			return false;
-		else if (m_HeadsIndex > newPos && newPos >= m_TailsIndex)
+		else if (m_HeadsIndex.load() > newPos && newPos >= m_TailsIndex)
 			return false;
 
 		if (newPos >= m_HeadsIndex)
@@ -36,7 +36,7 @@ namespace BackBeat {
 		}
 		else
 		{
-			unsigned int index = ActualSize - m_HeadsIndex;
+			unsigned int index = s_ArraySize - m_HeadsIndex;
 			unsigned int num1 = index * sizeof(float);
 			unsigned int num2 = newPos * sizeof(float);
 			memcpy(m_Array + m_HeadsIndex, data, std::size_t(num1));
@@ -49,10 +49,10 @@ namespace BackBeat {
 
 	bool CircularBuffer::Read(float* data, unsigned int num)
 	{
-		if (num > MaxBufferSize)
+		if (num > s_MaxBufferSize)
 			return false;
 
-		unsigned int newPos = (m_TailsIndex + num) % ActualSize;
+		unsigned int newPos = (m_TailsIndex + num) % s_ArraySize;
 		if (m_TailsIndex <= m_HeadsIndex && newPos >= m_HeadsIndex)
 			return false;
 		else if (m_TailsIndex > newPos && newPos > m_HeadsIndex)
@@ -66,7 +66,7 @@ namespace BackBeat {
 		}
 		else
 		{
-			unsigned int index = ActualSize - m_TailsIndex;
+			unsigned int index = s_ArraySize - m_TailsIndex;
 			unsigned int num1 = index * sizeof(float);
 			unsigned int num2 = newPos * sizeof(float);
 			memcpy(data, m_Array + m_TailsIndex, std::size_t(num1));

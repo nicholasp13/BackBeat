@@ -1,11 +1,11 @@
 #include "bbpch.h"
 
-#include "AudioEngine.h"
+#include "SynthEngine.h"
 namespace BackBeat {
 
 	// TODO: Finely tune volume
 
-	AudioEngine::AudioEngine(AudioProps props)
+	SynthEngine::SynthEngine(AudioProps props)
 		: 
 		m_NumVoices(SynthMaxVoices),
 		m_Buffer(std::make_shared<float[]>(props.sampleRate)), 
@@ -16,12 +16,12 @@ namespace BackBeat {
 		InitVoices();
 	}
 
-	AudioEngine::~AudioEngine()
+	SynthEngine::~SynthEngine()
 	{
 
 	}
 
-	void AudioEngine::Stop()
+	void SynthEngine::Stop()
 	{
 		MIDIEvent noteOff = {
 			.status = 0x00,
@@ -33,13 +33,13 @@ namespace BackBeat {
 				m_Voices[i]->ProcessMIDIEvent(noteOff);
 	}
 
-	void AudioEngine::Reset(unsigned int sampleRate)
+	void SynthEngine::Reset(unsigned int sampleRate)
 	{
 		for (unsigned int i = 0; i < m_NumVoices; i++)
 			m_Voices[i]->Reset(sampleRate);
 	}
 
-	void AudioEngine::Render(std::shared_ptr<RenderInfo> info)
+	void SynthEngine::Render(std::shared_ptr<RenderInfo> info)
 	{
 		float volume = m_Params->volume;
 		unsigned int numSamples = info->GetSamplesToRender();
@@ -67,18 +67,18 @@ namespace BackBeat {
 	}
 	
 	// Calls Voices update function
-	void AudioEngine::SetParam() // TODO: Implement if needed
+	void SynthEngine::SetParam() // TODO: Implement if needed
 	{
 
 
 	}
 
-	std::shared_ptr<EngineParameters> AudioEngine::GetParam()
+	std::shared_ptr<EngineParameters> SynthEngine::GetParam()
 	{
 		return m_Params;
 	}
 
-	void AudioEngine::ProcessMIDIEvent(MIDIEvent event)
+	void SynthEngine::ProcessMIDIEvent(MIDIEvent event)
 	{
 		bool noteOn = Audio::IsNoteOn(event);
 
@@ -105,7 +105,7 @@ namespace BackBeat {
 	}
 	
 	// Custom for each engine. Current engine for a basic synth piano
-	void AudioEngine::InitVoices()
+	void SynthEngine::InitVoices()
 	{
 		m_VoiceFactor = 2.0f / (float)m_NumVoices; // 2.0f to offset panning
 
@@ -114,7 +114,7 @@ namespace BackBeat {
 	}
 	 
 
-	void AudioEngine::InitParameters() 
+	void SynthEngine::InitParameters() 
 	{
 		auto DCAParams = std::make_shared<DCAParameters>();
 		DCAParams->leftAmp = 1.0f;

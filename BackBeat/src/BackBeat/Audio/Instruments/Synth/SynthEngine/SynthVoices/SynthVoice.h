@@ -32,7 +32,7 @@
 * function in their SynthModules which further make the corresponding functions calls to their cores which do the 
 * main work. The final output of the SynthModules is outputted to a single float buffer shared between most 
 * SynthModules (Oscs, Fitlers, and DCA specifically) which the SynthVoice then outputs additively to the main 
-* float buffer shared between all SynthVoices and the AudioEngine. 
+* float buffer shared between all SynthVoices and the SynthEngine. 
 *
 * NOTE: - Buffer size of most buffers is just the sample rate 48,000 which is not multiplied by the number of channels 
 *       so the buffer holds only half a second of data. This is sufficient as only LFOs require a buffer size larger 
@@ -52,14 +52,14 @@
 //  Implement ModularMatrix
 
 // #include "BackBeat/Audio/SynthIO/RenderInfo.h"
-#include "BackBeat/Audio/Instruments/Synth/AudioEngine/SynthModules/SynthModule.h"
-#include "BackBeat/Audio/Instruments/Synth/AudioEngine/SynthModules/DCA.h"
-#include "BackBeat/Audio/Instruments/Synth/AudioEngine/SynthModules/WaveOscillator.h"
-#include "BackBeat/Audio/Instruments/Synth/AudioEngine/SynthModules/LinearEG.h"
-#include "BackBeat/Audio/Instruments/Synth/AudioEngine/SynthModules/AmpEG.h"
-#include "BackBeat/Audio/Instruments/Synth/AudioEngine/SynthModules/LowFrequencyOscillator.h"
-#include "BackBeat/Audio/Instruments/Synth/AudioEngine/SynthModules/TPTLowPassFilter.h"
-#include "BackBeat/Audio/Instruments/Synth/AudioEngine/SynthModules/TPTHighPassFilter.h"
+#include "BackBeat/Audio/Instruments/Module.h"
+#include "BackBeat/Audio/Instruments/Synth/SynthEngine/SynthModules/DCA.h"
+#include "BackBeat/Audio/Instruments/Synth/SynthEngine/SynthModules/WaveOscillator.h"
+#include "BackBeat/Audio/Instruments/Synth/SynthEngine/SynthModules/LinearEG.h"
+#include "BackBeat/Audio/Instruments/Synth/SynthEngine/SynthModules/AmpEG.h"
+#include "BackBeat/Audio/Instruments/Synth/SynthEngine/SynthModules/LowFrequencyOscillator.h"
+#include "BackBeat/Audio/Instruments/Synth/SynthEngine/SynthModules/TPTLowPassFilter.h"
+#include "BackBeat/Audio/Instruments/Synth/SynthEngine/SynthModules/TPTHighPassFilter.h"
 #include "BackBeat/Audio/Instruments/Synth/SynthBase.h"
 namespace BackBeat {
 

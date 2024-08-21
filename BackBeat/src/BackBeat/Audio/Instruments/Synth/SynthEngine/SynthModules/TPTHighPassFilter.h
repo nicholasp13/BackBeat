@@ -1,10 +1,10 @@
 #pragma once
 
-#include "BackBeat/Audio/Instruments/Synth/AudioEngine/ModuleCores/TPTHPFilterCore.h"
-#include "SynthModule.h"
+#include "BackBeat/Audio/Instruments/Synth/SynthEngine/ModuleCores/TPTHPFilterCore.h"
+#include "BackBeat/Audio/Instruments/Module.h"
 namespace BackBeat {
 
-	class TPTHighPassFilter : public SynthModule
+	class TPTHighPassFilter : public Module
 	{
 	public:
 		TPTHighPassFilter(unsigned int sampleRate, unsigned int bufferSize, std::shared_ptr<float[]> buffer, std::shared_ptr<FilterParameters> params);

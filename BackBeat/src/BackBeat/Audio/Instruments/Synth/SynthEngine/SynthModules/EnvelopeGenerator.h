@@ -1,10 +1,10 @@
 #pragma once
 
-#include "BackBeat/Audio/Instruments/Synth/AudioEngine/ModuleCores/LinearEGCore.h"
-#include "SynthModule.h"
+#include "BackBeat/Audio/Instruments/Synth/SynthEngine/ModuleCores/LinearEGCore.h"
+#include "BackBeat/Audio/Instruments/Module.h"
 namespace BackBeat {
 
-	class EnvelopeGenerator : public SynthModule
+	class EnvelopeGenerator : public Module
 	{
 	public:
 		virtual void Reset(unsigned int sampleRate) {}

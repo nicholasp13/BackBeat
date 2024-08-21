@@ -4,6 +4,8 @@
 #include "MIDI/MIDIDeviceManager.h"
 #include "BackBeat/Audio/PlayBack/PlayerManager.h"
 #include "BackBeat/Audio/Recorder/RecorderManager.h"
+#include "BackBeat/Audio/Helpers/AudioThread.h"
+#include "AudioEngine.h"
 namespace BackBeat {
 
 	class AudioSystem
@@ -18,10 +20,6 @@ namespace BackBeat {
 		virtual PlayerManager* GetPlayerManager() { return nullptr; }
 		virtual RecorderManager* GetRecorderManager() { return nullptr; }
 		virtual MIDIDeviceManager* GetMIDIDeviceManager() { return nullptr; }
-		virtual void AddSampler() {}
-		virtual void AddSynth() {}
-		virtual void AddPlayer() {}
-
 
 	};
 }

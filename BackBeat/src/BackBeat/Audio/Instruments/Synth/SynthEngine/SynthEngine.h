@@ -22,16 +22,16 @@
 
 #include "BackBeat/Audio/Instruments/Synth/SynthBase.h"
 #include "BackBeat/Audio/Renderer/RenderInfo.h"
-#include "BackBeat/Audio/Instruments/Synth/AudioEngine/SynthVoices/SynthVoice.h"
+#include "BackBeat/Audio/Instruments/Synth/SynthEngine/SynthVoices/SynthVoice.h"
 namespace BackBeat {
 
 	constexpr unsigned int SynthMaxVoices = 12;
 
-	class AudioEngine
+	class SynthEngine
 	{
 	public:
-		AudioEngine(AudioProps props);
-		~AudioEngine();
+		SynthEngine(AudioProps props);
+		~SynthEngine();
 		
 		void Stop();
 

@@ -252,7 +252,7 @@ namespace Exampler {
 		float* volume = &(m_Sampler.GetEngineParams()->volume);
 		ImGui::Text("    "); ImGui::SameLine();
 		BackBeat::ImGuiWidgets::ImGuiSeekBarFloat("Volume", volume, 1.0f, "", ImGuiSliderFlags(0));
-		
+
 		ImGui::Spacing();
 		ImGui::PopID();
 	}

@@ -1,10 +1,10 @@
 #pragma once
 
-#include "SynthModule.h"
-#include "BackBeat/Audio/Instruments/Synth/AudioEngine/ModuleCores/WaveOscCore.h"
+#include "BackBeat/Audio/Instruments/Synth/SynthEngine/ModuleCores/WaveOscCore.h"
+#include "BackBeat/Audio/Instruments/Module.h"
 namespace BackBeat {
 
-	class WaveOscillator : public SynthModule
+	class WaveOscillator : public Module
 	{
 	public:
 		WaveOscillator(unsigned int sampleRate, std::shared_ptr<float[]> buffer, std::shared_ptr<OscParameters> params);

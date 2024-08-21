@@ -1,10 +1,10 @@
 #pragma once
 
-#include "BackBeat/Audio/Instruments/Synth/AudioEngine/ModuleCores/LFOCore.h"
-#include "SynthModule.h"
+#include "BackBeat/Audio/Instruments/Synth/SynthEngine/ModuleCores/LFOCore.h"
+#include "BackBeat/Audio/Instruments/Module.h"
 namespace BackBeat {
 
-	class LowFrequencyOscillator : public SynthModule
+	class LowFrequencyOscillator : public Module
 	{
 	public:
 		LowFrequencyOscillator(unsigned int sampleRate, unsigned int bufferSize, std::shared_ptr<float[]> outputBuffer, std::shared_ptr<LFOParameters> params);

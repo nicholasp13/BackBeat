@@ -1,10 +1,10 @@
 #pragma once
 
-#include "BackBeat/Audio/Instruments/Synth/AudioEngine/ModuleCores/TPTLPFilterCore.h"
-#include "SynthModule.h"
+#include "BackBeat/Audio/Instruments/Synth/SynthEngine/ModuleCores/TPTLPFilterCore.h"
+#include "BackBeat/Audio/Instruments/Module.h"
 namespace BackBeat {
 
-	class TPTLowPassFilter : public SynthModule
+	class TPTLowPassFilter : public Module
 	{
 	public:
 		TPTLowPassFilter(unsigned int sampleRate, unsigned int bufferSize, std::shared_ptr<float[]> buffer, std::shared_ptr<FilterParameters> params);
