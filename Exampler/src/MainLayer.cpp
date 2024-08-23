@@ -1,9 +1,5 @@
 // TODO: Create editable timeline for entity/track objects
 
-// TODO LIST: IMMEDIATE
-// 1. Remove heap allocations in any of the BBObject audio rendering work flow 
-// x. Make ObjectParameters atomics
-
 #include "MainLayer.h"
 namespace Exampler {
 
@@ -22,7 +18,8 @@ namespace Exampler {
 		m_PlayerMgr(audio->GetPlayerManager()),
 		m_RecorderMgr(audio->GetRecorderManager()),
 		m_AudioRenderer(audio->GetRenderer()),
-		m_MIDIDeviceManager(audio->GetMIDIDeviceManager())
+		m_MIDIDeviceManager(audio->GetMIDIDeviceManager()),
+		m_Visualizer(audio->GetVisualizer())
 	{
 
 	}
@@ -57,6 +54,7 @@ namespace Exampler {
 		{
 			(*itr)->Update();
 		}
+		m_Visualizer->Update();
 	}
 
 	void MainLayer::OnEvent(BackBeat::Event& event)
@@ -99,6 +97,7 @@ namespace Exampler {
 
 			RenderMenubar();
 			RenderCanvas();
+			RenderAudioVisualizer();
 			RenderMgrs();
 			RenderPopups();
 
@@ -181,7 +180,7 @@ namespace Exampler {
 		unsigned int width = m_Window->GetWidth();
 		unsigned int height = m_Window->GetHeight();
 		const int wBorder = 20;
-		const int hBorder = 100;
+		const int hBorder = 250;
 		ImGuiWindowFlags childFlags = 0;
 		childFlags |= ImGuiWindowFlags_NoTitleBar;
 		childFlags |= ImGuiWindowFlags_NoMove;
@@ -235,6 +234,37 @@ namespace Exampler {
 		}
 
 		ImGui::PopStyleColor(cCount);
+	}
+
+	// BUG: When spamming the on and off button. It may cause the visuals to glitch (mostly show the data when it should have been flushed)
+	void MainLayer::RenderAudioVisualizer()
+	{
+		ImGui::Spacing();
+
+		if (!m_Visualizer->IsOn())
+		{
+			if (ImGui::Button("On", ImVec2(100, 20)))
+				m_Visualizer->On();
+		}
+		else
+		{
+			if (ImGui::Button("Off", ImVec2(100, 20)))
+				m_Visualizer->Off();
+		}
+
+		// NOTE: While inuitive to think that the min/max shouldd be near 1.0f, the sound is multiplied by multiple different gain levels
+		//       through the BackBeat workflow making the average peak of a sound wave much lower than you would think.
+		const float visualMax = .15f;
+		auto bufferSize = m_Visualizer->GetChannelBufferSize();
+		for (unsigned int i = 0; i < m_Visualizer->GetNumChannels(); i++)
+		{
+			ImGui::Spacing();
+			std::string name = "Channel " + std::to_string(i);
+			ImGui::PlotLines(name.c_str(), m_Visualizer->GetChannelBuffer(i), bufferSize, 1, "", visualMax * -1, visualMax, ImVec2(m_Window->GetWidth() - 200.0f, 60.0f));
+		}
+
+
+		ImGui::Spacing();
 	}
 
 	void MainLayer::RenderMgrs()
@@ -331,55 +361,7 @@ namespace Exampler {
 
 			if(ImGui::Button("Yes"))
 			{
-				m_Audio->Stop();
-				m_PlayerMgr->StopAll();
-				m_RecorderMgr->Stop();
-				m_MIDIDeviceManager->StopDevice();
-
-				auto id = m_EtyToDelete->GetID();
-				for (auto itr = m_Entities.begin(); itr != m_Entities.end(); itr++)
-				{
-					if ((*itr)->GetID() == id)
-					{
-						m_Entities.erase(itr);
-						break;
-					}
-				}
-
-				m_EtyToDelete->Delete(m_PlayerMgr, m_RecorderMgr, m_AudioRenderer->GetMixer(), m_MIDIDeviceManager);
-
-				switch (m_EtyToDelete->GetType())
-				{
-				case EntityType::none:
-				{
-					break;
-				}
-				case EntityType::synth:
-				{
-					m_NumSynths--;
-					break;
-				}
-				case EntityType::sampler:
-				{
-					m_NumSamplers--;
-					break;
-				}
-				case EntityType::playback:
-				{
-					m_NumPlayback--;
-					break;
-				}
-				case EntityType::recording:
-				{
-					m_NumRecorders--;
-					break;
-				}
-				default:
-					break;
-				}
-
-				m_Audio->Start();
-				m_EtyToDelete = nullptr;
+				DeleteEntity();
 				ImGui::CloseCurrentPopup();
 			} ImGui::SameLine();
 
@@ -453,6 +435,59 @@ namespace Exampler {
 		m_Entities.push_back(recordingTrack);
 
 		m_Audio->Start();
+	}
+
+	void MainLayer::DeleteEntity()
+	{
+		m_Audio->Stop();
+		m_PlayerMgr->StopAll();
+		m_RecorderMgr->Stop();
+		m_MIDIDeviceManager->StopDevice();
+
+		auto id = m_EtyToDelete->GetID();
+		for (auto itr = m_Entities.begin(); itr != m_Entities.end(); itr++)
+		{
+			if ((*itr)->GetID() == id)
+			{
+				m_Entities.erase(itr);
+				break;
+			}
+		}
+
+		m_EtyToDelete->Delete(m_PlayerMgr, m_RecorderMgr, m_AudioRenderer->GetMixer(), m_MIDIDeviceManager);
+
+		switch (m_EtyToDelete->GetType())
+		{
+		case EntityType::none:
+		{
+			break;
+		}
+		case EntityType::synth:
+		{
+			m_NumSynths--;
+			break;
+		}
+		case EntityType::sampler:
+		{
+			m_NumSamplers--;
+			break;
+		}
+		case EntityType::playback:
+		{
+			m_NumPlayback--;
+			break;
+		}
+		case EntityType::recording:
+		{
+			m_NumRecorders--;
+			break;
+		}
+		default:
+			break;
+		}
+
+		m_Audio->Start();
+		m_EtyToDelete = nullptr;
 	}
 
 	bool MainLayer::OnKeyEvent(BackBeat::KeyPressedEvent& event)

@@ -5,6 +5,7 @@
 #include "BackBeat/Audio/PlayBack/PlayerManager.h"
 #include "BackBeat/Audio/Recorder/RecorderManager.h"
 #include "BackBeat/Audio/Helpers/AudioThread.h"
+#include "BackBeat/Audio/Visualizer/Visualizer.h"
 #include "AudioEngine.h"
 namespace BackBeat {
 
@@ -20,6 +21,6 @@ namespace BackBeat {
 		virtual PlayerManager* GetPlayerManager() { return nullptr; }
 		virtual RecorderManager* GetRecorderManager() { return nullptr; }
 		virtual MIDIDeviceManager* GetMIDIDeviceManager() { return nullptr; }
-
+		virtual Visualizer* GetVisualizer() { return nullptr; }
 	};
 }

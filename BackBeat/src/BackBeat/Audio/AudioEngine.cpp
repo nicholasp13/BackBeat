@@ -25,9 +25,13 @@ namespace BackBeat {
 		m_Free = free;
 
 		m_RecordingSink.Init(m_Props);
-		m_Mixer.Init(m_Props, &m_RecordingSink);
+		m_VisualizingSink.Init(m_Props);
+		m_Mixer.Init(m_Props, &m_RecordingSink, &m_VisualizingSink);
 		m_Mixer.SetRecordingManager(recordingMgr);
+		m_Mixer.SetVisualizer(&m_Visualizer);
 		m_Renderer->SetMixer(&m_Mixer);
+
+		m_Visualizer.Init(m_Props, &m_VisualizingSink, m_Props.sampleRate * m_Props.numChannels / 10);
 
 		m_Init = true;
 	}

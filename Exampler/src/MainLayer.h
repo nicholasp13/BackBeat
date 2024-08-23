@@ -49,20 +49,27 @@ namespace Exampler {
 		BackBeat::RecorderManager* m_RecorderMgr;
 		BackBeat::Renderer* m_AudioRenderer;
 		BackBeat::MIDIDeviceManager* m_MIDIDeviceManager;
+		BackBeat::Visualizer* m_Visualizer;
 
 	private:
 		void RenderMenubar();
 		void RenderCanvas();
+		void RenderAudioVisualizer();
 		void RenderMgrs();
 		void RenderEntities();
 		void RenderEntityMenubar(unsigned int index);
 		void RenderPopups();
+
 		void AddSynth();
 		void AddSampler();
 		void AddPlaybackTrack();
 		void AddRecordingTrack();
+
+		void DeleteEntity();
+
 		bool OnKeyEvent(BackBeat::KeyPressedEvent& event);
 		bool OnMouseButtonEvent(BackBeat::MouseButtonPressedEvent& event);
+
 		unsigned int SetCanvasColors();
 		unsigned int SetMainColors();
 	};

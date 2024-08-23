@@ -23,7 +23,6 @@
 
 // ------------------------------------------------------------------------------- //
 // TODO:
-// - Fix/reduce artifacting
 // - Create SynthModule Modulation Matrix that has access to EnvelopeGenerators(EGs), 
 //       Low Frequency Oscillators(LFOs), and filters to allow for personal
 //       customizable sounds
