@@ -229,7 +229,7 @@ namespace BackBeat {
 		unsigned int position = 0;
 		int24* targetBuffer = new int24[numInts];
 
-		for (unsigned int i = 0; i < numInts; i ++) {
+		for (unsigned int i = 0; i < numInts; i++) {
 			if (bigEndian)
 				src = int24(buffer[position], buffer[position + 1], buffer[position + 2]);
 			else

@@ -17,6 +17,7 @@
 #include <queue>
 #include <algorithm>
 #include <cstdio>
+#include <stdatomic.h>
 
 #ifdef BB_PLATFORM_WINDOWS
 	#include <Windows.h>

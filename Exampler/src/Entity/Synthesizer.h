@@ -17,17 +17,22 @@ namespace Exampler {
 	class Synthesizer : public Entity
 	{
 	public:
-		Synthesizer(std::shared_ptr<BackBeat::RecorderManager> recorderMgr);
+		Synthesizer();
 		~Synthesizer();
 
 		virtual void Update() override;
 		virtual void OnEvent(BackBeat::Event& event) override;
 		virtual void ImGuiRender() override;
+		virtual void Add(
+			BackBeat::PlayerManager* playerMgr,
+			BackBeat::RecorderManager* recorderMgr,
+			BackBeat::Mixer* mixer,
+			BackBeat::MIDIDeviceManager* midiDeviceManager) override;
 		virtual void Delete(
 			BackBeat::PlayerManager* playerMgr,
-			std::shared_ptr<BackBeat::RecorderManager> recorderMgr,
-			std::shared_ptr<BackBeat::Mixer> mixer,
-			BackBeat::WindowsMIDIDeviceManager* midiDeviceManager) override;
+			BackBeat::RecorderManager* recorderMgr,
+			BackBeat::Mixer* mixer,
+			BackBeat::MIDIDeviceManager* midiDeviceManager) override;
 
 		inline virtual void Open() override { m_Open = true; };
 		inline virtual void Close() override { m_Open = false; };
@@ -46,7 +51,7 @@ namespace Exampler {
 		bool m_Open;
 		bool m_KeyboardActive;
 		std::string m_Name;
-		// Synthesizer params
+		// Synthesizer params || TODO: Make this a struct in SynthParams header
 		int m_NoteVelocity;
 		float m_Pan;
 		int m_LFOWave,
@@ -63,7 +68,7 @@ namespace Exampler {
 		std::shared_ptr<BackBeat::SynthParameters> m_SynthParams;
 		std::shared_ptr<BackBeat::SynthEventHandler> m_SynthEventHandler;
 		std::shared_ptr<BackBeat::Player> m_RecordingPlayer;
-		std::shared_ptr<BackBeat::RecorderManager> m_RecorderMgr;
+		BackBeat::RecorderManager* m_RecorderMgr;
 
 	private:
 		void RenderCanvasEntity();

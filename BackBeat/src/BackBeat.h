@@ -18,14 +18,18 @@
 #include "BackBeat/Core/Window.h"
 
 #include "BackBeat/Audio/Audio.h"
+#include "BackBeat/Audio/AudioSystem.h"
 #include "BackBeat/Audio/Helpers/int24.h"
-#include "BackBeat/Audio/IO/WAVFileBuilder.h"
-#include "BackBeat/Audio/IO/WindowsRenderer.h"
-#include "BackBeat/Audio/MIDI/WindowsMIDIDeviceManager.h"
+#include "BackBeat/Audio/FileIO/WAVFileBuilder.h"
 #include "BackBeat/Audio/PlayBack/PlayerManager.h"
 #include "BackBeat/Audio/Recorder/RecorderManager.h"
-#include "BackBeat/Audio/Recorder/WindowsRecorder.h"
-#include "BackBeat/Audio/Sampler/Sampler.h"
-#include "BackBeat/Audio/Synth/Synth.h"
+#include "BackBeat/Audio/Instruments/Sampler/Sampler.h"
+#include "BackBeat/Audio/Instruments/Synth/Synth.h"
 
 #include "BackBeat/ImGui/ImGuiWidgets.h"
+
+#ifdef BB_PLATFORM_WINDOWS
+	#include "Platform/Windows/Windows.h"
+	#include "Platform/Windows/WindowsWindow.h"
+	#include "Platform/Windows/Audio/WindowsAudioSystem.h"
+#endif

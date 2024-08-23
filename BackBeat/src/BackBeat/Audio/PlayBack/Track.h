@@ -25,6 +25,7 @@ namespace BackBeat {
 		inline std::string GetFilePath() { return m_Info.filePath; }
 		inline AudioProps GetProps() { return m_Info.props; }
 		inline AudioInfo GetInfo() { return m_Info; }
+		inline FileType GetFileType() { return m_Info.type; }
 		inline void SetVolume(float vol) { m_Volume = vol; }
 		inline void SetDataSize(unsigned int size) { m_Info.dataSize = size; } // NOTE: This should ONLY be used by the Recording class
 

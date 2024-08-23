@@ -58,8 +58,13 @@ namespace BackBeat {
 		static int24* GetInt24Buffer(byte* buffer, unsigned int numInts, bool bigEndian);
 		static byte* GetByteBuffer(int24* buffer, unsigned int numInts, bool bigEndian);
 
-		// NOTE: Due to the way template functions are. This, using include on a .cpp file,
+		// NOTE(s): - Due to the way template functions are. This implementation, using include on a .cpp file,
 		//       or creating seperate functions for each type are the only solutions
+		//          - Allocating memory on the heap during important run time ESPECIALLY on the audio thread which requires
+		//       exact timing is generally looked down on. However in this case, this code is baked in here and in 
+		//       SampleBuilder and would take a bit of reworking to fix so this is for future reference in case I forget.
+		//       (Another thing is that creating an array or pointer of the class as a private member caused nontrivial compiler 
+		//       errors that made this tough to solve)
 		template<typename T>
 		static void TranslateDataToInt24(T inBuffer, byte* outputBuffer, unsigned int inBitDepth,
 			unsigned int numChannels, unsigned int numSamples, bool bigEndian)

@@ -2,8 +2,8 @@
 
 namespace Exampler {
 
-	PlaybackTrack::PlaybackTrack(std::shared_ptr<BackBeat::Player> player)
-		: m_Volume(1.0f), m_Player(player)
+	PlaybackTrack::PlaybackTrack()
+		: m_Volume(1.0f), m_Player(nullptr) // Create in Add() function
 	{
 
 	}
@@ -104,11 +104,21 @@ namespace Exampler {
 		ImGui::PopID();
 	}
 
+	void PlaybackTrack::Add(
+		BackBeat::PlayerManager* playerMgr,
+		BackBeat::RecorderManager* recorderMgr,
+		BackBeat::Mixer* mixer,
+		BackBeat::MIDIDeviceManager* midiDeviceManager)
+	{
+		m_Player = playerMgr->AddNewPlayer();
+		mixer->PushProcessor(m_Player->GetProc());
+	}
+
 	void PlaybackTrack::Delete(
 		BackBeat::PlayerManager* playerMgr,
-		std::shared_ptr<BackBeat::RecorderManager> recorderMgr,
-		std::shared_ptr<BackBeat::Mixer> mixer,
-		BackBeat::WindowsMIDIDeviceManager* midiDeviceManager)
+		BackBeat::RecorderManager* recorderMgr,
+		BackBeat::Mixer* mixer,
+		BackBeat::MIDIDeviceManager* midiDeviceManager)
 	{
 		auto playerID = m_Player->GetID();
 

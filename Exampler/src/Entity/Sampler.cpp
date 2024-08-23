@@ -6,7 +6,7 @@
 #include "Sampler.h"
 namespace Exampler {
 
-	Sampler::Sampler(std::shared_ptr<BackBeat::RecorderManager> recorderMgr)
+	Sampler::Sampler()
 		:
 		m_Open(false),
 		m_KeyboardActive(true),
@@ -16,7 +16,7 @@ namespace Exampler {
 		m_NumMIDIDevices(0),
 		m_PadToProgram(0),
 		m_RecordingPlayer(nullptr),
-		m_RecorderMgr(recorderMgr)
+		m_RecorderMgr(nullptr)
 	{
 		m_NumPads = m_Sampler.GetProgrammer()->GetNumPads();
 	}
@@ -88,23 +88,45 @@ namespace Exampler {
 		ImGui::PopID();
 	}
 
+	void Sampler::Add(
+		BackBeat::PlayerManager* playerMgr,
+		BackBeat::RecorderManager* recorderMgr,
+		BackBeat::Mixer* mixer,
+		BackBeat::MIDIDeviceManager* midiDeviceManager)
+	{
+		m_RecorderMgr = recorderMgr;
+		m_RecordingPlayer = playerMgr->AddNewPlayer();
+		auto samplerProc = m_Sampler.GetProcessor();
+		auto samplerID = samplerProc->GetID();
+		auto id = m_Sampler.GetID();
+		auto samplerTrack = m_RecorderMgr->AddRecordingTrack(samplerID, BackBeat::RecorderType::audio);
+		m_RecordingPlayer->LoadTrack(samplerTrack);
+
+		mixer->PushProcessor(samplerProc);
+		mixer->PushProcessor(m_RecordingPlayer->GetProc());
+		mixer->PushProcessor(m_TrackPlayer.GetProc());
+		midiDeviceManager->PushOutput(m_Sampler.GetMIDIInput());
+	}
+
 	void Sampler::Delete(
 		BackBeat::PlayerManager* playerMgr,
-		std::shared_ptr<BackBeat::RecorderManager> recorderMgr,
-		std::shared_ptr<BackBeat::Mixer> mixer,
-		BackBeat::WindowsMIDIDeviceManager* midiDeviceManager)
+		BackBeat::RecorderManager* recorderMgr,
+		BackBeat::Mixer* mixer,
+		BackBeat::MIDIDeviceManager* midiDeviceManager)
 	{
-		auto synthID = m_Sampler.GetID();
+		auto samplerID = m_Sampler.GetID();
 		auto trackPlayerID = m_RecordingPlayer->GetID();
 		auto midiInputID = m_Sampler.GetMIDIInput()->GetID();
+		auto sampleTrackPlayerID = m_TrackPlayer.GetID();
 
 		m_Sampler.Stop();
 		m_RecordingPlayer->Stop();
 
 		playerMgr->Delete(m_RecordingPlayer->GetID());
-		recorderMgr->DeleteRecorder(synthID);
-		mixer->DeleteProcessor(synthID);
+		recorderMgr->DeleteTrack(samplerID);
+		mixer->DeleteProcessor(samplerID);
 		mixer->DeleteProcessor(trackPlayerID);
+		mixer->DeleteProcessor(sampleTrackPlayerID);
 		midiDeviceManager->DeleteOutput(midiInputID);
 	}
 
@@ -136,7 +158,7 @@ namespace Exampler {
 
 		// Render Recorder controls
 		{
-			if (!m_RecorderMgr->IsOn(samplerID))
+			if (!m_RecorderMgr->IsActive(samplerID))
 			{
 				if (ImGui::Button("Record On", ImVec2(125, 20)))
 				{
@@ -173,8 +195,8 @@ namespace Exampler {
 				} ImGui::SameLine();
 
 				if (ImGui::Button("Clear Recording"))
-					if (!m_RecorderMgr->IsOn(samplerID))
-						m_RecorderMgr->ResetRecorder(samplerID);
+					if (!m_RecorderMgr->IsActive(samplerID))
+						m_RecorderMgr->ResetRecording(samplerID);
 
 
 				BackBeat::TimeMinSec trackTime = m_RecordingPlayer->GetTime();
@@ -230,7 +252,7 @@ namespace Exampler {
 		float* volume = &(m_Sampler.GetEngineParams()->volume);
 		ImGui::Text("    "); ImGui::SameLine();
 		BackBeat::ImGuiWidgets::ImGuiSeekBarFloat("Volume", volume, 1.0f, "", ImGuiSliderFlags(0));
-		
+
 		ImGui::Spacing();
 		ImGui::PopID();
 	}
@@ -524,6 +546,7 @@ namespace Exampler {
 					if (ImGui::Button("Play"))
 					{
 						m_TrackPlayer.SetPosition(start);
+						m_TrackPlayer.On();
 						m_TrackPlayer.Start();
 					}
 				}

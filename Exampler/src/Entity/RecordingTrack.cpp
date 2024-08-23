@@ -2,17 +2,12 @@
 
 namespace Exampler {
 	
-	RecordingTrack::RecordingTrack(
-		BackBeat::UUID recorderID,
-		std::shared_ptr<BackBeat::Track> track,
-		std::shared_ptr<BackBeat::Player> player,
-		std::shared_ptr<BackBeat::RecorderManager> recorderMgr)
+	RecordingTrack::RecordingTrack()
 		: 
 		m_Volume(1.0f),
-		m_RecorderID(recorderID),
-		m_Track(track),
-		m_Player(player),
-		m_RecorderMgr(recorderMgr)
+		m_Track(nullptr),
+		m_Player(nullptr),
+		m_RecorderMgr(nullptr)
 	{
 
 	}
@@ -20,7 +15,6 @@ namespace Exampler {
 	RecordingTrack::~RecordingTrack()
 	{
 		m_Player->Stop();
-		std::remove(m_Track->GetFilePath().c_str());
 	}
 
 	void RecordingTrack::Update()
@@ -38,30 +32,23 @@ namespace Exampler {
 	// NOTE: Placeholder for GUI as I will be overhaulling the Sampler GUI next
 	void RecordingTrack::ImGuiRender()
 	{
-		auto trackID = m_Player->GetID();
 		unsigned int count = SetRecordingTrackColors();
-		ImGui::PushID(trackID.ToString().c_str());
+		ImGui::PushID(m_RecorderID.ToString().c_str());
 		ImGui::SeparatorText(m_Name.c_str());
 
 		// Render canvas control buttons
 		{	
-			if (!(m_RecorderMgr->IsOn(m_RecorderID) && m_RecorderMgr->IsDeviceTrackOn(trackID)))
+			if (!m_RecorderMgr->IsActive(m_RecorderID))
 			{
 				if (ImGui::Button("Record On", ImVec2(125, 20)))
 					if (!m_RecorderMgr->IsRecording())
-					{
 						m_RecorderMgr->SetRecorderActive(m_RecorderID);
-						m_RecorderMgr->SetDeviceRecorderTrack(m_Player->GetID(), m_Track);
-					}
 			}
 			else
 			{
 				if (ImGui::Button("Record Off", ImVec2(125, 20)))
 					if (!m_RecorderMgr->IsRecording())
-					{
 						m_RecorderMgr->SetRecorderInactive(m_RecorderID);
-						m_RecorderMgr->ClearDeviceTrack();
-					}
 			} ImGui::SameLine();
 
 			if (!m_Player->IsOn())
@@ -76,32 +63,25 @@ namespace Exampler {
 			} ImGui::SameLine();
 
 			if (ImGui::Button("Clear Recording"))
-			{
 				if (!m_RecorderMgr->IsRecording())
-				{
-					m_RecorderMgr->SetDeviceRecorderTrack(m_Player->GetID(), m_Track);
-					m_RecorderMgr->ResetRecorder(m_RecorderID);
-					m_RecorderMgr->SetRecorderInactive(m_RecorderID);
-					m_RecorderMgr->ClearDeviceTrack();
-				}
-			}
+					m_RecorderMgr->ResetRecording(m_RecorderID);
 		}
 
 		// Render Playback controls/info
 		{
 			BackBeat::TimeMinSec trackTime = m_Player->GetTime();
 			BackBeat::TimeMinSec trackLength = m_Player->GetLength();
-
 			int position = m_Player->GetPosition();
 			int size = m_Player->GetSize();
 			static bool wasPlaying = false;
+
 			ImGui::Text("%d:%02d", trackTime.minutes, trackTime.seconds); ImGui::SameLine();
 
 			// Placeholder for future implementation of a custom ImGui::Timeline widget
 			if (m_Player->IsLoaded() && m_Player->GetSize() > 0)
 			{
 				ImGui::PushID("Seekbar");
-				if (BackBeat::ImGuiWidgets::ImGuiSeekBarInt("##", &position, m_Player->GetSize(), "", ImGuiSliderFlags(0)))
+				if (BackBeat::ImGuiWidgets::ImGuiSeekBarInt("##", &position, size, "", ImGuiSliderFlags(0)))
 				{
 					if (m_Player->IsPlaying())
 					{
@@ -140,18 +120,33 @@ namespace Exampler {
 		ImGui::PopID();
 	}
 
+	void RecordingTrack::Add(
+		BackBeat::PlayerManager* playerMgr,
+		BackBeat::RecorderManager* recorderMgr,
+		BackBeat::Mixer* mixer,
+		BackBeat::MIDIDeviceManager* midiDeviceManager)
+	{
+		m_Player = playerMgr->AddNewPlayer();
+		m_RecorderMgr = recorderMgr;
+		m_Track = m_RecorderMgr->AddRecordingTrack(m_RecorderID, BackBeat::RecorderType::device);
+
+		m_Player->LoadTrack(m_Track);
+
+		mixer->PushProcessor(m_Player->GetProc());
+	}
+
 	void RecordingTrack::Delete(
 		BackBeat::PlayerManager* playerMgr,
-		std::shared_ptr<BackBeat::RecorderManager> recorderMgr,
-		std::shared_ptr<BackBeat::Mixer> mixer,
-		BackBeat::WindowsMIDIDeviceManager* midiDeviceManager)
+		BackBeat::RecorderManager* recorderMgr,
+		BackBeat::Mixer* mixer,
+		BackBeat::MIDIDeviceManager* midiDeviceManager)
 	{
 		auto playerID = m_Player->GetID();
 
 		m_Player->Stop();
 		m_Player->ClearTrack();
 		m_RecorderMgr->SetRecorderInactive(m_RecorderID);
-		m_RecorderMgr->ClearDeviceTrack();
+		m_RecorderMgr->ClearTrack(m_RecorderID);
 
 		playerMgr->Delete(playerID);
 		mixer->DeleteProcessor(playerID);

@@ -7,7 +7,6 @@ namespace BackBeat {
 		: 
 		m_On(false),
 		m_BufferSize(0),
-		m_Output(nullptr),
 		m_Track(nullptr)
 	{
 
@@ -15,7 +14,7 @@ namespace BackBeat {
 
 	PlayerProcessor::~PlayerProcessor()
 	{
-		delete[]m_Output;
+		
 	}
 
 	void PlayerProcessor::ProcessSamples(unsigned int numSamples, unsigned int sampleRate, unsigned int numChannels)
@@ -24,6 +23,9 @@ namespace BackBeat {
 			return;
 		if (!m_Track)
 			return;
+		if (numSamples == 0)
+			return;
+
 		if (m_Track->GetProps().sampleRate != sampleRate) 
 		{
 			BB_CORE_ERROR("SAMPLE RATE NOT SUPPORTED");
@@ -31,6 +33,7 @@ namespace BackBeat {
 			return;
 		}
 
+		const unsigned int bufferSize = 10000;
 		AudioProps props = m_Track->GetProps();
 		float actualSamples = (float)numSamples * (float)props.sampleRate / (float)sampleRate;
 		unsigned int actualBytes = (unsigned int)floor(actualSamples * (float)props.blockAlign);
@@ -43,7 +46,7 @@ namespace BackBeat {
 		// Changes Mono to Stereo and vice versa
 		if (m_Track->GetProps().numChannels != numChannels)
 		{
-			auto temp = new byte[actualBytes];
+			byte temp[bufferSize] = {};
 			m_Track->Render(temp, actualBytes);
 			if (numChannels == Audio::Stereo)
 			{
@@ -53,7 +56,6 @@ namespace BackBeat {
 			{
 				StereoToMono(actualBytes, props.bitDepth, temp, m_Output);
 			}
-			delete[actualBytes](temp);
 		}
 		else 
 		{
@@ -96,17 +98,13 @@ namespace BackBeat {
 	{
 		if (!track)
 			return;
-		delete[m_BufferSize](m_Output);
 		m_Track = track;
 		m_BufferSize = track->GetProps().byteRate; // NOTE: This buffer size might be too big and can make it smaller
-		m_Output = new byte[m_BufferSize];
 	}
 
 	void PlayerProcessor::ClearTrack()
 	{
 		m_On = false;
-		delete[m_BufferSize](m_Output);
-		m_Output = nullptr;
 		m_Track = nullptr;
 	}
 

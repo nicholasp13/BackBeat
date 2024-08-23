@@ -1,12 +1,15 @@
 // TODO: Create editable timeline for entity/track objects
 
+// TODO LIST: IMMEDIATE
+// 1. Remove heap allocations in any of the BBObject audio rendering work flow 
+// x. Make ObjectParameters atomics
+
 #include "MainLayer.h"
 namespace Exampler {
 
-	MainLayer::MainLayer(BackBeat::Window* window)
+	MainLayer::MainLayer(BackBeat::Window* window, BackBeat::AudioSystem* audio)
 		: 
 		Layer("MainLayer"), 
-		m_Window(window), 
 		m_NumMIDIDevices(0),
 		m_NumSynths(0),
 		m_NumSamplers(0),
@@ -14,7 +17,12 @@ namespace Exampler {
 		m_NumRecorders(0),
 		m_EtyToRename(nullptr),
 		m_EtyToDelete(nullptr),
-		m_RecorderMgr(std::make_shared<BackBeat::RecorderManager>())
+		m_Window(window),
+		m_Audio(audio),
+		m_PlayerMgr(audio->GetPlayerManager()),
+		m_RecorderMgr(audio->GetRecorderManager()),
+		m_AudioRenderer(audio->GetRenderer()),
+		m_MIDIDeviceManager(audio->GetMIDIDeviceManager())
 	{
 
 	}
@@ -26,21 +34,9 @@ namespace Exampler {
 
 	void MainLayer::OnAttach()
 	{
-		m_RecorderMgr->AddDeviceRecorder(std::make_shared<BackBeat::WindowsRecorder>());
-		m_AudioRenderer.Start();
-		auto mixer = m_AudioRenderer.GetMixer();
-		mixer->AddRecordingManager(m_RecorderMgr);
-
-		// Creates filepath to directory to store 
-		std::string appDataLocalDir = BackBeat::Windows::GetLocalAppFileDirectory();
-		BackBeat::FileSystem::SetAppDataLocalDir(appDataLocalDir);
-		BackBeat::FileSystem::SetProjectDir(std::string("\\Exampler"));
-		BackBeat::FileSystem::CreateTempDir();
-		BackBeat::RecorderBuilder::SetFileDirectory(BackBeat::FileSystem::GetTempDir());
-
-		m_NumMIDIDevices = m_MIDIDeviceManager.GetNumDevices();
+		m_NumMIDIDevices = m_MIDIDeviceManager->GetNumDevices();
 		for (unsigned int i = 0; i < m_NumMIDIDevices; i++) {
-			m_DeviceNames.push_back(m_MIDIDeviceManager.GetDeviceName(i));
+			m_DeviceNames.push_back(m_MIDIDeviceManager->GetDeviceName(i));
 		}
 	}
 
@@ -50,10 +46,9 @@ namespace Exampler {
 		{
 			(*itr)->Close();
 			(*itr)->Off();
+			(*itr)->Delete(m_PlayerMgr, m_RecorderMgr, m_AudioRenderer->GetMixer(), m_MIDIDeviceManager);
 		}
 
-		m_AudioRenderer.Stop();
-		m_MIDIDeviceManager.CloseAll();
 	}
 
 	void MainLayer::OnUpdate()
@@ -150,7 +145,7 @@ namespace Exampler {
 					for (unsigned int i = 0; i < m_NumMIDIDevices; i++) {
 
 						// TODO: Test multiple MIDI devices and if MIDI devices change number
-						bool s_DeviceOpen = m_MIDIDeviceManager.IsOpen(i);
+						bool s_DeviceOpen = m_MIDIDeviceManager->IsOpen(i);
 
 						if (ImGui::BeginMenu(m_DeviceNames[i].c_str()))
 						{
@@ -158,12 +153,12 @@ namespace Exampler {
 							{
 								if (s_DeviceOpen)
 								{
-									if (m_MIDIDeviceManager.OpenDevice(i))
-										m_MIDIDeviceManager.RunDevice(i);
+									if (m_MIDIDeviceManager->OpenDevice(i))
+										m_MIDIDeviceManager->RunDevice(i);
 								}
 								else
 								{
-									m_MIDIDeviceManager.StopDevice();
+									m_MIDIDeviceManager->StopDevice();
 								}
 							}
 
@@ -235,8 +230,8 @@ namespace Exampler {
 			bool limitRecorders = (m_NumRecorders < MaxRecordingDevices);
 			if (ImGui::MenuItem("Add Recording Track", "", false, limitRecorders))
 				AddRecordingTrack();
+			
 			ImGui::EndPopup();
-
 		}
 
 		ImGui::PopStyleColor(cCount);
@@ -244,22 +239,22 @@ namespace Exampler {
 
 	void MainLayer::RenderMgrs()
 	{
-		if (!m_PlayerMgr.IsPlaying())
+		if (!m_PlayerMgr->IsPlaying())
 		{
 			if (ImGui::Button("Play", ImVec2(100, 20)))
 				if (!m_RecorderMgr->IsRecording())
-					m_PlayerMgr.PlayAll();
+					m_PlayerMgr->PlayAll();
 		}
 		else
 		{
 			if (ImGui::Button("Pause", ImVec2(100, 20)))
-				m_PlayerMgr.PauseAll();
+				m_PlayerMgr->PauseAll();
 		} ImGui::SameLine();
 
 		if (!m_RecorderMgr->IsRecording())
 		{
 			if (ImGui::Button("Record", ImVec2(100, 20)))
-				if (!m_PlayerMgr.IsPlaying())
+				if (!m_PlayerMgr->IsPlaying())
 					m_RecorderMgr->Start();
 		}
 		else
@@ -284,7 +279,12 @@ namespace Exampler {
 	{
 		std::shared_ptr<Entity> entity = m_Entities[index];
 		auto type = entity->GetType();
-		if (ImGui::BeginMenu(entity->GetName().c_str()))
+		auto name = entity->GetName();
+		auto id = entity->GetID();
+
+		const std::string hashDivider = "###";
+		std::string labelID = name.c_str() + hashDivider + id.ToString();
+		if (ImGui::BeginMenu(labelID.c_str()))
 		{
 			if (type == EntityType::synth || type == EntityType::sampler)
 				if (ImGui::MenuItem("Open"))
@@ -331,10 +331,10 @@ namespace Exampler {
 
 			if(ImGui::Button("Yes"))
 			{
-				m_AudioRenderer.Stop();
-				m_PlayerMgr.StopAll();
+				m_Audio->Stop();
+				m_PlayerMgr->StopAll();
 				m_RecorderMgr->Stop();
-				m_MIDIDeviceManager.StopDevice();
+				m_MIDIDeviceManager->StopDevice();
 
 				auto id = m_EtyToDelete->GetID();
 				for (auto itr = m_Entities.begin(); itr != m_Entities.end(); itr++)
@@ -346,7 +346,7 @@ namespace Exampler {
 					}
 				}
 
-				m_EtyToDelete->Delete(&m_PlayerMgr, m_RecorderMgr, m_AudioRenderer.GetMixer(), &m_MIDIDeviceManager);
+				m_EtyToDelete->Delete(m_PlayerMgr, m_RecorderMgr, m_AudioRenderer->GetMixer(), m_MIDIDeviceManager);
 
 				switch (m_EtyToDelete->GetType())
 				{
@@ -378,7 +378,7 @@ namespace Exampler {
 					break;
 				}
 
-				m_AudioRenderer.Start();
+				m_Audio->Start();
 				m_EtyToDelete = nullptr;
 				ImGui::CloseCurrentPopup();
 			} ImGui::SameLine();
@@ -398,105 +398,61 @@ namespace Exampler {
 	{
 		if (m_NumSynths >= MaxSynths)
 			return;
-		m_AudioRenderer.Stop();
+		m_Audio->Stop();
 
-		auto synth = std::make_shared<Synthesizer>(m_RecorderMgr);
-		auto mixer = m_AudioRenderer.GetMixer();
-		auto synthProc = synth->GetSynthProc();
-		auto synthID = synthProc->GetID();
-		auto player = m_PlayerMgr.AddNewPlayer();
-		auto recorder = m_RecorderMgr->AddRecorder(synthID, synthProc->GetProperties());
-		auto synthTrack = recorder->GetRecordingTrack();
-
-		player->LoadTrack(synthTrack);
-		synth->SetRecordingPlayer(player);
-		mixer->PushProcessor(synthProc);
-		mixer->PushProcessor(player->GetProc());
-		m_MIDIDeviceManager.PushOutput(synth->GetMIDIInput());
-
+		auto synth = std::make_shared<Synthesizer>();
+		synth->Add(m_PlayerMgr, m_RecorderMgr, m_AudioRenderer->GetMixer(), m_MIDIDeviceManager);
 		std::string synthName = "Synth " + std::to_string(++m_NumSynths);
 		synth->SetName(synthName);
 		m_Entities.push_back(synth);
-		m_AudioRenderer.Start();
+		
+		m_Audio->Start();
 	}
 
 	void MainLayer::AddSampler()
 	{
 		if (m_NumSamplers >= MaxSamplers)
 			return;
-		m_AudioRenderer.Stop();
+		m_Audio->Stop();
 
-		auto sampler = std::make_shared<Sampler>(m_RecorderMgr);
-		auto mixer = m_AudioRenderer.GetMixer();
-		auto samplerProc = sampler->GetSamplerProcessor();
-		auto samplerID = samplerProc->GetID();
-		auto recordingPlayer = m_PlayerMgr.AddNewPlayer();
-		auto recorder = m_RecorderMgr->AddRecorder(samplerID, samplerProc->GetProperties());
-		auto recordingTrack = recorder->GetRecordingTrack();
-
-		recordingPlayer->LoadTrack(recordingTrack);
-		mixer->PushProcessor(sampler->GetSamplerProcessor());
-		mixer->PushProcessor(sampler->GetTrackProcessor());
-		mixer->PushProcessor(recordingPlayer->GetProc());
-		m_MIDIDeviceManager.PushOutput(sampler->GetMIDIInput());
-
+		auto sampler = std::make_shared<Sampler>();
+		sampler->Add(m_PlayerMgr, m_RecorderMgr, m_AudioRenderer->GetMixer(), m_MIDIDeviceManager);
 		std::string samplerName = "Sampler " + std::to_string(++m_NumSamplers);
 		sampler->SetName(samplerName);
-		sampler->SetRecordingPlayer(recordingPlayer);
 		m_Entities.push_back(sampler);
-		m_AudioRenderer.Start();
+
+		m_Audio->Start();
 	}
 
 	void MainLayer::AddPlaybackTrack()
 	{
 		if (m_NumPlayback >= MaxPlayback)
 			return;
-		m_AudioRenderer.Stop();
+		m_Audio->Stop();
 
-		auto player = m_PlayerMgr.AddNewPlayer();
-		auto mixer = m_AudioRenderer.GetMixer();
-		mixer->PushProcessor(player->GetProc());
-		auto playback = std::make_shared<PlaybackTrack>(player);
+		auto playback = std::make_shared<PlaybackTrack>();
+		playback->Add(m_PlayerMgr, m_RecorderMgr, m_AudioRenderer->GetMixer(), m_MIDIDeviceManager);
 		std::string playerName = "Player " + std::to_string(++m_NumPlayback);
 		playback->SetName(playerName);
 		m_Entities.push_back(playback);
-		m_AudioRenderer.Start();
+
+		m_Audio->Start();
 	}
 
 	void MainLayer::AddRecordingTrack()
 	{
 		if (m_NumRecorders >= MaxRecordingDevices)
 			return;
-		m_AudioRenderer.Stop();
+		m_Audio->Stop();
 		m_RecorderMgr->Stop();
 
-		auto player = m_PlayerMgr.AddNewPlayer();
-		auto deviceRecorder = m_RecorderMgr->GetDeviceRecorder();
-		auto mixer = m_AudioRenderer.GetMixer();
-		auto playerID = player->GetID();
-
-		std::string filePath = BackBeat::FileSystem::GetTempDir().c_str() + playerID.ToString();
-		auto info = BackBeat::AudioInfo{
-			.type = BackBeat::FileType::recordingTemp,
-			.name = playerID.ToString(),
-			.filePath = filePath,
-			.props = deviceRecorder->GetProps(),
-			.dataZero = 0u,
-			.dataSize = 0u
-		};
-		auto deviceRecorderTrack = std::make_shared<BackBeat::Track>(info);
-
-		player->LoadTrack(deviceRecorderTrack);
-		mixer->PushProcessor(player->GetProc());
-		auto recordingTrack = std::make_shared<RecordingTrack>(
-			deviceRecorder->GetID(), 
-			deviceRecorderTrack,
-			player, 
-			m_RecorderMgr);
+		auto recordingTrack = std::make_shared<RecordingTrack>();
+		recordingTrack->Add(m_PlayerMgr, m_RecorderMgr, m_AudioRenderer->GetMixer(), m_MIDIDeviceManager);
 		std::string trackName = "Recording " + std::to_string(++m_NumRecorders);
 		recordingTrack->SetName(trackName);
 		m_Entities.push_back(recordingTrack);
-		m_AudioRenderer.Start();
+
+		m_Audio->Start();
 	}
 
 	bool MainLayer::OnKeyEvent(BackBeat::KeyPressedEvent& event)

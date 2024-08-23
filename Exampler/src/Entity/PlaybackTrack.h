@@ -12,17 +12,22 @@ namespace Exampler {
 	class PlaybackTrack : public Entity
 	{
 	public:
-		PlaybackTrack(std::shared_ptr<BackBeat::Player> player);
+		PlaybackTrack();
 		~PlaybackTrack();
 
 		virtual void Update() override;
 		virtual void OnEvent(BackBeat::Event& event) override;
 		virtual void ImGuiRender() override;
+		virtual void Add(
+			BackBeat::PlayerManager* playerMgr,
+			BackBeat::RecorderManager* recorderMgr,
+			BackBeat::Mixer* mixer,
+			BackBeat::MIDIDeviceManager* midiDeviceManager) override;
 		virtual void Delete(
 			BackBeat::PlayerManager* playerMgr,
-			std::shared_ptr<BackBeat::RecorderManager> recorderMgr,
-			std::shared_ptr<BackBeat::Mixer> mixer,
-			BackBeat::WindowsMIDIDeviceManager* midiDeviceManager) override;
+			BackBeat::RecorderManager* recorderMgr,
+			BackBeat::Mixer* mixer,
+			BackBeat::MIDIDeviceManager* midiDeviceManager) override;
 
 		inline virtual void Open() override { };
 		inline virtual void Close() override { };

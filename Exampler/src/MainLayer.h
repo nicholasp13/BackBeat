@@ -14,7 +14,7 @@ namespace Exampler {
 
 	// Arbitrarily chosen but should be decided based on RAM size/ memory usage
 	constexpr unsigned int       // Memory:
-		MaxSynths = 2,           // ~84 mb
+		MaxSynths = 2,           // ~90 mb
 		MaxSamplers = 1,         // ~10 mb
 		MaxPlayback = 8,         //  ~0 mb
 		MaxRecordingDevices = 4; //  ~2 mb
@@ -22,7 +22,7 @@ namespace Exampler {
 	class MainLayer : public BackBeat::Layer
 	{
 	public:
-		MainLayer(BackBeat::Window* window);
+		MainLayer(BackBeat::Window* window, BackBeat::AudioSystem* audio);
 		~MainLayer();
 
 		virtual void OnAttach() override;
@@ -43,11 +43,12 @@ namespace Exampler {
 		std::shared_ptr<Entity> m_EtyToDelete;
 
 		// BackBeat members
-		BackBeat::PlayerManager m_PlayerMgr;
-		std::shared_ptr<BackBeat::RecorderManager> m_RecorderMgr;
 		BackBeat::Window* m_Window;
-		BackBeat::WindowsRenderer m_AudioRenderer;
-		BackBeat::WindowsMIDIDeviceManager m_MIDIDeviceManager;
+		BackBeat::AudioSystem* m_Audio;
+		BackBeat::PlayerManager* m_PlayerMgr;
+		BackBeat::RecorderManager* m_RecorderMgr;
+		BackBeat::Renderer* m_AudioRenderer;
+		BackBeat::MIDIDeviceManager* m_MIDIDeviceManager;
 
 	private:
 		void RenderMenubar();

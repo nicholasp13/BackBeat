@@ -14,14 +14,19 @@ namespace Exampler {
 	public:
 		Exampler()
 		{
-			PushLayer(new MainLayer(&this->GetWindow()));
+			m_Audio.Init(std::string("\\Exampler"));
+			m_Audio.Start();
+
+			PushLayer(new MainLayer(&this->GetWindow(), &m_Audio));
 		}
 
 		~Exampler()
 		{
-
+			
 		}
 
+	private:
+		BackBeat::WindowsAudioSystem m_Audio;
 	};
 }
 

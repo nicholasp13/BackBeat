@@ -35,6 +35,7 @@ namespace BackBeat {
 		Window* m_Window;
 		bool m_Running = true;
 		LayerStack m_LayerStack;
+
 	};
 
 	// To be defined in CLIENT
