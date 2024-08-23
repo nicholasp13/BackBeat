@@ -16,7 +16,7 @@ namespace BackBeat {
 
 	RecorderManager::~RecorderManager()
 	{
-
+		Stop();
 	}
 
 	void RecorderManager::Init(Recorder* recorder, Recorder* deviceRecorder)
@@ -41,9 +41,15 @@ namespace BackBeat {
 			return;
 
 		if (ContainsAudio(m_ActiveID))
-			m_AudioRecorder->Start();
+		{
+			std::function<void()> callback = std::bind(&Recorder::Start, m_AudioRecorder);
+			m_Thread.Start(callback, 0, true, false);
+		}
 		else
-			m_DeviceRecorder->Start();
+		{
+			std::function<void()> callback = std::bind(&Recorder::Start, m_DeviceRecorder);
+			m_Thread.Start(callback, 0, true, false);
+		}
 		m_Recording = true;
 	}
 
@@ -58,6 +64,7 @@ namespace BackBeat {
 			m_AudioRecorder->Stop();
 		else
 			m_DeviceRecorder->Stop();
+		m_Thread.Stop();
 		m_Recording = false;
 	}
 

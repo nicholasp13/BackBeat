@@ -1,5 +1,10 @@
 .vs/
 bin/
-bin-init/
+bin-int/
 packages/
 BackBeat.sln
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+imgui.ini
+packages.config

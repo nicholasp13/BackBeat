@@ -1,5 +1,20 @@
 #pragma once
 
+// -- BUG: --
+// Very noticeable artifacting in Synth. This happens only in Synth as other BackBeat audio creators
+// do not cause any artifacting even as the Synth is. The artifacting is most noticeable in held notes/chords. While
+// it is not completely unbearable it is still not up to par with how a standard DAW should run.
+// HOWEVER, at this moment I will be moving on from trying to solve this.
+// Possible solutions:
+//  - Multithreading each SynthVoice
+//  - Seperating the callback of WindowsRenderer and the AudioEngine (tried multiple times)
+//  - Double buffering and pre-loading the AudioEngine Render such that WindowsRenderer only needs to copy the buffer
+//    (requires multithreading)
+//  
+// NOTES: Looking at CPU usage profiler, the biggest use is the m_Voices->Render() calls in the SynthEngine
+//        Further in the callstack shows that it is mostly the Osc cores that cause most (~50%) of the CPU
+//        usage in SynthVoice.Render()
+
 /* 
 * Basic virtual polyphonic Synth with basic sound waves following MMA DLS level 1 specifications
 * Produces only 48k sample rate, 32 bit depth, and stereo sounds for Windows 10 and 11 but 
@@ -8,6 +23,7 @@
 
 // ------------------------------------------------------------------------------- //
 // TODO:
+// - Fix/reduce artifacting
 // - Create SynthModule Modulation Matrix that has access to EnvelopeGenerators(EGs), 
 //       Low Frequency Oscillators(LFOs), and filters to allow for personal
 //       customizable sounds
@@ -22,9 +38,6 @@
 // - Upgrade to MMA DLS level 2
 // - Create method for voice stealing ("stealing" a SynthVoice object already playing 
 //       a note to to play a new note on that voice when all voices are active)
-// - Create a Linux Renderer to allow for playing on Linux
-// - Create an implementation of Fast Fourier Transform and create a way to graph
-//   frequency s-plane
 // - Reimplement memory by changing most pointers/objects into stack allocation 
 //       for improved performance. NOTE: Not necessary but good practice
 // 

@@ -36,7 +36,6 @@ namespace BackBeat {
 		bool m_Init;
 		unsigned int m_BufferSize;
 		float m_Buffer[ActualBufferSize] = {};
-		std::thread m_Thread;
 		UUID m_ID;
 		AudioProps m_AudioProps;
 		Recording m_Recording;

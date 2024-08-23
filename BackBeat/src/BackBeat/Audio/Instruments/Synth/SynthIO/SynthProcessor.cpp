@@ -24,6 +24,8 @@ namespace BackBeat {
 	{
 		if (!m_On)
 			return;
+		if (numSamples == 0)
+			return;
 		if (numSamples * m_Props.numChannels > m_Bus.GetBufferSize())
 			return;
 

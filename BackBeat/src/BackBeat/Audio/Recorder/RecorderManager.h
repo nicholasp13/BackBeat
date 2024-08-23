@@ -9,6 +9,7 @@
 
 #include "BackBeat/Core/UUID.h"
 #include "BackBeat/Audio/PlayBack/TrackFactory.h"
+#include "BackBeat/Audio/Helpers/AudioThread.h"
 #include "Recorder.h"
 namespace BackBeat {
 
@@ -38,6 +39,7 @@ namespace BackBeat {
 	private:
 		bool m_Recording;
 		bool m_Init;
+		AudioThread m_Thread;
 		Recorder* m_AudioRecorder;
 		Recorder* m_DeviceRecorder;
 		UUID m_ActiveID;

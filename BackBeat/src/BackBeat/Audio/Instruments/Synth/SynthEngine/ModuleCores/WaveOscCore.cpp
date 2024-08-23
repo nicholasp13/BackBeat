@@ -44,7 +44,6 @@ namespace BackBeat {
 	{
 		Update();
 
-		unsigned int position2 = (m_Position + 2) % (m_WaveSize);;
 		auto modInput = m_ModInput->GetBuffer();
 		int offset = 0;
 		int position = m_Position;

@@ -129,16 +129,6 @@ namespace BackBeat {
 		BB_CORE_ERROR("WindowsRenderer ERROR: SHOULD BE RENDERED FREELY NOT IN A LOOP OUTSIDE OF THIS CLASS/SCOPE");
 	}
 
-	// TODO: Should just keep as class member and return in inline
-	long long WindowsRenderer::GetCycleTime()
-	{
-		if (!m_Init)
-			return 0;
-
-		long long time = (long long)(m_ActualBufferDuration) / Windows::ReftimesPerMillisecond / 2 * 1000000;
-		return time;
-	}
-
 	void WindowsRenderer::RenderFree()
 	{
 		SpinSleeper spinner;
@@ -171,14 +161,13 @@ namespace BackBeat {
 		hr = m_AudioClient->Start();
 		CHECK_FAILURE_HRESULT(hr);
 
-		// TODO: Put these timing calculations into the SpinSleeper class
 		timer.Start();
 		lastTimeFrame = timer.GetTimeNano();
 		while (m_Rendering)
 		{
 			time = timer.GetTimeNano();
-			spinner.Spin(sleepTime - nanoseconds(time - lastTimeFrame));
-			lastTimeFrame = timer.GetTimeNano();
+			spinner.Spin(sleepTime - nanoseconds(time));
+			timer.Reset();
 
 			hr = m_AudioClient->GetCurrentPadding(&padding);
 			CHECK_FAILURE_HRESULT(hr);

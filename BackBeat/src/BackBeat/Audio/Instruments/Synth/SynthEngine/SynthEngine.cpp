@@ -9,7 +9,6 @@ namespace BackBeat {
 		: 
 		m_NumVoices(SynthMaxVoices),
 		m_Buffer(std::make_shared<float[]>(props.sampleRate)), 
-		m_OutputBufferPosition(0),
 		m_Props(props)
 	{
 		InitParameters();
@@ -46,6 +45,7 @@ namespace BackBeat {
 		unsigned int bufferSize = info->GetBufferSize();
 		std::shared_ptr<float[]> outputBuffer = info->GetBuffer();
 
+#if 1
 		Audio::FlushBuffer(m_Buffer, numSamples, Audio::Stereo, 0.0f);
 
 		while (!info->MIDIEventsEmpty()) 
@@ -62,8 +62,57 @@ namespace BackBeat {
 
 		for (unsigned int j = 0; j < numSamples * 2; j++) {
 			outputBuffer[j] = m_Buffer[j] * m_VoiceFactor * volume;
-			m_OutputBufferPosition = (m_OutputBufferPosition + 1) % bufferSize;
 		}
+#else
+		// LOGGING/TIMING
+
+		BB_CORE_INFO("-----------------------------");
+
+		Timer timer;
+		float time = 0.0f;
+		float lastTimeFrame = 0.0f;
+		float deltaTime = 0.0f;
+
+		timer.Start();
+
+		Audio::FlushBuffer(m_Buffer, numSamples, Audio::Stereo, 0.0f);
+		time = timer.GetTimeNano();
+		deltaTime = time - lastTimeFrame;
+		BB_CORE_INFO("FLUSH TIME (in nanoseconds):     {0}", deltaTime);
+		lastTimeFrame = time;
+
+
+		while (!info->MIDIEventsEmpty())
+		{
+			ProcessMIDIEvent(info->PopMIDIEvent());
+		}
+		time = timer.GetTimeNano();
+		deltaTime = time - lastTimeFrame;
+		BB_CORE_INFO("MIDI TIME (in nanoseconds):      {0}", deltaTime);
+		lastTimeFrame = time;
+
+		for (unsigned int i = 0; i < m_NumVoices; i++) {
+			if (m_Voices[i]->IsActive())
+			{
+				m_Voices[i]->Render(numSamples);
+			}
+		}
+		time = timer.GetTimeNano();
+		deltaTime = time - lastTimeFrame;
+		BB_CORE_INFO("VOICES TIME (in nanoseconds):    {0}", deltaTime);
+		lastTimeFrame = time;
+
+		for (unsigned int j = 0; j < numSamples * 2; j++) {
+			outputBuffer[j] = m_Buffer[j] * m_VoiceFactor * volume;
+		}
+		time = timer.GetTimeNano();
+		deltaTime = time - lastTimeFrame;
+		BB_CORE_INFO("COPY TIME (in nanoseconds):      {0}", deltaTime);
+		lastTimeFrame = time;
+
+		BB_CORE_INFO("-----------------------------");
+#endif
+
 	}
 	
 	// Calls Voices update function

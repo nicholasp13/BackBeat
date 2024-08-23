@@ -29,7 +29,6 @@ namespace BackBeat {
 			now = m_Timer.GetTimeNano();
 			deltaTime = totalTime - now;
 		}
-		// BB_CORE_INFO("Time requested: {0}\nTime spun: {1}", time, now);
 	}
 
 	void SpinSleeper::Sleep(nanoseconds time)

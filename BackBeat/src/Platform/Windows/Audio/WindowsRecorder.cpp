@@ -17,7 +17,6 @@
 /**/
 
 // TODO: 
-// - Allow for captured audio to be processed to Mixer
 // - Fix mono/stereo problem noted above through automation or user
 #include "WindowsRecorder.h"  
 namespace BackBeat {
@@ -51,14 +50,12 @@ namespace BackBeat {
 			return;
 
 		m_IsRecording = true;
-		m_Thread = std::thread(&WindowsRecorder::Record, this);
+		Record();
 	}
 
 	void WindowsRecorder::Stop()
 	{
 		m_IsRecording = false;
-		if (m_Thread.joinable())
-			m_Thread.join();
 	}
 
 	void WindowsRecorder::Reset()

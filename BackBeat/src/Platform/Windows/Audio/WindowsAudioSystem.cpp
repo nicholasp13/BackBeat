@@ -36,7 +36,7 @@ namespace BackBeat {
 	void WindowsAudioSystem::Start()
 	{
 		std::function<void()> callback = std::bind(&AudioEngine::Callback, &m_Engine);
-		m_Thread.Start(callback, m_Renderer.GetCycleTime(), true);
+		m_Thread.Start(callback, 0, true, false);
 	}
 
 	void WindowsAudioSystem::Stop()

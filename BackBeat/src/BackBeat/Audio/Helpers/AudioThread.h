@@ -12,11 +12,13 @@ namespace BackBeat {
 		AudioThread();
 		~AudioThread();
 
-		void Start(std::function<void()> callback, long long sleepTime, bool free);
+		void Start(std::function<void()> callback, long long sleepTime, bool free, bool spin);
 		void Stop();
 
 	private:
 		bool m_Running;
+		bool m_Free;
+		bool m_Spin;
 		long long m_SleepTime;
 		std::thread m_Thread;
 		std::function<void()> m_CallBack;

@@ -23,6 +23,9 @@ namespace BackBeat {
 			return;
 		if (!m_Track)
 			return;
+		if (numSamples == 0)
+			return;
+
 		if (m_Track->GetProps().sampleRate != sampleRate) 
 		{
 			BB_CORE_ERROR("SAMPLE RATE NOT SUPPORTED");

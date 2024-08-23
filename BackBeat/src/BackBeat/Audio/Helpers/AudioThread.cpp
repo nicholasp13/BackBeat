@@ -4,7 +4,11 @@
 namespace BackBeat {
 
 	AudioThread::AudioThread()
-		: m_Running(false), m_SleepTime(0ll)
+		: 
+		m_Running(false), 
+		m_Free(false),
+		m_Spin(false),
+		m_SleepTime(0ll)
 	{
 
 	}
@@ -16,12 +20,14 @@ namespace BackBeat {
 	
 	// @params
 	//     free - This determines whether AudioThread loops itself or the callback is free to do whatever after it is called
-	void AudioThread::Start(std::function<void()> callback, long long sleepTime, bool free)
+	void AudioThread::Start(std::function<void()> callback, long long sleepTime, bool free, bool spin)
 	{
-		m_Running = true;
-		m_SleepTime = sleepTime;
 		m_CallBack = callback;
-		if (free)
+		m_SleepTime = sleepTime;
+		m_Free = free;
+		m_Spin = spin;
+
+		if (m_Free)
 			m_Thread = std::thread(&AudioThread::RunFree, this);
 		else
 			m_Thread = std::thread(&AudioThread::Run, this);
@@ -41,8 +47,11 @@ namespace BackBeat {
 
 		while (m_Running)
 		{
-			// Should find way to specify whether the thread should sleep or spin depending on importance
-			spinner.Spin(m_SleepTime);
+			if (m_Spin)
+				spinner.Spin(m_SleepTime);
+			else
+				spinner.Sleep(m_SleepTime);
+
 			m_CallBack();
 		}
 	}
@@ -50,5 +59,6 @@ namespace BackBeat {
 	void AudioThread::RunFree()
 	{
 		m_CallBack();
+		m_Running = false;
 	}
 }

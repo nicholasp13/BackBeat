@@ -32,6 +32,8 @@ namespace BackBeat {
 	// - Only floating bit size case has been tested but the code for the others is there and should work
 	void Mixer::RenderData(byte* data, unsigned int numFrames)
 	{
+		if (numFrames == 0)
+			return;
 
 		for (unsigned int i = 0; i < m_Processors.size(); i++) {
 			if (!m_Processors[i]->IsOn())
@@ -161,9 +163,6 @@ namespace BackBeat {
 
 			}
 
-			// FIXME: This call to record lags Synth enough to ruin the audio. 
-			//        Need to implement some sort of multithreading in regards to Creating, Rendering, Recording audio data
-			// TODO: Copy data to a seperate AudioSink for recording
 			if (recording)
 			{
 				auto id = m_Processors[i]->GetID();

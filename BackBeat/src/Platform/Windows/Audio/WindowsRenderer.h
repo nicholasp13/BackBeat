@@ -22,7 +22,6 @@ namespace BackBeat {
 		virtual void Stop() override;
 		virtual void Render() override;
 		virtual void RenderFree() override;
-		virtual long long GetCycleTime() override;
 
 		inline virtual bool IsRendering() override { return m_Rendering; }
 		inline virtual Mixer* GetMixer() override { return m_Mixer; };

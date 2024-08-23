@@ -43,7 +43,6 @@ namespace BackBeat {
 
 	private:
 		unsigned int m_NumVoices;
-		unsigned int m_OutputBufferPosition;
 		float m_VoiceFactor;
 		AudioProps m_Props;
 

@@ -32,7 +32,6 @@ namespace BackBeat {
 	private:
 		bool m_IsRecording;
 		bool m_Init;
-		std::thread m_Thread;
 		UUID m_ID;
 		AudioProps m_AudioProps;
 		Recording m_Recording;

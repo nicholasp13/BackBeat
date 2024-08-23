@@ -49,7 +49,6 @@ namespace Exampler {
 			(*itr)->Delete(m_PlayerMgr, m_RecorderMgr, m_AudioRenderer->GetMixer(), m_MIDIDeviceManager);
 		}
 
-		// TODO: Delete entitities here
 	}
 
 	void MainLayer::OnUpdate()
@@ -332,7 +331,7 @@ namespace Exampler {
 
 			if(ImGui::Button("Yes"))
 			{
-				m_AudioRenderer->Stop();
+				m_Audio->Stop();
 				m_PlayerMgr->StopAll();
 				m_RecorderMgr->Stop();
 				m_MIDIDeviceManager->StopDevice();
@@ -379,7 +378,7 @@ namespace Exampler {
 					break;
 				}
 
-				m_AudioRenderer->Start();
+				m_Audio->Start();
 				m_EtyToDelete = nullptr;
 				ImGui::CloseCurrentPopup();
 			} ImGui::SameLine();

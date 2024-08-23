@@ -26,14 +26,12 @@ namespace BackBeat {
 			return;
 
 		m_IsRecording = true;
-		m_Thread = std::thread(&AudioRecorder::Record, this);
+		Record();
 	}
 
 	void AudioRecorder::Stop()
 	{
 		m_IsRecording = false;
-		if (m_Thread.joinable())
-			m_Thread.join();
 	}
 
 	void AudioRecorder::Reset()
@@ -99,7 +97,7 @@ namespace BackBeat {
 		{
 			if (m_Sink->ReadData(readBuffer, m_BufferSize))
 				m_Recording.Record(writeBuffer, numFrames);
-			std::this_thread::sleep_for(std::chrono::nanoseconds(sleepTime));
+			std::this_thread::sleep_for(sleepTime);
 		}
 	}
 }

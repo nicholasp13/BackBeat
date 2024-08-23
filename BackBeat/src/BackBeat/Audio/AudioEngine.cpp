@@ -43,7 +43,9 @@ namespace BackBeat {
 			m_Renderer->RenderFree();
 		}
 		else
+		{
 			m_Renderer->Render();
+		}
 	}
 
 }

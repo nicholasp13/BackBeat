@@ -77,11 +77,11 @@ namespace BackBeat {
 
 		inline virtual int GetChannel() { return m_Channel; }
 		inline virtual byte GetNote() { return m_NotePressed; }
-		inline virtual bool IsActive() { return m_Actice; }
+		inline virtual bool IsActive() { return m_Active; }
 
 	private:
 		unsigned int m_SampleRate;
-		bool m_Actice;
+		bool m_Active;
 		int m_Channel;
 		byte m_NotePressed;
 
@@ -95,7 +95,7 @@ namespace BackBeat {
 		std::unique_ptr<WaveOscillator> m_Osc2;
 		std::unique_ptr<WaveOscillator> m_Osc3;
 		std::unique_ptr<WaveOscillator> m_Osc4;
-		std::unique_ptr<LinearEG> m_EG; // TODO: Link this EG to one of or both of the filters
+		// std::unique_ptr<LinearEG> m_EG; // TODO: Link this EG to one of or both of the filters
 		std::unique_ptr<AmpEG> m_AmpEG;
 		std::unique_ptr<LowFrequencyOscillator> m_LFO1;
 		std::unique_ptr<TPTLowPassFilter> m_LPFilter;

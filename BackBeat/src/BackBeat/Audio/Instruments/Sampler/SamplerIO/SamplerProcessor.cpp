@@ -26,6 +26,8 @@ namespace BackBeat {
 	{
 		if (!m_On)
 			return;
+		if (numSamples == 0)
+			return;
 		if (numSamples * m_Props.numChannels > m_Bus.GetBufferSize())
 			return;
 
@@ -33,7 +35,6 @@ namespace BackBeat {
 		m_Engine->Render(m_Info);
 
 		// NOTE: Samples should always be a floating point (or a double) and this is assumed and not checked
-		float* targetBuffer = reinterpret_cast<float*>(m_Output);
 		auto srcBuffer = m_Bus.GetBuffer()->GetBuffer();
 		if (m_Props.sampleRate == sampleRate)
 		{
@@ -42,7 +43,7 @@ namespace BackBeat {
 				for (unsigned int i = 0; i < numSamples * m_Props.numChannels; i += m_Props.numChannels) {
 					for (unsigned int j = 0; j < m_Props.numChannels; j++) {
 						int index = i + j; // Added to get rid of error message
-						targetBuffer[index] = (float)(srcBuffer[index]);
+						m_Output[index] = (float)(srcBuffer[index]);
 					}
 				}
 			}
@@ -50,7 +51,7 @@ namespace BackBeat {
 			{
 				unsigned int index = 0;
 				for (unsigned int i = 0; i < numSamples * m_Props.numChannels; i += m_Props.numChannels) {
-					targetBuffer[i] = srcBuffer[index];
+					m_Output[i] = srcBuffer[index];
 					index += m_Props.numChannels;
 				}
 			}
