@@ -10,9 +10,9 @@ namespace BackBeat {
 		AudioSink();
 		~AudioSink();
 
-		void Init(AudioProps props);
-		bool WriteData(float* data, unsigned int numSamples);
-		bool ReadData(float* data, unsigned int numSamples);
+		inline void Init(AudioProps props) { m_Props = props; }
+		bool WriteData(float* data, unsigned int numSamples) { return m_Sink.Write(data, numSamples); }
+		bool ReadData(float* data, unsigned int numSamples) { return m_Sink.Read(data, numSamples); }
 		
 		inline void Reset() { m_Sink.Reset(); }
 

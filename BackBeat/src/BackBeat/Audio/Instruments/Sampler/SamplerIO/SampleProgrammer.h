@@ -12,7 +12,7 @@ namespace BackBeat {
 
 		void ProgramNote(unsigned int index, MIDICode newNote);
 		void ProgramSample(unsigned int index);
-		void ProgramSample(unsigned int index, Sample* sample);
+		void ProgramSample(unsigned int index, std::shared_ptr<Sample> sample);
 		void ProgramSample(unsigned int index, std::string filePath);
 
 		inline void AddSamplerPad(std::shared_ptr<SamplerPad> newPad) { m_SamplePads.push_back(newPad); }

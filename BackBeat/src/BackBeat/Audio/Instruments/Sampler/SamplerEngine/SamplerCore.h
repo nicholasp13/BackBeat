@@ -19,7 +19,7 @@ namespace BackBeat {
 		virtual void DoNoteOff(NoteEvent event) override;
 		
 		bool IsActive();
-		void SetSample(Sample* newSample);
+		void SetSample(std::shared_ptr<Sample> newSample);
 		std::string GetName();
 
 		inline virtual std::shared_ptr<float[]> GetBuffer() override { return m_Output; }
@@ -35,7 +35,7 @@ namespace BackBeat {
 
 		bool m_Looping;
 		unsigned int m_SampleRate;
-		Sample* m_Sample;
+		std::shared_ptr<Sample> m_Sample;
 		float m_Input[s_BufferSize];
 		std::shared_ptr<float[]> m_Output;
 

@@ -136,11 +136,11 @@ namespace BackBeat {
 		}
 	}
 
-	Sample* SampleBuilder::BuildSample(std::string filePath)
+	std::shared_ptr<Sample> SampleBuilder::BuildSample(std::string filePath)
 	{
 		AudioInfo info = AudioFileReader::ReadFile(filePath);
 		if (info.type == FileType::sample)
-			return new Sample(info);
+			return std::make_shared<Sample>(info);
 
 		return nullptr;
 	}

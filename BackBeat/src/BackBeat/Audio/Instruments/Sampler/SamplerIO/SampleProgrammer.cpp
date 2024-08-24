@@ -31,44 +31,24 @@ namespace BackBeat {
 
 	void SampleProgrammer::ProgramSample(unsigned int index)
 	{
-		Sample* newSample = SampleBuilder::BuildSample(FileDialog::OpenFile("Sample Files (*.smpl)\0*.smpl\0"));
+		auto newSample = SampleBuilder::BuildSample(FileDialog::OpenFile("Sample Files (*.smpl)\0*.smpl\0"));
 		if (newSample)
 			m_SamplePads[index]->SetSample(newSample);
 	}
 
-	void SampleProgrammer::ProgramSample(unsigned int index, Sample* sample)
+	void SampleProgrammer::ProgramSample(unsigned int index, std::shared_ptr<Sample> sample)
 	{
 		if (sample)
-		{
 			if (sample->GetProps().sampleRate == m_Props.sampleRate && sample->GetProps().blockAlign == m_Props.blockAlign)
-			{
 				m_SamplePads[index]->SetSample(sample);
-				return;
-			}
-			else
-			{
-				delete sample;
-				return;
-			}
-		}
 	}
 
 	void SampleProgrammer::ProgramSample(unsigned int index, std::string filePath)
 	{
-		Sample* newSample = SampleBuilder::BuildSample(filePath);
+		auto newSample = SampleBuilder::BuildSample(filePath);
 		if (newSample)
-		{
 			if (newSample->GetProps().sampleRate == m_Props.sampleRate && newSample->GetProps().blockAlign == m_Props.blockAlign)
-			{
 				m_SamplePads[index]->SetSample(newSample);
-				return;
-			}
-			else
-			{
-				delete newSample;
-				return;
-			}
-		}
 	}
 
 }

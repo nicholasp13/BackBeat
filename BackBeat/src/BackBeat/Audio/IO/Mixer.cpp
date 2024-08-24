@@ -8,7 +8,8 @@ namespace BackBeat {
 		: 
 		m_Buffer(new byte[s_BufferSize]),
 		m_Props(AudioProps()), 
-		m_Sink(nullptr),
+		m_RecordingSink(nullptr),
+		m_VisualizingSink(nullptr),
 		m_Processors(std::vector< std::shared_ptr<AudioProcessor> >()),
 		m_RecordingManager(nullptr)
 	{
@@ -20,10 +21,11 @@ namespace BackBeat {
 
 	}
 
-	void Mixer::Init(AudioProps props, AudioSink* sink)
+	void Mixer::Init(AudioProps props, AudioSink* recordingSink, AudioSink* visualizingSink)
 	{
 		m_Props = props;
-		m_Sink = sink;
+		m_RecordingSink = recordingSink;
+		m_VisualizingSink = visualizingSink;
 	}
 
 	// NOTE: 
@@ -166,16 +168,21 @@ namespace BackBeat {
 			if (recording)
 			{
 				auto id = m_Processors[i]->GetID();
-				if (m_Sink && m_RecordingManager->IsActive(id))
-					m_Sink->WriteData(reinterpret_cast<float*>(data), totalSamples);
+				if (m_RecordingSink && m_RecordingManager->IsActive(id))
+					m_RecordingSink->WriteData(reinterpret_cast<float*>(inBuffer), totalSamples);
 			}
 
 		}
 
+		if (m_Visualizer->IsOn())
+			m_VisualizingSink->WriteData(reinterpret_cast<float*>(data), totalSamples);
 	}
 
 	void Mixer::RenderData(unsigned int numFrames)
 	{
+		if (numFrames == 0)
+			return;
+
 		byte* data = m_Buffer.get();
 
 		for (unsigned int i = 0; i < m_Processors.size(); i++) {
@@ -308,19 +315,17 @@ namespace BackBeat {
 
 			}
 
-			// FIXME: This call to record lags Synth enough to ruin the audio. 
-			//        Need to implement some sort of multithreading in regards to Creating, Rendering, Recording audio data
-			// TODO: Copy data to a seperate AudioSink for recording
-			if (false)
+			if (recording)
 			{
 				auto id = m_Processors[i]->GetID();
-				if (m_Sink && m_RecordingManager->IsActive(id))
-					m_Sink->WriteData(reinterpret_cast<float*>(data), totalSamples);
+				if (m_RecordingSink && m_RecordingManager->IsActive(id))
+					m_RecordingSink->WriteData(reinterpret_cast<float*>(inBuffer), totalSamples);
 			}
 
 		}
 
-		m_Sink->WriteData(reinterpret_cast<float*>(data), totalSamples);
+		if (m_Visualizer->IsOn())
+			m_VisualizingSink->WriteData(reinterpret_cast<float*>(data), totalSamples);
 	}
 
 	void Mixer::DeleteProcessor(UUID id)

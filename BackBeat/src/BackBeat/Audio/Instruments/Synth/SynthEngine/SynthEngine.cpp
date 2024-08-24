@@ -3,8 +3,6 @@
 #include "SynthEngine.h"
 namespace BackBeat {
 
-	// TODO: Finely tune volume
-
 	SynthEngine::SynthEngine(AudioProps props)
 		: 
 		m_NumVoices(SynthMaxVoices),

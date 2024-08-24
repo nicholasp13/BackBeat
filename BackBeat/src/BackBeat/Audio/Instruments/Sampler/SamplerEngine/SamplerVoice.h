@@ -23,7 +23,7 @@ namespace BackBeat {
 		inline void LoopOff() { m_SamplerModule->LoopOff(); }
 		inline bool IsLooping() { return m_SamplerModule->IsLooping(); }
 		inline void SetMIDINote(MIDICode newNote) { m_MIDINote = newNote; }
-		inline void SetSample(Sample* newSample) { m_SamplerModule->GetCore()->SetSample(newSample); }
+		inline void SetSample(std::shared_ptr<Sample> newSample) { m_SamplerModule->GetCore()->SetSample(newSample); }
 		inline MIDICode GetMIDINote() { return m_MIDINote; }
 		inline std::string GetSampleName() { return m_SamplerModule->GetCore()->GetName(); }
 		inline std::shared_ptr<SamplerCore> GetCore() { return m_SamplerModule->GetCore(); }

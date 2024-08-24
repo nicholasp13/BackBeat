@@ -53,10 +53,11 @@ namespace BackBeat {
 		return false;
 	}
 	
-	// TODO: Make inline if not changed
 	std::shared_ptr<Track> AudioRecorder::GetRecordingTrack()
 	{
-		return m_Recording.GetTrack();
+		if (!m_IsRecording)
+			return m_Recording.GetTrack();
+		return nullptr;
 	}
 
 	void AudioRecorder::Init(AudioProps props, AudioSink* sink)

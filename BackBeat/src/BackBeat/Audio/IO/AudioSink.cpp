@@ -14,20 +14,4 @@ namespace BackBeat {
 
 	}
 
-	// TODO: Make inline if not expanded
-	void AudioSink::Init(AudioProps props)
-	{
-		m_Props = props;
-	}
-
-	bool AudioSink::WriteData(float* data, unsigned int numSamples)
-	{
-		return m_Sink.Write(data, numSamples);
-	}
-
-	bool AudioSink::ReadData(float* data, unsigned int numSamples)
-	{
-		return m_Sink.Read(data, numSamples);
-	}
-
 }

@@ -23,6 +23,7 @@ namespace BackBeat {
 		inline virtual PlayerManager* GetPlayerManager() override { return &m_PlayerMgr; }
 		inline virtual RecorderManager* GetRecorderManager() override { return &m_RecorderMgr; }
 		inline virtual MIDIDeviceManager* GetMIDIDeviceManager() override { return &m_MIDIDeviceMgr; }
+		inline virtual Visualizer* GetVisualizer() override { return m_Engine.GetVisualizer(); }
 
 	private:
 		AudioProps m_Props;

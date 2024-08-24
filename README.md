@@ -4,7 +4,7 @@ Currently a music application engine for Windows 10/11 written in C++.
 Currently implements a basic polyphonic synth and a sampler both with recording capabilities,
 recording audio devices like mics using Windows API, and WAV file playback as shown in the example _Exampler_ application
 
-## Goals
+## Goal
 The goal is to create an open source, simple digital audio workstation (DAW) with the ability to easily customize sounds and interface
 ### Current features:
 - Synthesizer with 4 wave oscillators, bilinear low pass and high pass filters, low frequency oscillator, panning, and volume control
@@ -12,10 +12,10 @@ The goal is to create an open source, simple digital audio workstation (DAW) wit
 - Playback of WAV files of all bit depths and 48k sample rate
 - MIDI input device support for both Synthesizer and Sampler
 - Recording audio from devices such as mics and instruments through Windows API and recording BackBeat objects like Sampler and Synth
+- Audio Visualization to show users the music their making and how their inputs change the sound
 - GUI using ImGui to fully control, add, and delete BackBeat objects during runtime
 ### Upcoming features:
-- Multithreading different audio functions like creating samples, rendering, recording, visualizing, etc. for better performance and reducing artifacting in audio streams
-- Audio Visualization
+- Custom ImGui widget for a timeline that allows the user to edit multiple different audio tracks at the same time
 - Serialization to save configuration of BackBeat objects and other misc. settings
 ### Planned features:
 - Modular Matrix for interactive GUI implementation to customize synth sounds
