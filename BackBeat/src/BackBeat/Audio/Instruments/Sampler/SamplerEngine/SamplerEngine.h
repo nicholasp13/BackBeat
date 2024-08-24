@@ -31,7 +31,7 @@ namespace BackBeat {
 		inline bool IsLooping(unsigned int index) { return m_Voices[index]->IsLooping(); }
 		inline std::shared_ptr<SamplerCore> GetSamplerCore(unsigned int index) { return m_Voices[index]->GetCore(); }
 		inline void SetNote(MIDICode code, unsigned int index) { m_Voices[index]->SetMIDINote(code); }
-		inline void SetSample(Sample* newSample, unsigned int index) { m_Voices[index]->SetSample(newSample); }
+		inline void SetSample(std::shared_ptr<Sample> newSample, unsigned int index) { m_Voices[index]->SetSample(newSample); }
 
 	private:
 		unsigned int m_NumVoices;

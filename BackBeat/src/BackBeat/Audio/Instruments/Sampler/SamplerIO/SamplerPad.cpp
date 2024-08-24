@@ -50,7 +50,7 @@ namespace BackBeat {
 		m_Engine->SetNote(newNote, m_Index);
 	}
 
-	void SamplerPad::SetSample(Sample* newSample)
+	void SamplerPad::SetSample(std::shared_ptr<Sample> newSample)
 	{
 		m_Name = newSample->GetName();
 		m_Engine->SetSample(newSample, m_Index);

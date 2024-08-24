@@ -16,7 +16,7 @@ namespace BackBeat {
 
 	SamplerCore::~SamplerCore()
 	{
-		delete m_Sample;
+		
 	}
 
 	void SamplerCore::Reset(unsigned int sampleRate)
@@ -87,9 +87,8 @@ namespace BackBeat {
 		return false;
 	}
 
-	void SamplerCore::SetSample(Sample* newSample)
+	void SamplerCore::SetSample(std::shared_ptr<Sample> newSample)
 	{
-		delete m_Sample;
 		m_Sample = newSample;
 		m_Sample->Off();
 	}

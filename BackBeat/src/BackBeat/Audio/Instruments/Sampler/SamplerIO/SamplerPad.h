@@ -15,7 +15,7 @@ namespace BackBeat {
 		void ClearNote();
 		void ClearSample();
 		void SetNote(MIDICode newNote);
-		void SetSample(Sample* newSample);
+		void SetSample(std::shared_ptr<Sample> newSample);
 
 		inline void LoopOn() { m_Engine->LoopOn(m_Index); }
 		inline void LoopOff() { m_Engine->LoopOff(m_Index); }
