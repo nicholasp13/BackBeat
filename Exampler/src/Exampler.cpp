@@ -1,4 +1,4 @@
-/* 
+ /* 
 * Demonstrates application of BackBeat with Synth, Sampler, Recording, and Playback functionality. Playback only supports  
 * WAV files with only 48k sample rate and supports all bit depths.
 */

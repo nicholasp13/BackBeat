@@ -5,22 +5,6 @@
 #include "ImGuiWidgets.h"
 namespace BackBeat {
 
-	// TODO: FINISH
-	bool ImGuiWidgets::ImGuiTimeline()
-	{
-		ImGuiWindow* window = ImGui::GetCurrentWindow();
-		if (window->SkipItems)
-			return false;
-
-		ImGui::PushID("Timeline");
-
-		ImVec2 pos = window->DC.CursorPos;
-	    ImRect background = window->InnerClipRect;
-
-		ImGui::PopID();
-		return true;
-	}
-
 	// NOTE: Only handles int, may implement other data types later
 	//       Flags not used, may remove
 	// COLORS:
@@ -76,7 +60,7 @@ namespace BackBeat {
 		ImGui::RenderFrame(activeTrack.Min, activeTrack.Max, ImGui::GetColorU32(ImGuiCol_SliderGrab), true, g.Style.FrameRounding);
 
 		// Display value from format
-		char valueBuf[64];
+		char valueBuf[64] = {};
 		const char* valueBufEnd = valueBuf + ImGui::DataTypeFormatString(valueBuf, IM_ARRAYSIZE(valueBuf), ImGuiDataType_S32, lowerV, format);
 		if (g.LogEnabled)
 			ImGui::LogSetNextTextDecoration("{", "}");
@@ -92,7 +76,6 @@ namespace BackBeat {
 	//           bar does not move or change with the track position) The following example code shows an
 	//           implementation that avoids the constant audio playing while the user is using the seekbar().
 	//  ---- Example Code ----
-	// ImGui::PushID("Seekbar");
 	// if (BackBeat::ImGuiWidgets::ImGuiSeekBarInt("##", &position, m_Player->GetSize(), "", ImGuiSliderFlags(0)))
 	// {
 	//     if (m_Player->IsPlaying())

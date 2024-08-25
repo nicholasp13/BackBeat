@@ -10,6 +10,7 @@
 #include "Entity/Sampler.h"
 #include "Entity/RecordingTrack.h"
 #include "Entity/PlaybackTrack.h"
+#include "Entity/DummyEntity.h"
 namespace Exampler {
 
 	// Arbitrarily chosen but should be decided based on RAM size/ memory usage

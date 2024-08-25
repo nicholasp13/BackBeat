@@ -35,6 +35,11 @@ namespace Exampler {
 		for (unsigned int i = 0; i < m_NumMIDIDevices; i++) {
 			m_DeviceNames.push_back(m_MIDIDeviceManager->GetDeviceName(i));
 		}
+
+		// FOR TESTING
+#ifdef TRUE
+		m_Entities.push_back(std::make_shared<Dummy>());
+#endif
 	}
 
 	void MainLayer::OnDetach()
