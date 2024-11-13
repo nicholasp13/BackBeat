@@ -37,7 +37,7 @@ namespace Exampler {
 		}
 
 		// FOR TESTING
-#ifdef TRUE
+#if FALSE
 		m_Entities.push_back(std::make_shared<Dummy>());
 #endif
 	}
@@ -264,7 +264,7 @@ namespace Exampler {
 		for (unsigned int i = 0; i < m_Visualizer->GetNumChannels(); i++)
 		{
 			ImGui::Spacing();
-			std::string name = "Channel " + std::to_string(i);
+			std::string name = "Channel " + std::to_string(i + 1);
 			ImGui::PlotLines(name.c_str(), m_Visualizer->GetChannelBuffer(i), bufferSize, 1, "", visualMax * -1, visualMax, ImVec2(m_Window->GetWidth() - 200.0f, 60.0f));
 		}
 

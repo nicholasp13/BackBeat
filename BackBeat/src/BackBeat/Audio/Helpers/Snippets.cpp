@@ -1,6 +1,6 @@
 #include "bbpch.h"
 
-// TODO: Unit test snippets
+// NOTE: Unused and possible will be deleted later when serialization is fully realized
 
 #include "Snippets.h"
 namespace BackBeat {
@@ -16,6 +16,10 @@ namespace BackBeat {
 
 	}
 
+	// NOTE: Using ProTools as a baseline it allows for their "Snippets" to overlap and their order does not really matter.
+	//       They also note where their "snippets" are with hard drawn borders (for future reference) They can also cover
+	//       each other and create a layer/priority of snippets that get played over the other ones
+	// 
 	// @return
 	//     -1    - If failed to add due to overlapping with another snippet or if the bounds of the Snippet are outside the min or max
 	//     index - Index of snippet in Snippets

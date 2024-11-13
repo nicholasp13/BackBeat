@@ -1,6 +1,7 @@
 #pragma once
 
 // Dummy Entity class used to test custom ImGui::Widgets without ruining current GUI
+
 #include "Entity.h"
 namespace Exampler {
 

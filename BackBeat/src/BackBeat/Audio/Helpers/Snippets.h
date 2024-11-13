@@ -1,10 +1,13 @@
 #pragma once
 
+// NOTE: Unused and possible will be deleted later when serialization is fully realized
+
 #include <vector>
 #include <memory>
 
 namespace BackBeat {
 
+	// NOTE: Should have a position member that is the main sorted (todo after making headway to ImGui widget)
 	struct Snippet
 	{
 		unsigned int start;
