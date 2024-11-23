@@ -20,7 +20,8 @@ namespace BackBeat {
 
 	bool WindowsMIDIDeviceManager::OpenDevice(UINT index)
 	{
-		if (m_NumOutputsSet == 0) {
+		if (m_NumOutputsSet == 0) 
+		{
 			BB_CORE_ERROR("SET MIDI DEVICE OUTPUT");
 			return false;
 		}
@@ -32,7 +33,8 @@ namespace BackBeat {
 
 	bool WindowsMIDIDeviceManager::CloseDevice(UINT index)
 	{
-		if (m_NumOutputsSet == 0) {
+		if (m_NumOutputsSet == 0) 
+		{
 			BB_CORE_ERROR("SET MIDI DEVICE OUTPUT");
 			return false;
 		}
@@ -44,17 +46,20 @@ namespace BackBeat {
 
 	bool WindowsMIDIDeviceManager::RunDevice(UINT index)
 	{
-		if (m_NumOutputsSet == 0) {
+		if (m_NumOutputsSet == 0) 
+		{
 			BB_CORE_ERROR("SET MIDI DEVICE OUTPUT");
 			return false;
 		}
 
-		if (m_RunID < 0) {
+		if (m_RunID < 0) 
+		{
 			m_Devices[index].Run();
 			m_RunID = index;
 			return true;
 		} 
-		else {
+		else 
+		{
 			m_Devices[m_RunID].Stop();
 			m_Devices[index].Run();
 			m_RunID = index;
@@ -68,6 +73,7 @@ namespace BackBeat {
 	{
 		if (m_RunID < 0)
 			return true;
+
 		m_Devices[m_RunID].Stop();
 		m_Devices[m_RunID].Close();
 		m_RunID = -1;
@@ -78,7 +84,8 @@ namespace BackBeat {
 	{
 		if (m_RunID >= 0)
 			m_Devices[m_RunID].Stop();
-		for (UINT i = 0; i < m_NumDevices; i++) {
+		for (UINT i = 0; i < m_NumDevices; i++) 
+		{
 			m_Devices[i].Close();
 		}
 		return true;
@@ -88,7 +95,11 @@ namespace BackBeat {
 	{
 		if (!output)
 			return;
-		for (UINT i = 0; i < m_NumDevices; i++) {
+		if (m_NumDevices == 0)
+			return;
+
+		for (UINT i = 0; i < m_NumDevices; i++) 
+		{
 			m_Devices[i].PushOutput(output);
 		}
 		m_NumOutputsSet = m_Devices[0].GetNumOutputs();
@@ -96,7 +107,8 @@ namespace BackBeat {
 
 	void WindowsMIDIDeviceManager::DeleteOutput(UUID id)
 	{
-		for (UINT i = 0; i < m_NumDevices; i++) {
+		for (UINT i = 0; i < m_NumDevices; i++) 
+		{
 			m_Devices[i].DeleteOutput(id);
 		}
 		if (m_NumDevices > 0)
@@ -110,7 +122,8 @@ namespace BackBeat {
 		MIDIINCAPSA deviceInfo;
 		std::string name;
 
-		for (UINT i = 0; i < m_NumDevices; i++) {
+		for (UINT i = 0; i < m_NumDevices; i++) 
+		{
 			deviceInfo = MIDIINCAPSA();
 
 			// MMRESULT midiInGetDevCapsA(

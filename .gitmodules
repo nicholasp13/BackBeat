@@ -10,3 +10,6 @@
 [submodule "BackBeat/vendor/lodepng"]
 	path = BackBeat/vendor/lodepng
 	url = https://github.com/nicholasp13/lodepng
+[submodule "BackBeat/vendor/pugixml"]
+	path = BackBeat/vendor/pugixml
+	url = https://github.com/nicholasp13/pugixml.git

@@ -10,6 +10,7 @@
 #include "Entity/Sampler.h"
 #include "Entity/RecordingTrack.h"
 #include "Entity/PlaybackTrack.h"
+#include "Entity/DummyEntity.h"
 namespace Exampler {
 
 	// Arbitrarily chosen but should be decided based on RAM size/ memory usage
@@ -51,6 +52,13 @@ namespace Exampler {
 		BackBeat::MIDIDeviceManager* m_MIDIDeviceManager;
 		BackBeat::Visualizer* m_Visualizer;
 
+		enum class AppState
+		{
+			Start = 0, Play = 1
+		};
+
+		AppState m_State;
+
 	private:
 		void RenderMenubar();
 		void RenderCanvas();
@@ -72,6 +80,7 @@ namespace Exampler {
 
 		unsigned int SetCanvasColors();
 		unsigned int SetMainColors();
+
 	};
 
 }

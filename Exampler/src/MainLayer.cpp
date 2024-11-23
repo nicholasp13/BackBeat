@@ -19,7 +19,8 @@ namespace Exampler {
 		m_RecorderMgr(audio->GetRecorderManager()),
 		m_AudioRenderer(audio->GetRenderer()),
 		m_MIDIDeviceManager(audio->GetMIDIDeviceManager()),
-		m_Visualizer(audio->GetVisualizer())
+		m_Visualizer(audio->GetVisualizer()),
+		m_State(AppState::Play)
 	{
 
 	}
@@ -32,9 +33,15 @@ namespace Exampler {
 	void MainLayer::OnAttach()
 	{
 		m_NumMIDIDevices = m_MIDIDeviceManager->GetNumDevices();
-		for (unsigned int i = 0; i < m_NumMIDIDevices; i++) {
+		for (unsigned int i = 0; i < m_NumMIDIDevices; i++) 
+		{
 			m_DeviceNames.push_back(m_MIDIDeviceManager->GetDeviceName(i));
 		}
+
+		// FOR TESTING
+#if FALSE
+		m_Entities.push_back(std::make_shared<Dummy>());
+#endif
 	}
 
 	void MainLayer::OnDetach()
@@ -50,18 +57,47 @@ namespace Exampler {
 
 	void MainLayer::OnUpdate()
 	{
-		for (auto itr = m_Entities.begin(); itr != m_Entities.end(); itr++)
+
+		switch (m_State)
 		{
-			(*itr)->Update();
+
+		case AppState::Start:
+		{
+			break;
 		}
-		m_Visualizer->Update();
+
+		case AppState::Play:
+		{
+			for (auto itr = m_Entities.begin(); itr != m_Entities.end(); itr++)
+			{
+				(*itr)->Update();
+			}
+			m_Visualizer->Update();
+			break;
+		}
+
+		}
 	}
 
 	void MainLayer::OnEvent(BackBeat::Event& event)
 	{
-		for (auto itr = m_Entities.begin(); itr != m_Entities.end(); itr++)
+		switch (m_State)
 		{
-			(*itr)->OnEvent(event);
+
+		case AppState::Start:
+		{
+			break;
+		}
+
+		case AppState::Play:
+		{
+			for (auto itr = m_Entities.begin(); itr != m_Entities.end(); itr++)
+			{
+				(*itr)->OnEvent(event);
+			}
+			break;
+		}
+
 		}
 
 		BackBeat::EventDispatcher dispatcher(event);
@@ -78,6 +114,12 @@ namespace Exampler {
 			return;
 
 		unsigned int count = SetMainColors();
+
+		if (m_State == AppState::Start)
+		{
+			ImGui::PopStyleColor(count);
+			return;
+		}
 
 		// Render background
 		{
@@ -259,7 +301,7 @@ namespace Exampler {
 		for (unsigned int i = 0; i < m_Visualizer->GetNumChannels(); i++)
 		{
 			ImGui::Spacing();
-			std::string name = "Channel " + std::to_string(i);
+			std::string name = "Channel " + std::to_string(i + 1);
 			ImGui::PlotLines(name.c_str(), m_Visualizer->GetChannelBuffer(i), bufferSize, 1, "", visualMax * -1, visualMax, ImVec2(m_Window->GetWidth() - 200.0f, 60.0f));
 		}
 

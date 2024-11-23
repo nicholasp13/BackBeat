@@ -5,22 +5,6 @@
 #include "ImGuiWidgets.h"
 namespace BackBeat {
 
-	// TODO: FINISH
-	bool ImGuiWidgets::ImGuiTimeline()
-	{
-		ImGuiWindow* window = ImGui::GetCurrentWindow();
-		if (window->SkipItems)
-			return false;
-
-		ImGui::PushID("Timeline");
-
-		ImVec2 pos = window->DC.CursorPos;
-	    ImRect background = window->InnerClipRect;
-
-		ImGui::PopID();
-		return true;
-	}
-
 	// NOTE: Only handles int, may implement other data types later
 	//       Flags not used, may remove
 	// COLORS:
@@ -76,7 +60,7 @@ namespace BackBeat {
 		ImGui::RenderFrame(activeTrack.Min, activeTrack.Max, ImGui::GetColorU32(ImGuiCol_SliderGrab), true, g.Style.FrameRounding);
 
 		// Display value from format
-		char valueBuf[64];
+		char valueBuf[64] = {};
 		const char* valueBufEnd = valueBuf + ImGui::DataTypeFormatString(valueBuf, IM_ARRAYSIZE(valueBuf), ImGuiDataType_S32, lowerV, format);
 		if (g.LogEnabled)
 			ImGui::LogSetNextTextDecoration("{", "}");
@@ -86,13 +70,49 @@ namespace BackBeat {
 		return valueChanged;
 	}
 
+	// NOTE: Currently unused and unfinished as it will be worked on after serialization is finished
+	bool ImGuiWidgets::ImGuiTrackSnipper(const char* label, Snippets* snippets, const int* pMin, const int* pMax, 
+		const char* format, ImGuiSliderFlags flags)
+	{
+		ImGuiWindow* window = ImGui::GetCurrentWindow();
+		if (window->SkipItems)
+			return false;
+
+		ImGuiContext& g = *GImGui;
+		const ImGuiStyle& style = g.Style;
+		const ImGuiID id = window->GetID(label);
+		const float w = ImGui::CalcItemWidth();
+		const ImVec2 labelSize = ImGui::CalcTextSize(label, NULL, true);
+		const ImRect frameRect(window->DC.CursorPos, Add(window->DC.CursorPos, ImVec2(w, labelSize.y + style.FramePadding.y * 2.0f)));
+		const ImRect totalRect(frameRect.Min, Add(frameRect.Max, ImVec2(labelSize.x > 0.0f ? style.ItemInnerSpacing.x + labelSize.x : 0.0f, 0.0f)));
+
+		ImGui::ItemSize(totalRect, style.FramePadding.y);
+		if (!ImGui::ItemAdd(totalRect, id, &frameRect, 0))
+			return false;
+
+		// Default format string when passing NULL
+		if (format == NULL)
+			format = ImGui::DataTypeGetInfo(ImGuiDataType_S32)->PrintFmt;
+
+		const bool hovered = ImGui::ItemHoverable(frameRect, id, g.LastItemData.InFlags);
+		const bool clicked = hovered && ImGui::IsMouseClicked(0, id);
+		if (clicked)
+		{
+			ImGui::SetActiveID(id, window);
+			ImGui::SetFocusID(id, window);
+			ImGui::FocusWindow(window);
+			g.ActiveIdUsingNavDirMask |= (1 << ImGuiDir_Left) | (1 << ImGuiDir_Right);
+		}
+
+		return true;
+	}
+
 	// NOTE: - Future implementation might want the track to keep playing while visually the seek bar changes
 	//           and only when the bar is released then the position is changed. (This does not work as either
 	//           the bar does not update while the track plays but does change only when released OR the
 	//           bar does not move or change with the track position) The following example code shows an
 	//           implementation that avoids the constant audio playing while the user is using the seekbar().
 	//  ---- Example Code ----
-	// ImGui::PushID("Seekbar");
 	// if (BackBeat::ImGuiWidgets::ImGuiSeekBarInt("##", &position, m_Player->GetSize(), "", ImGuiSliderFlags(0)))
 	// {
 	//     if (m_Player->IsPlaying())
