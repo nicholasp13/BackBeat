@@ -28,7 +28,7 @@
 
 #include "BackBeat/ImGui/ImGuiWidgets.h"
 
-#ifdef BB_PLATFORM_WINDOWS
+#if BB_PLATFORM_WINDOWS
 	#include "Platform/Windows/Windows.h"
 	#include "Platform/Windows/WindowsWindow.h"
 	#include "Platform/Windows/Audio/WindowsAudioSystem.h"

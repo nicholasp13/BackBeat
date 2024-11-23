@@ -16,6 +16,7 @@ include "BackBeat/vendor/glfw"
 include "BackBeat/vendor/Glad"
 include "BackBeat/vendor/imgui"
 include "BackBeat/vendor/lodepng"
+include "BackBeat/vendor/pugixml"
 
 project "BackBeat"
 	location "BackBeat"
@@ -45,14 +46,17 @@ project "BackBeat"
 		"%{prj.name}/vendor/glfw/include",
 		"%{prj.name}/vendor/Glad/include",
 		"%{prj.name}/vendor/imgui",
-		"%{prj.name}/vendor/lodepng"
+		"%{prj.name}/vendor/lodepng",
+		"%{prj.name}/vendor/pugixml"
 	}
 
-	links{
+	links
+	{
 		"GLFW",
 		"Glad",
 		"imgui",
 		"lodepng",
+		"pugixml",
 		"opengl32.lib"
 	}
 
@@ -103,6 +107,7 @@ project "Exampler"
 		"BackBeat/vendor/imgui",
 		"BackBeat/vendor/glfw/include",
 		"BackBeat/vendor/lodepng",
+		"BackBeat/vendor/pugixml",
 		"BackBeat/src"
 	}
 	
@@ -154,6 +159,7 @@ project "UnitTests"
 		"BackBeat/vendor/imgui",
 		"BackBeat/vendor/glfw/include",
 		"BackBeat/vendor/lodepng",
+		"BackBeat/vendor/pugixml",
 		"BackBeat/src"
 	}
 	

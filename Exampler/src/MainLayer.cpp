@@ -19,7 +19,8 @@ namespace Exampler {
 		m_RecorderMgr(audio->GetRecorderManager()),
 		m_AudioRenderer(audio->GetRenderer()),
 		m_MIDIDeviceManager(audio->GetMIDIDeviceManager()),
-		m_Visualizer(audio->GetVisualizer())
+		m_Visualizer(audio->GetVisualizer()),
+		m_State(AppState::Play)
 	{
 
 	}
@@ -32,7 +33,8 @@ namespace Exampler {
 	void MainLayer::OnAttach()
 	{
 		m_NumMIDIDevices = m_MIDIDeviceManager->GetNumDevices();
-		for (unsigned int i = 0; i < m_NumMIDIDevices; i++) {
+		for (unsigned int i = 0; i < m_NumMIDIDevices; i++) 
+		{
 			m_DeviceNames.push_back(m_MIDIDeviceManager->GetDeviceName(i));
 		}
 
@@ -55,18 +57,47 @@ namespace Exampler {
 
 	void MainLayer::OnUpdate()
 	{
-		for (auto itr = m_Entities.begin(); itr != m_Entities.end(); itr++)
+
+		switch (m_State)
 		{
-			(*itr)->Update();
+
+		case AppState::Start:
+		{
+			break;
 		}
-		m_Visualizer->Update();
+
+		case AppState::Play:
+		{
+			for (auto itr = m_Entities.begin(); itr != m_Entities.end(); itr++)
+			{
+				(*itr)->Update();
+			}
+			m_Visualizer->Update();
+			break;
+		}
+
+		}
 	}
 
 	void MainLayer::OnEvent(BackBeat::Event& event)
 	{
-		for (auto itr = m_Entities.begin(); itr != m_Entities.end(); itr++)
+		switch (m_State)
 		{
-			(*itr)->OnEvent(event);
+
+		case AppState::Start:
+		{
+			break;
+		}
+
+		case AppState::Play:
+		{
+			for (auto itr = m_Entities.begin(); itr != m_Entities.end(); itr++)
+			{
+				(*itr)->OnEvent(event);
+			}
+			break;
+		}
+
 		}
 
 		BackBeat::EventDispatcher dispatcher(event);
@@ -83,6 +114,12 @@ namespace Exampler {
 			return;
 
 		unsigned int count = SetMainColors();
+
+		if (m_State == AppState::Start)
+		{
+			ImGui::PopStyleColor(count);
+			return;
+		}
 
 		// Render background
 		{
