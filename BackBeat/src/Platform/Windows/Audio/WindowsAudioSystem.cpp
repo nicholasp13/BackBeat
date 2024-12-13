@@ -16,12 +16,12 @@ namespace BackBeat {
 		m_Thread.Stop();
 	}
 
-	void WindowsAudioSystem::Init(std::string projectName)
+	void WindowsAudioSystem::Init(std::string appName)
 	{
 		// Creates filepath to directory to store 
 		std::string appDataLocalDir = BackBeat::Windows::GetLocalAppFileDirectory();
 		BackBeat::FileSystem::SetAppDataLocalDir(appDataLocalDir);
-		BackBeat::FileSystem::SetProjectDir(projectName);
+		BackBeat::FileSystem::SetAppDir(appName);
 		BackBeat::FileSystem::CreateTempDir();
 
 		m_Renderer.Init();

@@ -33,12 +33,16 @@ namespace Exampler {
 		virtual void OnImGuiRender() override;
 
 	private:
+		bool m_NewPopupOpen;
+		bool m_SaveAsPopupOpen;
 		unsigned int m_NumMIDIDevices;
 		unsigned int m_NumSynths;
 		unsigned int m_NumSamplers;
 		unsigned int m_NumPlayback;
 		unsigned int m_NumRecorders;
+		std::string m_AppFileDir;
 		std::vector< std::string > m_DeviceNames;
+		std::vector< std::string > m_ProjectNames;
 		std::vector< std::shared_ptr<Entity> > m_Entities;
 		std::shared_ptr<Entity> m_EtyToRename;
 		std::shared_ptr<Entity> m_EtyToDelete;
@@ -51,6 +55,8 @@ namespace Exampler {
 		BackBeat::Renderer* m_AudioRenderer;
 		BackBeat::MIDIDeviceManager* m_MIDIDeviceManager;
 		BackBeat::Visualizer* m_Visualizer;
+		BackBeat::FileManager m_FileMgr;
+		std::shared_ptr<BackBeat::Project> m_ActiveProject;
 
 		enum class AppState
 		{
@@ -60,6 +66,8 @@ namespace Exampler {
 		AppState m_State;
 
 	private:
+		// Rendering functions
+		void RenderStartup();
 		void RenderMenubar();
 		void RenderCanvas();
 		void RenderAudioVisualizer();
@@ -68,16 +76,23 @@ namespace Exampler {
 		void RenderEntityMenubar(unsigned int index);
 		void RenderPopups();
 
+		// Entity functions
 		void AddSynth();
 		void AddSampler();
 		void AddPlaybackTrack();
 		void AddRecordingTrack();
-
 		void DeleteEntity();
 
+		// Project functions
+		bool LoadProject(std::string project);
+		void NewProject();
+		void SaveProject();
+
+		// Event functions
 		bool OnKeyEvent(BackBeat::KeyPressedEvent& event);
 		bool OnMouseButtonEvent(BackBeat::MouseButtonPressedEvent& event);
 
+		// Color functions
 		unsigned int SetCanvasColors();
 		unsigned int SetMainColors();
 

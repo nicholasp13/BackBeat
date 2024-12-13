@@ -154,7 +154,7 @@ namespace BackBeat {
 	// Custom for each engine. Current engine for a basic synth piano
 	void SynthEngine::InitVoices()
 	{
-		m_VoiceFactor = 2.0f / (float)m_NumVoices; // 2.0f to offset panning
+		m_VoiceFactor = 4.0f / (float)m_NumVoices; // 4.0f to offset panning
 
 		for (unsigned int i = 0; i < m_NumVoices; i++)
 			m_Voices[i] = std::make_unique<SynthVoice>(m_Props.sampleRate, m_Buffer, m_Params->voiceParams);

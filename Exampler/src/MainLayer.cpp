@@ -1,4 +1,5 @@
-// TODO: Create editable timeline for entity/track objects
+// TODO: - Create editable timeline for entity/track objects
+//       - Ask user if they want to save current project if they close window
 
 #include "MainLayer.h"
 namespace Exampler {
@@ -6,11 +7,14 @@ namespace Exampler {
 	MainLayer::MainLayer(BackBeat::Window* window, BackBeat::AudioSystem* audio)
 		: 
 		Layer("MainLayer"), 
+		m_NewPopupOpen(false),
+		m_SaveAsPopupOpen(false),
 		m_NumMIDIDevices(0),
 		m_NumSynths(0),
 		m_NumSamplers(0),
 		m_NumPlayback(0),
 		m_NumRecorders(0),
+		m_AppFileDir(BackBeat::FileSystem::GetAppDir()),
 		m_EtyToRename(nullptr),
 		m_EtyToDelete(nullptr),
 		m_Window(window),
@@ -20,7 +24,8 @@ namespace Exampler {
 		m_AudioRenderer(audio->GetRenderer()),
 		m_MIDIDeviceManager(audio->GetMIDIDeviceManager()),
 		m_Visualizer(audio->GetVisualizer()),
-		m_State(AppState::Play)
+		m_ActiveProject(nullptr),
+		m_State(AppState::Start)
 	{
 
 	}
@@ -37,6 +42,11 @@ namespace Exampler {
 		{
 			m_DeviceNames.push_back(m_MIDIDeviceManager->GetDeviceName(i));
 		}
+
+		if (!m_FileMgr.SetWorkingDirectory(m_AppFileDir))
+			BB_CLIENT_ERROR("NOT A VALID WORKING DIRECTORY: {0}", m_AppFileDir.c_str());
+
+		m_ProjectNames = m_FileMgr.GetSubDirNames();
 
 		// FOR TESTING
 #if FALSE
@@ -115,27 +125,28 @@ namespace Exampler {
 
 		unsigned int count = SetMainColors();
 
+		// Renders Start window
 		if (m_State == AppState::Start)
-		{
-			ImGui::PopStyleColor(count);
-			return;
-		}
+			RenderStartup();
 
 		// Render background
 		{
 			ImGui::SetNextWindowSize(ImVec2((float)width, (float)height));
 			ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f), (ImGuiCond)0);
 			// Background flags
-			ImGuiWindowFlags window_flags = 0;
-			window_flags |= ImGuiWindowFlags_NoTitleBar;
-			window_flags |= ImGuiWindowFlags_NoMove;
-			window_flags |= ImGuiWindowFlags_NoCollapse;
-			window_flags |= ImGuiWindowFlags_NoResize;
-			window_flags |= ImGuiWindowFlags_MenuBar;
-			window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus;
+			ImGuiWindowFlags windowFlags = 0;
+			windowFlags |= ImGuiWindowFlags_NoTitleBar;
+			windowFlags |= ImGuiWindowFlags_NoMove;
+			windowFlags |= ImGuiWindowFlags_NoCollapse;
+			windowFlags |= ImGuiWindowFlags_NoResize;
+			windowFlags |= ImGuiWindowFlags_MenuBar;
+			windowFlags |= ImGuiWindowFlags_NoBringToFrontOnFocus;
 			bool open;
 
-			ImGui::Begin("Background", &open, window_flags);
+			if (m_State == AppState::Start)
+				windowFlags |= ImGuiWindowFlags_NoInputs;
+
+			ImGui::Begin("Background", &open, windowFlags);
 
 			RenderMenubar();
 			RenderCanvas();
@@ -149,37 +160,144 @@ namespace Exampler {
 		ImGui::PopStyleColor(count);
 	}
 
+	void MainLayer::RenderStartup()
+	{
+		// ImGui::ShowDemoWindow();
+		static int selected = -1;
+
+		unsigned int width = m_Window->GetWidth();
+		unsigned int height = m_Window->GetHeight();
+		float startWidth = 300.0f;
+		float startHeight = 500.0f;
+		float startX = (float)width / 2.0f - startWidth / 2.0f;
+		float startY = (float)height / 2.0f - startHeight / 2.0f;
+
+		ImGui::SetNextWindowSize(ImVec2(startWidth, startHeight));
+		ImGui::SetNextWindowPos(ImVec2(startX, startY), (ImGuiCond)0);
+
+		ImGuiWindowFlags windowFlags = 0;
+		windowFlags |= ImGuiWindowFlags_NoTitleBar;
+		windowFlags |= ImGuiWindowFlags_NoMove;
+		windowFlags |= ImGuiWindowFlags_NoCollapse;
+		windowFlags |= ImGuiWindowFlags_NoResize;
+		bool open;
+
+		ImGui::Begin("Startup", &open, windowFlags);
+
+		ImGui::SeparatorText("Projects");
+
+		// Renders projects selector
+		{
+			const float wBorder = 20;
+			const float hBorder = 100;
+			ImGuiWindowFlags childFlags = 0;
+			childFlags |= ImGuiWindowFlags_NoTitleBar;
+			childFlags |= ImGuiWindowFlags_NoMove;
+			childFlags |= ImGuiWindowFlags_NoCollapse;
+			childFlags |= ImGuiWindowFlags_NoResize;
+			childFlags |= ImGuiWindowFlags_AlwaysVerticalScrollbar;
+
+			// NOTE: Uses canvas colors for now as a placeholder
+			unsigned int cCount = SetCanvasColors();
+
+			ImGui::BeginChild("Projects", ImVec2(startWidth - wBorder, startHeight - hBorder), false, childFlags);
+			
+			for (int i = 0; i < m_ProjectNames.size(); i++)
+			{
+				if (ImGui::Selectable(m_ProjectNames[i].c_str(), selected == i, ImGuiSelectableFlags_AllowDoubleClick))
+				{
+					selected = i;
+					if (ImGui::IsMouseDoubleClicked(0))
+						LoadProject(m_ProjectNames[selected]);
+				}
+			}
+
+			ImGui::EndChild();
+
+			ImGui::PopStyleColor(cCount);
+		}
+
+		ImGui::BeginDisabled(selected == -1);
+		if (ImGui::Button("Load"))
+			LoadProject(m_ProjectNames[selected]);
+		ImGui::EndDisabled();
+
+		if (ImGui::Button("New"))
+			NewProject();
+
+		ImGui::End();
+	}
+
 	void MainLayer::RenderMenubar()
 	{
 		if (ImGui::BeginMenuBar())
 		{
-			if (ImGui::BeginMenu("Menu"))
+			// TODO: Finish
+			// Project menu
+			if (ImGui::BeginMenu("File"))
 			{
-				// Entities menu
-				if (ImGui::BeginMenu("Tracks"))
-				{
-					if (m_Entities.size() == 0)
-					{
-						ImGui::BeginDisabled();
-						if (ImGui::MenuItem("No tracks")) 
-						{ }
-						ImGui::EndDisabled();
-					}
-					
-					for (unsigned int i = 0; i < m_Entities.size(); i++)
-						RenderEntityMenubar(i);
+				BackBeat::ProjectConfig config = m_ActiveProject->GetConfig();
 
-					ImGui::EndMenu();
+				// See RenderPopups() to find implementation of how "New" works
+				if (ImGui::MenuItem("New"))
+				{
+					m_NewPopupOpen = true;
 				}
 
-				// MIDI Devices menu
+				// Should either be a drop down menu with all projects listed
+				// OR open file dialog to open a project XML
+				if (ImGui::MenuItem("Open"))
+				{
+
+				}
+
+				const auto untitled = std::string("Untitled");
+				// Should be disabled when Active Project has not been saved yet
+				ImGui::BeginDisabled(config.name == untitled);
+				if (ImGui::MenuItem("Save"))
+				{
+					SaveProject();
+				}
+				ImGui::EndDisabled();
+
+				// See RenderPopups() to find implementation of how "Save As" works
+				if (ImGui::MenuItem("Save As"))
+				{
+					m_SaveAsPopupOpen = true;
+				}
+
+				ImGui::EndMenu();
+			}
+				
+			// TODO: Add way to add tracks through this menu
+			// Entities menu
+			if (ImGui::BeginMenu("Tracks"))
+			{
+				if (m_Entities.size() == 0)
+				{
+					ImGui::BeginDisabled();
+					if (ImGui::MenuItem("No tracks")) 
+					{ }
+					ImGui::EndDisabled();
+				}
+				
+				for (unsigned int i = 0; i < m_Entities.size(); i++)
+					RenderEntityMenubar(i);
+				
+				ImGui::EndMenu();
+			}
+
+			// MIDI Devices menu
+			if (ImGui::BeginMenu("Devices"))
+			{
 				if (ImGui::BeginMenu("MIDI Devices"))
 				{
 					if (m_NumMIDIDevices == 0)
 					{
 						ImGui::BeginDisabled();
 						if (ImGui::MenuItem("No devices detected"))
-						{ }
+						{
+						}
 						ImGui::EndDisabled();
 					}
 
@@ -229,6 +347,10 @@ namespace Exampler {
 		childFlags |= ImGuiWindowFlags_NoCollapse;
 		childFlags |= ImGuiWindowFlags_NoResize;
 		childFlags |= ImGuiWindowFlags_AlwaysVerticalScrollbar;
+
+		if (m_State == AppState::Start)
+			childFlags |= ImGuiWindowFlags_NoInputs;
+
 		unsigned int cCount = SetCanvasColors();
 
 		ImGui::BeginChild("Canvas", ImVec2((float)(width - wBorder), (float)(height - hBorder)), false, childFlags);
@@ -278,6 +400,7 @@ namespace Exampler {
 		ImGui::PopStyleColor(cCount);
 	}
 
+	// TODO: Hide this initially
 	// BUG: When spamming the on and off button. It may cause the visuals to glitch (mostly show the data when it should have been flushed)
 	void MainLayer::RenderAudioVisualizer()
 	{
@@ -374,6 +497,7 @@ namespace Exampler {
 
 	void MainLayer::RenderPopups()
 	{
+		// Renaming Entity Popup
 		if (m_EtyToRename)
 			ImGui::OpenPopup("RenamePopupID");
 		if (ImGui::BeginPopup("RenamePopupID"))
@@ -393,6 +517,7 @@ namespace Exampler {
 			ImGui::EndPopup();
 		}
 
+		// Deleting Entity Popup
 		if (m_EtyToDelete)
 			ImGui::OpenPopup("DeletePopupID");
 		if (ImGui::BeginPopup("DeletePopupID"))
@@ -416,6 +541,62 @@ namespace Exampler {
 			ImGui::EndPopup();
 		}
 
+		// TODO: FINISH
+		// New Project Popup
+		if (m_NewPopupOpen)
+			ImGui::OpenPopup("NewPopupID");
+		if (ImGui::BeginPopup("NewPopupID"))
+		{
+			ImGui::Text("WORK IN PROGRESS");
+			m_NewPopupOpen = false;
+
+			ImGui::EndPopup();
+		}
+
+		// SavingAs Project Popup
+		if (m_SaveAsPopupOpen)
+			ImGui::OpenPopup("SaveAsPopupID");
+		if (ImGui::BeginPopup("SaveAsPopupID"))
+		{
+			BackBeat::ProjectConfig config = m_ActiveProject->GetConfig();
+			std::string oldName = config.name;
+			char changeName[128] = {};
+			bool opened = false;
+
+			ImGui::InputTextWithHint("Input New Project Name", oldName.c_str(), changeName,
+				IM_ARRAYSIZE(changeName));
+			if (ImGui::IsItemDeactivated())
+			{
+				auto newName = std::string(changeName);
+				if (newName.size() > 0 && newName != oldName)
+				{
+					// TODO: Add user ability to overwrite
+					if (m_FileMgr.Exists(newName))
+					{
+						BB_CLIENT_ERROR("Project name taken");
+					}
+					else
+					{
+
+						m_ActiveProject = BackBeat::Project::New();
+						m_ActiveProject->GetConfig().app = "Exampler";
+						m_ActiveProject->GetConfig().name = newName;
+
+						auto projectDirPath = m_FileMgr.CreateSubDirectory(newName);
+						m_ActiveProject->GetConfig().projectDirectoryPath = projectDirPath;
+
+						auto xmlFilePath = projectDirPath + newName + ".xml";
+						m_ActiveProject->GetConfig().xmlFilePath = xmlFilePath;
+
+						SaveProject();
+					}
+				}
+				ImGui::CloseCurrentPopup();
+			}
+			m_SaveAsPopupOpen = false;
+
+			ImGui::EndPopup();
+		}
 	}
 
 	void MainLayer::AddSynth()
@@ -530,6 +711,87 @@ namespace Exampler {
 
 		m_Audio->Start();
 		m_EtyToDelete = nullptr;
+	}
+
+	bool MainLayer::LoadProject(std::string project)
+	{
+		// NOTE: Adding "\\" is a current lazy solution but this should happen in BackBeat::FileManager
+		auto projectPath = m_FileMgr.GetSubDirPath(project) + "\\";
+		// NOTE: May want to change into a class member or use exisitng member BackBeat::FileManager
+		auto projectMgr = BackBeat::FileManager();
+
+		if (!projectMgr.SetWorkingDirectory(projectPath))
+		{
+			BB_CLIENT_ERROR("NOT A VALID WORKING PROJECT DIRECTORY: {0}", project.c_str());
+			NewProject();
+			return false;
+		}
+
+		// auto projectXMLName = project + ".xml";
+		auto projectXMLName = project + ".txt"; // TODO: DELETE, For testing
+		auto projectXMLPath = projectMgr.GetFilePath(projectXMLName);
+
+		if (projectXMLPath.empty())
+		{
+			BB_CLIENT_ERROR("NOT A VALID PROJECT XML FILE PATH! FAILED TO FIND! \nFILE NAME: {0}", 
+				projectXMLName.c_str());
+			NewProject();
+			return false;
+		}
+
+		m_ActiveProject = BackBeat::Project::Load(projectXMLPath);
+
+		if (!m_ActiveProject)
+		{
+			BB_CLIENT_ERROR("NOT A VALID PROJECT XML FILE! FAILED TO DESERIALIZE! \nFILE NAME: {0}\nFILE PATH: {1}",
+				projectXMLName.c_str(), projectXMLPath.c_str());
+			NewProject();
+			return false;
+		}
+		
+		m_State = AppState::Play;
+		return true;
+	}
+
+	void MainLayer::NewProject()
+	{
+		m_ActiveProject = BackBeat::Project::New();
+		m_ActiveProject->GetConfig().app = "Exampler";
+
+		switch (m_State)
+		{
+		
+		case AppState::Start:
+		{
+			m_State = AppState::Play;
+			break;
+		}
+		
+		case AppState::Play:
+		{
+			// Should clear all entities here
+
+			break;
+		}
+
+		default:
+		{
+			break;
+		}
+
+
+		}
+	}
+
+	void MainLayer::SaveProject()
+	{
+		m_ActiveProject->GetConfig().objectList.clear();
+		for (auto itr = m_Entities.begin(); itr != m_Entities.end(); itr++)
+		{
+			m_ActiveProject->GetConfig().objectList.push_back(*itr);
+		}
+
+		BackBeat::Project::SaveActive(m_ActiveProject->GetConfig().xmlFilePath);
 	}
 
 	bool MainLayer::OnKeyEvent(BackBeat::KeyPressedEvent& event)

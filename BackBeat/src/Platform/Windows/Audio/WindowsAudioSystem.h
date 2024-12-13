@@ -13,7 +13,7 @@ namespace BackBeat {
 		WindowsAudioSystem();
 		~WindowsAudioSystem();
 
-		virtual void Init(std::string projectName) override;
+		virtual void Init(std::string appName) override;
 		virtual void Start() override;
 		virtual void Stop() override;
 
