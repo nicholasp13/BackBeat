@@ -839,14 +839,17 @@ namespace Exampler {
 			return;
 		}
 
-		// Clear entities here
-
 		for (pugi::xml_node_iterator itr = objectsNode.begin(); itr != objectsNode.end(); itr++)
 		{
 			auto entityType = itr->name();
 			if (strcmp(entityType, "Synthesizer") == 0)
 			{
 				AddSynth();
+				m_Entities.back()->ReadObject(&(*itr));
+			}
+			else if (strcmp(entityType, "Playback") == 0)
+			{
+				AddPlaybackTrack();
 				m_Entities.back()->ReadObject(&(*itr));
 			}
 			else

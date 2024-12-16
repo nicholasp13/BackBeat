@@ -129,6 +129,37 @@ namespace Exampler {
 		mixer->DeleteProcessor(playerID);
 	}
 
+	// NOTE: - node is the parent of the node being written to
+	void PlaybackTrack::WriteObject(pugi::xml_node* node)
+	{
+		auto playbackNode = node->append_child("Playback");
+
+		playbackNode.append_attribute("Name") = m_Name;
+
+		auto volumeNode = playbackNode.append_child("Volume");
+		volumeNode.append_attribute("Value") = m_Volume;
+
+		auto fileNode = playbackNode.append_child("File");
+		auto track = m_Player->GetTrack();
+		if (track)
+			fileNode.append_attribute("Path") = track->GetFilePath();
+		else
+			fileNode.append_attribute("Path");
+	}
+
+	// NOTE: - node is the node being written to. This is different to WriteObject() || Might want to specify in
+	//       function declaration
+	void PlaybackTrack::ReadObject(pugi::xml_node* node)
+	{
+		m_Name = node->attribute("Name").as_string();
+
+		m_Volume = node->child("Volume").attribute("Value").as_float();
+
+		auto fileNode = node->child("File");
+		if (!fileNode.attribute("Path").empty())
+			m_Player->LoadTrack(fileNode.attribute("Path").as_string());
+	}
+
 	unsigned int PlaybackTrack::SetPlaybackColors()
 	{
 		unsigned int count = 0;
