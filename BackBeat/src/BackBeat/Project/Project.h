@@ -4,6 +4,7 @@
 #include <memory>
 #include <vector>
 
+#include "Serializable.h"
 namespace BackBeat {
 
 	struct ProjectConfig
@@ -12,7 +13,7 @@ namespace BackBeat {
 		std::string name = "Untitled";
 		std::string projectDirectoryPath = "";
 		std::string xmlFilePath = "";
-		std::vector<std::shared_ptr<void>> objectList;
+		std::vector< std::shared_ptr<Serializable> > objectList;
 	};
 
 	class Project

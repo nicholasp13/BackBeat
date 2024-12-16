@@ -87,6 +87,8 @@ namespace Exampler {
 		bool LoadProject(std::string project);
 		void NewProject();
 		void SaveProject();
+		void Serialize(std::string filePath);
+		void Deserialize(std::string filePath);
 
 		// Event functions
 		bool OnKeyEvent(BackBeat::KeyPressedEvent& event);

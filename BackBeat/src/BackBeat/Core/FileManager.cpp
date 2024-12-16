@@ -106,7 +106,6 @@ namespace BackBeat {
 			}
 		}
 
-
 		return files;
 	}
 

@@ -1,6 +1,13 @@
 // TODO: - Create editable timeline for entity/track objects
 //       - Ask user if they want to save current project if they close window
 
+// NOTE: BUG - Added m_Audio->Start() and m_Audio->Stop() during adding and deleting entities
+//       but when deserializing multiple entities it caused the AudioThread to block the 
+//       main thread as it was waiting for AudioThread to end but it never does. This also happens
+//       if the Start and Stop calls are called quickly between each other. I commented out the function
+//       calls and have experience no bugs so far. Delete comments if no harm seems to be done with 
+//       not stopping and starting the thread when adding BackBeat audio objects.
+
 #include "MainLayer.h"
 namespace Exampler {
 
@@ -603,7 +610,7 @@ namespace Exampler {
 	{
 		if (m_NumSynths >= MaxSynths)
 			return;
-		m_Audio->Stop();
+		// m_Audio->Stop();
 
 		auto synth = std::make_shared<Synthesizer>();
 		synth->Add(m_PlayerMgr, m_RecorderMgr, m_AudioRenderer->GetMixer(), m_MIDIDeviceManager);
@@ -611,14 +618,14 @@ namespace Exampler {
 		synth->SetName(synthName);
 		m_Entities.push_back(synth);
 		
-		m_Audio->Start();
+		// m_Audio->Start();
 	}
 
 	void MainLayer::AddSampler()
 	{
 		if (m_NumSamplers >= MaxSamplers)
 			return;
-		m_Audio->Stop();
+		// m_Audio->Stop();
 
 		auto sampler = std::make_shared<Sampler>();
 		sampler->Add(m_PlayerMgr, m_RecorderMgr, m_AudioRenderer->GetMixer(), m_MIDIDeviceManager);
@@ -626,14 +633,14 @@ namespace Exampler {
 		sampler->SetName(samplerName);
 		m_Entities.push_back(sampler);
 
-		m_Audio->Start();
+		// m_Audio->Start();
 	}
 
 	void MainLayer::AddPlaybackTrack()
 	{
 		if (m_NumPlayback >= MaxPlayback)
 			return;
-		m_Audio->Stop();
+		// m_Audio->Stop();
 
 		auto playback = std::make_shared<PlaybackTrack>();
 		playback->Add(m_PlayerMgr, m_RecorderMgr, m_AudioRenderer->GetMixer(), m_MIDIDeviceManager);
@@ -641,14 +648,14 @@ namespace Exampler {
 		playback->SetName(playerName);
 		m_Entities.push_back(playback);
 
-		m_Audio->Start();
+		// m_Audio->Start();
 	}
 
 	void MainLayer::AddRecordingTrack()
 	{
 		if (m_NumRecorders >= MaxRecordingDevices)
 			return;
-		m_Audio->Stop();
+		// m_Audio->Stop();
 		m_RecorderMgr->Stop();
 
 		auto recordingTrack = std::make_shared<RecordingTrack>();
@@ -657,12 +664,12 @@ namespace Exampler {
 		recordingTrack->SetName(trackName);
 		m_Entities.push_back(recordingTrack);
 
-		m_Audio->Start();
+		// m_Audio->Start();
 	}
 
 	void MainLayer::DeleteEntity()
 	{
-		m_Audio->Stop();
+		// m_Audio->Stop();
 		m_PlayerMgr->StopAll();
 		m_RecorderMgr->Stop();
 		m_MIDIDeviceManager->StopDevice();
@@ -709,7 +716,7 @@ namespace Exampler {
 			break;
 		}
 
-		m_Audio->Start();
+		// m_Audio->Start();
 		m_EtyToDelete = nullptr;
 	}
 
@@ -727,6 +734,8 @@ namespace Exampler {
 			return false;
 		}
 
+		// TODO: DELETE WHEN DONE TESTING DESERIALIZATION
+		/**
 		// auto projectXMLName = project + ".xml";
 		auto projectXMLName = project + ".txt"; // TODO: DELETE, For testing
 		auto projectXMLPath = projectMgr.GetFilePath(projectXMLName);
@@ -740,15 +749,23 @@ namespace Exampler {
 		}
 
 		m_ActiveProject = BackBeat::Project::Load(projectXMLPath);
+		/**/
+
+		std::string testPath = "C:\\Dev\\Testing\\BackBeat\\test.xml"; // TODO: DELETE AND USE FILEPATH
+		m_ActiveProject = BackBeat::Project::Load(testPath); // TODO: DELETE AND USE FILEPATH
 
 		if (!m_ActiveProject)
 		{
-			BB_CLIENT_ERROR("NOT A VALID PROJECT XML FILE! FAILED TO DESERIALIZE! \nFILE NAME: {0}\nFILE PATH: {1}",
-				projectXMLName.c_str(), projectXMLPath.c_str());
+			BB_CLIENT_ERROR("NOT A VALID PROJECT XML FILE! FAILED TO DESERIALIZE!");
+			// TODO: DELETE WHEN DONE TESTING DESERIALIZATION
+			// BB_CLIENT_ERROR("NOT A VALID PROJECT XML FILE! FAILED TO DESERIALIZE! \nFILE NAME: {0}\nFILE PATH: {1}",
+			//	projectXMLName.c_str(), projectXMLPath.c_str());
 			NewProject();
 			return false;
 		}
 		
+		Deserialize(testPath);
+
 		m_State = AppState::Play;
 		return true;
 	}
@@ -792,6 +809,53 @@ namespace Exampler {
 		}
 
 		BackBeat::Project::SaveActive(m_ActiveProject->GetConfig().xmlFilePath);
+	}
+
+	// TODO: Implement after all Entity parameters are done
+	void MainLayer::Serialize(std::string filePath)
+	{
+		// NOTE: Empty as BackBeat::Project::SaveActive handles all serialization but will be
+		//       filled as needed to serialize Exampler specific stuff like which tracks are
+		//       being recorded and where
+	}
+
+	void MainLayer::Deserialize(std::string filePath)
+	{
+		auto doc = pugi::xml_document();
+		pugi::xml_parse_result result = doc.load_file(filePath.c_str());
+
+		if (!result)
+		{
+			BB_CLIENT_ERROR("ERROR DESERIALIZING XML FILE OBJECTS");
+			return;
+		}
+
+		auto appNode = doc.first_child();
+		auto objectsNode = appNode.child("Objects");
+
+		if (objectsNode.empty())
+		{
+			BB_CLIENT_ERROR("ERROR DESERIALIZING XML FILE OBJECTS");
+			return;
+		}
+
+		// Clear entities here
+
+		for (pugi::xml_node_iterator itr = objectsNode.begin(); itr != objectsNode.end(); itr++)
+		{
+			auto entityType = itr->name();
+			if (strcmp(entityType, "Synthesizer") == 0)
+			{
+				AddSynth();
+				m_Entities.back()->ReadObject(&(*itr));
+			}
+			else
+			{
+				BB_CLIENT_ERROR("UNRECOGNIZED TRACK TYPE IN XML: {0}", entityType);
+			}
+			// TODO: Add other entities as needed
+		}
+
 	}
 
 	bool MainLayer::OnKeyEvent(BackBeat::KeyPressedEvent& event)
