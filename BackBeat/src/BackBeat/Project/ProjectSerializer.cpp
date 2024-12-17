@@ -21,7 +21,6 @@ namespace BackBeat {
 
 	bool ProjectSerializer::Serialize(std::string filePath)
 	{
-		// Create pugi::xml_document
 		auto doc = pugi::xml_document();
 
 		ProjectConfig projectConfig = m_Project->GetConfig();
@@ -36,9 +35,7 @@ namespace BackBeat {
 			(*itr)->WriteObject(&objects);
 		}
 
-		// Write pugi::xml_document into filePath
-		std::string testPath = "C:\\Dev\\Testing\\BackBeat\\test.xml"; // TODO: DELETE AND USE FILEPATH
-		if (!doc.save_file(testPath.c_str()))
+		if (!doc.save_file(filePath.c_str()))
 		{
 			BB_CORE_ERROR("ERROR SAVING XML FILE");
 			return false;
@@ -47,14 +44,11 @@ namespace BackBeat {
 		return true;
 	}
 
-	// TODO: Finish
 	// NOTE: Object list deserialization is handled outside of ProjectSerializer
 	bool ProjectSerializer::Deserialize(std::string filePath)
-	{
-		std::string testPath = "C:\\Dev\\Testing\\BackBeat\\test.xml"; // TODO: DELETE AND USE FILEPATH
-		
+	{	
 		auto doc = pugi::xml_document();
-		pugi::xml_parse_result result = doc.load_file(testPath.c_str());
+		pugi::xml_parse_result result = doc.load_file(filePath.c_str());
 
 		if (!result)
 		{
@@ -68,15 +62,6 @@ namespace BackBeat {
 		m_Project->GetConfig().projectDirectoryPath = app.attribute("WorkingDirectory").as_string();
 		m_Project->GetConfig().xmlFilePath = filePath;
 
-		// TODO: Delete
-		/**
-		BB_CORE_TRACE("Project Config");
-		BB_CORE_INFO("APP:               {0}", m_Project->GetConfig().app);
-		BB_CORE_INFO("NAME:              {0}", m_Project->GetConfig().name);
-		BB_CORE_INFO("PROJECT DIRECTORY: {0}", m_Project->GetConfig().projectDirectoryPath);
-		BB_CORE_INFO("XML FILEPATH:      {0}", m_Project->GetConfig().xmlFilePath);
-		BB_CORE_INFO("NUM OBJECTS:       {0}", m_Project->GetConfig().objectList.size());
-		/**/
 		return true;
 	}
 

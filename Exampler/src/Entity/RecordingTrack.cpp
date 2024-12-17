@@ -152,6 +152,27 @@ namespace Exampler {
 		mixer->DeleteProcessor(playerID);
 	}
 
+	// NOTE: - node is the parent of the node being written to
+	void RecordingTrack::WriteObject(pugi::xml_node* node)
+	{
+		auto recorderNode = node->append_child("Recorder");
+
+		recorderNode.append_attribute("Name") = m_Name;
+
+		auto volumeNode = recorderNode.append_child("Volume");
+		volumeNode.append_attribute("Value") = m_Volume;
+	}
+
+	// NOTE: - node is the node being read from. This is different to WriteObject() || Might want to specify in
+	//       function declaration
+	void RecordingTrack::ReadObject(pugi::xml_node* node)
+	{
+		m_Name = node->attribute("Name").value();
+
+		auto volumeNode = node->child("Volume");
+		m_Volume = volumeNode.attribute("Value").as_float();
+	}
+
 	unsigned int RecordingTrack::SetRecordingTrackColors()
 	{
 		unsigned int count = 0;

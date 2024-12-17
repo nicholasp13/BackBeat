@@ -1,5 +1,8 @@
 // TODO: - Create editable timeline for entity/track objects
-//       - Ask user if they want to save current project if they close window
+//       - Add ability to add tracks in menubar
+//       - Hide visualizer
+//       - Serialize MIDI devices
+//       - Load playback entity with its specific file and do not allow it to change after creation
 
 // NOTE: BUG - Added m_Audio->Start() and m_Audio->Stop() during adding and deleting entities
 //       but when deserializing multiple entities it caused the AudioThread to block the 
@@ -7,6 +10,11 @@
 //       if the Start and Stop calls are called quickly between each other. I commented out the function
 //       calls and have experience no bugs so far. Delete comments if no harm seems to be done with 
 //       not stopping and starting the thread when adding BackBeat audio objects.
+
+// TODO IMINENTLY:
+// - Serialize each entity's recorded track to the xml file
+// - Ask user if they want to save current project if they close window or open new project
+// - Redesign SaveAs popup
 
 #include "MainLayer.h"
 namespace Exampler {
@@ -53,8 +61,6 @@ namespace Exampler {
 		if (!m_FileMgr.SetWorkingDirectory(m_AppFileDir))
 			BB_CLIENT_ERROR("NOT A VALID WORKING DIRECTORY: {0}", m_AppFileDir.c_str());
 
-		m_ProjectNames = m_FileMgr.GetSubDirNames();
-
 		// FOR TESTING
 #if FALSE
 		m_Entities.push_back(std::make_shared<Dummy>());
@@ -63,13 +69,7 @@ namespace Exampler {
 
 	void MainLayer::OnDetach()
 	{
-		for (auto itr = m_Entities.begin(); itr != m_Entities.end(); itr++)
-		{
-			(*itr)->Close();
-			(*itr)->Off();
-			(*itr)->Delete(m_PlayerMgr, m_RecorderMgr, m_AudioRenderer->GetMixer(), m_MIDIDeviceManager);
-		}
-
+		ClearEntities();
 	}
 
 	void MainLayer::OnUpdate()
@@ -133,8 +133,8 @@ namespace Exampler {
 		unsigned int count = SetMainColors();
 
 		// Renders Start window
-		if (m_State == AppState::Start)
-			RenderStartup();
+		if (m_State == AppState::Start || m_State == AppState::Load)
+			RenderProjectMgr();
 
 		// Render background
 		{
@@ -150,7 +150,7 @@ namespace Exampler {
 			windowFlags |= ImGuiWindowFlags_NoBringToFrontOnFocus;
 			bool open;
 
-			if (m_State == AppState::Start)
+			if (m_State != AppState::Play)
 				windowFlags |= ImGuiWindowFlags_NoInputs;
 
 			ImGui::Begin("Background", &open, windowFlags);
@@ -167,10 +167,12 @@ namespace Exampler {
 		ImGui::PopStyleColor(count);
 	}
 
-	void MainLayer::RenderStartup()
+	// TODO: Add delete
+	void MainLayer::RenderProjectMgr()
 	{
-		// ImGui::ShowDemoWindow();
 		static int selected = -1;
+
+		m_ProjectNames = m_FileMgr.GetSubDirNames();
 
 		unsigned int width = m_Window->GetWidth();
 		unsigned int height = m_Window->GetHeight();
@@ -224,13 +226,61 @@ namespace Exampler {
 			ImGui::PopStyleColor(cCount);
 		}
 
-		ImGui::BeginDisabled(selected == -1);
-		if (ImGui::Button("Load"))
-			LoadProject(m_ProjectNames[selected]);
-		ImGui::EndDisabled();
+		// Renders disabled Load and Delete buttons and Delete popup
+		{
+			ImGui::BeginDisabled(selected == -1);
+
+			if (ImGui::Button("Load"))
+				LoadProject(m_ProjectNames[selected]);
+
+			ImGui::SameLine(); ImGui::Text("                         "); ImGui::SameLine();
+
+			static bool toDelete = true;
+			if (ImGui::Button("Delete"))
+			{
+				toDelete = true;
+				ImGui::OpenPopup("##DeleteProjectPopupID");
+			}
+
+			const float width = 500.0f;
+			const float height = 100.0f;
+			ImGui::SetNextWindowSize(ImVec2(width, height));
+
+			if (ImGui::BeginPopupModal("##DeleteProjectPopupID", &toDelete, ImGuiWindowFlags_NoResize))
+			{
+				ImGui::Text("Are you sure you want to delete"); ImGui::SameLine();
+				ImGui::Text(m_ProjectNames[selected].c_str()); ImGui::SameLine();
+				ImGui::Text("project?"); ImGui::NewLine();
+
+				if (ImGui::Button("Yes"))
+				{
+					DeleteProject(m_ProjectNames[selected]);
+					ImGui::CloseCurrentPopup();
+				} ImGui::SameLine();
+
+				if (ImGui::Button("No"))
+				{
+					ImGui::CloseCurrentPopup();
+				}
+
+				ImGui::EndPopup();
+			}
+
+			ImGui::EndDisabled();
+		}
 
 		if (ImGui::Button("New"))
 			NewProject();
+
+		if (m_State == AppState::Load)
+		{
+			ImGui::SameLine(); ImGui::Text("                          "); ImGui::SameLine();
+
+			if (ImGui::Button("Cancel"))
+			{
+				m_State = AppState::Play;
+			}
+		}
 
 		ImGui::End();
 	}
@@ -239,7 +289,7 @@ namespace Exampler {
 	{
 		if (ImGui::BeginMenuBar())
 		{
-			// TODO: Finish
+
 			// Project menu
 			if (ImGui::BeginMenu("File"))
 			{
@@ -251,15 +301,12 @@ namespace Exampler {
 					m_NewPopupOpen = true;
 				}
 
-				// Should either be a drop down menu with all projects listed
-				// OR open file dialog to open a project XML
 				if (ImGui::MenuItem("Open"))
 				{
-
+					m_State = AppState::Load;
 				}
 
 				const auto untitled = std::string("Untitled");
-				// Should be disabled when Active Project has not been saved yet
 				ImGui::BeginDisabled(config.name == untitled);
 				if (ImGui::MenuItem("Save"))
 				{
@@ -355,7 +402,7 @@ namespace Exampler {
 		childFlags |= ImGuiWindowFlags_NoResize;
 		childFlags |= ImGuiWindowFlags_AlwaysVerticalScrollbar;
 
-		if (m_State == AppState::Start)
+		if (m_State != AppState::Play)
 			childFlags |= ImGuiWindowFlags_NoInputs;
 
 		unsigned int cCount = SetCanvasColors();
@@ -548,29 +595,49 @@ namespace Exampler {
 			ImGui::EndPopup();
 		}
 
-		// TODO: FINISH
 		// New Project Popup
 		if (m_NewPopupOpen)
-			ImGui::OpenPopup("NewPopupID");
-		if (ImGui::BeginPopup("NewPopupID"))
+			ImGui::OpenPopup("##NewPopupID");
+		if (ImGui::BeginPopupModal("##NewPopupID", &m_NewPopupOpen, ImGuiWindowFlags_NoResize))
 		{
-			ImGui::Text("WORK IN PROGRESS");
-			m_NewPopupOpen = false;
+			ImGui::Text("Save changes to"); ImGui::SameLine();
+			ImGui::Text(m_ActiveProject->GetConfig().name.c_str()); ImGui::SameLine();
+			ImGui::Text("before closing?");
+
+			if (ImGui::Button("Save"))
+			{
+				SaveProject();
+				NewProject();
+				m_NewPopupOpen = false;
+			}
+			ImGui::SameLine();
+
+			if (ImGui::Button("Don't Save"))
+			{
+				NewProject();
+				m_NewPopupOpen = false;
+			}
+			ImGui::SameLine();
+
+			if (ImGui::Button("Cancel"))
+			{
+				m_NewPopupOpen = false;
+			}
 
 			ImGui::EndPopup();
 		}
 
 		// SavingAs Project Popup
 		if (m_SaveAsPopupOpen)
-			ImGui::OpenPopup("SaveAsPopupID");
-		if (ImGui::BeginPopup("SaveAsPopupID"))
+			ImGui::OpenPopup("##SaveAsPopupID");
+		if (ImGui::BeginPopup("##SaveAsPopupID"))
 		{
 			BackBeat::ProjectConfig config = m_ActiveProject->GetConfig();
 			std::string oldName = config.name;
 			char changeName[128] = {};
 			bool opened = false;
 
-			ImGui::InputTextWithHint("Input New Project Name", oldName.c_str(), changeName,
+			ImGui::InputTextWithHint("Enter New Project Name", oldName.c_str(), changeName,
 				IM_ARRAYSIZE(changeName));
 			if (ImGui::IsItemDeactivated())
 			{
@@ -720,6 +787,15 @@ namespace Exampler {
 		m_EtyToDelete = nullptr;
 	}
 
+	void MainLayer::ClearEntities()
+	{
+		while (!m_Entities.empty())
+		{
+			m_EtyToDelete = m_Entities.front();
+			DeleteEntity();
+		}
+	}
+
 	bool MainLayer::LoadProject(std::string project)
 	{
 		// NOTE: Adding "\\" is a current lazy solution but this should happen in BackBeat::FileManager
@@ -734,10 +810,7 @@ namespace Exampler {
 			return false;
 		}
 
-		// TODO: DELETE WHEN DONE TESTING DESERIALIZATION
-		/**
-		// auto projectXMLName = project + ".xml";
-		auto projectXMLName = project + ".txt"; // TODO: DELETE, For testing
+		auto projectXMLName = project + ".xml";
 		auto projectXMLPath = projectMgr.GetFilePath(projectXMLName);
 
 		if (projectXMLPath.empty())
@@ -749,22 +822,16 @@ namespace Exampler {
 		}
 
 		m_ActiveProject = BackBeat::Project::Load(projectXMLPath);
-		/**/
-
-		std::string testPath = "C:\\Dev\\Testing\\BackBeat\\test.xml"; // TODO: DELETE AND USE FILEPATH
-		m_ActiveProject = BackBeat::Project::Load(testPath); // TODO: DELETE AND USE FILEPATH
 
 		if (!m_ActiveProject)
 		{
 			BB_CLIENT_ERROR("NOT A VALID PROJECT XML FILE! FAILED TO DESERIALIZE!");
-			// TODO: DELETE WHEN DONE TESTING DESERIALIZATION
-			// BB_CLIENT_ERROR("NOT A VALID PROJECT XML FILE! FAILED TO DESERIALIZE! \nFILE NAME: {0}\nFILE PATH: {1}",
-			//	projectXMLName.c_str(), projectXMLPath.c_str());
 			NewProject();
 			return false;
 		}
 		
-		Deserialize(testPath);
+		ClearEntities();
+		Deserialize(projectXMLPath);
 
 		m_State = AppState::Play;
 		return true;
@@ -786,8 +853,14 @@ namespace Exampler {
 		
 		case AppState::Play:
 		{
-			// Should clear all entities here
+			ClearEntities();
+			break;
+		}
 
+		case AppState::Load:
+		{
+			ClearEntities();
+			m_State = AppState::Play;
 			break;
 		}
 
@@ -809,6 +882,11 @@ namespace Exampler {
 		}
 
 		BackBeat::Project::SaveActive(m_ActiveProject->GetConfig().xmlFilePath);
+	}
+
+	void MainLayer::DeleteProject(std::string project)
+	{
+		m_FileMgr.DeleteSubDirectory(project);
 	}
 
 	// TODO: Implement after all Entity parameters are done
@@ -839,33 +917,24 @@ namespace Exampler {
 			return;
 		}
 
+		size_t numEntities = 0;
 		for (pugi::xml_node_iterator itr = objectsNode.begin(); itr != objectsNode.end(); itr++)
 		{
+			numEntities = m_Entities.size();
 			auto entityType = itr->name();
 			if (strcmp(entityType, "Synthesizer") == 0)
-			{
 				AddSynth();
-				m_Entities.back()->ReadObject(&(*itr));
-			}
 			else if (strcmp(entityType, "Sampler") == 0)
-			{
 				AddSampler();
-				m_Entities.back()->ReadObject(&(*itr));
-			}
 			else if (strcmp(entityType, "Playback") == 0)
-			{
 				AddPlaybackTrack();
-				m_Entities.back()->ReadObject(&(*itr));
-			}
 			else if (strcmp(entityType, "Recorder") == 0)
-			{
-				BB_CLIENT_ERROR("WORK IN PROGRESS FOR DESERIALIZING RECORDER");
-			}
+				AddRecordingTrack();
 			else
-			{
 				BB_CLIENT_ERROR("UNRECOGNIZED TRACK TYPE IN XML: {0}", entityType);
-			}
-			// TODO: Add other entities as needed
+
+			if (numEntities != m_Entities.size())
+				m_Entities.back()->ReadObject(&(*itr));
 		}
 
 	}

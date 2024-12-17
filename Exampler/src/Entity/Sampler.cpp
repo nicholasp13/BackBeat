@@ -202,7 +202,7 @@ namespace Exampler {
 			auto sampleProgrammer = m_Sampler.GetProgrammer();
 			auto padsNode = node->child("Pads");
 
-			int i = 0;
+			unsigned int i = 0;
 			for (pugi::xml_node_iterator itr = padsNode.begin(); itr != padsNode.end(); itr++)
 			{
 				pugi::xml_node padNode = *itr;

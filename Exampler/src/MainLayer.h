@@ -60,14 +60,14 @@ namespace Exampler {
 
 		enum class AppState
 		{
-			Start = 0, Play = 1
+			Start = 0, Play = 1, Load = 2
 		};
 
 		AppState m_State;
 
 	private:
 		// Rendering functions
-		void RenderStartup();
+		void RenderProjectMgr();
 		void RenderMenubar();
 		void RenderCanvas();
 		void RenderAudioVisualizer();
@@ -82,11 +82,13 @@ namespace Exampler {
 		void AddPlaybackTrack();
 		void AddRecordingTrack();
 		void DeleteEntity();
+		void ClearEntities();
 
 		// Project functions
 		bool LoadProject(std::string project);
 		void NewProject();
 		void SaveProject();
+		void DeleteProject(std::string project);
 		void Serialize(std::string filePath);
 		void Deserialize(std::string filePath);
 

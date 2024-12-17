@@ -13,8 +13,7 @@ namespace BackBeat {
 		~FileManager();
 
 		std::string CreateSubDirectory(std::string dir);
-		bool OpenSubDirectory(std::string subDir);
-		bool OpenParentDirectory();
+		void DeleteSubDirectory(std::string dir);
 
 		bool SetWorkingDirectory(std::string dir);
 

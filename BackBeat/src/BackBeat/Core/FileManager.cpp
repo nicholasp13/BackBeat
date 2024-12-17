@@ -27,18 +27,13 @@ namespace BackBeat {
 		return fullPathDir;
 	}
 
-	// TODO: FINISH
-	bool FileManager::OpenSubDirectory(std::string subDir)
+	void FileManager::DeleteSubDirectory(std::string dir)
 	{
+		auto path = Find(dir);
+		if (path.empty())
+			return;
 
-		return false;
-	}
-
-	// TODO: FINISH
-	bool FileManager::OpenParentDirectory()
-	{
-
-		return false;
+		std::filesystem::remove_all(path);
 	}
 
 	// TODO: Check if "//" is at the end of the filepath and if not: make sure it is added.
@@ -68,7 +63,7 @@ namespace BackBeat {
 		return targetFile.string();
 	}
 
-	// NOTE: Should give only name of the file not the fullpath. Assumes file is in current working directory
+	// NOTE: Should give only name of the file not the fullpath. Assumes directory is in current working directory
 	std::string FileManager::GetSubDirPath(std::string subDir)
 	{
 		auto targetSubDir = Find(subDir);
