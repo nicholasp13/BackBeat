@@ -147,7 +147,7 @@ namespace Exampler {
 			fileNode.append_attribute("Path");
 	}
 
-	// NOTE: - node is the node being written to. This is different to WriteObject() || Might want to specify in
+	// NOTE: - node is the node being read from. This is different to WriteObject() || Might want to specify in
 	//       function declaration
 	void PlaybackTrack::ReadObject(pugi::xml_node* node)
 	{

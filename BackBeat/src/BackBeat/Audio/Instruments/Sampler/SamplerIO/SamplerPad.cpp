@@ -52,6 +52,7 @@ namespace BackBeat {
 
 	void SamplerPad::SetSample(std::shared_ptr<Sample> newSample)
 	{
+		m_FilePath = newSample->GetFilePath();
 		m_Name = newSample->GetName();
 		m_Engine->SetSample(newSample, m_Index);
 	}

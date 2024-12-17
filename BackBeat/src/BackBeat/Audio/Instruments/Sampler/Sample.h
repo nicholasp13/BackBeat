@@ -18,6 +18,7 @@ namespace BackBeat {
 		inline bool IsActive() { return !m_Done && m_Position < m_Info.dataSize + m_Info.dataZero; }
 		inline unsigned int GetBytePosition() { return m_Position - m_Info.dataZero; }
 		inline unsigned int GetByteSize() { return m_Info.dataSize; }
+		inline std::string GetFilePath() { return m_Info.filePath; }
 		inline AudioInfo GetInfo() { return m_Info; }
 		inline std::string GetName() { return m_Info.name; }
 		inline AudioProps GetProps() { return m_Info.props; }

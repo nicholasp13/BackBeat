@@ -1,5 +1,6 @@
 // TODO: - Create ImGui Pad widget and Pad control popup/window
 //       - Fix panning volume level
+//       - Add panning to the SamplerPad class
 
 // NOTE: Current panning settings currently make the sample quieter compared to when the sample splicer makes them.
 
@@ -13,7 +14,6 @@ namespace Exampler {
 		m_CreatingSample(false),
 		m_ProgrammingNote(false),
 		m_DevicesOpen(0),
-		m_NumMIDIDevices(0),
 		m_PadToProgram(0),
 		m_RecordingPlayer(nullptr),
 		m_RecorderMgr(nullptr)
@@ -67,15 +67,15 @@ namespace Exampler {
 		ImGui::SetNextWindowPos(ImVec2(x, y), ImGuiCond_FirstUseEver);
 		ImGui::SetNextWindowSize(ImVec2(width, height), ImGuiCond_Once);
 		// Sampler flags
-		ImGuiWindowFlags sampler_window_flags = 0;
-		sampler_window_flags |= ImGuiWindowFlags_NoCollapse;
-		sampler_window_flags |= ImGuiWindowFlags_MenuBar;
-		sampler_window_flags |= ImGuiWindowFlags_NoResize;
+		ImGuiWindowFlags samplerWindowFlags = 0;
+		samplerWindowFlags |= ImGuiWindowFlags_NoCollapse;
+		samplerWindowFlags |= ImGuiWindowFlags_MenuBar;
+		samplerWindowFlags |= ImGuiWindowFlags_NoResize;
 
 		// Creates a label ID for ImGui::Begin() that avoids collision to other ImGui::Begin() calls with the same name
 		const std::string hashDivider = "###";
 		std::string labelID = m_Name.c_str() + hashDivider + samplerID.ToString();
-		ImGui::Begin(labelID.c_str(), &m_Open, sampler_window_flags);
+		ImGui::Begin(labelID.c_str(), &m_Open, samplerWindowFlags);
 
 		RenderMenuBar();
 		RenderSamplerPads();
@@ -128,6 +128,118 @@ namespace Exampler {
 		mixer->DeleteProcessor(trackPlayerID);
 		mixer->DeleteProcessor(sampleTrackPlayerID);
 		midiDeviceManager->DeleteOutput(midiInputID);
+	}
+
+	// NOTE: - node is the parent of the node being written to
+	//       - TODO: Still need to implement serializing RecordingTracks
+	void Sampler::WriteObject(pugi::xml_node* node)
+	{
+		auto samplerNode = node->append_child("Sampler");
+
+		samplerNode.append_attribute("Name") = m_Name;
+
+		// General Controls
+		{
+			auto keyboardControls = samplerNode.append_child("KeyboardControls");
+			keyboardControls.append_attribute("Active") = m_KeyboardActive;
+			
+			auto volumeNode = samplerNode.append_child("Volume");
+			volumeNode.append_attribute("Value") = m_Sampler.GetEngineParams()->volume;
+		}
+
+		// Sampler pads
+		{
+			auto sampleProgrammer = m_Sampler.GetProgrammer();
+			auto padsNode = samplerNode.append_child("Pads");
+
+			for (unsigned int i = 0; i < m_NumPads; i++) 
+			{
+				auto pad = sampleProgrammer->GetSamplePad(i);
+				auto padNode = padsNode.append_child("Pad");
+
+				padNode.append_attribute("Number") = i + 1;
+
+				auto fileNode = padNode.append_child("File");
+				fileNode.append_attribute("Name") = pad->GetName();
+				fileNode.append_attribute("Path") = pad->GetFilePath();
+
+				auto note = pad->GetNote();
+				auto noteNode = padNode.append_child("Note");
+				noteNode.append_attribute("Value") = note;
+				if (note == BackBeat::MIDI::NoteOff)
+					noteNode.append_attribute("Name") = "NOTE OFF";
+				else
+					noteNode.append_attribute("Name") = BackBeat::MIDI::MIDINoteNames[note];
+
+				auto loopNode = padNode.append_child("Loop");
+				loopNode.append_attribute("On") = pad->IsLooping();
+
+				auto volumeNode = padNode.append_child("Volume");
+				volumeNode.append_attribute("Value") = pad->GetDCAParameters()->volume;
+			}
+
+		}
+	}
+
+	// NOTE: - node is the node being read from. This is different to WriteObject() || Might want to specify in
+	//       function declaration
+	//       - TODO: Still need to implement serializing RecordingTracks
+	void Sampler::ReadObject(pugi::xml_node* node)
+	{
+		m_Name = node->attribute("Name").value();
+
+		// General Controls
+		{
+			auto keyboardControls = node->child("KeyboardControls");
+			m_KeyboardActive = keyboardControls.attribute("Active").as_bool();
+
+			auto volumeNode = node->child("Volume");
+			m_Sampler.GetEngineParams()->volume = volumeNode.attribute("Value").as_float();
+		}
+
+		// Sampler pads
+		{
+			auto sampleProgrammer = m_Sampler.GetProgrammer();
+			auto padsNode = node->child("Pads");
+
+			int i = 0;
+			for (pugi::xml_node_iterator itr = padsNode.begin(); itr != padsNode.end(); itr++)
+			{
+				pugi::xml_node padNode = *itr;
+				auto pad = sampleProgrammer->GetSamplePad(i);
+
+				if (padNode.attribute("Number").as_int() != i + 1)
+				{
+					BB_CLIENT_ERROR("ERROR DESERIALIZING XML FILE FOR SAMPLER. NUMBER OF PADS DID NOT ALIGN");
+					break;
+				}
+
+				auto fileNode = padNode.child("File");
+				
+				if (!fileNode.attribute("Name").empty())
+				{
+					std::string filePath = fileNode.attribute("Path").as_string();
+					sampleProgrammer->ProgramSample(i, filePath);
+				}
+
+				auto noteNode = padNode.child("Note");
+				sampleProgrammer->ProgramNote(i, noteNode.attribute("Value").as_uint());
+
+				auto loopNode = padNode.child("Loop");
+				if (loopNode.attribute("On").as_bool())
+					pad->LoopOn();
+				else
+					pad->LoopOff();
+
+				auto volumeNode = padNode.child("Volume");
+				pad->GetDCAParameters()->volume = volumeNode.attribute("Value").as_float();
+
+				i++;
+				if (i > m_NumPads)
+					break;
+			}
+
+		}
 	}
 
 	void Sampler::RenderCanvasEntity()
@@ -332,11 +444,11 @@ namespace Exampler {
 
 		ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing();
 
-		static ImGuiTableFlags table_flags = 0;
-		table_flags |= ImGuiTableFlags_RowBg;
-		table_flags |= ImGuiTableFlags_BordersH;
-		table_flags |= ImGuiTableFlags_BordersV;
-		ImGui::BeginTable("SampleEditor", 4, table_flags, ImVec2(0.0f, 0.0f), 0.0f);
+		static ImGuiTableFlags tableFlags = 0;
+		tableFlags |= ImGuiTableFlags_RowBg;
+		tableFlags |= ImGuiTableFlags_BordersH;
+		tableFlags |= ImGuiTableFlags_BordersV;
+		ImGui::BeginTable("SampleEditor", 4, tableFlags, ImVec2(0.0f, 0.0f), 0.0f);
 
 		for (unsigned int i = 0; i < m_NumPads; i++) {
 			ImGui::TableNextColumn();

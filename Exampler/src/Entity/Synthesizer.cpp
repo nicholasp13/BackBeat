@@ -919,7 +919,7 @@ namespace Exampler {
 
 	}
 
-	// NOTE: - node is the node being written to. This is different to WriteObject() || Might want to specify in
+	// NOTE: - node is the node being read from. This is different to WriteObject() || Might want to specify in
 	//       function declaration
 	//       - TODO: Still need to implement serializing RecordingTracks
 	void Synthesizer::ReadObject(pugi::xml_node* node)

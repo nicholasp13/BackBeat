@@ -41,7 +41,6 @@ namespace BackBeat {
 
 		std::shared_ptr<float[]> m_Buffer;
 		std::shared_ptr<SamplerEngineParameters> m_Params;
-		// std::vector< std::shared_ptr<DCAParameters> > m_Params;
 		std::unique_ptr<SamplerVoice> m_Voices[SamplerMaxVoices];
 		std::queue<MIDIEvent> m_MIDIEvents;
 

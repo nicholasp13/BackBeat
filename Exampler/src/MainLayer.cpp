@@ -847,10 +847,19 @@ namespace Exampler {
 				AddSynth();
 				m_Entities.back()->ReadObject(&(*itr));
 			}
+			else if (strcmp(entityType, "Sampler") == 0)
+			{
+				AddSampler();
+				m_Entities.back()->ReadObject(&(*itr));
+			}
 			else if (strcmp(entityType, "Playback") == 0)
 			{
 				AddPlaybackTrack();
 				m_Entities.back()->ReadObject(&(*itr));
+			}
+			else if (strcmp(entityType, "Recorder") == 0)
+			{
+				BB_CLIENT_ERROR("WORK IN PROGRESS FOR DESERIALIZING RECORDER");
 			}
 			else
 			{
