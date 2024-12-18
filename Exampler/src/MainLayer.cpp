@@ -1,8 +1,7 @@
 // TODO: - Create editable timeline for entity/track objects
-//       - Add ability to add tracks in menubar
-//       - Hide visualizer
 //       - Serialize MIDI devices
-//       - Load playback entity with its specific file and do not allow it to change after creation
+//       - Add the ability to save specific configs from certain entities i.e. Synth's to a config xml file
+//       - Add warning to save changes to current project when closing app
 
 // NOTE: BUG - Added m_Audio->Start() and m_Audio->Stop() during adding and deleting entities
 //       but when deserializing multiple entities it caused the AudioThread to block the 
@@ -13,8 +12,6 @@
 
 // TODO IMINENTLY:
 // - Serialize each entity's recorded track to the xml file
-// - Ask user if they want to save current project if they close window or open new project
-// - Redesign SaveAs popup
 
 #include "MainLayer.h"
 namespace Exampler {
@@ -24,6 +21,7 @@ namespace Exampler {
 		Layer("MainLayer"), 
 		m_NewPopupOpen(false),
 		m_SaveAsPopupOpen(false),
+		m_OpenAudioVisualizer(false),
 		m_NumMIDIDevices(0),
 		m_NumSynths(0),
 		m_NumSamplers(0),
@@ -157,8 +155,8 @@ namespace Exampler {
 
 			RenderMenubar();
 			RenderCanvas();
-			RenderAudioVisualizer();
 			RenderMgrs();
+			RenderAudioVisualizer();
 			RenderPopups();
 
 			ImGui::End();
@@ -167,10 +165,10 @@ namespace Exampler {
 		ImGui::PopStyleColor(count);
 	}
 
-	// TODO: Add delete
 	void MainLayer::RenderProjectMgr()
 	{
 		static int selected = -1;
+		static bool warning = false;
 
 		m_ProjectNames = m_FileMgr.GetSubDirNames();
 
@@ -217,7 +215,12 @@ namespace Exampler {
 				{
 					selected = i;
 					if (ImGui::IsMouseDoubleClicked(0))
-						LoadProject(m_ProjectNames[selected]);
+					{
+						if (m_State == AppState::Start)
+							LoadProject(m_ProjectNames[selected]);
+						else
+							warning = true;
+					}
 				}
 			}
 
@@ -226,15 +229,79 @@ namespace Exampler {
 			ImGui::PopStyleColor(cCount);
 		}
 
-		// Renders disabled Load and Delete buttons and Delete popup
+		ImGui::BeginDisabled(selected == -1);
+
+		// Renders Load button and popup
 		{
-			ImGui::BeginDisabled(selected == -1);
-
 			if (ImGui::Button("Load"))
-				LoadProject(m_ProjectNames[selected]);
+			{
+				if (m_State == AppState::Start)
+					LoadProject(m_ProjectNames[selected]);
+				else
+					warning = true;
+			}
 
-			ImGui::SameLine(); ImGui::Text("                         "); ImGui::SameLine();
+			const float width = 500.0f;
+			const float height = 100.0f;
+			ImGui::SetNextWindowSize(ImVec2(width, height));
 
+			if (warning)
+				ImGui::OpenPopup("##LoadWarningProjectPopupID");
+			if (ImGui::BeginPopupModal("##LoadWarningProjectPopupID", &warning, ImGuiWindowFlags_NoResize))
+			{
+				std::string activeProjectName = m_ActiveProject->GetConfig().name;
+				if (activeProjectName != "Untitled")
+				{
+					ImGui::Text("Save changes to"); ImGui::SameLine();
+					ImGui::Text(activeProjectName.c_str()); ImGui::SameLine();
+					ImGui::Text("before loading another project?");
+					ImGui::Text(" ");
+
+					if (ImGui::Button("Save"))
+					{
+						SaveProject();
+						LoadProject(m_ProjectNames[selected]);
+						warning = false;
+						ImGui::CloseCurrentPopup();
+					}
+					ImGui::SameLine();
+
+					if (ImGui::Button("Don't Save"))
+					{
+						LoadProject(m_ProjectNames[selected]);
+						warning = false;
+						ImGui::CloseCurrentPopup();
+					}
+					ImGui::SameLine();
+				}
+				else
+				{
+					ImGui::Text("Current project is unsaved.");
+					ImGui::Text("Do you wish to continue to load a different project?");
+
+					if (ImGui::Button("Continue"))
+					{
+						LoadProject(m_ProjectNames[selected]);
+						warning = false;
+						ImGui::CloseCurrentPopup();
+					}
+					ImGui::SameLine();
+				}
+
+				if (ImGui::Button("Cancel"))
+				{
+					warning = false;
+					ImGui::CloseCurrentPopup();
+				}
+
+				ImGui::EndPopup();
+			}
+		}
+
+		ImGui::SameLine(); ImGui::Text("                         "); ImGui::SameLine();
+
+		// Delete buttons and Delete popup
+		{
 			static bool toDelete = true;
 			if (ImGui::Button("Delete"))
 			{
@@ -254,7 +321,18 @@ namespace Exampler {
 
 				if (ImGui::Button("Yes"))
 				{
-					DeleteProject(m_ProjectNames[selected]);
+					std::string selecetedProject = m_ProjectNames[selected];
+					if (m_ActiveProject)
+					{
+						if (selecetedProject == m_ActiveProject->GetConfig().name)
+						{
+							NewProject();
+							m_State = AppState::Load;
+						}
+					}
+
+					DeleteProject(selecetedProject);
+
 					ImGui::CloseCurrentPopup();
 				} ImGui::SameLine();
 
@@ -262,12 +340,12 @@ namespace Exampler {
 				{
 					ImGui::CloseCurrentPopup();
 				}
-
 				ImGui::EndPopup();
 			}
 
-			ImGui::EndDisabled();
 		}
+
+		ImGui::EndDisabled();
 
 		if (ImGui::Button("New"))
 			NewProject();
@@ -323,7 +401,6 @@ namespace Exampler {
 				ImGui::EndMenu();
 			}
 				
-			// TODO: Add way to add tracks through this menu
 			// Entities menu
 			if (ImGui::BeginMenu("Tracks"))
 			{
@@ -338,6 +415,24 @@ namespace Exampler {
 				for (unsigned int i = 0; i < m_Entities.size(); i++)
 					RenderEntityMenubar(i);
 				
+				ImGui::Separator();
+
+				bool limitSynths = (m_NumSynths < MaxSynths);
+				if (ImGui::MenuItem("Add Synth", "", false, limitSynths))
+					AddSynth();
+
+				bool limitSamplers = (m_NumSamplers < MaxSamplers);
+				if (ImGui::MenuItem("Add Sampler", "", false, limitSamplers))
+					AddSampler();
+
+				bool limitPlayback = (m_NumPlayback < MaxPlayback);
+				if (ImGui::MenuItem("Add Playback Track", "", false, limitPlayback))
+					AddPlaybackTrack();
+
+				bool limitRecorders = (m_NumRecorders < MaxRecordingDevices);
+				if (ImGui::MenuItem("Add Recording Track", "", false, limitRecorders))
+					AddRecordingTrack();
+
 				ImGui::EndMenu();
 			}
 
@@ -454,11 +549,29 @@ namespace Exampler {
 		ImGui::PopStyleColor(cCount);
 	}
 
-	// TODO: Hide this initially
 	// BUG: When spamming the on and off button. It may cause the visuals to glitch (mostly show the data when it should have been flushed)
 	void MainLayer::RenderAudioVisualizer()
 	{
 		ImGui::Spacing();
+
+		if (!m_OpenAudioVisualizer)
+		{
+			if (ImGui::Button("Open Audio Visualizer"))
+			{
+				m_OpenAudioVisualizer = true;
+			}
+
+			return;
+		}
+
+		if (ImGui::Button("Close Audio Visualizer"))
+		{
+			m_OpenAudioVisualizer = false;;
+			m_Visualizer->Off();
+			return;
+		}
+
+		ImGui::Spacing(); ImGui::Separator(); ImGui::Spacing();
 
 		if (!m_Visualizer->IsOn())
 		{
@@ -479,7 +592,8 @@ namespace Exampler {
 		{
 			ImGui::Spacing();
 			std::string name = "Channel " + std::to_string(i + 1);
-			ImGui::PlotLines(name.c_str(), m_Visualizer->GetChannelBuffer(i), bufferSize, 1, "", visualMax * -1, visualMax, ImVec2(m_Window->GetWidth() - 200.0f, 60.0f));
+			ImGui::PlotLines(name.c_str(), m_Visualizer->GetChannelBuffer(i), bufferSize, 1, "", 
+				visualMax * -1, visualMax, ImVec2(m_Window->GetWidth() - 200.0f, 60.0f));
 		}
 
 
@@ -552,125 +666,171 @@ namespace Exampler {
 	void MainLayer::RenderPopups()
 	{
 		// Renaming Entity Popup
-		if (m_EtyToRename)
-			ImGui::OpenPopup("RenamePopupID");
-		if (ImGui::BeginPopup("RenamePopupID"))
 		{
-			char changeName[128] = {};
-			bool opened = false;
-			ImGui::InputTextWithHint("Input New Name", m_EtyToRename->GetName().c_str(), changeName, IM_ARRAYSIZE(changeName));
-			if (ImGui::IsItemDeactivated())
+			if (m_EtyToRename)
+				ImGui::OpenPopup("RenamePopupID");
+			if (ImGui::BeginPopup("RenamePopupID"))
 			{
-				auto newName = std::string(changeName);
-				if (newName.size() > 0)
-					m_EtyToRename->SetName(newName);
-				m_EtyToRename = nullptr;
-				ImGui::CloseCurrentPopup();
+				char changeName[128] = {};
+				bool opened = false;
+				ImGui::InputTextWithHint("Input New Name", m_EtyToRename->GetName().c_str(), changeName, IM_ARRAYSIZE(changeName));
+				if (ImGui::IsItemDeactivated())
+				{
+					auto newName = std::string(changeName);
+					if (newName.size() > 0)
+						m_EtyToRename->SetName(newName);
+					m_EtyToRename = nullptr;
+					ImGui::CloseCurrentPopup();
+				}
+
+				ImGui::EndPopup();
 			}
-			
-			ImGui::EndPopup();
 		}
 
 		// Deleting Entity Popup
-		if (m_EtyToDelete)
-			ImGui::OpenPopup("DeletePopupID");
-		if (ImGui::BeginPopup("DeletePopupID"))
 		{
-			ImGui::Text("Are you sure you want to delete"); ImGui::SameLine();
-			ImGui::Text(m_EtyToDelete->GetName().c_str()); ImGui::SameLine();
-			ImGui::Text("?");
-
-			if(ImGui::Button("Yes"))
+			if (m_EtyToDelete)
+				ImGui::OpenPopup("DeletePopupID");
+			if (ImGui::BeginPopup("DeletePopupID"))
 			{
-				DeleteEntity();
-				ImGui::CloseCurrentPopup();
-			} ImGui::SameLine();
+				ImGui::Text("Are you sure you want to delete"); ImGui::SameLine();
+				ImGui::Text(m_EtyToDelete->GetName().c_str()); ImGui::SameLine();
+				ImGui::Text("?");
 
-			if (ImGui::Button("No"))
-			{
-				m_EtyToDelete = nullptr;
-				ImGui::CloseCurrentPopup();
+				if (ImGui::Button("Yes"))
+				{
+					DeleteEntity();
+					ImGui::CloseCurrentPopup();
+				} ImGui::SameLine();
+
+				if (ImGui::Button("No"))
+				{
+					m_EtyToDelete = nullptr;
+					ImGui::CloseCurrentPopup();
+				}
+
+				ImGui::EndPopup();
 			}
-
-			ImGui::EndPopup();
 		}
 
 		// New Project Popup
-		if (m_NewPopupOpen)
-			ImGui::OpenPopup("##NewPopupID");
-		if (ImGui::BeginPopupModal("##NewPopupID", &m_NewPopupOpen, ImGuiWindowFlags_NoResize))
 		{
-			ImGui::Text("Save changes to"); ImGui::SameLine();
-			ImGui::Text(m_ActiveProject->GetConfig().name.c_str()); ImGui::SameLine();
-			ImGui::Text("before closing?");
+			const float width = 500.0f;
+			const float height = 100.0f;
+			ImGui::SetNextWindowSize(ImVec2(width, height));
 
-			if (ImGui::Button("Save"))
+			if (m_NewPopupOpen)
+				ImGui::OpenPopup("##NewPopupID");
+			if (ImGui::BeginPopupModal("##NewPopupID", &m_NewPopupOpen, ImGuiWindowFlags_NoResize))
 			{
-				SaveProject();
-				NewProject();
-				m_NewPopupOpen = false;
-			}
-			ImGui::SameLine();
+				std::string activeProjectName = m_ActiveProject->GetConfig().name;
+				if (activeProjectName != "Untitled")
+				{
+					ImGui::Text("Save changes to"); ImGui::SameLine();
+					ImGui::Text(activeProjectName.c_str()); ImGui::SameLine();
+					ImGui::Text("before closing?");
 
-			if (ImGui::Button("Don't Save"))
-			{
-				NewProject();
-				m_NewPopupOpen = false;
-			}
-			ImGui::SameLine();
+					if (ImGui::Button("Save"))
+					{
+						SaveProject();
+						NewProject();
+						m_NewPopupOpen = false;
+					}
+					ImGui::SameLine();
 
-			if (ImGui::Button("Cancel"))
-			{
-				m_NewPopupOpen = false;
-			}
+					if (ImGui::Button("Don't Save"))
+					{
+						NewProject();
+						m_NewPopupOpen = false;
+						ImGui::CloseCurrentPopup();
+					}
+					ImGui::SameLine();
 
-			ImGui::EndPopup();
+				}
+				else
+				{
+					ImGui::Text("Current project is unsaved.");
+					ImGui::Text("Do you wish to continue to a new project?");
+
+					if (ImGui::Button("Continue"))
+					{
+						NewProject();
+						m_NewPopupOpen = false;
+						ImGui::CloseCurrentPopup();
+					}
+					ImGui::SameLine();
+				}
+
+				if (ImGui::Button("Cancel"))
+				{
+					m_NewPopupOpen = false;
+					ImGui::CloseCurrentPopup();
+				}
+
+				ImGui::EndPopup();
+			}
 		}
 
 		// SavingAs Project Popup
-		if (m_SaveAsPopupOpen)
-			ImGui::OpenPopup("##SaveAsPopupID");
-		if (ImGui::BeginPopup("##SaveAsPopupID"))
 		{
-			BackBeat::ProjectConfig config = m_ActiveProject->GetConfig();
-			std::string oldName = config.name;
-			char changeName[128] = {};
-			bool opened = false;
+			const float width = 500.0f;
+			const float height = 125.0f;
+			ImGui::SetNextWindowSize(ImVec2(width, height));
 
-			ImGui::InputTextWithHint("Enter New Project Name", oldName.c_str(), changeName,
-				IM_ARRAYSIZE(changeName));
-			if (ImGui::IsItemDeactivated())
+			if (m_SaveAsPopupOpen)
+				ImGui::OpenPopup("##SaveAsPopupID");
+			if (ImGui::BeginPopupModal("##SaveAsPopupID", &m_SaveAsPopupOpen, ImGuiWindowFlags_NoResize))
 			{
+				const std::string untitled = "Untitled";
+				bool valid = true;
+
+				BackBeat::ProjectConfig config = m_ActiveProject->GetConfig();
+				std::string oldName = config.name;
+				char changeName[128] = {};
+				bool opened = false;
+
+				ImGui::Text("Enter name");
+				ImGui::InputTextWithHint("##ProjectInputText", untitled.c_str(), changeName,
+					IM_ARRAYSIZE(changeName));
+
 				auto newName = std::string(changeName);
-				if (newName.size() > 0 && newName != oldName)
+
+				if (m_FileMgr.Exists(newName) && newName.size() > 0)
 				{
-					// TODO: Add user ability to overwrite
-					if (m_FileMgr.Exists(newName))
-					{
-						BB_CLIENT_ERROR("Project name taken");
-					}
-					else
-					{
-
-						m_ActiveProject = BackBeat::Project::New();
-						m_ActiveProject->GetConfig().app = "Exampler";
-						m_ActiveProject->GetConfig().name = newName;
-
-						auto projectDirPath = m_FileMgr.CreateSubDirectory(newName);
-						m_ActiveProject->GetConfig().projectDirectoryPath = projectDirPath;
-
-						auto xmlFilePath = projectDirPath + newName + ".xml";
-						m_ActiveProject->GetConfig().xmlFilePath = xmlFilePath;
-
-						SaveProject();
-					}
+					ImGui::Text("Invalid! Name taken!");
+					valid = false;
 				}
-				ImGui::CloseCurrentPopup();
-			}
-			m_SaveAsPopupOpen = false;
+				else if (newName == untitled)
+				{
+					ImGui::Text("Invalid name!");
+					valid = false;
+				}
+				else
+				{
+					ImGui::Text(" "); 
+					valid = true;
+				}
 
-			ImGui::EndPopup();
+				ImGui::BeginDisabled(!(newName.size() > 0 && newName != oldName) || !valid);
+				if (ImGui::Button("Save"))
+				{
+					SaveAsProject(newName);
+					m_SaveAsPopupOpen = false;
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::EndDisabled();
+
+				ImGui::SameLine();
+				if (ImGui::Button("Cancel"))
+				{
+					m_SaveAsPopupOpen = false;
+					ImGui::CloseCurrentPopup();
+				}
+
+				ImGui::EndPopup();
+			}
 		}
+
 	}
 
 	void MainLayer::AddSynth()
@@ -711,7 +871,22 @@ namespace Exampler {
 
 		auto playback = std::make_shared<PlaybackTrack>();
 		playback->Add(m_PlayerMgr, m_RecorderMgr, m_AudioRenderer->GetMixer(), m_MIDIDeviceManager);
-		std::string playerName = "Player " + std::to_string(++m_NumPlayback);
+		std::string playerName = "Playback " + std::to_string(++m_NumPlayback);
+		playback->SetName(playerName);
+		m_Entities.push_back(playback);
+
+		// m_Audio->Start();
+	}
+
+	void MainLayer::AddPlaybackTrack(std::string filePath)
+	{
+		if (m_NumPlayback >= MaxPlayback)
+			return;
+		// m_Audio->Stop();
+
+		auto playback = std::make_shared<PlaybackTrack>();
+		playback->Add(m_PlayerMgr, m_RecorderMgr, m_AudioRenderer->GetMixer(), m_MIDIDeviceManager, filePath);
+		std::string playerName = "Playback " + std::to_string(++m_NumPlayback);
 		playback->SetName(playerName);
 		m_Entities.push_back(playback);
 
@@ -884,6 +1059,36 @@ namespace Exampler {
 		BackBeat::Project::SaveActive(m_ActiveProject->GetConfig().xmlFilePath);
 	}
 
+	void MainLayer::SaveAsProject(std::string project)
+	{
+		const std::string untitled = "Untitled";
+
+		if (project == untitled)
+		{
+			BB_CLIENT_ERROR("Invalid project name");
+		}
+		// TODO: Add user ability to overwrite
+		else if (m_FileMgr.Exists(project))
+		{
+			BB_CLIENT_ERROR("Project name taken");
+		}
+		else
+		{
+
+			m_ActiveProject = BackBeat::Project::New();
+			m_ActiveProject->GetConfig().app = "Exampler";
+			m_ActiveProject->GetConfig().name = project;
+
+			auto projectDirPath = m_FileMgr.CreateSubDirectory(project);
+			m_ActiveProject->GetConfig().projectDirectoryPath = projectDirPath;
+
+			auto xmlFilePath = projectDirPath + project + ".xml";
+			m_ActiveProject->GetConfig().xmlFilePath = xmlFilePath;
+
+			SaveProject();
+		}
+	}
+
 	void MainLayer::DeleteProject(std::string project)
 	{
 		m_FileMgr.DeleteSubDirectory(project);
@@ -927,7 +1132,13 @@ namespace Exampler {
 			else if (strcmp(entityType, "Sampler") == 0)
 				AddSampler();
 			else if (strcmp(entityType, "Playback") == 0)
-				AddPlaybackTrack();
+			{
+				std::string filePath = itr->child("File").attribute("Path").as_string();
+				if (filePath.empty())
+					AddPlaybackTrack();
+				else
+					AddPlaybackTrack(filePath);
+			}
 			else if (strcmp(entityType, "Recorder") == 0)
 				AddRecordingTrack();
 			else

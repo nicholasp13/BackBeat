@@ -541,8 +541,6 @@ namespace Exampler {
 
 		ImGui::EndTable();
 
-		// TODO: Add ModMatrix here
-
 		ImGui::End();
 
 		ImGui::PopStyleColor(count);
@@ -704,7 +702,7 @@ namespace Exampler {
 
 			auto oscNode = synthNode.append_child("Oscillator1");
 
-			oscNode.append_child("Octave").append_attribute("Value") = oscParams->octave;
+			oscNode.append_child("Octave").append_attribute("Value") = m_Octave1;
 
 			auto waveformNode = oscNode.append_child("Waveform");
 
@@ -759,7 +757,7 @@ namespace Exampler {
 
 			auto oscNode = synthNode.append_child("Oscillator2");
 
-			oscNode.append_child("Octave").append_attribute("Value") = oscParams->octave;
+			oscNode.append_child("Octave").append_attribute("Value") = m_Octave2;
 
 			auto waveformNode = oscNode.append_child("Waveform");
 
@@ -814,7 +812,7 @@ namespace Exampler {
 
 			auto oscNode = synthNode.append_child("Oscillator3");
 
-			oscNode.append_child("Octave").append_attribute("Value") = oscParams->octave;
+			oscNode.append_child("Octave").append_attribute("Value") = m_Octave3;
 
 			auto waveformNode = oscNode.append_child("Waveform");
 
@@ -869,7 +867,7 @@ namespace Exampler {
 
 			auto oscNode = synthNode.append_child("Oscillator4");
 
-			oscNode.append_child("Octave").append_attribute("Value") = oscParams->octave;
+			oscNode.append_child("Octave").append_attribute("Value") = m_Octave4;
 
 			auto waveformNode = oscNode.append_child("Waveform");
 
@@ -1026,7 +1024,8 @@ namespace Exampler {
 
 			auto oscNode = node->child("Oscillator1");
 
-			oscParams->octave = oscNode.child("Octave").attribute("Value").as_float();
+			m_Octave1 = oscNode.child("Octave").attribute("Value").as_int();
+			oscParams->octave = pow(2.0f, (float)m_Octave1);
 
 			auto waveformNode = oscNode.child("Waveform");
 
@@ -1075,7 +1074,8 @@ namespace Exampler {
 
 			auto oscNode = node->child("Oscillator2");
 
-			oscParams->octave = oscNode.child("Octave").attribute("Value").as_float();
+			m_Octave2 = oscNode.child("Octave").attribute("Value").as_int();
+			oscParams->octave = pow(2.0f, (float)m_Octave2);
 
 			auto waveformNode = oscNode.child("Waveform");
 
@@ -1124,7 +1124,8 @@ namespace Exampler {
 
 			auto oscNode = node->child("Oscillator3");
 
-			oscParams->octave = oscNode.child("Octave").attribute("Value").as_float();
+			m_Octave3 = oscNode.child("Octave").attribute("Value").as_int();
+			oscParams->octave = pow(2.0f, (float)m_Octave3);
 
 			auto waveformNode = oscNode.child("Waveform");
 
@@ -1173,7 +1174,8 @@ namespace Exampler {
 
 			auto oscNode = node->child("Oscillator4");
 
-			oscParams->octave = oscNode.child("Octave").attribute("Value").as_float();
+			m_Octave4 = oscNode.child("Octave").attribute("Value").as_int();
+			oscParams->octave = pow(2.0f, (float)m_Octave4);
 
 			auto waveformNode = oscNode.child("Waveform");
 

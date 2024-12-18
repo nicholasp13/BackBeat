@@ -42,15 +42,9 @@ namespace Exampler {
 				m_Player->Off();
 		} ImGui::SameLine();
 
-		if (ImGui::Button("Open file"))
-		{
-			m_Player->Pause();
-			m_Player->LoadTrack(BackBeat::FileDialog::OpenFile("WAV Files (*.wav)\0*.wav\0"));
-		}
-
 		// Render Playback controls/info
 		{
-			ImGui::Text("Title:"); ImGui::SameLine();
+			// ImGui::Text("Title:"); ImGui::SameLine();
 			ImGui::Text(m_Player->GetTrackName().c_str());
 
 			BackBeat::TimeMinSec trackTime = m_Player->GetTime();
@@ -112,6 +106,19 @@ namespace Exampler {
 	{
 		m_Player = playerMgr->AddNewPlayer();
 		mixer->PushProcessor(m_Player->GetProc());
+		m_Player->LoadTrack(BackBeat::FileDialog::OpenFile("WAV Files (*.wav)\0*.wav\0"));
+	}
+
+	void PlaybackTrack::Add(
+		BackBeat::PlayerManager* playerMgr,
+		BackBeat::RecorderManager* recorderMgr,
+		BackBeat::Mixer* mixer,
+		BackBeat::MIDIDeviceManager* midiDeviceManager,
+		std::string filePath)
+	{
+		m_Player = playerMgr->AddNewPlayer();
+		mixer->PushProcessor(m_Player->GetProc());
+		m_Player->LoadTrack(filePath);
 	}
 
 	void PlaybackTrack::Delete(

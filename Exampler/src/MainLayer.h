@@ -35,6 +35,7 @@ namespace Exampler {
 	private:
 		bool m_NewPopupOpen;
 		bool m_SaveAsPopupOpen;
+		bool m_OpenAudioVisualizer;
 		unsigned int m_NumMIDIDevices;
 		unsigned int m_NumSynths;
 		unsigned int m_NumSamplers;
@@ -80,6 +81,7 @@ namespace Exampler {
 		void AddSynth();
 		void AddSampler();
 		void AddPlaybackTrack();
+		void AddPlaybackTrack(std::string filePath);
 		void AddRecordingTrack();
 		void DeleteEntity();
 		void ClearEntities();
@@ -88,6 +90,7 @@ namespace Exampler {
 		bool LoadProject(std::string project);
 		void NewProject();
 		void SaveProject();
+		void SaveAsProject(std::string project);
 		void DeleteProject(std::string project);
 		void Serialize(std::string filePath);
 		void Deserialize(std::string filePath);

@@ -45,6 +45,12 @@ namespace Exampler {
 
 		// Playback functions
 		inline std::shared_ptr<BackBeat::PlayerProcessor> GetProc() { return m_Player->GetProc(); }
+		void Add(
+			BackBeat::PlayerManager* playerMgr,
+			BackBeat::RecorderManager* recorderMgr,
+			BackBeat::Mixer* mixer,
+			BackBeat::MIDIDeviceManager* midiDeviceManager,
+			std::string filePath);
 
 	private:
 		float m_Volume;
