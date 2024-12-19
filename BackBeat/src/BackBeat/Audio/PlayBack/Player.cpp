@@ -138,6 +138,13 @@ namespace BackBeat {
 		return "";
 	}
 
+	std::string Player::GetTrackFilePath()
+	{
+		if (m_SelectedTrack)
+			return m_SelectedTrack->GetFilePath();
+		return "";
+	}
+
 	void Player::SetPosition(unsigned int pos)
 	{
 		if (m_SelectedTrack)

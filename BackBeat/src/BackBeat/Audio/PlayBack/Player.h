@@ -32,6 +32,7 @@ namespace BackBeat {
 		unsigned int GetStartPosition();
 		unsigned int GetEndPosition();
 		std::string GetTrackName();
+		std::string GetTrackFilePath();
 		void SetPosition(unsigned int pos);
 		void SetStart(unsigned int start);
 		void SetEnd(unsigned int end);

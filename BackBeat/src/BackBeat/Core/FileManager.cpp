@@ -36,6 +36,17 @@ namespace BackBeat {
 		std::filesystem::remove_all(path);
 	}
 
+	void FileManager::MoveFileFullpath(std::string to, std::string from)
+	{
+		std::filesystem::path target = to;
+		std::filesystem::path source = from;
+
+		if (!std::filesystem::exists(target) || !std::filesystem::exists(source))
+			return;
+
+		std::filesystem::rename(source, target);
+	}
+
 	// TODO: Check if "//" is at the end of the filepath and if not: make sure it is added.
 	bool FileManager::SetWorkingDirectory(std::string dir)
 	{

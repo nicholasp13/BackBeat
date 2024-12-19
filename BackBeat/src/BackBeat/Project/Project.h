@@ -12,6 +12,7 @@ namespace BackBeat {
 		std::string app = "";
 		std::string name = "Untitled";
 		std::string projectDirectoryPath = "";
+		std::string tracksDirectoryPath = "";
 		std::string xmlFilePath = "";
 		std::vector< std::shared_ptr<Serializable> > objectList;
 	};

@@ -14,6 +14,7 @@ namespace BackBeat {
 
 		std::string CreateSubDirectory(std::string dir);
 		void DeleteSubDirectory(std::string dir);
+		void MoveFileFullpath(std::string to, std::string from);
 
 		bool SetWorkingDirectory(std::string dir);
 

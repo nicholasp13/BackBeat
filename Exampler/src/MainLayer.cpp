@@ -782,12 +782,12 @@ namespace Exampler {
 			if (ImGui::BeginPopupModal("##SaveAsPopupID", &m_SaveAsPopupOpen, ImGuiWindowFlags_NoResize))
 			{
 				const std::string untitled = "Untitled";
-				bool valid = true;
+				static bool valid = true;
 
 				BackBeat::ProjectConfig config = m_ActiveProject->GetConfig();
 				std::string oldName = config.name;
-				char changeName[128] = {};
-				bool opened = false;
+				const int nameSize = 128;
+				static char changeName[nameSize] = {};
 
 				ImGui::Text("Enter name");
 				ImGui::InputTextWithHint("##ProjectInputText", untitled.c_str(), changeName,
@@ -811,11 +811,12 @@ namespace Exampler {
 					valid = true;
 				}
 
-				ImGui::BeginDisabled(!(newName.size() > 0 && newName != oldName) || !valid);
+				ImGui::BeginDisabled(!valid);
 				if (ImGui::Button("Save"))
 				{
 					SaveAsProject(newName);
 					m_SaveAsPopupOpen = false;
+					memset(changeName, 0, nameSize * sizeof(char));
 					ImGui::CloseCurrentPopup();
 				}
 				ImGui::EndDisabled();
@@ -824,6 +825,7 @@ namespace Exampler {
 				if (ImGui::Button("Cancel"))
 				{
 					m_SaveAsPopupOpen = false;
+					memset(changeName, 0, nameSize * sizeof(char));
 					ImGui::CloseCurrentPopup();
 				}
 
@@ -1016,6 +1018,7 @@ namespace Exampler {
 	{
 		m_ActiveProject = BackBeat::Project::New();
 		m_ActiveProject->GetConfig().app = "Exampler";
+		m_ActiveProject->GetConfig().tracksDirectoryPath = BackBeat::FileSystem::GetTempDir();
 
 		switch (m_State)
 		{
@@ -1067,7 +1070,6 @@ namespace Exampler {
 		{
 			BB_CLIENT_ERROR("Invalid project name");
 		}
-		// TODO: Add user ability to overwrite
 		else if (m_FileMgr.Exists(project))
 		{
 			BB_CLIENT_ERROR("Project name taken");
@@ -1081,6 +1083,11 @@ namespace Exampler {
 
 			auto projectDirPath = m_FileMgr.CreateSubDirectory(project);
 			m_ActiveProject->GetConfig().projectDirectoryPath = projectDirPath;
+
+			auto projectFileMgr = BackBeat::FileManager();
+			projectFileMgr.SetWorkingDirectory(projectDirPath);
+			std::string trackSubDir = "Tracks";
+			m_ActiveProject->GetConfig().tracksDirectoryPath = projectFileMgr.CreateSubDirectory(trackSubDir);
 
 			auto xmlFilePath = projectDirPath + project + ".xml";
 			m_ActiveProject->GetConfig().xmlFilePath = xmlFilePath;

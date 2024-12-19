@@ -915,6 +915,20 @@ namespace Exampler {
 			oscNode.append_child("Amp").append_attribute("Value") = oscParams->amp;
 		}
 
+		// Audio track
+		{
+			// Copy/move track from temp folder to the project folder
+			auto trackNode = synthNode.append_child("Track");
+
+			std::string trackName = m_RecordingPlayer->GetTrackName();
+			std::string fromFilePath = m_RecordingPlayer->GetTrackFilePath();
+			std::string toFilePath = BackBeat::Project::GetActive()->GetConfig().tracksDirectoryPath + trackName;
+
+			BB_CLIENT_INFO("SYNTH TRACK FORMER PATH: {0}", fromFilePath.c_str());
+			BB_CLIENT_INFO("SYNTH TRACK TO PATH: {0}", toFilePath.c_str());
+
+			// Move file here
+		}
 	}
 
 	// NOTE: - node is the node being read from. This is different to WriteObject() || Might want to specify in
