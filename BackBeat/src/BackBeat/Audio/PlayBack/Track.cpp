@@ -1,6 +1,8 @@
 #include "bbpch.h"
 
 #include "BackBeat/Audio/Helpers/int24.h"
+#include "BackBeat/Audio/FileIO/AudioFileReader.h"
+#include "BackBeat/Audio/FileIO/AudioFileWriter.h"
 #include "Track.h"
 namespace BackBeat {
 
@@ -77,6 +79,45 @@ namespace BackBeat {
 
 		file.close();
 		return true;
+	}
+
+	// Rewrites/replaces current data data. May want to move this somewhere else for better SRP. Fine for now.
+	bool Track::CopyData(AudioInfo srcInfo)
+	{
+		if (m_Info.props != srcInfo.props)
+			return false;
+		if (m_Info.type != FileType::recordingTemp)
+			return false;
+			
+		std::remove(m_Info.filePath.c_str());
+
+		const unsigned int arraySize = 5000;
+		char data[arraySize] = {};
+		unsigned int size = srcInfo.dataSize + srcInfo.dataZero;
+		const unsigned int dataSize = arraySize;
+		const unsigned int fileSize = size;
+		unsigned int filePosition = srcInfo.dataZero;
+		unsigned int dataIncrement = dataSize;
+		 
+		bool success = true;
+		while (filePosition < fileSize && success)
+		{
+			dataIncrement = (dataSize + filePosition) <= fileSize ? dataSize : (fileSize - filePosition);
+			success = AudioFileReader::ReadAudioFileData(srcInfo.filePath, data, filePosition, dataIncrement);
+			success = AudioFileWriter::WriteAudioFileData(m_Info.filePath, data, dataIncrement);
+			filePosition += dataIncrement;
+		}
+
+		if (success)
+		{
+			m_Info.dataSize = srcInfo.dataSize;
+			m_Info.props.fileSize = srcInfo.props.fileSize;
+			m_StartPosition = 0;
+			m_Position = 0;
+			m_EndPosition = srcInfo.dataSize;
+		}
+
+		return success;
 	}
 
 	TimeMinSec Track::GetTime()

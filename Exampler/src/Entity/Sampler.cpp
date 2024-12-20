@@ -179,11 +179,30 @@ namespace Exampler {
 			}
 
 		}
+
+		// Audio track
+		{
+			auto trackNode = samplerNode.append_child("Track");
+
+			std::shared_ptr<BackBeat::Track> track = m_RecordingPlayer->GetTrack();
+			if (track)
+			{
+				std::string trackFilePath = BackBeat::Project::GetActive()->GetConfig().tracksDirectoryPath
+					+ m_Name + ".wav";
+
+				if (BackBeat::WAVFileBuilder::BuildWAVFile(track.get(), track->GetStart(), track->GetEnd(), trackFilePath))
+					trackNode.append_attribute("FilePath") = trackFilePath;
+				else
+					trackNode.append_attribute("FilePath") = "";
+			}
+			else
+				trackNode.append_attribute("FilePath") = "";
+		}
+
 	}
 
 	// NOTE: - node is the node being read from. This is different to WriteObject() || Might want to specify in
 	//       function declaration
-	//       - TODO: Still need to implement serializing RecordingTracks
 	void Sampler::ReadObject(pugi::xml_node* node)
 	{
 		m_Name = node->attribute("Name").value();
@@ -239,6 +258,19 @@ namespace Exampler {
 					break;
 			}
 
+		}
+
+		// Audio track
+		{
+			auto trackNode = node->child("Track");
+			std::string trackFilePath = trackNode.attribute("FilePath").as_string();
+
+			if (!trackFilePath.empty())
+			{
+				BackBeat::AudioInfo info = BackBeat::AudioFileReader::ReadFile(trackFilePath);
+				if (!m_RecordingPlayer->GetTrack()->CopyData(info))
+					BB_CLIENT_ERROR("ERROR LOADING AUDIO FILE FOR {0} from {1}", m_Name.c_str(), trackFilePath.c_str());
+			}
 		}
 	}
 

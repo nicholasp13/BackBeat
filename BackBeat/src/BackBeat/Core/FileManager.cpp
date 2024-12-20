@@ -41,7 +41,7 @@ namespace BackBeat {
 		std::filesystem::path target = to;
 		std::filesystem::path source = from;
 
-		if (!std::filesystem::exists(target) || !std::filesystem::exists(source))
+		if (!std::filesystem::exists(source))
 			return;
 
 		std::filesystem::rename(source, target);

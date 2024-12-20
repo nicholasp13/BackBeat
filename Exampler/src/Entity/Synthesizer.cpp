@@ -917,23 +917,26 @@ namespace Exampler {
 
 		// Audio track
 		{
-			// Copy/move track from temp folder to the project folder
 			auto trackNode = synthNode.append_child("Track");
 
-			std::string trackName = m_RecordingPlayer->GetTrackName();
-			std::string fromFilePath = m_RecordingPlayer->GetTrackFilePath();
-			std::string toFilePath = BackBeat::Project::GetActive()->GetConfig().tracksDirectoryPath + trackName;
+			std::shared_ptr<BackBeat::Track> track = m_RecordingPlayer->GetTrack();
+			if (track)
+			{
+				std::string trackFilePath = BackBeat::Project::GetActive()->GetConfig().tracksDirectoryPath
+					+ m_Name + ".wav";
 
-			BB_CLIENT_INFO("SYNTH TRACK FORMER PATH: {0}", fromFilePath.c_str());
-			BB_CLIENT_INFO("SYNTH TRACK TO PATH: {0}", toFilePath.c_str());
-
-			// Move file here
+				if (BackBeat::WAVFileBuilder::BuildWAVFile(track.get(), track->GetStart(), track->GetEnd(), trackFilePath))
+					trackNode.append_attribute("FilePath") = trackFilePath;
+				else
+					trackNode.append_attribute("FilePath") = "";
+			}
+			else
+				trackNode.append_attribute("FilePath") = "";
 		}
 	}
 
 	// NOTE: - node is the node being read from. This is different to WriteObject() || Might want to specify in
 	//       function declaration
-	//       - TODO: Still need to implement serializing RecordingTracks
 	void Synthesizer::ReadObject(pugi::xml_node* node)
 	{
 		m_Name = node->attribute("Name").as_string();
@@ -1228,6 +1231,19 @@ namespace Exampler {
 			}
 
 			oscParams->amp = oscNode.child("Amp").attribute("Value").as_float();
+		}
+
+		// Audio track
+		{
+			auto trackNode = node->child("Track");
+			std::string trackFilePath = trackNode.attribute("FilePath").as_string();
+
+			if (!trackFilePath.empty())
+			{
+				BackBeat::AudioInfo info = BackBeat::AudioFileReader::ReadFile(trackFilePath);
+				if (!m_RecordingPlayer->GetTrack()->CopyData(info))
+					BB_CLIENT_ERROR("ERROR LOADING AUDIO FILE FOR {0} from {1}", m_Name.c_str(), trackFilePath.c_str());
+			}
 		}
 
 	}

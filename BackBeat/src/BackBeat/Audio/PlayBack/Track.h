@@ -10,6 +10,8 @@ namespace BackBeat {
 		~Track();
 
 		bool Render(byte* output, unsigned int numBytes);	
+		bool CopyData(AudioInfo srcInfo);
+
 		TimeMinSec GetTime();
 		TimeMinSec GetLength();
 		void SetPosition(unsigned int position);

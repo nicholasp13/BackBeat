@@ -7,5 +7,6 @@ namespace BackBeat {
 	namespace WAVFileBuilder
 	{
 		bool BuildWAVFile(Track* track, unsigned int start, unsigned int end);
+		bool BuildWAVFile(Track* track, unsigned int start, unsigned int end, std::string filePath);
 	}
 }

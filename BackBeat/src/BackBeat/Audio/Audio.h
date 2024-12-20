@@ -85,8 +85,11 @@ namespace BackBeat {
 		constexpr float Int24Max             = 8388607.0f;
 
 		// AUDIOFILE CONSTANTS
-		constexpr unsigned int Mono               = 1;
-		constexpr unsigned int Stereo             = 2;
+		constexpr unsigned int Mono                  = 1;
+		constexpr unsigned int Stereo                = 2;
+		constexpr unsigned int FormatUncompressed    = 1;
+		constexpr unsigned int FormatTwosCompliement = 2;
+		constexpr unsigned int FormatFloatingPoint   = 3;
 		constexpr auto MP3 = "ID3";
 		// WAV files
 		constexpr unsigned int WAVHeaderSize      = 12;

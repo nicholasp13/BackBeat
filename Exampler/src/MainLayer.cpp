@@ -2,16 +2,7 @@
 //       - Serialize MIDI devices
 //       - Add the ability to save specific configs from certain entities i.e. Synth's to a config xml file
 //       - Add warning to save changes to current project when closing app
-
-// NOTE: BUG - Added m_Audio->Start() and m_Audio->Stop() during adding and deleting entities
-//       but when deserializing multiple entities it caused the AudioThread to block the 
-//       main thread as it was waiting for AudioThread to end but it never does. This also happens
-//       if the Start and Stop calls are called quickly between each other. I commented out the function
-//       calls and have experience no bugs so far. Delete comments if no harm seems to be done with 
-//       not stopping and starting the thread when adding BackBeat audio objects.
-
-// TODO IMINENTLY:
-// - Serialize each entity's recorded track to the xml file
+//       - Allow user to change the audio input channel for RecordingTrack and between MONO and STEREO
 
 #include "MainLayer.h"
 namespace Exampler {
@@ -839,67 +830,55 @@ namespace Exampler {
 	{
 		if (m_NumSynths >= MaxSynths)
 			return;
-		// m_Audio->Stop();
 
 		auto synth = std::make_shared<Synthesizer>();
 		synth->Add(m_PlayerMgr, m_RecorderMgr, m_AudioRenderer->GetMixer(), m_MIDIDeviceManager);
 		std::string synthName = "Synth " + std::to_string(++m_NumSynths);
 		synth->SetName(synthName);
 		m_Entities.push_back(synth);
-		
-		// m_Audio->Start();
 	}
 
 	void MainLayer::AddSampler()
 	{
 		if (m_NumSamplers >= MaxSamplers)
 			return;
-		// m_Audio->Stop();
 
 		auto sampler = std::make_shared<Sampler>();
 		sampler->Add(m_PlayerMgr, m_RecorderMgr, m_AudioRenderer->GetMixer(), m_MIDIDeviceManager);
 		std::string samplerName = "Sampler " + std::to_string(++m_NumSamplers);
 		sampler->SetName(samplerName);
 		m_Entities.push_back(sampler);
-
-		// m_Audio->Start();
 	}
 
 	void MainLayer::AddPlaybackTrack()
 	{
 		if (m_NumPlayback >= MaxPlayback)
 			return;
-		// m_Audio->Stop();
 
 		auto playback = std::make_shared<PlaybackTrack>();
 		playback->Add(m_PlayerMgr, m_RecorderMgr, m_AudioRenderer->GetMixer(), m_MIDIDeviceManager);
 		std::string playerName = "Playback " + std::to_string(++m_NumPlayback);
 		playback->SetName(playerName);
 		m_Entities.push_back(playback);
-
-		// m_Audio->Start();
 	}
 
 	void MainLayer::AddPlaybackTrack(std::string filePath)
 	{
 		if (m_NumPlayback >= MaxPlayback)
 			return;
-		// m_Audio->Stop();
 
 		auto playback = std::make_shared<PlaybackTrack>();
 		playback->Add(m_PlayerMgr, m_RecorderMgr, m_AudioRenderer->GetMixer(), m_MIDIDeviceManager, filePath);
 		std::string playerName = "Playback " + std::to_string(++m_NumPlayback);
 		playback->SetName(playerName);
 		m_Entities.push_back(playback);
-
-		// m_Audio->Start();
 	}
 
 	void MainLayer::AddRecordingTrack()
 	{
 		if (m_NumRecorders >= MaxRecordingDevices)
 			return;
-		// m_Audio->Stop();
+
 		m_RecorderMgr->Stop();
 
 		auto recordingTrack = std::make_shared<RecordingTrack>();
@@ -907,13 +886,10 @@ namespace Exampler {
 		std::string trackName = "Recording " + std::to_string(++m_NumRecorders);
 		recordingTrack->SetName(trackName);
 		m_Entities.push_back(recordingTrack);
-
-		// m_Audio->Start();
 	}
 
 	void MainLayer::DeleteEntity()
 	{
-		// m_Audio->Stop();
 		m_PlayerMgr->StopAll();
 		m_RecorderMgr->Stop();
 		m_MIDIDeviceManager->StopDevice();
@@ -960,7 +936,6 @@ namespace Exampler {
 			break;
 		}
 
-		// m_Audio->Start();
 		m_EtyToDelete = nullptr;
 	}
 
@@ -1076,7 +1051,6 @@ namespace Exampler {
 		}
 		else
 		{
-
 			m_ActiveProject = BackBeat::Project::New();
 			m_ActiveProject->GetConfig().app = "Exampler";
 			m_ActiveProject->GetConfig().name = project;
@@ -1101,7 +1075,7 @@ namespace Exampler {
 		m_FileMgr.DeleteSubDirectory(project);
 	}
 
-	// TODO: Implement after all Entity parameters are done
+	// Implement if needed. Currently just a placeholder
 	void MainLayer::Serialize(std::string filePath)
 	{
 		// NOTE: Empty as BackBeat::Project::SaveActive handles all serialization but will be

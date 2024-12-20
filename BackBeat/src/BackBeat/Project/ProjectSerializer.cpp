@@ -28,6 +28,7 @@ namespace BackBeat {
 		auto app = doc.append_child(projectConfig.app);
 		app.append_attribute("ProjectName") = projectConfig.name;
 		app.append_attribute("WorkingDirectory") = projectConfig.projectDirectoryPath;
+		app.append_attribute("TrackDirectory") = projectConfig.tracksDirectoryPath;
 
 		auto objects = app.append_child("Objects");
 		for (auto itr = projectConfig.objectList.begin(); itr != projectConfig.objectList.end(); itr++)
@@ -60,6 +61,7 @@ namespace BackBeat {
 		m_Project->GetConfig().app = app.name();
 		m_Project->GetConfig().name = app.attribute("ProjectName").as_string();
 		m_Project->GetConfig().projectDirectoryPath = app.attribute("WorkingDirectory").as_string();
+		m_Project->GetConfig().tracksDirectoryPath = app.attribute("TrackDirectory").as_string();
 		m_Project->GetConfig().xmlFilePath = filePath;
 
 		return true;
