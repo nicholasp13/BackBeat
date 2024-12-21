@@ -1,8 +1,8 @@
 // TODO: - Create editable timeline for entity/track objects
-//       - Serialize MIDI devices
 //       - Add the ability to save specific configs from certain entities i.e. Synth's to a config xml file
 //       - Add warning to save changes to current project when closing app
 //       - Allow user to change the audio input channel for RecordingTrack and between MONO and STEREO
+//       - Add loading popup while the app loads/deserializes projects
 
 #include "MainLayer.h"
 namespace Exampler {
@@ -444,13 +444,13 @@ namespace Exampler {
 					for (unsigned int i = 0; i < m_NumMIDIDevices; i++) {
 
 						// TODO: Test multiple MIDI devices and if MIDI devices change number
-						bool s_DeviceOpen = m_MIDIDeviceManager->IsOpen(i);
+						bool deviceRunning = m_MIDIDeviceManager->IsRunning(i);
 
 						if (ImGui::BeginMenu(m_DeviceNames[i].c_str()))
 						{
-							if (ImGui::MenuItem("Set Active", "", &s_DeviceOpen))
+							if (ImGui::MenuItem("Set Active", "", &deviceRunning))
 							{
-								if (s_DeviceOpen)
+								if (deviceRunning)
 								{
 									if (m_MIDIDeviceManager->OpenDevice(i))
 										m_MIDIDeviceManager->RunDevice(i);
@@ -1034,7 +1034,10 @@ namespace Exampler {
 			m_ActiveProject->GetConfig().objectList.push_back(*itr);
 		}
 
-		BackBeat::Project::SaveActive(m_ActiveProject->GetConfig().xmlFilePath);
+		std::string xmlFilePath = m_ActiveProject->GetConfig().xmlFilePath;
+
+		if (BackBeat::Project::SaveActive(xmlFilePath))
+			Serialize(xmlFilePath);
 	}
 
 	void MainLayer::SaveAsProject(std::string project)
@@ -1075,12 +1078,37 @@ namespace Exampler {
 		m_FileMgr.DeleteSubDirectory(project);
 	}
 
-	// Implement if needed. Currently just a placeholder
 	void MainLayer::Serialize(std::string filePath)
 	{
-		// NOTE: Empty as BackBeat::Project::SaveActive handles all serialization but will be
-		//       filled as needed to serialize Exampler specific stuff like which tracks are
-		//       being recorded and where
+		auto doc = pugi::xml_document();
+		pugi::xml_parse_result result = doc.load_file(filePath.c_str());
+
+		if (!result)
+		{
+			BB_CLIENT_ERROR("ERROR DESERIALIZING XML FILE OBJECTS");
+			return;
+		}
+
+		auto appNode = doc.first_child();
+
+		// MIDI Devices
+		{
+			auto midiDevicesNode = appNode.append_child("MIDIDevices");
+			
+			for (unsigned int i = 0; i < m_NumMIDIDevices; i++)
+			{
+				auto deviceNode = midiDevicesNode.append_child("Device");
+
+				deviceNode.append_attribute("ID") = i;
+				deviceNode.append_attribute("Name") = m_DeviceNames[i];
+
+				auto onNode = deviceNode.append_child("On");
+				onNode.append_attribute("Value") = m_MIDIDeviceManager->IsRunning(i);
+			}
+		}
+
+		if (!doc.save_file(filePath.c_str()))
+			BB_CORE_ERROR("ERROR SAVING XML FILE");
 	}
 
 	void MainLayer::Deserialize(std::string filePath)
@@ -1103,32 +1131,67 @@ namespace Exampler {
 			return;
 		}
 
-		size_t numEntities = 0;
-		for (pugi::xml_node_iterator itr = objectsNode.begin(); itr != objectsNode.end(); itr++)
+		// Objects/Entities
 		{
-			numEntities = m_Entities.size();
-			auto entityType = itr->name();
-			if (strcmp(entityType, "Synthesizer") == 0)
-				AddSynth();
-			else if (strcmp(entityType, "Sampler") == 0)
-				AddSampler();
-			else if (strcmp(entityType, "Playback") == 0)
+			size_t numEntities = 0;
+			for (pugi::xml_node_iterator itr = objectsNode.begin(); itr != objectsNode.end(); itr++)
 			{
-				std::string filePath = itr->child("File").attribute("Path").as_string();
-				if (filePath.empty())
-					AddPlaybackTrack();
+				numEntities = m_Entities.size();
+				auto entityType = itr->name();
+				if (strcmp(entityType, "Synthesizer") == 0)
+					AddSynth();
+				else if (strcmp(entityType, "Sampler") == 0)
+					AddSampler();
+				else if (strcmp(entityType, "Playback") == 0)
+				{
+					std::string filePath = itr->child("File").attribute("Path").as_string();
+					if (filePath.empty())
+						AddPlaybackTrack();
+					else
+						AddPlaybackTrack(filePath);
+				}
+				else if (strcmp(entityType, "Recorder") == 0)
+					AddRecordingTrack();
 				else
-					AddPlaybackTrack(filePath);
-			}
-			else if (strcmp(entityType, "Recorder") == 0)
-				AddRecordingTrack();
-			else
-				BB_CLIENT_ERROR("UNRECOGNIZED TRACK TYPE IN XML: {0}", entityType);
+					BB_CLIENT_ERROR("UNRECOGNIZED TRACK TYPE IN XML: {0}", entityType);
 
-			if (numEntities != m_Entities.size())
-				m_Entities.back()->ReadObject(&(*itr));
+				if (numEntities != m_Entities.size())
+					m_Entities.back()->ReadObject(&(*itr));
+			}
 		}
 
+		// MIDI Devices
+		{
+			auto midiDevicesNode = appNode.child("MIDIDevices");
+
+			unsigned int i = 0;
+			for (pugi::xml_node_iterator itr = midiDevicesNode.begin(); itr != midiDevicesNode.end(); itr++)
+			{
+				if (i >= m_NumMIDIDevices)
+					break;
+
+				pugi::xml_node deviceNode = *itr;
+				if (deviceNode.attribute("ID").as_uint() != i)
+				{
+					i++;
+					continue;
+				}
+
+				if (deviceNode.attribute("Name").as_string() != m_DeviceNames[i])
+				{
+					i++;
+					continue;
+				}
+
+				if (deviceNode.child("On").attribute("Value").as_bool())
+				{
+					if (m_MIDIDeviceManager->OpenDevice(i))
+						m_MIDIDeviceManager->RunDevice(i);
+				}
+
+				i++;
+			}
+		}
 	}
 
 	bool MainLayer::OnKeyEvent(BackBeat::KeyPressedEvent& event)

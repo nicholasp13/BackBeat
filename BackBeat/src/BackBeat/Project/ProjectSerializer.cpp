@@ -1,6 +1,5 @@
 #include "bbpch.h"
 
-// TODO: Finish by adding pugixml
 #include "src/pugixml.hpp"
 
 #include "BackBeat/Core/Log.h"
