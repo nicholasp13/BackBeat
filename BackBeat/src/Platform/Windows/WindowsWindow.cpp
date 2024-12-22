@@ -71,7 +71,7 @@ namespace BackBeat {
 				WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 				WindowCloseEvent event;
 				data.EventCallback(event);
-			});
+ 			});
 
 		glfwSetKeyCallback(m_Window, [](GLFWwindow* window, int key, int scancode, int action, int mods)
 			{
@@ -163,8 +163,6 @@ namespace BackBeat {
 	{
 		return m_Data.VSync;
 	}
-
-
 
 	void WindowsWindow::LoadIcons()
 	{

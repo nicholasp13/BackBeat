@@ -18,6 +18,7 @@ namespace Exampler {
 		Sampler();
 		~Sampler();
 
+		// Entity functions
 		virtual void Update() override;
 		virtual void OnEvent(BackBeat::Event& event) override;
 		virtual void ImGuiRender() override;
@@ -41,6 +42,11 @@ namespace Exampler {
 		inline virtual EntityType GetType() override { return EntityType::sampler; }
 		inline virtual void SetName(std::string name) override { m_Name = name; }
 
+		// BackBeat::Serializable functions
+		virtual void WriteObject(pugi::xml_node* node) override;
+		virtual void ReadObject(pugi::xml_node* node) override;
+
+		// Sampler functions
 		inline std::shared_ptr<BackBeat::MIDIInputHandler> GetMIDIInput() { return m_Sampler.GetMIDIInput(); }
 		inline std::shared_ptr<BackBeat::PlayerProcessor> GetTrackProcessor() { return m_TrackPlayer.GetProc(); }
 		inline std::shared_ptr<BackBeat::SamplerProcessor> GetSamplerProcessor() { return m_Sampler.GetProcessor(); }
@@ -52,11 +58,9 @@ namespace Exampler {
 		bool m_CreatingSample;
 		bool m_ProgrammingNote;
 		unsigned int m_DevicesOpen;
-		unsigned int m_NumMIDIDevices;
 		unsigned int m_NumPads;
 		unsigned int m_PadToProgram; // This is the display Pad # not the actual index number, actual index is this - 1
 		std::string m_Name;
-		std::vector<std::string> m_DeviceNames;
 
 		// BackBeat objects
 		BackBeat::Player m_TrackPlayer;

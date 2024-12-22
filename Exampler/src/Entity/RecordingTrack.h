@@ -17,6 +17,7 @@ namespace Exampler {
 		RecordingTrack();
 		~RecordingTrack();
 
+		// Entity functions
 		virtual void Update() override;
 		virtual void OnEvent(BackBeat::Event& event) override;
 		virtual void ImGuiRender() override;
@@ -40,6 +41,11 @@ namespace Exampler {
 		inline virtual EntityType GetType() override { return EntityType::recording; }
 		inline virtual void SetName(std::string name) override { m_Name = name; }
 
+		// BackBeat::Serializable functions
+		virtual void WriteObject(pugi::xml_node* node) override;
+		virtual void ReadObject(pugi::xml_node* node) override;
+
+		// RecordingTrack functions
 		inline std::shared_ptr<BackBeat::PlayerProcessor> GetProc() { return m_Player->GetProc(); }
 
 	private:

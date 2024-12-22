@@ -14,9 +14,10 @@ The goal is to create an open source, simple digital audio workstation (DAW) wit
 - Recording audio from devices such as mics and instruments through Windows API and recording BackBeat objects like Sampler and Synth
 - Audio Visualization to show users the music their making and how their inputs change the sound
 - GUI using ImGui to fully control, add, and delete BackBeat objects during runtime
+- XML serialization to save and load any work done as projects
 ### Upcoming features:
 - Custom ImGui widget for a timeline that allows the user to edit multiple different audio tracks at the same time
-- Serialization to save configuration of BackBeat objects and other misc. settings
+- Rework aux input recording to allow for selecting specific audio channels and choosing MONO vs STEREO
 ### Planned features:
 - Modular Matrix for interactive GUI implementation to customize synth sounds
 - Add downsampling and upsampling to support different sample rates (only 48k sample rate supported currently)

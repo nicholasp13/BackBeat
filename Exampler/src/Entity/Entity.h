@@ -14,7 +14,7 @@ namespace Exampler {
 
 	// Externally referreed to as "Track" but not interally as it may be confused with BackBeat::Track
 	// Name of this class is subject to change
-	class Entity
+	class Entity : public BackBeat::Serializable
 	{
 	public:
 		virtual void Update() {}

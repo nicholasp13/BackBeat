@@ -68,6 +68,24 @@ namespace BackBeat {
 		return AudioInfo();
 	}
 
+	bool AudioFileReader::ReadAudioFileData(
+		std::string filePath, 
+		char* data, 
+		unsigned int position, 
+		unsigned int numBytes)
+	{
+		std::ifstream file;
+		file.open(filePath, std::ios::binary);
+		if (file.is_open())
+		{
+			file.seekg(position);
+			file.read(data, numBytes);
+			file.close();
+			return true;
+		}
+
+		return false;
+	}
 
 	// TODO: CREATE INITIALIZE AFTER CREATING MP3 decoder
 	AudioInfo AudioFileReader::ReadMP3Header(std::string filePath, unsigned int size)
@@ -211,4 +229,5 @@ namespace BackBeat {
 		file.close();
 		return info;
 	}
+
 }

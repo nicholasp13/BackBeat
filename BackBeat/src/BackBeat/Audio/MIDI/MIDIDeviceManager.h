@@ -17,7 +17,7 @@ namespace BackBeat {
 		virtual bool CloseAll() { return false; }
 		virtual std::string GetDeviceName(unsigned int index) { return std::string(); }
 		virtual unsigned int GetNumDevices() { return 0; }
-		virtual bool IsRunning() { return false; }
+		virtual bool IsRunning(unsigned int index) { return false; }
 		virtual bool IsOpen(unsigned int index) { return false; }
 		virtual void PushOutput(std::shared_ptr<MIDIInputHandler> output) {}
 		virtual void DeleteOutput(UUID id) {}

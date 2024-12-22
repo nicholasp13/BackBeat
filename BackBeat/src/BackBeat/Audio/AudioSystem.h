@@ -12,7 +12,7 @@ namespace BackBeat {
 	class AudioSystem
 	{
 	public:
-		virtual void Init(std::string projectName) {}
+		virtual void Init(std::string appName) {}
 		virtual void Start() {}
 		virtual void Stop() {}
 		virtual AudioProps GetProps() { return AudioProps(); }

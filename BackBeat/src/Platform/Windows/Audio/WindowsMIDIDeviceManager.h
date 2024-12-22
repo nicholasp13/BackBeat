@@ -27,7 +27,7 @@ namespace BackBeat {
 		inline virtual std::string GetDeviceName(UINT index) override { return m_Devices[index].GetName(); }
 		inline virtual UINT GetNumDevices() override { return m_NumDevices; }
 		inline virtual bool IsOpen(UINT index) override { return m_Devices[index].IsOpen(); };
-		inline virtual bool IsRunning() override { return (m_RunID >= 0); }
+		inline virtual bool IsRunning(UINT index) override { return (m_RunID >= (int)index); }
 
 	private:
 		unsigned int m_NumOutputsSet;

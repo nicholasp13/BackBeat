@@ -1,5 +1,7 @@
 #include "RecordingTrack.h"
 
+// TODO: Allow user to split the audio channels input into MONO entities or 1 STEREO entities
+
 namespace Exampler {
 	
 	RecordingTrack::RecordingTrack()
@@ -150,6 +152,65 @@ namespace Exampler {
 
 		playerMgr->Delete(playerID);
 		mixer->DeleteProcessor(playerID);
+	}
+
+	// NOTE: - node is the parent of the node being written to
+	// TODO: Test this
+	void RecordingTrack::WriteObject(pugi::xml_node* node)
+	{
+		auto recorderNode = node->append_child("Recorder");
+
+		recorderNode.append_attribute("Name") = m_Name;
+
+		// Volume
+		{
+			auto volumeNode = recorderNode.append_child("Volume");
+			volumeNode.append_attribute("Value") = m_Volume;
+		}
+
+		// Audio track
+		{
+			auto trackNode = recorderNode.append_child("Track");
+
+			std::shared_ptr<BackBeat::Track> track = m_Player->GetTrack();
+			if (track)
+			{
+				std::string trackFilePath = BackBeat::Project::GetActive()->GetConfig().tracksDirectoryPath
+					+ m_Name + ".wav";
+
+				if (BackBeat::WAVFileBuilder::BuildWAVFile(track.get(), track->GetStart(), track->GetEnd(), trackFilePath))
+					trackNode.append_attribute("FilePath") = trackFilePath;
+				else
+					trackNode.append_attribute("FilePath") = "";
+			}
+			else
+				trackNode.append_attribute("FilePath") = "";
+		}
+	}
+
+	// NOTE: - node is the node being read from. This is different to WriteObject() || Might want to specify in
+	//       function declaration
+	void RecordingTrack::ReadObject(pugi::xml_node* node)
+	{
+		m_Name = node->attribute("Name").value();
+
+		// Volume
+		{
+			auto volumeNode = node->child("Volume");
+			m_Volume = volumeNode.attribute("Value").as_float();
+		}
+
+		// Audio track
+		{
+			auto trackNode = node->child("Track");
+			std::string trackFilePath = trackNode.attribute("FilePath").as_string();
+			if (!trackFilePath.empty())
+			{
+				BackBeat::AudioInfo info = BackBeat::AudioFileReader::ReadFile(trackFilePath);
+				if (!m_Player->GetTrack()->CopyData(info))
+				BB_CLIENT_ERROR("ERROR LOADING AUDIO FILE FOR {0} from {1}", m_Name.c_str(), trackFilePath.c_str());
+			}
+		}
 	}
 
 	unsigned int RecordingTrack::SetRecordingTrackColors()

@@ -7,6 +7,7 @@
 #include "Synthesizer.h"
 namespace Exampler {
 
+	// TODO: Get rid of magic numbers for 
 	Synthesizer::Synthesizer()
 		: 
 		m_Open(false), 
@@ -540,8 +541,6 @@ namespace Exampler {
 
 		ImGui::EndTable();
 
-		// TODO: Add ModMatrix here
-
 		ImGui::End();
 
 		ImGui::PopStyleColor(count);
@@ -585,6 +584,668 @@ namespace Exampler {
 		mixer->DeleteProcessor(synthID);
 		mixer->DeleteProcessor(trackPlayerID);
 		midiDeviceManager->DeleteOutput(midiInputID);
+	}
+
+	// NOTE: - node is the parent of the node being written to
+	//       - TODO: Still need to implement serializing RecordingTracks
+	void Synthesizer::WriteObject(pugi::xml_node* node)
+	{
+		auto synthNode = node->append_child("Synthesizer");
+
+		synthNode.append_attribute("Name") = m_Name;
+
+		// General Controls
+		{
+			auto keyboardControls = synthNode.append_child("KeyboardControls");
+			keyboardControls.append_attribute("Active") = m_KeyboardActive;
+			keyboardControls.append_attribute("Octave") = m_SynthParams->eventHandlerParams->octave;
+			keyboardControls.append_attribute("NoteVelocity") = m_NoteVelocity;
+
+			synthNode.append_child("Volume").append_attribute("Value") = m_SynthParams->engineParams->volume;
+
+			synthNode.append_child("Pan").append_attribute("Value") = m_Pan;
+		}
+
+		// LFO 1
+		{
+			std::shared_ptr<BackBeat::LFOParameters> lfoParams = 
+				m_SynthParams->engineParams->voiceParams->LFOParams1;
+
+			auto lfoNode = synthNode.append_child("LFO1");
+			auto waveformNode = lfoNode.append_child("Waveform");
+
+			switch (lfoParams->wave)
+			{
+
+			case BackBeat::WaveType::Sin:
+			{
+				waveformNode.append_attribute("Type") = "Sin";
+				break;
+			}
+
+			case BackBeat::WaveType::SawtoothUp:
+			{
+				waveformNode.append_attribute("Type") = "SawtoothUp";
+				break;
+			}
+
+			case BackBeat::WaveType::SawtoothDown:
+			{
+				waveformNode.append_attribute("Type") = "SawtoothDown";
+				break;
+			}
+
+			case BackBeat::WaveType::Triangle:
+			{
+				waveformNode.append_attribute("Type") = "Triangle";
+				break;
+			}
+
+			case BackBeat::WaveType::Square:
+			{
+				waveformNode.append_attribute("Type") = "Square";
+				break;
+			}
+
+			default:
+			{
+				BB_CLIENT_ERROR("UNKNOWN WAVEFORM TYPE! Saved as sin wave. Please update WaveTypes or Synthesizer");
+				waveformNode.append_attribute("Type") = "Sin";
+				break;
+			}
+
+			}
+
+			lfoNode.append_child("Frequency").append_attribute("Value") = lfoParams->hertz;
+			lfoNode.append_child("Amp").append_attribute("Value") = lfoParams->amp;
+		}
+
+		// Low Pass Filter
+		{
+			std::shared_ptr<BackBeat::FilterParameters> lowpassParams = 
+				m_SynthParams->engineParams->voiceParams->LPFilterParams;
+
+			auto lowpassNode = synthNode.append_child("LowPassFilter");
+
+			lowpassNode.append_child("FilterOn").append_attribute("Value") = lowpassParams->isOn;
+			lowpassNode.append_child("CutoffFrequency").append_attribute("Value") = lowpassParams->cutoff;
+		}
+
+		// High Pass Filter
+		{
+			std::shared_ptr<BackBeat::FilterParameters> highpassParams =
+				m_SynthParams->engineParams->voiceParams->HPFilterParams;
+
+			auto highpassNode = synthNode.append_child("HighPassFilter");
+
+			highpassNode.append_child("FilterOn").append_attribute("Value") = highpassParams->isOn;
+			highpassNode.append_child("CutoffFrequency").append_attribute("Value") = highpassParams->cutoff;
+		}
+
+		// Amp Envelope Generator
+		{
+			std::shared_ptr<BackBeat::EGParameters> ampEGParams =
+				m_SynthParams->engineParams->voiceParams->AmpEGParams;
+
+			auto ampEGNode = synthNode.append_child("AmpEnvelopeGenerator");
+
+			ampEGNode.append_child("Attack").append_attribute("Value") = ampEGParams->attackDuration;
+			ampEGNode.append_child("Decay").append_attribute("Value") = ampEGParams->decayDuration;
+			ampEGNode.append_child("Release").append_attribute("Value") = ampEGParams->releaseDuration;
+			ampEGNode.append_child("Sustain").append_attribute("Value") = ampEGParams->sustainValue;
+		}
+
+		// Oscillator 1
+		{
+			std::shared_ptr<BackBeat::OscParameters> oscParams =
+				m_SynthParams->engineParams->voiceParams->OscParams1;
+
+			auto oscNode = synthNode.append_child("Oscillator1");
+
+			oscNode.append_child("Octave").append_attribute("Value") = m_Octave1;
+
+			auto waveformNode = oscNode.append_child("Waveform");
+
+			switch (oscParams->wave)
+			{
+			case BackBeat::WaveType::Sin:
+			{
+				waveformNode.append_attribute("Type") = "Sin";
+				break;
+			}
+
+			case BackBeat::WaveType::SawtoothUp:
+			{
+				waveformNode.append_attribute("Type") = "SawtoothUp";
+				break;
+			}
+
+			case BackBeat::WaveType::SawtoothDown:
+			{
+				waveformNode.append_attribute("Type") = "SawtoothDown";
+				break;
+			}
+
+			case BackBeat::WaveType::Triangle:
+			{
+				waveformNode.append_attribute("Type") = "Triangle";
+				break;
+			}
+
+			case BackBeat::WaveType::Square:
+			{
+				waveformNode.append_attribute("Type") = "Square";
+				break;
+			}
+
+			default:
+			{
+				BB_CLIENT_ERROR("UNKNOWN WAVEFORM TYPE! Saved as sin wave. Please update WaveTypes or Synthesizer");
+				waveformNode.append_attribute("Type") = "Sin";
+				break;
+			}
+
+			}
+
+			oscNode.append_child("Amp").append_attribute("Value") = oscParams->amp;
+		}
+
+		// Oscillator 2
+		{
+			std::shared_ptr<BackBeat::OscParameters> oscParams =
+				m_SynthParams->engineParams->voiceParams->OscParams2;
+
+			auto oscNode = synthNode.append_child("Oscillator2");
+
+			oscNode.append_child("Octave").append_attribute("Value") = m_Octave2;
+
+			auto waveformNode = oscNode.append_child("Waveform");
+
+			switch (oscParams->wave)
+			{
+			case BackBeat::WaveType::Sin:
+			{
+				waveformNode.append_attribute("Type") = "Sin";
+				break;
+			}
+
+			case BackBeat::WaveType::SawtoothUp:
+			{
+				waveformNode.append_attribute("Type") = "SawtoothUp";
+				break;
+			}
+
+			case BackBeat::WaveType::SawtoothDown:
+			{
+				waveformNode.append_attribute("Type") = "SawtoothDown";
+				break;
+			}
+
+			case BackBeat::WaveType::Triangle:
+			{
+				waveformNode.append_attribute("Type") = "Triangle";
+				break;
+			}
+
+			case BackBeat::WaveType::Square:
+			{
+				waveformNode.append_attribute("Type") = "Square";
+				break;
+			}
+
+			default:
+			{
+				BB_CLIENT_ERROR("UNKNOWN WAVEFORM TYPE! Saved as sin wave. Please update WaveTypes or Synthesizer");
+				waveformNode.append_attribute("Type") = "Sin";
+				break;
+			}
+
+			}
+
+			oscNode.append_child("Amp").append_attribute("Value") = oscParams->amp;
+		}
+
+		// Oscillator 3
+		{
+			std::shared_ptr<BackBeat::OscParameters> oscParams =
+				m_SynthParams->engineParams->voiceParams->OscParams3;
+
+			auto oscNode = synthNode.append_child("Oscillator3");
+
+			oscNode.append_child("Octave").append_attribute("Value") = m_Octave3;
+
+			auto waveformNode = oscNode.append_child("Waveform");
+
+			switch (oscParams->wave)
+			{
+			case BackBeat::WaveType::Sin:
+			{
+				waveformNode.append_attribute("Type") = "Sin";
+				break;
+			}
+
+			case BackBeat::WaveType::SawtoothUp:
+			{
+				waveformNode.append_attribute("Type") = "SawtoothUp";
+				break;
+			}
+
+			case BackBeat::WaveType::SawtoothDown:
+			{
+				waveformNode.append_attribute("Type") = "SawtoothDown";
+				break;
+			}
+
+			case BackBeat::WaveType::Triangle:
+			{
+				waveformNode.append_attribute("Type") = "Triangle";
+				break;
+			}
+
+			case BackBeat::WaveType::Square:
+			{
+				waveformNode.append_attribute("Type") = "Square";
+				break;
+			}
+
+			default:
+			{
+				BB_CLIENT_ERROR("UNKNOWN WAVEFORM TYPE! Saved as sin wave. Please update WaveTypes or Synthesizer");
+				waveformNode.append_attribute("Type") = "Sin";
+				break;
+			}
+
+			}
+
+			oscNode.append_child("Amp").append_attribute("Value") = oscParams->amp;
+		}
+
+		// Oscillator 4
+		{
+			std::shared_ptr<BackBeat::OscParameters> oscParams =
+				m_SynthParams->engineParams->voiceParams->OscParams4;
+
+			auto oscNode = synthNode.append_child("Oscillator4");
+
+			oscNode.append_child("Octave").append_attribute("Value") = m_Octave4;
+
+			auto waveformNode = oscNode.append_child("Waveform");
+
+			switch (oscParams->wave)
+			{
+			case BackBeat::WaveType::Sin:
+			{
+				waveformNode.append_attribute("Type") = "Sin";
+				break;
+			}
+
+			case BackBeat::WaveType::SawtoothUp:
+			{
+				waveformNode.append_attribute("Type") = "SawtoothUp";
+				break;
+			}
+
+			case BackBeat::WaveType::SawtoothDown:
+			{
+				waveformNode.append_attribute("Type") = "SawtoothDown";
+				break;
+			}
+
+			case BackBeat::WaveType::Triangle:
+			{
+				waveformNode.append_attribute("Type") = "Triangle";
+				break;
+			}
+
+			case BackBeat::WaveType::Square:
+			{
+				waveformNode.append_attribute("Type") = "Square";
+				break;
+			}
+
+			default:
+			{
+				BB_CLIENT_ERROR("UNKNOWN WAVEFORM TYPE! Saved as sin wave. Please update WaveTypes or Synthesizer");
+				waveformNode.append_attribute("Type") = "Sin";
+				break;
+			}
+
+			}
+
+			oscNode.append_child("Amp").append_attribute("Value") = oscParams->amp;
+		}
+
+		// Audio track
+		{
+			auto trackNode = synthNode.append_child("Track");
+
+			std::shared_ptr<BackBeat::Track> track = m_RecordingPlayer->GetTrack();
+			if (track)
+			{
+				std::string trackFilePath = BackBeat::Project::GetActive()->GetConfig().tracksDirectoryPath
+					+ m_Name + ".wav";
+
+				if (BackBeat::WAVFileBuilder::BuildWAVFile(track.get(), track->GetStart(), track->GetEnd(), trackFilePath))
+					trackNode.append_attribute("FilePath") = trackFilePath;
+				else
+					trackNode.append_attribute("FilePath") = "";
+			}
+			else
+				trackNode.append_attribute("FilePath") = "";
+		}
+	}
+
+	// NOTE: - node is the node being read from. This is different to WriteObject() || Might want to specify in
+	//       function declaration
+	void Synthesizer::ReadObject(pugi::xml_node* node)
+	{
+		m_Name = node->attribute("Name").as_string();
+
+		// General Controls
+		{
+			auto keyboardControls = node->child("KeyboardControls");
+			m_KeyboardActive = keyboardControls.attribute("Active").as_bool();
+			m_SynthParams->eventHandlerParams->octave = keyboardControls.attribute("Octave").as_int();
+			m_NoteVelocity = keyboardControls.attribute("NoteVelocity").as_int();
+
+			m_SynthParams->engineParams->volume = node->child("Volume").attribute("Value").as_float();
+
+			m_Pan = node->child("Pan").attribute("Value").as_float();
+		}
+
+		// LFO 1
+		{
+			std::shared_ptr<BackBeat::LFOParameters> lfoParams =
+				m_SynthParams->engineParams->voiceParams->LFOParams1;
+
+			auto lfoNode = node->child("LFO1");
+			auto waveformNode = lfoNode.child("Waveform");
+
+			auto waveType = waveformNode.attribute("Type").value();
+
+			if (strcmp(waveType, "Sin") == 0)
+			{
+				m_LFOWave = 0;
+				lfoParams->wave = BackBeat::WaveType::Sin;
+			}
+			else if (strcmp(waveType, "SawtoothUp") == 0)
+			{
+				m_LFOWave = 3;
+				lfoParams->wave = BackBeat::WaveType::SawtoothUp;
+			}
+			else if (strcmp(waveType, "SawtoothDown") == 0)
+			{
+				m_LFOWave = 4;
+				lfoParams->wave = BackBeat::WaveType::SawtoothDown;
+			}
+			else if (strcmp(waveType, "Triangle") == 0)
+			{
+				m_LFOWave = 1;
+				lfoParams->wave = BackBeat::WaveType::Triangle;
+			}
+			else if (strcmp(waveType, "Square") == 0)
+			{
+				m_LFOWave = 2;
+				lfoParams->wave = BackBeat::WaveType::Square;
+			}
+			else
+			{
+				BB_CLIENT_ERROR("UNRECOGNIZED WAVETYPE FOR LFO IN XML FOR {0} TRACK! Loading Sin Wav",
+					m_Name.c_str());
+				lfoParams->wave = BackBeat::WaveType::Sin;
+			}
+
+			lfoParams->hertz = lfoNode.child("Frequency").attribute("Value").as_float();
+			lfoParams->amp = lfoNode.child("Amp").attribute("Value").as_float();
+		}
+
+		// Low Pass Filter
+		{
+			std::shared_ptr<BackBeat::FilterParameters> lowpassParams =
+				m_SynthParams->engineParams->voiceParams->LPFilterParams;
+
+			auto lowpassNode = node->child("LowPassFilter");
+
+			lowpassParams->isOn = lowpassNode.child("FilterOn").attribute("Value").as_bool();
+			lowpassParams->cutoff = lowpassNode.child("CutoffFrequency").attribute("Value").as_float();
+		}
+
+		// High Pass Filter
+		{
+			std::shared_ptr<BackBeat::FilterParameters> highpassParams =
+				m_SynthParams->engineParams->voiceParams->HPFilterParams;
+
+			auto lowpassNode = node->child("HighPassFilter");
+
+			highpassParams->isOn = lowpassNode.child("FilterOn").attribute("Value").as_bool();
+			highpassParams->cutoff = lowpassNode.child("CutoffFrequency").attribute("Value").as_float();
+		}
+
+		// Amp Envelope Generator
+		{
+			std::shared_ptr<BackBeat::EGParameters> ampEGParams =
+				m_SynthParams->engineParams->voiceParams->AmpEGParams;
+
+			auto ampEGNode = node->child("AmpEnvelopeGenerator");
+
+			ampEGParams->attackDuration = ampEGNode.child("Attack").attribute("Value").as_float();
+			ampEGParams->decayDuration = ampEGNode.child("Decay").attribute("Value").as_float();
+			ampEGParams->releaseDuration = ampEGNode.child("Release").attribute("Value").as_float();
+			ampEGParams->sustainValue = ampEGNode.child("Sustain").attribute("Value").as_float();
+		}
+
+		// Oscillator 1
+		{
+			std::shared_ptr<BackBeat::OscParameters> oscParams =
+				m_SynthParams->engineParams->voiceParams->OscParams1;
+
+			auto oscNode = node->child("Oscillator1");
+
+			m_Octave1 = oscNode.child("Octave").attribute("Value").as_int();
+			oscParams->octave = pow(2.0f, (float)m_Octave1);
+
+			auto waveformNode = oscNode.child("Waveform");
+
+			auto waveType = waveformNode.attribute("Type").value();
+
+			if (strcmp(waveType, "Sin") == 0)
+			{
+				m_OscWave1 = 0;
+				oscParams->wave = BackBeat::WaveType::Sin;
+			}
+			else if (strcmp(waveType, "SawtoothUp") == 0)
+			{
+				m_OscWave1 = 3;
+				oscParams->wave = BackBeat::WaveType::SawtoothUp;
+			}
+			else if (strcmp(waveType, "SawtoothDown") == 0)
+			{
+				m_OscWave1 = 4;
+				oscParams->wave = BackBeat::WaveType::SawtoothDown;
+			}
+			else if (strcmp(waveType, "Triangle") == 0)
+			{
+				m_OscWave1 = 1;
+				oscParams->wave = BackBeat::WaveType::Triangle;
+			}
+			else if (strcmp(waveType, "Square") == 0)
+			{
+				m_OscWave1 = 2;
+				oscParams->wave = BackBeat::WaveType::Square;
+			}
+			else
+			{
+				BB_CLIENT_ERROR("UNRECOGNIZED WAVETYPE FOR Oscillator1 IN XML FOR {0} TRACK! Loading Sin Wav",
+					m_Name.c_str());
+				m_OscWave1 = 0;
+				oscParams->wave = BackBeat::WaveType::Sin;
+			}
+
+			oscParams->amp = oscNode.child("Amp").attribute("Value").as_float();
+		}
+
+		// Oscillator 2
+		{
+			std::shared_ptr<BackBeat::OscParameters> oscParams =
+				m_SynthParams->engineParams->voiceParams->OscParams2;
+
+			auto oscNode = node->child("Oscillator2");
+
+			m_Octave2 = oscNode.child("Octave").attribute("Value").as_int();
+			oscParams->octave = pow(2.0f, (float)m_Octave2);
+
+			auto waveformNode = oscNode.child("Waveform");
+
+			auto waveType = waveformNode.attribute("Type").value();
+
+			if (strcmp(waveType, "Sin") == 0)
+			{
+				m_OscWave2 = 0;
+				oscParams->wave = BackBeat::WaveType::Sin;
+			}
+			else if (strcmp(waveType, "SawtoothUp") == 0)
+			{
+				m_OscWave2 = 3;
+				oscParams->wave = BackBeat::WaveType::SawtoothUp;
+			}
+			else if (strcmp(waveType, "SawtoothDown") == 0)
+			{
+				m_OscWave2 = 4;
+				oscParams->wave = BackBeat::WaveType::SawtoothDown;
+			}
+			else if (strcmp(waveType, "Triangle") == 0)
+			{
+				m_OscWave2 = 1;
+				oscParams->wave = BackBeat::WaveType::Triangle;
+			}
+			else if (strcmp(waveType, "Square") == 0)
+			{
+				m_OscWave2 = 2;
+				oscParams->wave = BackBeat::WaveType::Square;
+			}
+			else
+			{
+				BB_CLIENT_ERROR("UNRECOGNIZED WAVETYPE FOR Oscillator2 IN XML FOR {0} TRACK! Loading Sin Wav",
+					m_Name.c_str());
+				m_OscWave2 = 0;
+				oscParams->wave = BackBeat::WaveType::Sin;
+			}
+
+			oscParams->amp = oscNode.child("Amp").attribute("Value").as_float();
+		}
+
+		// Oscillator 3
+		{
+			std::shared_ptr<BackBeat::OscParameters> oscParams =
+				m_SynthParams->engineParams->voiceParams->OscParams3;
+
+			auto oscNode = node->child("Oscillator3");
+
+			m_Octave3 = oscNode.child("Octave").attribute("Value").as_int();
+			oscParams->octave = pow(2.0f, (float)m_Octave3);
+
+			auto waveformNode = oscNode.child("Waveform");
+
+			auto waveType = waveformNode.attribute("Type").value();
+
+			if (strcmp(waveType, "Sin") == 0)
+			{
+				m_OscWave3 = 0;
+				oscParams->wave = BackBeat::WaveType::Sin;
+			}
+			else if (strcmp(waveType, "SawtoothUp") == 0)
+			{
+				m_OscWave3 = 3;
+				oscParams->wave = BackBeat::WaveType::SawtoothUp;
+			}
+			else if (strcmp(waveType, "SawtoothDown") == 0)
+			{
+				m_OscWave3 = 4;
+				oscParams->wave = BackBeat::WaveType::SawtoothDown;
+			}
+			else if (strcmp(waveType, "Triangle") == 0)
+			{
+				m_OscWave3 = 1;
+				oscParams->wave = BackBeat::WaveType::Triangle;
+			}
+			else if (strcmp(waveType, "Square") == 0)
+			{
+				m_OscWave3 = 2;
+				oscParams->wave = BackBeat::WaveType::Square;
+			}
+			else
+			{
+				BB_CLIENT_ERROR("UNRECOGNIZED WAVETYPE FOR Oscillator3 IN XML FOR {0} TRACK! Loading Sin Wav",
+					m_Name.c_str());
+				m_OscWave3 = 0;
+				oscParams->wave = BackBeat::WaveType::Sin;
+			}
+
+			oscParams->amp = oscNode.child("Amp").attribute("Value").as_float();
+		}
+
+		// Oscillator 4
+		{
+			std::shared_ptr<BackBeat::OscParameters> oscParams =
+				m_SynthParams->engineParams->voiceParams->OscParams4;
+
+			auto oscNode = node->child("Oscillator4");
+
+			m_Octave4 = oscNode.child("Octave").attribute("Value").as_int();
+			oscParams->octave = pow(2.0f, (float)m_Octave4);
+
+			auto waveformNode = oscNode.child("Waveform");
+
+			auto waveType = waveformNode.attribute("Type").value();
+
+			if (strcmp(waveType, "Sin") == 0)
+			{
+				m_OscWave4 = 0;
+				oscParams->wave = BackBeat::WaveType::Sin;
+			}
+			else if (strcmp(waveType, "SawtoothUp") == 0)
+			{
+				m_OscWave4 = 3;
+				oscParams->wave = BackBeat::WaveType::SawtoothUp;
+			}
+			else if (strcmp(waveType, "SawtoothDown") == 0)
+			{
+				m_OscWave4 = 4;
+				oscParams->wave = BackBeat::WaveType::SawtoothDown;
+			}
+			else if (strcmp(waveType, "Triangle") == 0)
+			{
+				m_OscWave4 = 1;
+				oscParams->wave = BackBeat::WaveType::Triangle;
+			}
+			else if (strcmp(waveType, "Square") == 0)
+			{
+				m_OscWave4 = 2;
+				oscParams->wave = BackBeat::WaveType::Square;
+			}
+			else
+			{
+				BB_CLIENT_ERROR("UNRECOGNIZED WAVETYPE FOR Oscillator4 IN XML FOR {0} TRACK! Loading Sin Wav",
+					m_Name.c_str());
+				oscParams->wave = BackBeat::WaveType::Sin;
+			}
+
+			oscParams->amp = oscNode.child("Amp").attribute("Value").as_float();
+		}
+
+		// Audio track
+		{
+			auto trackNode = node->child("Track");
+			std::string trackFilePath = trackNode.attribute("FilePath").as_string();
+
+			if (!trackFilePath.empty())
+			{
+				BackBeat::AudioInfo info = BackBeat::AudioFileReader::ReadFile(trackFilePath);
+				if (!m_RecordingPlayer->GetTrack()->CopyData(info))
+					BB_CLIENT_ERROR("ERROR LOADING AUDIO FILE FOR {0} from {1}", m_Name.c_str(), trackFilePath.c_str());
+			}
+		}
+
 	}
 
 	void Synthesizer::RenderCanvasEntity()

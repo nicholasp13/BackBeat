@@ -42,15 +42,9 @@ namespace Exampler {
 				m_Player->Off();
 		} ImGui::SameLine();
 
-		if (ImGui::Button("Open file"))
-		{
-			m_Player->Pause();
-			m_Player->LoadTrack(BackBeat::FileDialog::OpenFile("WAV Files (*.wav)\0*.wav\0"));
-		}
-
 		// Render Playback controls/info
 		{
-			ImGui::Text("Title:"); ImGui::SameLine();
+			// ImGui::Text("Title:"); ImGui::SameLine();
 			ImGui::Text(m_Player->GetTrackName().c_str());
 
 			BackBeat::TimeMinSec trackTime = m_Player->GetTime();
@@ -112,6 +106,19 @@ namespace Exampler {
 	{
 		m_Player = playerMgr->AddNewPlayer();
 		mixer->PushProcessor(m_Player->GetProc());
+		m_Player->LoadTrack(BackBeat::FileDialog::OpenFile("WAV Files (*.wav)\0*.wav\0"));
+	}
+
+	void PlaybackTrack::Add(
+		BackBeat::PlayerManager* playerMgr,
+		BackBeat::RecorderManager* recorderMgr,
+		BackBeat::Mixer* mixer,
+		BackBeat::MIDIDeviceManager* midiDeviceManager,
+		std::string filePath)
+	{
+		m_Player = playerMgr->AddNewPlayer();
+		mixer->PushProcessor(m_Player->GetProc());
+		m_Player->LoadTrack(filePath);
 	}
 
 	void PlaybackTrack::Delete(
@@ -127,6 +134,37 @@ namespace Exampler {
 
 		playerMgr->Delete(playerID);
 		mixer->DeleteProcessor(playerID);
+	}
+
+	// NOTE: - node is the parent of the node being written to
+	void PlaybackTrack::WriteObject(pugi::xml_node* node)
+	{
+		auto playbackNode = node->append_child("Playback");
+
+		playbackNode.append_attribute("Name") = m_Name;
+
+		auto volumeNode = playbackNode.append_child("Volume");
+		volumeNode.append_attribute("Value") = m_Volume;
+
+		auto fileNode = playbackNode.append_child("File");
+		auto track = m_Player->GetTrack();
+		if (track)
+			fileNode.append_attribute("Path") = track->GetFilePath();
+		else
+			fileNode.append_attribute("Path");
+	}
+
+	// NOTE: - node is the node being read from. This is different to WriteObject() || Might want to specify in
+	//       function declaration
+	void PlaybackTrack::ReadObject(pugi::xml_node* node)
+	{
+		m_Name = node->attribute("Name").as_string();
+
+		m_Volume = node->child("Volume").attribute("Value").as_float();
+
+		auto fileNode = node->child("File");
+		if (!fileNode.attribute("Path").empty())
+			m_Player->LoadTrack(fileNode.attribute("Path").as_string());
 	}
 
 	unsigned int PlaybackTrack::SetPlaybackColors()
