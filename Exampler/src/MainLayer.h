@@ -42,6 +42,7 @@ namespace Exampler {
 		unsigned int m_NumPlayback;
 		unsigned int m_NumRecorders;
 		std::string m_AppFileDir;
+		std::thread m_Thread;
 		std::vector< std::string > m_DeviceNames;
 		std::vector< std::string > m_ProjectNames;
 		std::vector< std::shared_ptr<Entity> > m_Entities;
@@ -61,7 +62,7 @@ namespace Exampler {
 
 		enum class AppState
 		{
-			Start = 0, Play = 1, Load = 2
+			Start = 0, Play = 1, Load = 2, Save = 3, SelectProject = 4
 		};
 
 		AppState m_State;
@@ -75,7 +76,7 @@ namespace Exampler {
 		void RenderMgrs();
 		void RenderEntities();
 		void RenderEntityMenubar(unsigned int index);
-		void RenderPopups();
+		void RenderMenubarPopups();
 
 		// Entity functions
 		void AddSynth();
@@ -99,9 +100,10 @@ namespace Exampler {
 		bool OnKeyEvent(BackBeat::KeyPressedEvent& event);
 		bool OnMouseButtonEvent(BackBeat::MouseButtonPressedEvent& event);
 
-		// Color functions
+		// ImGui functions
 		unsigned int SetCanvasColors();
 		unsigned int SetMainColors();
+		ImVec2 Center(float width, float height);
 
 	};
 

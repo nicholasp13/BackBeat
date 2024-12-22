@@ -1,8 +1,6 @@
 // TODO: - Create editable timeline for entity/track objects
 //       - Add the ability to save specific configs from certain entities i.e. Synth's to a config xml file
-//       - Add warning to save changes to current project when closing app
 //       - Allow user to change the audio input channel for RecordingTrack and between MONO and STEREO
-//       - Add loading popup while the app loads/deserializes projects
 
 #include "MainLayer.h"
 namespace Exampler {
@@ -122,7 +120,7 @@ namespace Exampler {
 		unsigned int count = SetMainColors();
 
 		// Renders Start window
-		if (m_State == AppState::Start || m_State == AppState::Load)
+		if (m_State == AppState::Start || m_State == AppState::SelectProject)
 			RenderProjectMgr();
 
 		// Render background
@@ -148,7 +146,8 @@ namespace Exampler {
 			RenderCanvas();
 			RenderMgrs();
 			RenderAudioVisualizer();
-			RenderPopups();
+			RenderMenubarPopups();
+			RenderBufferingPopup();
 
 			ImGui::End();
 		}
@@ -167,11 +166,9 @@ namespace Exampler {
 		unsigned int height = m_Window->GetHeight();
 		float startWidth = 300.0f;
 		float startHeight = 500.0f;
-		float startX = (float)width / 2.0f - startWidth / 2.0f;
-		float startY = (float)height / 2.0f - startHeight / 2.0f;
 
 		ImGui::SetNextWindowSize(ImVec2(startWidth, startHeight));
-		ImGui::SetNextWindowPos(ImVec2(startX, startY), (ImGuiCond)0);
+		ImGui::SetNextWindowPos(Center(startWidth, startHeight), (ImGuiCond)0);
 
 		ImGuiWindowFlags windowFlags = 0;
 		windowFlags |= ImGuiWindowFlags_NoTitleBar;
@@ -318,7 +315,7 @@ namespace Exampler {
 						if (selecetedProject == m_ActiveProject->GetConfig().name)
 						{
 							NewProject();
-							m_State = AppState::Load;
+							m_State = AppState::SelectProject;
 						}
 					}
 
@@ -341,7 +338,7 @@ namespace Exampler {
 		if (ImGui::Button("New"))
 			NewProject();
 
-		if (m_State == AppState::Load)
+		if (m_State == AppState::SelectProject)
 		{
 			ImGui::SameLine(); ImGui::Text("                          "); ImGui::SameLine();
 
@@ -364,7 +361,7 @@ namespace Exampler {
 			{
 				BackBeat::ProjectConfig config = m_ActiveProject->GetConfig();
 
-				// See RenderPopups() to find implementation of how "New" works
+				// See RenderMenubarPopups() to find implementation of how "New" works
 				if (ImGui::MenuItem("New"))
 				{
 					m_NewPopupOpen = true;
@@ -372,7 +369,7 @@ namespace Exampler {
 
 				if (ImGui::MenuItem("Open"))
 				{
-					m_State = AppState::Load;
+					m_State = AppState::SelectProject;
 				}
 
 				const auto untitled = std::string("Untitled");
@@ -383,7 +380,7 @@ namespace Exampler {
 				}
 				ImGui::EndDisabled();
 
-				// See RenderPopups() to find implementation of how "Save As" works
+				// See RenderMenubarPopups() to find implementation of how "Save As" works
 				if (ImGui::MenuItem("Save As"))
 				{
 					m_SaveAsPopupOpen = true;
@@ -654,7 +651,7 @@ namespace Exampler {
 		}
 	}
 
-	void MainLayer::RenderPopups()
+	void MainLayer::RenderMenubarPopups()
 	{
 		// Renaming Entity Popup
 		{
@@ -950,6 +947,7 @@ namespace Exampler {
 
 	bool MainLayer::LoadProject(std::string project)
 	{
+		m_State = AppState::Load;
 		// NOTE: Adding "\\" is a current lazy solution but this should happen in BackBeat::FileManager
 		auto projectPath = m_FileMgr.GetSubDirPath(project) + "\\";
 		// NOTE: May want to change into a class member or use exisitng member BackBeat::FileManager
@@ -1010,7 +1008,7 @@ namespace Exampler {
 			break;
 		}
 
-		case AppState::Load:
+		case AppState::SelectProject:
 		{
 			ClearEntities();
 			m_State = AppState::Play;
@@ -1237,6 +1235,23 @@ namespace Exampler {
 		ImGui::PushStyleColor(ImGuiCol_WindowBg, IM_COL32(189, 197, 206, 255)); count++;
 
 		return count;
+	}
+
+	ImVec2 MainLayer::Center(float width, float height)
+	{
+		if (width < 0.0f || height < 0.0f)
+			return ImVec2();
+
+		float windowWidth = (float)m_Window->GetWidth();
+		float windowHeight = (float)m_Window->GetHeight();
+
+		if (width > windowWidth || height > windowHeight)
+			return ImVec2();
+
+		float centerX = windowWidth / 2.0f - width / 2.0f;
+		float centerY = windowHeight / 2.0f - height / 2.0f;
+
+		return ImVec2(centerX, centerY);
 	}
 
 }
