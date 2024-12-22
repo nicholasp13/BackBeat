@@ -147,7 +147,6 @@ namespace Exampler {
 			RenderMgrs();
 			RenderAudioVisualizer();
 			RenderMenubarPopups();
-			RenderBufferingPopup();
 
 			ImGui::End();
 		}
