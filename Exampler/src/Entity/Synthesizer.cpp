@@ -1278,7 +1278,7 @@ namespace Exampler {
 		{
 			if (!m_RecorderMgr->IsActive(synthID))
 			{
-				if (ImGui::Button("Record On", ImVec2(125, 20)))
+				if (ImGui::Button("Record On"))
 				{
 					if (!m_RecorderMgr->IsRecording())
 					{
@@ -1289,16 +1289,11 @@ namespace Exampler {
 			}
 			else
 			{
-				if (ImGui::Button("Record Off", ImVec2(125, 20)))
+				if (ImGui::Button("Record Off"))
 					if (!m_RecorderMgr->IsRecording())
 						m_RecorderMgr->SetRecorderInactive(synthID);
 			}
-			ImGui::SameLine();
 
-		}
-
-		// Render Recording Track Player controls
-		{
 			int trackSize = m_RecordingPlayer->GetSize();
 			if (m_RecordingPlayer && trackSize > 0)
 			{
@@ -1311,65 +1306,28 @@ namespace Exampler {
 				{
 					if (ImGui::Button("Play Recording Off"))
 						m_RecordingPlayer->Off();
-				} ImGui::SameLine();
+				}
 
 				if (ImGui::Button("Clear Recording"))
 					if (!m_RecorderMgr->IsActive(synthID))
 						m_RecorderMgr->ResetRecording(synthID);
 
-				int position = m_RecordingPlayer->GetPosition();
-
-				static bool wasPlaying = false;
-				BackBeat::TimeMinSec trackTime = m_RecordingPlayer->GetTime();
-				BackBeat::TimeMinSec trackLength = m_RecordingPlayer->GetLength();
-
-				ImGui::Text("%d:%02d", trackTime.minutes, trackTime.seconds); ImGui::SameLine();
-
-				// Placeholder for future implementation of a custom ImGui::Timeline widget
-				ImGui::PushID("Seekbar");
-				if (BackBeat::ImGuiWidgets::ImGuiSeekBarInt("##", &position, trackSize, "", ImGuiSliderFlags(0)))
-				{
-					if (m_RecordingPlayer->IsPlaying())
-					{
-						m_RecordingPlayer->Pause();
-						wasPlaying = true;
-					}
-					m_RecordingPlayer->SetPosition(position);
-				}
-				if (ImGui::IsItemDeactivated() && wasPlaying)
-				{
-					m_RecordingPlayer->Play();
-					wasPlaying = false;
-				}
-				ImGui::SameLine(); ImGui::Text("%d:%02d", trackLength.minutes, trackLength.seconds);
-				ImGui::PopID();
-
 			}
 			else
 			{
 				if (ImGui::Button("Play Recording On "))
-				{ 
-				} ImGui::SameLine();
-				if (ImGui::Button("Clear Recording"))
-				{ 
+				{
 				}
-
-				// Renders an empty, uninteractable seek bar if no track is loaded
-				ImGui::PushID("EmptySeekbar");
-				int temp = 0;
-				ImGui::Text("%d:%02d", 0, 0); ImGui::SameLine();
-				BackBeat::ImGuiWidgets::ImGuiSeekBarInt("##", &temp, 10000, "", ImGuiSliderFlags(0)); ImGui::SameLine();
-				ImGui::Text("%d:%02d", 0, 0);
-				ImGui::PopID();
-
+				if (ImGui::Button("Clear Recording"))
+				{
+				}
 			}
-			ImGui::Spacing();
 
 		}
 
 		float* volume = &(m_SynthParams->engineParams->volume);
-		ImGui::Text("    "); ImGui::SameLine();
-		BackBeat::ImGuiWidgets::ImGuiSeekBarFloat("Volume", volume, 1.0f, "", ImGuiSliderFlags(0));
+		ImGui::Text("Volume"); ImGui::SameLine();
+		BackBeat::ImGuiWidgets::ImGuiSeekBarFloat("##Volume", volume, 1.0f, "", ImGuiSliderFlags(0));
 		
 		ImGui::Spacing();
 		ImGui::PopID();

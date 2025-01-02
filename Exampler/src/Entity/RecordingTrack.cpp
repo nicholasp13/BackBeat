@@ -51,7 +51,7 @@ namespace Exampler {
 				if (ImGui::Button("Record Off", ImVec2(125, 20)))
 					if (!m_RecorderMgr->IsRecording())
 						m_RecorderMgr->SetRecorderInactive(m_RecorderID);
-			} ImGui::SameLine();
+			}
 
 			if (!m_Player->IsOn())
 			{
@@ -62,7 +62,7 @@ namespace Exampler {
 			{
 				if (ImGui::Button("Play Recording Off"))
 					m_Player->Off();
-			} ImGui::SameLine();
+			}
 
 			if (ImGui::Button("Clear Recording"))
 				if (!m_RecorderMgr->IsRecording())
@@ -71,49 +71,8 @@ namespace Exampler {
 
 		// Render Playback controls/info
 		{
-			BackBeat::TimeMinSec trackTime = m_Player->GetTime();
-			BackBeat::TimeMinSec trackLength = m_Player->GetLength();
-			int position = m_Player->GetPosition();
-			int size = m_Player->GetSize();
-			static bool wasPlaying = false;
-
-			ImGui::Text("%d:%02d", trackTime.minutes, trackTime.seconds); ImGui::SameLine();
-
-			// Placeholder for future implementation of a custom ImGui::Timeline widget
-			if (m_Player->IsLoaded() && m_Player->GetSize() > 0)
-			{
-				ImGui::PushID("Seekbar");
-				if (BackBeat::ImGuiWidgets::ImGuiSeekBarInt("##", &position, size, "", ImGuiSliderFlags(0)))
-				{
-					if (m_Player->IsPlaying())
-					{
-						m_Player->Pause();
-						wasPlaying = true;
-					}
-					m_Player->SetPosition(position);
-				}
-				if (ImGui::IsItemDeactivated() && wasPlaying)
-				{
-					m_Player->Play();
-					wasPlaying = false;
-				}
-				ImGui::SameLine(); ImGui::Text("%d:%02d", trackLength.minutes, trackLength.seconds);
-				ImGui::PopID();
-			}
-			else
-			{
-				// Renders an empty, uninteractable seek bar if no track is loaded
-				ImGui::PushID("EmptySeekbar");
-				int temp = 0;
-				BackBeat::ImGuiWidgets::ImGuiSeekBarInt("##", &temp, 10000, "", ImGuiSliderFlags(0));
-				ImGui::SameLine(); ImGui::Text("%d:%02d", trackLength.minutes, trackLength.seconds);
-				ImGui::PopID();
-
-			}
-			ImGui::Spacing();
-
-			ImGui::Text("    "); ImGui::SameLine();
-			BackBeat::ImGuiWidgets::ImGuiSeekBarFloat("Volume", &m_Volume, 1.0f, "", ImGuiSliderFlags(0));
+			ImGui::Text("Volume"); ImGui::SameLine();
+			BackBeat::ImGuiWidgets::ImGuiSeekBarFloat("##Volume", &m_Volume, 1.0f, "", ImGuiSliderFlags(0));
 			m_Player->SetVolume(m_Volume);
 		}
 

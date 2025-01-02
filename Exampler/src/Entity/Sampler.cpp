@@ -319,7 +319,6 @@ namespace Exampler {
 					if (!m_RecorderMgr->IsRecording())
 						m_RecorderMgr->SetRecorderInactive(samplerID);
 			}
-			ImGui::SameLine();
 
 		}
 
@@ -336,57 +335,21 @@ namespace Exampler {
 				{
 					if (ImGui::Button("Play Recording Off"))
 						m_RecordingPlayer->Off();
-				} ImGui::SameLine();
+				}
 
 				if (ImGui::Button("Clear Recording"))
 					if (!m_RecorderMgr->IsActive(samplerID))
 						m_RecorderMgr->ResetRecording(samplerID);
-
-
-				BackBeat::TimeMinSec trackTime = m_RecordingPlayer->GetTime();
-				BackBeat::TimeMinSec trackLength = m_RecordingPlayer->GetLength();
-
-				int position = m_RecordingPlayer->GetPosition();
-				int size = m_RecordingPlayer->GetSize();
-				static bool wasPlaying = false;
-				ImGui::Text("%d:%02d", trackTime.minutes, trackTime.seconds); ImGui::SameLine();
-
-				// Placeholder for future implementation of a custom ImGui::Timeline widget
-				ImGui::PushID("Seekbar");
-				if (BackBeat::ImGuiWidgets::ImGuiSeekBarInt("##", &position, m_RecordingPlayer->GetSize(), "", ImGuiSliderFlags(0)))
-				{
-					if (m_RecordingPlayer->IsPlaying())
-					{
-						m_RecordingPlayer->Pause();
-						wasPlaying = true;
-					}
-					m_RecordingPlayer->SetPosition(position);
-				}
-				if (ImGui::IsItemDeactivated() && wasPlaying)
-				{
-					m_RecordingPlayer->Play();
-					wasPlaying = false;
-				}
-				ImGui::SameLine(); ImGui::Text("%d:%02d", trackLength.minutes, trackLength.seconds);
-				ImGui::PopID();
 
 			}
 			else
 			{
 				if (ImGui::Button("Play Recording On "))
 				{
-				} ImGui::SameLine();
+				}
 				if (ImGui::Button("Clear Recording"))
 				{ 
 				}
-
-				// Renders an empty, uninteractable seek bar if no track is loaded
-				ImGui::PushID("EmptySeekbar");
-				int temp = 0;
-				ImGui::Text("%d:%02d", 0, 0); ImGui::SameLine();
-				BackBeat::ImGuiWidgets::ImGuiSeekBarInt("##", &temp, 10000, "", ImGuiSliderFlags(0)); ImGui::SameLine();
-				ImGui::Text("%d:%02d", 0, 0);
-				ImGui::PopID();
 
 			}
 			ImGui::Spacing();
@@ -394,8 +357,8 @@ namespace Exampler {
 		}
 
 		float* volume = &(m_Sampler.GetEngineParams()->volume);
-		ImGui::Text("    "); ImGui::SameLine();
-		BackBeat::ImGuiWidgets::ImGuiSeekBarFloat("Volume", volume, 1.0f, "", ImGuiSliderFlags(0));
+		ImGui::Text("Volume"); ImGui::SameLine();
+		BackBeat::ImGuiWidgets::ImGuiSeekBarFloat("##Volume", volume, 1.0f, "", ImGuiSliderFlags(0));
 
 		ImGui::Spacing();
 		ImGui::PopID();
