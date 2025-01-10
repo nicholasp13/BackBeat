@@ -24,7 +24,7 @@ namespace BackBeat {
 		const ImVec2 labelSize = ImGui::CalcTextSize(label, NULL, true);
 		const ImRect frameRect(window->DC.CursorPos, Add(window->DC.CursorPos, ImVec2(w, labelSize.y + style.FramePadding.y * 2.0f)));
 		const ImRect totalRect(frameRect.Min, Add(frameRect.Max, ImVec2(labelSize.x > 0.0f ? style.ItemInnerSpacing.x + labelSize.x : 0.0f, 0.0f)));
-
+		
 		ImGui::ItemSize(totalRect, style.FramePadding.y);
 		if (!ImGui::ItemAdd(totalRect, id, &frameRect, 0))
 			return false;

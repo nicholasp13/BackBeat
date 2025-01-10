@@ -51,15 +51,14 @@ namespace Exampler {
 			const float tHeight = 1200.0f;
 			static ImGuiTableFlags tableFlags = 0;
 			tableFlags |= ImGuiTableFlags_RowBg;
-			tableFlags |= ImGuiTableFlags_BordersInner;
-			tableFlags |= ImGuiTableFlags_NoPadOuterX;
-			tableFlags |= ImGuiTableFlags_NoPadInnerX;
+			tableFlags |= ImGuiTableFlags_BordersInnerH;
+			tableFlags |= ImGuiTableFlags_BordersOuter;
 
-			ImGui::BeginTable("Entities", 2, tableFlags, ImVec2(tWidth, tHeight), 0.0f);
+			ImGui::BeginTable("Entities", 2, tableFlags, ImVec2(tWidth, tHeight), 1.0f);
 			
 			// Setup ImGui table columns
 			const float firstColumnWidth = 200.0f;
-			ImGui::TableSetupColumn("one", ImGuiTableColumnFlags_WidthFixed, firstColumnWidth); // Default to 100.0f
+			ImGui::TableSetupColumn("one", ImGuiTableColumnFlags_WidthFixed, firstColumnWidth);
 			ImGui::TableSetupColumn("two", ImGuiTableColumnFlags_WidthFixed, tWidth - firstColumnWidth);
 
 			RenderEntities();
@@ -108,15 +107,19 @@ namespace Exampler {
 	void Canvas::RenderEntities()
 	{
 		// Size of track render
+		const float height = 150.0f;
 		const float firstColumnWidth = 200.0f;
-		float trackWidth = m_Width - firstColumnWidth;
-		auto size = ImVec2(trackWidth, 150.0f);
+		const float padding = 27.0f;
+		const float secondColumnWidth = m_Width - firstColumnWidth - padding;
+		auto size = ImVec2(secondColumnWidth, height);
+		static float progress = 0.0f;
 
 		// Placeholder for track render buffer
 		const float visualMax = .15f;
 		const int bufferSize = 100;
 		float buffer[bufferSize] = {};
 		memset(buffer, 0, (size_t)bufferSize * sizeof(float));
+
 
 		for (auto itr = m_Entities.begin(); itr != m_Entities.end(); itr++)
 		{
@@ -132,11 +135,15 @@ namespace Exampler {
 			{
 				ImGui::TableNextColumn();
 
-				// Placeholder for testing looks
-				ImGui::PlotLines("", buffer, bufferSize, 1, "",
-					visualMax * -1, visualMax, size);
+				BackBeat::ImGuiWidgets::ImGuiTimeline("", buffer, bufferSize, 1, "",
+					visualMax * -1, visualMax, size, 1, progress);
 			}
 		}
+
+		// Placeholder for testing looks
+		progress += 0.001f;
+		if (progress > 1.0f)
+			progress = 0.0f;
 	}
 
 	unsigned int Canvas::SetColors()
