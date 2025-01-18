@@ -64,7 +64,9 @@ namespace Exampler {
 	{
 		m_Player = playerMgr->AddNewPlayer();
 		mixer->PushProcessor(m_Player->GetProc());
-		m_Player->LoadTrack(BackBeat::FileDialog::OpenFile("WAV Files (*.wav)\0*.wav\0"));
+		// m_Player->LoadTrack(BackBeat::FileDialog::OpenFile("WAV Files (*.wav)\0*.wav\0"));
+		m_Player->LoadTrack(BackBeat::TrackFactory::BuildMappedTrack(
+			BackBeat::FileDialog::OpenFile("WAV Files (*.wav)\0*.wav\0")));
 	}
 
 	void PlaybackTrack::Add(
@@ -76,7 +78,9 @@ namespace Exampler {
 	{
 		m_Player = playerMgr->AddNewPlayer();
 		mixer->PushProcessor(m_Player->GetProc());
-		m_Player->LoadTrack(filePath);
+		// m_Player->LoadTrack(filePath);
+		m_Player->LoadTrack(BackBeat::TrackFactory::BuildMappedTrack(filePath));
+
 	}
 
 	void PlaybackTrack::Delete(
@@ -120,9 +124,7 @@ namespace Exampler {
 
 		m_Volume = node->child("Volume").attribute("Value").as_float();
 
-		auto fileNode = node->child("File");
-		if (!fileNode.attribute("Path").empty())
-			m_Player->LoadTrack(fileNode.attribute("Path").as_string());
+		// NOTE: Track is added in MainLayer no need to read from here unless playback changes functionality
 	}
 
 	unsigned int PlaybackTrack::SetPlaybackColors()

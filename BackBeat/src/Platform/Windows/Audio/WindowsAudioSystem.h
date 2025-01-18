@@ -3,6 +3,7 @@
 #include "WindowsMIDIDeviceManager.h"
 #include "WindowsRecorder.h"
 #include "WindowsRenderer.h"
+#include "Platform/Windows/File/WindowsFileMapper.h"
 #include "BackBeat/Audio/Recorder/AudioRecorder.h"
 #include "BackBeat/Audio/AudioSystem.h"
 namespace BackBeat {
@@ -18,6 +19,7 @@ namespace BackBeat {
 		virtual void Stop() override;
 
 		inline virtual AudioProps GetProps() override { return m_Props; }
+		inline virtual FileMapper* GetFileMapper() override { return &m_FileMapper; }
 		inline virtual Mixer* GetMixer() override { return m_Engine.GetMixer(); }
 		inline virtual Renderer* GetRenderer() override { return &m_Renderer; }
 		inline virtual PlayerManager* GetPlayerManager() override { return &m_PlayerMgr; }
@@ -33,6 +35,7 @@ namespace BackBeat {
 		RecorderManager m_RecorderMgr;
 		AudioThread m_Thread;
 
+		WindowsFileMapper m_FileMapper;
 		WindowsRecorder m_DeviceRecorder;
 		WindowsRenderer m_Renderer;
 		WindowsMIDIDeviceManager m_MIDIDeviceMgr;

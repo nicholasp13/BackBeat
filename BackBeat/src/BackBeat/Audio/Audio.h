@@ -143,7 +143,7 @@ namespace BackBeat {
 		template<typename T>
 		static void CopyInputToOutput(T inputBuffer, T outputBuffer, unsigned int bytesToCopy)
 		{
-			memcpy(reinterpret_cast<void*>(inputBuffer), reinterpret_cast<void*>(outputBuffer), bytesToCopy);
+			memcpy(reinterpret_cast<void*>(outputBuffer), reinterpret_cast<void*>(inputBuffer), bytesToCopy);
 		}
 
 		static void FlushBuffer(std::shared_ptr<float[]> buffer, unsigned int numSamples, unsigned int numChannels, float defaultValue)
@@ -362,5 +362,74 @@ namespace BackBeat {
 				}
 			}
 		}
+
+		// TODO: Inverse the dependency of Int24
+		// Currently does nothing with Int24 buffer values
+		static void MultiplyBufferByValue(byte* buffer, unsigned int numBytes, AudioProps props, float value)
+		{
+			unsigned int numSamples = numBytes / props.blockAlign * props.numChannels;
+
+			switch (props.bitDepth)
+			{
+
+			case (ByteBitSize):
+			{
+				for (unsigned int i = 0; i < numSamples; i++) {
+					buffer[i] = (byte)((float)(buffer[i]) * value);
+				}
+				break;
+			}
+
+			case (Int16BitSize):
+			{
+				auto shortbuffer = reinterpret_cast<signed short*>(buffer);
+				for (unsigned int i = 0; i < numSamples; i++) {
+					shortbuffer[i] = (signed short)((float)(shortbuffer[i]) * value);
+				}
+				break;
+			}
+
+			case (Int24BitSize):
+			{
+				/**
+				int24* intBuffer = int24::GetInt24Buffer(buffer, numSamples, props.bigEndian);
+				for (unsigned int i = 0; i < numSamples; i++) {
+					intBuffer[i] = int24((float)intBuffer[i] * value);
+				}
+
+				byte* byteBuffer = int24::GetByteBuffer(intBuffer, numSamples, props.bigEndian);
+				Audio::CopyInputToOutput(buffer, byteBuffer, numSamples * Audio::Int24ByteSize);
+				delete[] intBuffer;
+				delete[] byteBuffer;
+				break;
+				/**/
+			}
+
+			case (FloatBitSize):
+			{
+				auto floatBuffer = reinterpret_cast<float*>(buffer);
+				for (unsigned int i = 0; i < numSamples; i++) {
+					floatBuffer[i] = floatBuffer[i] * value;
+				}
+				break;
+			}
+
+			case (DoubleBitSize):
+			{
+				auto doubleBuffer = reinterpret_cast<double*>(buffer);
+				for (unsigned int i = 0; i < numSamples; i++) {
+					doubleBuffer[i] = (double)(doubleBuffer[i] * value);
+				}
+				break;
+			}
+
+			default:
+			{
+				return;
+			}
+
+			}
+		}
+
 	}
 }

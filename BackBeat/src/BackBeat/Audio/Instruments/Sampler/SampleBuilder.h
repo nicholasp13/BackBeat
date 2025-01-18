@@ -4,7 +4,7 @@
 #include "BackBeat/Audio/FileIO/AudioFileWriter.h"
 #include "BackBeat/Audio/Helpers/int24.h"
 #include "BackBeat/Audio/PlayBack/Track.h"
-#include "BackBeat/Core/FileDialog.h"
+#include "BackBeat/File/FileDialog.h"
 #include "Sample.h"
 namespace BackBeat {
 

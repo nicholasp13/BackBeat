@@ -6,7 +6,7 @@
 #include <GLFW/glfw3native.h>
 
 #include "BackBeat/Core/Application.h"
-#include "BackBeat/Core/FileDialog.h"
+#include "BackBeat/File/FileDialog.h"
 namespace BackBeat {
 
 	std::string FileDialog::OpenFile(const char* filter)

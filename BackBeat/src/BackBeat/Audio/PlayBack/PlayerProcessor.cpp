@@ -47,7 +47,7 @@ namespace BackBeat {
 		if (m_Track->GetProps().numChannels != numChannels)
 		{
 			byte temp[bufferSize] = {};
-			m_Track->Render(temp, actualBytes);
+			m_Track->Read(temp, actualBytes);
 			if (numChannels == Audio::Stereo)
 			{
 				MonoToStereo(actualBytes, props.bitDepth, temp, m_Output);
@@ -59,7 +59,7 @@ namespace BackBeat {
 		}
 		else 
 		{
-			m_Track->Render(m_Output, actualBytes);
+			m_Track->Read(m_Output, actualBytes);
 		}
 		
 		bool downSampling = m_Track->GetProps().sampleRate > sampleRate;

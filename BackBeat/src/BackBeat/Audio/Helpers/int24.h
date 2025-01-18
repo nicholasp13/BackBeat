@@ -2,6 +2,8 @@
 
 // Signed, two's complement 24 bit integer, always big endian
 
+// TODO: Reverse dependency on Audio as int24 should be included in Audio.h not the other way around
+
 #include "BackBeat/Audio/Audio.h"
 namespace BackBeat {
 

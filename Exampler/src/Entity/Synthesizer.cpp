@@ -587,7 +587,6 @@ namespace Exampler {
 	}
 
 	// NOTE: - node is the parent of the node being written to
-	//       - TODO: Still need to implement serializing RecordingTracks
 	void Synthesizer::WriteObject(pugi::xml_node* node)
 	{
 		auto synthNode = node->append_child("Synthesizer");
@@ -1240,9 +1239,9 @@ namespace Exampler {
 
 			if (!trackFilePath.empty())
 			{
-				BackBeat::AudioInfo info = BackBeat::AudioFileReader::ReadFile(trackFilePath);
-				if (!m_RecordingPlayer->GetTrack()->CopyData(info))
-					BB_CLIENT_ERROR("ERROR LOADING AUDIO FILE FOR {0} from {1}", m_Name.c_str(), trackFilePath.c_str());
+				auto trackToCopy = BackBeat::TrackFactory::BuildTrack(trackFilePath);
+				BackBeat::TrackFactory::CopyTrackData(trackToCopy, m_RecordingPlayer->GetTrack());
+				m_RecordingPlayer->Reset();
 			}
 		}
 

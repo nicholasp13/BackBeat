@@ -72,7 +72,7 @@ namespace BackBeat {
 				sampleDataIncrement = (unsigned int)((float)trackIncrement * blockAlignRatio);
 				numSamples = sampleDataIncrement / sampleProps.blockAlign;
 
-				track->Render((byte*)trackData, trackIncrement);
+				track->Read((byte*)trackData, trackIncrement);
 
 				byte defaultValue = 0x00;
 				Audio::FlushBufferT((byte*)sampleData, &defaultValue, sampleDataIncrement);

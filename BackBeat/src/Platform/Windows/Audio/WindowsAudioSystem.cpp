@@ -1,6 +1,6 @@
 #include "bbpch.h"
 
-#include "BackBeat/Core/FileSystem.h"
+#include "BackBeat/File/FileSystem.h"
 #include "WindowsAudioSystem.h"
 namespace BackBeat {
 
@@ -23,6 +23,8 @@ namespace BackBeat {
 		BackBeat::FileSystem::SetAppDataLocalDir(appDataLocalDir);
 		BackBeat::FileSystem::SetAppDir(appName);
 		BackBeat::FileSystem::CreateTempDir();
+
+		BackBeat::TrackFactory::SetFileMapper(&m_FileMapper);
 
 		m_Renderer.Init();
 

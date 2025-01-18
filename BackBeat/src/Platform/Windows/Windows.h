@@ -5,6 +5,7 @@
 #include <Audioclient.h>
 #include <mmeapi.h>
 #include <ShlObj_core.h>
+#include <memoryapi.h>
 
 #include <string>
 

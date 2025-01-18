@@ -165,9 +165,9 @@ namespace Exampler {
 			std::string trackFilePath = trackNode.attribute("FilePath").as_string();
 			if (!trackFilePath.empty())
 			{
-				BackBeat::AudioInfo info = BackBeat::AudioFileReader::ReadFile(trackFilePath);
-				if (!m_Player->GetTrack()->CopyData(info))
-				BB_CLIENT_ERROR("ERROR LOADING AUDIO FILE FOR {0} from {1}", m_Name.c_str(), trackFilePath.c_str());
+				auto trackToCopy = BackBeat::TrackFactory::BuildTrack(trackFilePath);
+				BackBeat::TrackFactory::CopyTrackData(trackToCopy, m_Player->GetTrack());
+				m_Player->Reset();
 			}
 		}
 	}
