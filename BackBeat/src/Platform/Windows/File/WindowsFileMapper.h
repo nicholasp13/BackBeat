@@ -14,6 +14,7 @@ namespace BackBeat {
 		~WindowsFileMapper();
 
 		virtual std::shared_ptr<FileMap> MapFile(std::string filePath, unsigned long size) override;
+		virtual std::shared_ptr<FileMap> CreateMappedFile(std::string filePath, unsigned long size) override;
 
 	private:
 		SYSTEM_INFO m_SystemInfo;

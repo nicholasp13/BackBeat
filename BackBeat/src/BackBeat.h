@@ -17,6 +17,7 @@
 
 #include "BackBeat/Audio/Audio.h"
 #include "BackBeat/Audio/AudioSystem.h"
+#include "BackBeat/Audio/FileIO/AudioFileLoader.h"
 #include "BackBeat/Audio/Helpers/int24.h"
 #include "BackBeat/Audio/FileIO/WAVFileBuilder.h"
 #include "BackBeat/Audio/PlayBack/PlayerManager.h"

@@ -2,6 +2,9 @@
 //       - Add the ability to save specific configs from certain entities i.e. Synth's to a config xml file
 //       - Allow user to change the audio input channel for RecordingTrack and between MONO and STEREO
 
+// TODO IMMINENTLY:
+//     - Make playerMgr use a Timer to keep track of time
+
 #include "MainLayer.h"
 namespace Exampler {
 
@@ -34,12 +37,12 @@ namespace Exampler {
 
 	MainLayer::~MainLayer()
 	{
-
+		
 	}
 
 	void MainLayer::OnAttach()
 	{
-		m_Canvas.Init(m_PlayerMgr);
+		m_Canvas.Init(m_Audio->GetProps(), m_PlayerMgr);
 
 		m_NumMIDIDevices = m_MIDIDeviceManager->GetNumDevices();
 		for (unsigned int i = 0; i < m_NumMIDIDevices; i++) 
@@ -529,7 +532,6 @@ namespace Exampler {
 				visualMax * -1, visualMax, ImVec2(m_Window->GetWidth() - 200.0f, 60.0f));
 		}
 
-
 		ImGui::Spacing();
 	}
 
@@ -791,10 +793,15 @@ namespace Exampler {
 
 		auto playback = std::make_shared<PlaybackTrack>();
 		playback->Add(m_PlayerMgr, m_RecorderMgr, m_AudioRenderer->GetMixer(), m_MIDIDeviceManager);
-		std::string playerName = "Playback " + std::to_string(++m_NumPlayback);
-		playback->SetName(playerName);
-		m_Entities.push_back(playback);
-		m_Canvas.AddEntity(playback);
+
+		// If playback loads incorrectly GetMappedTrack() will return a nullptr
+		if (playback->GetMappedTrack())
+		{
+			std::string playerName = "Playback " + std::to_string(++m_NumPlayback);
+			playback->SetName(playerName);
+			m_Entities.push_back(playback);
+			m_Canvas.AddEntity(playback);
+		}
 	}
 
 	void MainLayer::AddPlaybackTrack(std::string filePath)
@@ -804,10 +811,15 @@ namespace Exampler {
 
 		auto playback = std::make_shared<PlaybackTrack>();
 		playback->Add(m_PlayerMgr, m_RecorderMgr, m_AudioRenderer->GetMixer(), m_MIDIDeviceManager, filePath);
-		std::string playerName = "Playback " + std::to_string(++m_NumPlayback);
-		playback->SetName(playerName);
-		m_Entities.push_back(playback);
-		m_Canvas.AddEntity(playback);
+
+		// If playback loads incorrectly GetMappedTrack() will return a nullptr
+		if (playback->GetMappedTrack())
+		{
+			std::string playerName = "Playback " + std::to_string(++m_NumPlayback);
+			playback->SetName(playerName);
+			m_Entities.push_back(playback);
+			m_Canvas.AddEntity(playback);
+		}
 	}
 
 	void MainLayer::AddRecordingTrack()
@@ -885,11 +897,13 @@ namespace Exampler {
 			m_EtyToDelete = m_Entities.front();
 			DeleteEntity();
 		}
+		// BackBeat::FileSystem::ClearTempDir();
 	}
 
 	bool MainLayer::LoadProject(std::string project)
 	{
 		m_State = AppState::Load;
+		m_Canvas.Reset();
 		// NOTE: Adding "\\" is a current lazy solution but this should happen in BackBeat::FileManager
 		auto projectPath = m_FileMgr.GetSubDirPath(project) + "\\";
 		// NOTE: May want to change into a class member or use exisitng member BackBeat::FileManager
@@ -934,6 +948,7 @@ namespace Exampler {
 		m_ActiveProject = BackBeat::Project::New();
 		m_ActiveProject->GetConfig().app = "Exampler";
 		m_ActiveProject->GetConfig().tracksDirectoryPath = BackBeat::FileSystem::GetTempDir();
+		m_Canvas.Reset();
 
 		switch (m_State)
 		{
@@ -961,7 +976,6 @@ namespace Exampler {
 		{
 			break;
 		}
-
 
 		}
 	}

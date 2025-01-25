@@ -38,11 +38,8 @@ namespace BackBeat {
 		float actualSamples = (float)numSamples * (float)props.sampleRate / (float)sampleRate;
 		unsigned int actualBytes = (unsigned int)floor(actualSamples * (float)props.blockAlign);
 		
-		// Flush data buffer
-		for (unsigned int i = 0; i < actualBytes; i++) {
-			m_Output[i] = (byte)0x00;
-		}
-		
+		Audio::FlushBuffer(m_Output, actualBytes);
+
 		// Changes Mono to Stereo and vice versa
 		if (m_Track->GetProps().numChannels != numChannels)
 		{

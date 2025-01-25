@@ -55,7 +55,7 @@ namespace BackBeat {
 		const ImVec2 frameSize = ImGui::CalcItemSize(sizeArg, ImGui::CalcItemWidth(), labelSize.y + style.FramePadding.y * 2.0f);
 
 		const ImRect frameRect(window->DC.CursorPos, Add(window->DC.CursorPos, frameSize));
-		const ImRect innerRect(Add(frameRect.Min, style.FramePadding), Add(frameRect.Max, style.FramePadding));
+		const ImRect innerRect(Add(frameRect.Min, style.FramePadding), Sub(frameRect.Max, style.FramePadding));
 		const ImRect totalRect(frameRect.Min, Add(frameRect.Max, ImVec2(labelSize.x > 0.0f ? style.ItemInnerSpacing.x + labelSize.x : 0.0f, 0)));
 		ImGui::ItemSize(totalRect, style.FramePadding.y);
 		if (!ImGui::ItemAdd(totalRect, 0, &frameRect))
@@ -119,7 +119,7 @@ namespace BackBeat {
 
 		// Text overlay
 		if (overlayText)
-			ImGui::RenderTextClipped(ImVec2(frameRect.Min.x, frameRect.Min.y + style.FramePadding.y), frameRect.Max, overlayText, NULL, NULL, ImVec2(0.5f, 0.0f));
+			ImGui::RenderTextClipped(ImVec2(frameRect.Min.x + style.FramePadding.x, frameRect.Min.y + style.FramePadding.y), frameRect.Max, overlayText, NULL, NULL, ImVec2(0.0f, 0.0f));
 
 		if (labelSize.x > 0.0f)
 			ImGui::RenderText(ImVec2(frameRect.Max.x + style.ItemInnerSpacing.x, innerRect.Min.y), label);

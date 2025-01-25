@@ -217,6 +217,15 @@ namespace BackBeat {
 		return ImGuiSeekBar(label, ImGuiDataType_S32, fraction, v, &vMin, &vMax, format, flags);
 	}
 
+	// NOTE: Might want to change fraction calcultation to inside ImGuiSeekBar() depending on what is needed for future implementation.
+	//       Fine for now
+	bool ImGuiWidgets::ImGuiSeekBarUnsignedInt(const char* label, unsigned int* v, unsigned vMax, const char* format, ImGuiSliderFlags flags)
+	{
+		int vMin = 0;
+		float fraction = float(*v) / (float)vMax;
+		return ImGuiSeekBar(label, ImGuiDataType_S32, fraction, v, &vMin, &vMax, format, flags);
+	}
+
 	// NOTE: Only handles int, may implement other data types later
 	//       Might want to create way to set padding between lower and upper border
 	//       Might want to make the widget stop when the user crosses the upper and lower borders

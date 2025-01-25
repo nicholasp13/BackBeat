@@ -19,9 +19,12 @@ namespace BackBeat {
 
 	MappedTrack::~MappedTrack()
 	{
-
+		if (m_Info.type == FileType::recordingTemp)
+			m_FileMap->SetToDelete();
 	}
 
+	// Inherited from Track
+	// Read function derived from Track class that is used by audio rendering, copying data, etc.
 	bool MappedTrack::Read(byte* output, unsigned int numBytes)
 	{
 		if (numBytes == 0)
@@ -69,7 +72,9 @@ namespace BackBeat {
 		return true;
 	}
 
+	// Inherited from Track
 	// While regular Track appends data to the end of the file, MappedTrack overwrites the MappedFile
+	// Used for recording and copying data
 	bool MappedTrack::Write(byte* input, unsigned int numBytes)
 	{
 		if (numBytes == 0)
@@ -77,54 +82,152 @@ namespace BackBeat {
 		if ((numBytes % m_Info.props.blockAlign) != 0)
 			return false;
 
-		unsigned int position = m_Position + numBytes;
-		unsigned int bytesToRender = numBytes;
-		if (m_Position < m_StartPosition)
+		if (input)
+			m_FileMap->WriteData((char*)input, numBytes, m_Position);
+		else
 		{
-			if (position >= m_StartPosition)
+			// Write silence here
+		}
+
+		m_Position += numBytes;
+		if (m_Position > m_Info.dataSize + m_Info.dataZero)
+		{
+			m_Info.dataSize = m_Position - m_Info.dataZero;
+			m_EndPosition = m_Position;
+		}
+		return true;
+	}
+
+	// NOT inherited from Track
+	// Read used for visual representation of track. Does not set the track as done if goes passed the end position
+	// Position needs to be on block align as well as numBytes
+	bool MappedTrack::Read(byte* output, unsigned int numBytes, unsigned int position)
+	{
+		if (numBytes == 0)
+			return true;
+		if ((numBytes % m_Info.props.blockAlign) != 0)
+			return false;
+		if ((position % m_Info.props.blockAlign) != 0)
+			return false;
+
+		unsigned int newPosition = position + numBytes;
+		unsigned int bytesToRender = numBytes;
+		if (position < m_Info.dataZero)
+		{
+			if (newPosition >= m_Info.dataZero)
 			{
-				bytesToRender = position - m_StartPosition;
-				m_Position = m_StartPosition;
+				bytesToRender = newPosition - m_Info.dataZero;
+				position = m_Info.dataZero;
 			}
 			else
 			{
-				m_Position = position;
 				return true;
 			}
 		}
-		else if (m_Position >= m_EndPosition)
+		else if (position >= m_Info.dataSize + m_Info.dataZero)
 		{
-			m_Position += bytesToRender;
-			if (m_Position >= m_Info.dataSize + m_Info.dataZero)
-			{
-				m_Position = m_Info.dataSize + m_Info.dataZero;
-				m_Done = true;
-			}
 			return true;
 		}
-		else if (position > m_EndPosition)
-			bytesToRender = m_EndPosition - m_Position;
+		else if (newPosition > m_Info.props.fileSize)
+			bytesToRender = m_Info.props.fileSize - position;
 
-		m_FileMap->WriteData((char*)input, bytesToRender, m_Position);
+		return m_FileMap->ReadData((char*)output, bytesToRender, position);
+	}
 
-		m_Position += bytesToRender;
-		if (m_Position >= m_Info.dataSize + m_Info.dataZero)
-			m_Done = true;
+	// NOT inherited from Track
+	// Used for editing track, specifically overwriting specific parts of file.
+	// Does not set the track as done if goes passed the end position
+	// Position needs to be on block align as well as numBytes
+	bool MappedTrack::Write(byte* input, unsigned int numBytes, unsigned int position)
+	{
+		if (numBytes == 0)
+			return true;
+		if ((numBytes % m_Info.props.blockAlign) != 0)
+			return false;
+		if ((position % m_Info.props.blockAlign) != 0)
+			return false;
 
-		return true;
+		unsigned int newPosition = position + numBytes;
+		unsigned int bytesToRender = numBytes;
+		if (position < m_Info.dataZero)
+		{
+			if (newPosition >= m_Info.dataZero)
+			{
+				bytesToRender = newPosition - m_Info.dataZero;
+				position = m_Info.dataZero;
+			}
+			else
+			{
+				return true;
+			}
+		}
+		else if (newPosition > m_Info.props.fileSize)
+			bytesToRender = m_Info.props.fileSize - position;
+
+		if (m_FileMap->WriteData((char*)input, bytesToRender, position))
+		{
+			if (newPosition >= m_Info.dataSize + m_Info.dataZero)
+			{
+				m_Info.dataSize = newPosition - m_Info.dataZero;
+				m_EndPosition = newPosition;
+			}
+
+			return true;
+		}
+
+		return false;
+	}
+
+	void MappedTrack::Reset()
+	{
+		m_Position = 0;
+		m_StartPosition = 0;
+		m_EndPosition = 0;
+		m_Info.dataSize = 0;
+	}
+
+	void MappedTrack::Reset(AudioProps props)
+	{
+		m_Info.props = props;
+		Reset();
+	}
+
+	void MappedTrack::Clear()
+	{
+		// Write 0s for DataSize in FileMap
+		m_Position = 0;
+
+		const unsigned int bufferSize = 4800;
+		byte zero = 0;
+		byte buffer[bufferSize] = {};
+		Audio::FlushBufferT(buffer, &zero, bufferSize);
+
+		while (!m_Done)
+		{
+			Write(buffer, bufferSize);
+		}
+
+		Reset();
 	}
 
 	TimeMinSec MappedTrack::GetTime()
 	{
 		AudioProps props = m_Info.props;
-		float timeTotal = (float)((m_Position - m_Info.dataZero) / props.byteRate);
+		float timeTotal = ((float)m_Position - (float)m_Info.dataZero) / (float)props.byteRate;
 		return Audio::GetTime(timeTotal);
+	}
+
+	TimeMinSec MappedTrack::GetTimeMs()
+	{
+		AudioProps props = m_Info.props;
+		float timeTotal = ((float)m_Position - (float)m_Info.dataZero) / (float)props.byteRate;
+		return Audio::GetTimeMs(timeTotal);
 	}
 
 	TimeMinSec MappedTrack::GetLength()
 	{
 		AudioProps props = m_Info.props;
-		float timeTotal = (float)(m_Info.dataSize / props.byteRate);
+		float timeTotal = (float)m_Info.dataSize / (float)props.byteRate;
 		return Audio::GetTime(timeTotal);
 	}
 

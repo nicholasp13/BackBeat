@@ -1,13 +1,12 @@
 #include "bbpch.h"
 
-// NOTE: This is only partially implemented as the complete version will check the size and/or state of each player
-//       and update accordingly. Currently this class does not pause or stop by itself when all the players are done playing
+// TODO: Set and create timer
 
 #include "PlayerManager.h"
 namespace BackBeat {
 
 	PlayerManager::PlayerManager()
-		: m_Playing(false), m_Position(0u)
+		: m_Playing(false)
 	{
 
 	}
@@ -80,6 +79,81 @@ namespace BackBeat {
 				m_Players.erase(it);
 				return;
 			}
+		}
+	}
+
+	// Assumes all positions for all active players should be the same
+	unsigned int PlayerManager::GetPosition()
+	{
+		if (m_Players.size() == 0)
+			return 0;
+
+		for (auto it = m_Players.begin(); it != m_Players.end(); it++)
+		{
+			if ((*it)->IsPlaying())
+				return (*it)->GetPosition();
+		}
+
+		return m_Players[0]->GetPosition();
+	}
+
+	TimeMinSec PlayerManager::GetTime()
+	{
+		TimeMinSec time = {
+			.minutes      = 0,
+			.seconds      = 0,
+			.milliseconds = 0
+		};
+
+		if (m_Players.size() == 0)
+			return time;
+
+		for (auto it = m_Players.begin(); it != m_Players.end(); it++)
+		{
+			if ((*it)->IsPlaying())
+			{
+				return (*it)->GetTime();
+			}
+		}
+
+		return m_Players[0]->GetTime();
+	}
+
+	TimeMinSec PlayerManager::GetTimeMs()
+	{
+		TimeMinSec time = {
+			.minutes = 0,
+			.seconds = 0,
+			.milliseconds = 0
+		};
+
+		if (m_Players.size() == 0)
+			return time;
+
+		for (auto it = m_Players.begin(); it != m_Players.end(); it++)
+		{
+			if ((*it)->IsPlaying())
+			{
+				return (*it)->GetTimeMs();
+			}
+		}
+
+		return m_Players[0]->GetTimeMs();
+	}
+
+	// Change to use seconds
+	void PlayerManager::SetPosition(float seconds)
+	{
+		unsigned int position = 0;
+		float byteRate = 0.0f;
+		std::shared_ptr<Player> player = nullptr;
+
+		for (auto it = m_Players.begin(); it != m_Players.end(); it++)
+		{
+			player = *it;
+			byteRate = (float)player->GetTrack()->GetProps().byteRate;
+			position = unsigned int(seconds * byteRate);
+			player->SetPosition(position);
 		}
 	}
 

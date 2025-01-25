@@ -76,12 +76,15 @@ namespace BackBeat {
 
 		// MISC CONSTANTS
 		constexpr unsigned int ByteBitSize   = 8;
+		constexpr unsigned int ByteByteSize  = 1;
 		constexpr unsigned int Int16BitSize  = 16;
+		constexpr unsigned int Int16ByteSize = 2;
 		constexpr unsigned int Int24BitSize  = 24;
-		constexpr unsigned int FloatBitSize  = 32;
-		constexpr unsigned int DoubleBitSize = 64;
 		constexpr unsigned int Int24ByteSize = 3;
+		constexpr unsigned int FloatBitSize  = 32;
 		constexpr unsigned int FloatByteSize = 4;
+		constexpr unsigned int DoubleBitSize = 64;
+		constexpr unsigned int DoubleByteSize = 8;
 		constexpr float Int24Max             = 8388607.0f;
 
 		// AUDIOFILE CONSTANTS
@@ -152,6 +155,11 @@ namespace BackBeat {
 				buffer[i] = defaultValue;
 		}
 
+		static void FlushBuffer(byte* buffer, unsigned int numBytes)
+		{
+			memset(buffer, 0, numBytes); 
+		}
+
 		template<typename T>
 		static void FlushBufferT(T buffer, T defaultValue, unsigned int num)
 		{
@@ -167,7 +175,7 @@ namespace BackBeat {
 			return !p[0] == 1;
 		}
 
-		// Gets time in minutes and seconds only. TODO: Refactor to reflect specific time units returned
+		// Gets time in minutes and seconds only.
 		static TimeMinSec GetTime(float totalSeconds)
 		{
 			TimeMinSec time = TimeMinSec();
@@ -176,6 +184,26 @@ namespace BackBeat {
 			time.minutes = minutes;
 			time.seconds = seconds;
 			time.milliseconds = 0;
+			return time;
+		}
+
+		// Gets time in seconds only.
+		static TimeMinSec GetTimeSecs(float totalSeconds)
+		{
+			TimeMinSec time = TimeMinSec();
+			time.minutes = 0;
+			time.seconds = unsigned int(totalSeconds);
+			time.milliseconds = 0;
+			return time;
+		}
+
+		// Gets time in milliseconds
+		static TimeMinSec GetTimeMs(float totalSeconds)
+		{
+			TimeMinSec time = TimeMinSec();
+			time.minutes = 0;
+			time.seconds = 0;
+			time.milliseconds = unsigned int(totalSeconds * 1000.0f);
 			return time;
 		}
 

@@ -75,6 +75,13 @@ namespace BackBeat {
 		return TimeMinSec();
 	}
 
+	TimeMinSec Player::GetTimeMs()
+	{
+		if (m_SelectedTrack)
+			return m_SelectedTrack->GetTimeMs();
+		return TimeMinSec();
+	}
+
 	TimeMinSec Player::GetLength()
 	{
 		if (m_SelectedTrack)

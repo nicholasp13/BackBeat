@@ -11,11 +11,10 @@ namespace BackBeat {
 		if (end <= start)
 			return false;
 
-		const unsigned int arraySize = 5000;
-		char data[arraySize] = {};
-
 		std::string filePath = FileDialog::SaveFile("WAV Files (*.wav)\0*.wav\0");
 		AudioProps props = track->GetProps();
+		unsigned int arraySize = props.byteRate;
+		char* data = new char[arraySize];
 		unsigned int size = (end - (end % props.blockAlign)) - (start - (start % props.blockAlign));
 		
 		bool success = AudioFileWriter::WriteWAVFileHeader(filePath, props, size);
@@ -38,6 +37,8 @@ namespace BackBeat {
 				filePosition += dataIncrement;
 			}
 		}
+
+		delete[arraySize] data;
 		return success;
 	}
 
@@ -48,12 +49,13 @@ namespace BackBeat {
 		if (end <= start)
 			return false;
 
-		const unsigned int arraySize = 5000;
-		char data[arraySize] = {};
 		AudioProps props = track->GetProps();
+		unsigned int arraySize = props.byteRate;
+		char* data = new char[arraySize];
 		unsigned int size = (end - (end % props.blockAlign)) - (start - (start % props.blockAlign));
 
 		bool success = AudioFileWriter::WriteWAVFileHeader(filePath, props, size);
+
 		if (success)
 		{
 			const unsigned int dataSize = arraySize;
@@ -72,6 +74,8 @@ namespace BackBeat {
 				filePosition += dataIncrement;
 			}
 		}
+
+		delete[arraySize] data;
 		return success;
 	}
 }

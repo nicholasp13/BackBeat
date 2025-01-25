@@ -25,6 +25,7 @@ namespace BackBeat {
 		inline void PushProcessor(std::shared_ptr<AudioProcessor> processor) { m_Processors.push_back(processor); }
 		inline void SetRecordingManager(RecorderManager* recordingManager) { m_RecordingManager = recordingManager; }
 		inline void SetVisualizer(Visualizer* visualizer) { m_Visualizer = visualizer; }
+		inline AudioProps GetProps() { return m_Props; }
 
 	private:
 		static const unsigned int s_BufferSize = 50000;

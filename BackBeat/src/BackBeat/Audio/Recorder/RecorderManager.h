@@ -23,7 +23,7 @@ namespace BackBeat {
 		void Start();
 		void Stop();
 		std::shared_ptr<Track> AddRecordingTrack(UUID id, RecorderType type);
-		void AddRecordingTrack(UUID id, std::shared_ptr<Track> track, RecorderType type);
+		std::shared_ptr<MappedTrack> AddRecordingMappedTrack(UUID id, RecorderType type);
 		void SetRecorderActive(UUID id);
 		void SetRecorderInactive(UUID id);
 		void SetRecordingTrack(UUID id);

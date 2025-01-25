@@ -4,7 +4,14 @@ namespace Exampler {
 
 
 	Canvas::Canvas()
-		: m_Width(0.0f), m_Height(0.0f), m_PlayerMgr(nullptr)
+		:
+		m_Position(0u),
+		m_Width(0.0f), 
+		m_Height(0.0f),
+		m_Buffer(std::make_shared<float[]>(s_BufferSize)), 
+		m_Props(BackBeat::AudioProps()),
+		m_Loader(s_BufferSize* BackBeat::Audio::Stereo * sizeof(float)),
+		m_PlayerMgr(nullptr)
 	{
 
 	}
@@ -14,8 +21,9 @@ namespace Exampler {
 
 	}
 
-	void Canvas::Init(BackBeat::PlayerManager* playerMgr)
+	void Canvas::Init(BackBeat::AudioProps props, BackBeat::PlayerManager* playerMgr)
 	{
+		m_Props = props;
 		m_PlayerMgr = playerMgr;
 	}
 
@@ -69,8 +77,27 @@ namespace Exampler {
 
 		// TODO: Render Popup here
 
-		ImGui::Text("Position: %d:%02d", 0, 0); ImGui::SameLine();
-		ImGui::Text("Total: %d:%02d", 0, 0);
+		// Renders position controller
+		{
+			float fileLimit = (float)m_PlayerMgr->GetFileLimit();
+			float positionBytes = (float)m_Position * (float)sizeof(float) / (float)m_Props.byteRate;
+			static float positionPercent = 0.0f;
+
+			BackBeat::TimeMinSec time = BackBeat::Audio::GetTime(positionBytes);
+			BackBeat::TimeMinSec length = BackBeat::Audio::GetTime(fileLimit / (float)m_Props.byteRate);
+
+			ImGui::Text("Position: %d:%02d", time.minutes, time.seconds); ImGui::SameLine();
+			ImGui::Text("Total: %d:%02d", length.minutes, length.seconds); ImGui::SameLine();
+
+			if (BackBeat::ImGuiWidgets::ImGuiSeekBarFloat("##CanvasSeekbar", &positionPercent,
+				1.0f, "", ImGuiSliderFlags(0)))
+				m_Position = unsigned int(positionPercent * fileLimit / (float)sizeof(float));
+			else
+				positionPercent = ((float)m_Position * (float)sizeof(float)) / fileLimit;
+
+			if (ImGui::IsItemDeactivated())
+				m_PlayerMgr->SetPosition(positionPercent * fileLimit / float(m_Props.byteRate));
+		}
 
 		ImGui::PopStyleColor(count);
 	}
@@ -104,6 +131,11 @@ namespace Exampler {
 		}
 	}
 
+	void Canvas::Reset()
+	{
+		m_Position = 0;
+	}
+
 	void Canvas::RenderEntities()
 	{
 		// Size of track render
@@ -111,39 +143,87 @@ namespace Exampler {
 		const float firstColumnWidth = 200.0f;
 		const float padding = 27.0f;
 		const float secondColumnWidth = m_Width - firstColumnWidth - padding;
-		auto size = ImVec2(secondColumnWidth, height);
-		static float progress = 0.0f;
+		float progress = 0.0f;
+		float secondsPerBuffer = 0.0f;
+		float secondsPlayed = 0.0f;
+		float positionInSeconds = 0.0f;
+		unsigned int position = m_PlayerMgr->GetPosition();
+		unsigned int numChannels = 0;
+		unsigned int numBytes = s_BufferSize * sizeof(float);
+		unsigned int pos = m_Position * sizeof(float);
+		std::string label = "";
+		std::string overlayText = "";
+		const float visualMax = 1.00f;
+		std::shared_ptr<BackBeat::MappedTrack> track = nullptr;
 
-		// Placeholder for track render buffer
-		const float visualMax = .15f;
-		const int bufferSize = 100;
-		float buffer[bufferSize] = {};
-		memset(buffer, 0, (size_t)bufferSize * sizeof(float));
+		// Calculate the progress tracker
+		secondsPerBuffer = (float)(s_BufferSize * sizeof(float)) / (float)m_Props.byteRate * (float)m_Props.numChannels;
+		positionInSeconds = (float)pos / (float)m_Props.byteRate;
+		auto timePlayer = m_PlayerMgr->GetTimeMs();
+		secondsPlayed = (float)timePlayer.milliseconds / 1000.0f;
+		progress = (secondsPlayed - positionInSeconds) / secondsPerBuffer;
 
+		if (progress > 1.0f)
+		{
+			m_Position += (s_BufferSize * 2);
+			pos = m_Position * sizeof(float);
+			progress = 0.0f;
+		}
 
+		// Flush buffer before each call to Load()
 		for (auto itr = m_Entities.begin(); itr != m_Entities.end(); itr++)
 		{
+			std::shared_ptr<Entity> entity = *itr;
+			auto id = entity->GetID();
+			ImGui::PushID(id.ToString().c_str());
+
 			// Renders entity controls
 			{
 				ImGui::TableNextColumn();
-
-				std::shared_ptr<Entity> entity = *itr;
 				entity->ImGuiRender();
 			}
 
-			// Renders track
+			// Renders track data
 			{
 				ImGui::TableNextColumn();
 
-				BackBeat::ImGuiWidgets::ImGuiTimeline("", buffer, bufferSize, 1, "",
-					visualMax * -1, visualMax, size, 1, progress);
+				track = entity->GetMappedTrack();
+				BackBeat::Audio::FlushBuffer((byte*)m_Buffer.get(), numBytes);
+
+				if (track)
+				{
+					numChannels = track->GetProps().numChannels;
+
+					for (unsigned int i = 0; i < numChannels; i++)
+					{
+						label = track->GetName() + std::to_string(i);
+						overlayText = "Channel " + std::to_string(i + 1);
+
+						if (numChannels != m_Props.numChannels)
+							m_Loader.Load(track, (byte*)m_Buffer.get(), numBytes, pos / m_Props.numChannels * numChannels, i);
+						else
+							m_Loader.Load(track, (byte*)m_Buffer.get(), numBytes, pos, i);
+
+						BackBeat::ImGuiWidgets::ImGuiTimeline(label.c_str() , m_Buffer.get(), s_BufferSize, 1, overlayText.c_str(),
+							visualMax * -1, visualMax, ImVec2(secondColumnWidth, height / (float)numChannels),
+							BackBeat::Audio::FloatByteSize, progress);
+					}
+				}
+				else
+				{
+					// Creates empty timeline
+					overlayText = "Channel 1";
+					BackBeat::ImGuiWidgets::ImGuiTimeline("", m_Buffer.get(), s_BufferSize, 1, overlayText.c_str(),
+						visualMax * -1, visualMax, ImVec2(secondColumnWidth, height),
+						BackBeat::Audio::FloatByteSize, progress);
+				}
+
 			}
+
+			ImGui::PopID();
+			track = nullptr;
 		}
 
-		// Placeholder for testing looks
-		progress += 0.001f;
-		if (progress > 1.0f)
-			progress = 0.0f;
 	}
 
 	unsigned int Canvas::SetColors()

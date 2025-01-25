@@ -13,6 +13,7 @@ namespace BackBeat {
 		std::shared_ptr<Track> BuildTempTrack(UUID id, AudioProps props);
 		std::shared_ptr<MappedTrack> BuildMappedTrack(std::string filePath);
 		std::shared_ptr<MappedTrack> BuildMappedTrack(AudioInfo info);
+		std::shared_ptr<MappedTrack> BuildMappedTempTrack(UUID id, AudioProps props);
 		void CopyTrackData(std::shared_ptr<Track> input, std::shared_ptr<Track> output);
 		void SetFileMapper(FileMapper* fileMapper);
 		void SetFileSize(unsigned long size);

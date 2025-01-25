@@ -13,7 +13,15 @@ namespace BackBeat {
 		virtual bool Read(byte* output, unsigned int numBytes) override;
 		virtual bool Write(byte* input, unsigned int numBytes) override;
 
+		bool Read(byte* output, unsigned int numBytes, unsigned int position);
+		bool Write(byte* input, unsigned int numBytes, unsigned int position);
+
+		virtual void Reset() override;
+		virtual void Reset(AudioProps props) override;
+		virtual void Clear() override;
+
 		virtual TimeMinSec GetTime() override;
+		virtual TimeMinSec GetTimeMs() override;
 		virtual TimeMinSec GetLength() override;
 		virtual void SetPosition(unsigned int position) override;
 		virtual void SetStart(unsigned int start) override;
@@ -30,7 +38,8 @@ namespace BackBeat {
 		inline virtual AudioInfo GetInfo() override { return m_Info; }
 		inline virtual FileType GetFileType() override { return m_Info.type; }
 		inline virtual void SetVolume(float vol) override { m_Volume = vol; }
-		inline virtual void SetDataSize(unsigned int size) override { m_Info.dataSize = size; } // NOTE: This should ONLY be used by the Recording class
+		inline virtual void SetName(std::string name) override { m_Info.name = name; }
+		inline virtual void SetDataSize(unsigned int size) override { m_Info.dataSize = size; } // TODO: See if delete this
 
 	private:
 		bool m_Done;

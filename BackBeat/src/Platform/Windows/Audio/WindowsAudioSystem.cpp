@@ -12,6 +12,8 @@ namespace BackBeat {
 
 	WindowsAudioSystem::~WindowsAudioSystem()
 	{
+		m_RecorderMgr.Stop();
+		m_PlayerMgr.StopAll();
 		m_Renderer.Stop();
 		m_Thread.Stop();
 	}
@@ -23,6 +25,7 @@ namespace BackBeat {
 		BackBeat::FileSystem::SetAppDataLocalDir(appDataLocalDir);
 		BackBeat::FileSystem::SetAppDir(appName);
 		BackBeat::FileSystem::CreateTempDir();
+		BackBeat::FileSystem::ClearDir(BackBeat::FileSystem::GetTempDir());
 
 		BackBeat::TrackFactory::SetFileMapper(&m_FileMapper);
 

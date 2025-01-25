@@ -92,23 +92,30 @@ namespace BackBeat {
 		return track;
 	}
 
-	void RecorderManager::AddRecordingTrack(UUID id, std::shared_ptr<Track> track, RecorderType type)
+	std::shared_ptr<MappedTrack> RecorderManager::AddRecordingMappedTrack(UUID id, RecorderType type)
 	{
 		if (!m_Init)
-			return;
+			return nullptr;
 		if (Contains(id))
-			return;
-		if (!track)
-			return;
+			return nullptr;
 		if (type == RecorderType::none)
-			return;
+			return nullptr;
 
+		std::shared_ptr<MappedTrack> track = nullptr;
 		if (type == RecorderType::audio)
+		{
+			track = TrackFactory::BuildMappedTempTrack(id, m_AudioRecorder->GetProps());
 			m_AudioRecordings[id] = track;
+		}
 		else
+		{
+			track = TrackFactory::BuildMappedTempTrack(id, m_DeviceRecorder->GetProps());
 			m_DeviceRecordings[id] = track;
+		}
+
+		return track;
 	}
-	
+
 	void RecorderManager::SetRecorderActive(UUID id)
 	{
 		SetRecordingTrack(id);

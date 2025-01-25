@@ -99,8 +99,9 @@ namespace Exampler {
 		auto samplerProc = m_Sampler.GetProcessor();
 		auto samplerID = samplerProc->GetID();
 		auto id = m_Sampler.GetID();
-		auto samplerTrack = m_RecorderMgr->AddRecordingTrack(samplerID, BackBeat::RecorderType::audio);
-		m_RecordingPlayer->LoadTrack(samplerTrack);
+
+		m_RecordingMappedTrack = m_RecorderMgr->AddRecordingMappedTrack(samplerID, BackBeat::RecorderType::audio);
+		m_RecordingPlayer->LoadTrack(m_RecordingMappedTrack);
 
 		mixer->PushProcessor(samplerProc);
 		mixer->PushProcessor(m_RecordingPlayer->GetProc());
@@ -131,7 +132,6 @@ namespace Exampler {
 	}
 
 	// NOTE: - node is the parent of the node being written to
-	//       - TODO: Still need to implement serializing RecordingTracks
 	void Sampler::WriteObject(pugi::xml_node* node)
 	{
 		auto samplerNode = node->append_child("Sampler");

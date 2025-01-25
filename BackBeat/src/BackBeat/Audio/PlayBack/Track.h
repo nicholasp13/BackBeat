@@ -12,7 +12,16 @@ namespace BackBeat {
 		virtual bool Read(byte* output, unsigned int numBytes);	
 		virtual bool Write(byte* output, unsigned int numBytes);
 
+		// Following functions: Reset and Clear, have the same functionality in this class but
+		// are declared as different functions as they will have different implementations depending on 
+		// the derived class. This is mostly becuase the basic Track class has no real way of overwriting
+		// files using the standard c++ file i/o.
+		virtual void Reset();
+		virtual void Reset(AudioProps props);
+		virtual void Clear();
+
 		virtual TimeMinSec GetTime();
+		virtual TimeMinSec GetTimeMs();
 		virtual TimeMinSec GetLength();
 		virtual void SetPosition(unsigned int position);
 		virtual void SetStart(unsigned int start);
@@ -29,7 +38,8 @@ namespace BackBeat {
 		inline virtual AudioInfo GetInfo() { return m_Info; }
 		inline virtual FileType GetFileType() { return m_Info.type; }
 		inline virtual void SetVolume(float vol) { m_Volume = vol; }
-		inline virtual void SetDataSize(unsigned int size) { m_Info.dataSize = size; } // NOTE: This should ONLY be used by the Recording class
+		inline virtual void SetName(std::string name) { m_Info.name = name; }
+		inline virtual void SetDataSize(unsigned int size) { m_Info.dataSize = size; } // TODO: See if delete this
 
 	private:
 		bool m_Done;

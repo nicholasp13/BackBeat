@@ -7,7 +7,7 @@ namespace BackBeat {
 
 	AudioInfo AudioFileReader::ReadFile(std::string filePath)
 	{
-		unsigned long size = 0;
+		unsigned int size = 0;
 		char header[Audio::WAVHeaderSize] = {};
 		std::ifstream file;
 
@@ -35,16 +35,25 @@ namespace BackBeat {
 			
 			if (std::strcmp(Audio::WAV, header) == 0)
 			{
+				header[headerPosition] = temp1;
 				header[headerPosition + 1] = temp2;
+				header[sampleHeaderPosition] = temp3;
+
 				if (Audio::IsBigEndian()) 
 				{
-					size = *reinterpret_cast<unsigned long int*>(header + headerPosition + 1);
+					size = *reinterpret_cast<unsigned int*>(header + headerPosition + 1);
 				}
 				else 
 				{
 					size = Audio::EndianConverterLong(header[headerPosition + 1], header[headerPosition + 2],
 						header[headerPosition + 3], header[headerPosition + 4]);
 				}
+
+				// Some applications I've found do not properly set the size parameters in their WAV headers
+				// So this is a fail safe
+				if (size == (unsigned int)0xFFFFFFFF)
+					size = (unsigned int)std::filesystem::file_size(filePath);
+
 				return ReadHeader(filePath, size, FileType::wav);
 			}
 
@@ -55,7 +64,9 @@ namespace BackBeat {
 				header[sampleHeaderPosition] = temp3;
 				if (Audio::IsBigEndian()) 
 				{
-					size = *reinterpret_cast<unsigned long int*>(header + sampleHeaderPosition);
+					// size = *reinterpret_cast<unsigned long int*>(header + sampleHeaderPosition);
+					size = Audio::EndianConverterLong(header[sampleHeaderPosition + 3], header[sampleHeaderPosition + 2],
+						header[sampleHeaderPosition + 1], header[sampleHeaderPosition ]);
 				}
 				else 
 				{
@@ -216,6 +227,12 @@ namespace BackBeat {
 						dataSize = Audio::EndianConverterLong(dataChunk[dataChunkPos], dataChunk[dataChunkPos + 1],
 							dataChunk[dataChunkPos + 2], dataChunk[dataChunkPos + 3]);
 					}
+
+					// Some applications I've found do not properly set the size parameters in their WAV headers
+					// So this is a fail safe
+					if (dataSize == (unsigned int)0xFFFFFFFF)
+						dataSize = (unsigned int)std::filesystem::file_size(filePath);
+
 					std::string fileName = std::filesystem::path(filePath).stem().string();
 					info.filePath = filePath;
 					info.name = fileName;

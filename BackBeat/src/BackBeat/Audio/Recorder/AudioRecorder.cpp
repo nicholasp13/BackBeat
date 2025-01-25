@@ -86,7 +86,7 @@ namespace BackBeat {
 		// NOTE: Sleeping for buffsize while making sense, makes the recorder too slow for the renderer.
 		//       Through some testing this amount of sleep reduces CPU usage a decent amount however this testing
 		//       was not thorough and the sleepTime is subject to change if need be
-		const auto sleepTime = std::chrono::nanoseconds(1000);
+		const auto sleepTime = std::chrono::nanoseconds(10);
 		auto readBuffer = m_Buffer;
 		auto writeBuffer = reinterpret_cast<char*>(m_Buffer);
 		unsigned int numFrames = m_BufferSize / m_AudioProps.numChannels;

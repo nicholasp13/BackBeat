@@ -20,10 +20,7 @@ namespace BackBeat {
 
 	Track::~Track()
 	{
-		// NOTE: Usually the Recording class would delete its temp file during its destructrion
-		//       but this is a safeguard just in case its Track changes
-		if (m_Info.type == FileType::recordingTemp)
-			std::remove(m_Info.filePath.c_str());
+
 	}
 
 	// TODO: Implement endianness conversion if the track does not match the systems endianness
@@ -107,17 +104,44 @@ namespace BackBeat {
 		return true;
 	}
 
+	void Track::Reset()
+	{
+		std::remove(m_Info.filePath.c_str());
+		m_Position = 0;
+		m_StartPosition = 0;
+		m_EndPosition = 0;
+		m_Info.dataSize = 0;
+	}
+
+	void Track::Reset(AudioProps props)
+	{
+		m_Info.props = props;
+		Reset();
+	}
+
+	void Track::Clear()
+	{
+		Reset();
+	}
+
 	TimeMinSec Track::GetTime()
 	{
 		AudioProps props = m_Info.props;
-		float timeTotal = (float)((m_Position - m_Info.dataZero) / props.byteRate);
+		float timeTotal = ((float)m_Position - (float)m_Info.dataZero) / (float)props.byteRate;
 		return Audio::GetTime(timeTotal);
+	}
+
+	TimeMinSec Track::GetTimeMs()
+	{
+		AudioProps props = m_Info.props;
+		float timeTotal = (((float)m_Position - (float)m_Info.dataZero) / (float)props.byteRate);
+		return Audio::GetTimeMs(timeTotal);
 	}
 
 	TimeMinSec Track::GetLength()
 	{
 		AudioProps props = m_Info.props;
-		float timeTotal = (float)(m_Info.dataSize / props.byteRate);
+		float timeTotal = (float)m_Info.dataSize / (float)props.byteRate;
 		return Audio::GetTime(timeTotal);
 	}
 

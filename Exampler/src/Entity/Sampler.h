@@ -40,6 +40,7 @@ namespace Exampler {
 		inline virtual bool IsOpen() override { return m_Open; }
 		inline virtual std::string GetName() override { return m_Name; }
 		inline virtual EntityType GetType() override { return EntityType::sampler; }
+		inline virtual std::shared_ptr<BackBeat::MappedTrack> GetMappedTrack() override { return m_RecordingMappedTrack; }
 		inline virtual void SetName(std::string name) override { m_Name = name; }
 
 		// BackBeat::Serializable functions
@@ -67,6 +68,7 @@ namespace Exampler {
 		BackBeat::Sampler m_Sampler;
 		std::shared_ptr<BackBeat::Player> m_RecordingPlayer;
 		BackBeat::RecorderManager* m_RecorderMgr;
+		std::shared_ptr<BackBeat::MappedTrack> m_RecordingMappedTrack;
 
 	private:
 		void RenderCanvasEntity();

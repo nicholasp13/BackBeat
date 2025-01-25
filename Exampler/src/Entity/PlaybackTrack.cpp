@@ -10,7 +10,8 @@ namespace Exampler {
 
 	PlaybackTrack::~PlaybackTrack()
 	{
-		m_Player->Stop();
+		if (m_Player)
+			m_Player->Stop();
 	}
 
 	void PlaybackTrack::Update()
@@ -31,8 +32,7 @@ namespace Exampler {
 		unsigned int count = SetPlaybackColors();
 		ImGui::SeparatorText(m_Name.c_str());
 
-		// TODO: Wrap this text
-		ImGui::Text(m_Player->GetTrackName().c_str());
+		ImGui::Text(m_Track->GetName().c_str());
 
 		if (!m_Player->IsOn())
 		{
@@ -62,11 +62,35 @@ namespace Exampler {
 		BackBeat::Mixer* mixer,
 		BackBeat::MIDIDeviceManager* midiDeviceManager)
 	{
+		auto filePath = BackBeat::FileDialog::OpenFile("WAV Files (*.wav)\0*.wav\0");
+		if (filePath.empty())
+			return;
+
 		m_Player = playerMgr->AddNewPlayer();
+		auto playerID = m_Player->GetID();
+
+		auto trackToCopy = BackBeat::TrackFactory::BuildTrack(filePath);
+		if (!trackToCopy)
+			return;
+
+		BackBeat::AudioProps tempProps = trackToCopy->GetProps();
+
+		// Temps are always floating point
+		if (tempProps.bitDepth != BackBeat::Audio::FloatBitSize)
+		{
+			tempProps.bitDepth = BackBeat::Audio::FloatBitSize;
+			tempProps.blockAlign = tempProps.numChannels * BackBeat::Audio::FloatByteSize;
+			tempProps.format = BackBeat::Audio::FormatFloatingPoint;
+			tempProps.byteRate = tempProps.sampleRate * tempProps.blockAlign;
+		}
+
+		m_Track = BackBeat::TrackFactory::BuildMappedTempTrack(playerID, tempProps);
+		
+		BackBeat::TrackFactory::CopyTrackData(trackToCopy, m_Track);
+
 		mixer->PushProcessor(m_Player->GetProc());
-		// m_Player->LoadTrack(BackBeat::FileDialog::OpenFile("WAV Files (*.wav)\0*.wav\0"));
-		m_Player->LoadTrack(BackBeat::TrackFactory::BuildMappedTrack(
-			BackBeat::FileDialog::OpenFile("WAV Files (*.wav)\0*.wav\0")));
+		m_Player->LoadTrack(m_Track);
+		m_Player->Reset();
 	}
 
 	void PlaybackTrack::Add(
@@ -76,11 +100,34 @@ namespace Exampler {
 		BackBeat::MIDIDeviceManager* midiDeviceManager,
 		std::string filePath)
 	{
-		m_Player = playerMgr->AddNewPlayer();
-		mixer->PushProcessor(m_Player->GetProc());
-		// m_Player->LoadTrack(filePath);
-		m_Player->LoadTrack(BackBeat::TrackFactory::BuildMappedTrack(filePath));
+		if (filePath.empty())
+			return;
 
+		m_Player = playerMgr->AddNewPlayer();
+		auto playerID = m_Player->GetID();
+
+		auto trackToCopy = BackBeat::TrackFactory::BuildTrack(filePath);
+		if (!trackToCopy)
+			return;
+
+		BackBeat::AudioProps tempProps = trackToCopy->GetProps();
+
+		// Temps are always floating point
+		if (tempProps.bitDepth != BackBeat::Audio::FloatBitSize)
+		{
+			tempProps.bitDepth = BackBeat::Audio::FloatBitSize;
+			tempProps.blockAlign = tempProps.numChannels * BackBeat::Audio::FloatByteSize;
+			tempProps.format = BackBeat::Audio::FormatFloatingPoint;
+			tempProps.byteRate = tempProps.sampleRate * tempProps.blockAlign;
+		}
+
+		m_Track = BackBeat::TrackFactory::BuildMappedTempTrack(playerID, tempProps);
+		
+		BackBeat::TrackFactory::CopyTrackData(trackToCopy, m_Track);
+
+		mixer->PushProcessor(m_Player->GetProc());
+		m_Player->LoadTrack(m_Track);
+		m_Player->Reset();
 	}
 
 	void PlaybackTrack::Delete(
@@ -110,10 +157,23 @@ namespace Exampler {
 
 		auto fileNode = playbackNode.append_child("File");
 		auto track = m_Player->GetTrack();
+
 		if (track)
-			fileNode.append_attribute("Path") = track->GetFilePath();
+		{
+			fileNode.append_attribute("Name") = track->GetName();
+
+			std::string trackFilePath = BackBeat::Project::GetActive()->GetConfig().tracksDirectoryPath
+				+ m_Name + ".wav";
+			if (BackBeat::WAVFileBuilder::BuildWAVFile(track.get(), track->GetStart(), track->GetEnd(), trackFilePath))
+				fileNode.append_attribute("Path") = trackFilePath;
+			else
+				fileNode.append_attribute("Path") = "";
+		}
 		else
+		{
+			fileNode.append_attribute("Name");
 			fileNode.append_attribute("Path");
+		}
 	}
 
 	// NOTE: - node is the node being read from. This is different to WriteObject() || Might want to specify in
@@ -124,7 +184,18 @@ namespace Exampler {
 
 		m_Volume = node->child("Volume").attribute("Value").as_float();
 
-		// NOTE: Track is added in MainLayer no need to read from here unless playback changes functionality
+		auto fileNode = node->child("File");
+		std::string fileName = fileNode.attribute("Name").as_string();
+		std::string filePath = fileNode.attribute("Path").as_string();
+
+		if (!filePath.empty())
+		{
+			auto trackToCopy = BackBeat::TrackFactory::BuildTrack(filePath);
+			BackBeat::TrackFactory::CopyTrackData(trackToCopy, m_Track);
+			m_Track->SetName(fileName);
+			m_Player->Reset();
+		}
+		
 	}
 
 	unsigned int PlaybackTrack::SetPlaybackColors()

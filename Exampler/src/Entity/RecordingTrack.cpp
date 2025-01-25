@@ -89,7 +89,7 @@ namespace Exampler {
 	{
 		m_Player = playerMgr->AddNewPlayer();
 		m_RecorderMgr = recorderMgr;
-		m_Track = m_RecorderMgr->AddRecordingTrack(m_RecorderID, BackBeat::RecorderType::device);
+		m_Track = m_RecorderMgr->AddRecordingMappedTrack(m_RecorderID, BackBeat::RecorderType::device);
 
 		m_Player->LoadTrack(m_Track);
 

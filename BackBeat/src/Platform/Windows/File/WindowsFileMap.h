@@ -19,12 +19,20 @@ namespace BackBeat {
 		
 		virtual bool ReadData(char* buffer, unsigned int size, unsigned int position) override;
 		virtual bool WriteData(char* buffer, unsigned int size, unsigned int position) override;
+		
+		inline virtual void SetToDelete() override { m_ToDelete = true; }
 
 	private:
+		bool m_ToDelete;
+		bool m_Mapped;
+		bool m_Open;
 		DWORD m_FileSize;
 		DWORD m_SystemGranularity;
 		std::string m_FilePath;
 		WindowsMapHandles m_Handles;
+
+	private:
+		bool Unmap();
 
 	};
 

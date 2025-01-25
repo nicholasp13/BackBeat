@@ -7,7 +7,7 @@
 #include "Synthesizer.h"
 namespace Exampler {
 
-	// TODO: Get rid of magic numbers for 
+	// TODO: Get rid of magic numbers for parameters
 	Synthesizer::Synthesizer()
 		: 
 		m_Open(false), 
@@ -24,7 +24,8 @@ namespace Exampler {
 		m_Octave3(0),
 		m_Octave4(0),
 		m_RecordingPlayer(nullptr),
-		m_RecorderMgr(nullptr)
+		m_RecorderMgr(nullptr),
+		m_RecordingMappedTrack(nullptr)
 	{
 		m_SynthEventHandler = m_Synth.GetEventHandler();
 		m_SynthParams = m_Synth.GetParams();
@@ -558,8 +559,8 @@ namespace Exampler {
 		auto synthProc = m_Synth.GetProcessor();
 		auto synthID = synthProc->GetID();
 
-		auto synthTrack = m_RecorderMgr->AddRecordingTrack(synthID, BackBeat::RecorderType::audio);
-		m_RecordingPlayer->LoadTrack(synthTrack);
+		m_RecordingMappedTrack = m_RecorderMgr->AddRecordingMappedTrack(synthID, BackBeat::RecorderType::audio);
+		m_RecordingPlayer->LoadTrack(m_RecordingMappedTrack);
 		
 		mixer->PushProcessor(synthProc);
 		mixer->PushProcessor(m_RecordingPlayer->GetProc());
