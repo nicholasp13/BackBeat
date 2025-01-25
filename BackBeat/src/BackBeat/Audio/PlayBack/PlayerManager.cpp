@@ -1,12 +1,10 @@
 #include "bbpch.h"
 
-// TODO: Set and create timer
-
 #include "PlayerManager.h"
 namespace BackBeat {
 
 	PlayerManager::PlayerManager()
-		: m_Playing(false)
+		: m_Playing(false), m_TimeEclipsed(0.0f)
 	{
 
 	}
@@ -23,6 +21,8 @@ namespace BackBeat {
 			(*it)->Start();
 		}
 		m_Playing = true;
+		m_TimeEclipsed = 0.0f;
+		m_Timer.Start();
 	}
 
 	void PlayerManager::StopAll()
@@ -31,6 +31,7 @@ namespace BackBeat {
 		{
 			(*it)->Stop();
 		}
+		m_TimeEclipsed += m_Timer.GetTime();
 		m_Playing = false;
 	}
 
@@ -41,6 +42,7 @@ namespace BackBeat {
 			(*it)->Play();
 		}
 		m_Playing = true;
+		m_Timer.Start();
 	}
 
 	void PlayerManager::PauseAll()
@@ -49,6 +51,7 @@ namespace BackBeat {
 		{
 			(*it)->Pause();
 		}
+		m_TimeEclipsed += m_Timer.GetTime();
 		m_Playing = false;
 	}
 
@@ -59,6 +62,7 @@ namespace BackBeat {
 		{
 			(*it)->Reset();
 		}
+		m_TimeEclipsed = 0.0f;
 	}
 
 	std::shared_ptr<Player> PlayerManager::AddNewPlayer()
@@ -82,7 +86,7 @@ namespace BackBeat {
 		}
 	}
 
-	// Assumes all positions for all active players should be the same
+	// Mostly deprecated, most use cases should just use GetTime(), GetTimeSeconds(), or GetTimeMs() instead
 	unsigned int PlayerManager::GetPosition()
 	{
 		if (m_Players.size() == 0)
@@ -108,15 +112,29 @@ namespace BackBeat {
 		if (m_Players.size() == 0)
 			return time;
 
-		for (auto it = m_Players.begin(); it != m_Players.end(); it++)
-		{
-			if ((*it)->IsPlaying())
-			{
-				return (*it)->GetTime();
-			}
-		}
+		if (m_Playing)
+			return Audio::GetTime(m_Timer.GetTime() + m_TimeEclipsed);
+		else
+			return Audio::GetTime(m_TimeEclipsed);
+	}
 
-		return m_Players[0]->GetTime();
+	TimeMinSec PlayerManager::GetTimeSeconds()
+	{
+		TimeMinSec time = {
+			.minutes = 0,
+			.seconds = 0,
+			.milliseconds = 0
+		};
+
+		if (m_Players.size() == 0)
+			return time;
+
+		if (m_Playing)
+			time.seconds = unsigned int(m_Timer.GetTime() + m_TimeEclipsed);
+		else
+			time.seconds = unsigned int(m_TimeEclipsed);
+
+		return time;
 	}
 
 	TimeMinSec PlayerManager::GetTimeMs()
@@ -130,15 +148,10 @@ namespace BackBeat {
 		if (m_Players.size() == 0)
 			return time;
 
-		for (auto it = m_Players.begin(); it != m_Players.end(); it++)
-		{
-			if ((*it)->IsPlaying())
-			{
-				return (*it)->GetTimeMs();
-			}
-		}
-
-		return m_Players[0]->GetTimeMs();
+		if (m_Playing)
+			return Audio::GetTimeMs(m_Timer.GetTime() + m_TimeEclipsed);
+		else
+			return Audio::GetTimeMs(m_TimeEclipsed);
 	}
 
 	// Change to use seconds
@@ -155,6 +168,8 @@ namespace BackBeat {
 			position = unsigned int(seconds * byteRate);
 			player->SetPosition(position);
 		}
+		m_TimeEclipsed = seconds;
+		m_Timer.Reset();
 	}
 
 	std::shared_ptr<Player> PlayerManager::Find(UUID id)

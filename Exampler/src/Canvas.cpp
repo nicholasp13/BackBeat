@@ -2,7 +2,6 @@
 
 namespace Exampler {
 
-
 	Canvas::Canvas()
 		:
 		m_Position(0u),
@@ -75,28 +74,37 @@ namespace Exampler {
 		}
 		ImGui::EndChild();
 
-		// TODO: Render Popup here
-
 		// Renders position controller
 		{
 			float fileLimit = (float)m_PlayerMgr->GetFileLimit();
 			float positionBytes = (float)m_Position * (float)sizeof(float) / (float)m_Props.byteRate;
 			static float positionPercent = 0.0f;
 
-			BackBeat::TimeMinSec time = BackBeat::Audio::GetTime(positionBytes);
+			// BackBeat::TimeMinSec time = BackBeat::Audio::GetTime(positionBytes);
+			BackBeat::TimeMinSec time = m_PlayerMgr->GetTime();
 			BackBeat::TimeMinSec length = BackBeat::Audio::GetTime(fileLimit / (float)m_Props.byteRate);
 
-			ImGui::Text("Position: %d:%02d", time.minutes, time.seconds); ImGui::SameLine();
+			ImGui::Text("Time: %d:%02d", time.minutes, time.seconds); ImGui::SameLine();
 			ImGui::Text("Total: %d:%02d", length.minutes, length.seconds); ImGui::SameLine();
 
 			if (BackBeat::ImGuiWidgets::ImGuiSeekBarFloat("##CanvasSeekbar", &positionPercent,
 				1.0f, "", ImGuiSliderFlags(0)))
-				m_Position = unsigned int(positionPercent * fileLimit / (float)sizeof(float));
+			{
+				unsigned int position = unsigned int(positionPercent * fileLimit);
+				unsigned int remainder = position % m_Props.blockAlign;
+				m_Position = (position - remainder) / (unsigned int)sizeof(float);
+			}
 			else
 				positionPercent = ((float)m_Position * (float)sizeof(float)) / fileLimit;
 
 			if (ImGui::IsItemDeactivated())
+			{
+				unsigned int position = unsigned int(positionPercent * fileLimit);
+				unsigned int remainder = position % m_Props.blockAlign;
+				m_Position = (position - remainder) / (unsigned int)sizeof(float);
+
 				m_PlayerMgr->SetPosition(positionPercent * fileLimit / float(m_Props.byteRate));
+			}
 		}
 
 		ImGui::PopStyleColor(count);
@@ -138,7 +146,6 @@ namespace Exampler {
 
 	void Canvas::RenderEntities()
 	{
-		// Size of track render
 		const float height = 150.0f;
 		const float firstColumnWidth = 200.0f;
 		const float padding = 27.0f;
@@ -147,7 +154,6 @@ namespace Exampler {
 		float secondsPerBuffer = 0.0f;
 		float secondsPlayed = 0.0f;
 		float positionInSeconds = 0.0f;
-		unsigned int position = m_PlayerMgr->GetPosition();
 		unsigned int numChannels = 0;
 		unsigned int numBytes = s_BufferSize * sizeof(float);
 		unsigned int pos = m_Position * sizeof(float);
@@ -159,8 +165,7 @@ namespace Exampler {
 		// Calculate the progress tracker
 		secondsPerBuffer = (float)(s_BufferSize * sizeof(float)) / (float)m_Props.byteRate * (float)m_Props.numChannels;
 		positionInSeconds = (float)pos / (float)m_Props.byteRate;
-		auto timePlayer = m_PlayerMgr->GetTimeMs();
-		secondsPlayed = (float)timePlayer.milliseconds / 1000.0f;
+		secondsPlayed = float(m_PlayerMgr->GetTimeMs().milliseconds) / 1000.0f;
 		progress = (secondsPlayed - positionInSeconds) / secondsPerBuffer;
 
 		if (progress > 1.0f)

@@ -21,6 +21,7 @@ namespace BackBeat {
 
 		unsigned int GetPosition();
 		TimeMinSec GetTime();
+		TimeMinSec GetTimeSeconds();
 		TimeMinSec GetTimeMs();
 		void SetPosition(float seconds);
 
@@ -33,6 +34,8 @@ namespace BackBeat {
 		                                                          // (48k sample rate, 32bit floating point, stereo)
 
 		bool m_Playing;
+		float m_TimeEclipsed;
+		BackBeat::Timer m_Timer;
 		std::vector< std::shared_ptr<Player> > m_Players;
 
 	private:

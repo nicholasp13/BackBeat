@@ -2,9 +2,12 @@
 //       - Add the ability to save specific configs from certain entities i.e. Synth's to a config xml file
 //       - Allow user to change the audio input channel for RecordingTrack and between MONO and STEREO
 
-// TODO IMMINENTLY:
-//     - Make playerMgr use a Timer to keep track of time
-
+// TODO imminently : 
+// - Check all TODOs
+// - Fix GUI on some entity renders()
+//     - Volume on Synth and Sampler, volume bar on Canvas should control track volume not instrument volume
+//     - Fix it so that when PlayerMgr sets position that the Player is set to the same state
+//     - Fix volume changing on Synth when opening
 #include "MainLayer.h"
 namespace Exampler {
 
