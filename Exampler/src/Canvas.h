@@ -11,7 +11,7 @@ namespace Exampler {
 		Canvas();
 		~Canvas();
 
-		void Init(BackBeat::AudioProps props, BackBeat::PlayerManager* playerMgr);
+		void Init(BackBeat::AudioProps props, BackBeat::PlayerManager* playerMgr, BackBeat::RecorderManager* recorderMgr);
 		void Render(float width, float height, bool active);
 		void AddEntity(std::shared_ptr<Entity> entity);
 		void DeleteEntity(std::shared_ptr<Entity> entity);
@@ -31,6 +31,7 @@ namespace Exampler {
 		BackBeat::AudioProps m_Props;
 		BackBeat::AudioFileLoader m_Loader;
 		BackBeat::PlayerManager* m_PlayerMgr;
+		BackBeat::RecorderManager* m_RecorderMgr;
 
 	private:
 		void RenderEntities();

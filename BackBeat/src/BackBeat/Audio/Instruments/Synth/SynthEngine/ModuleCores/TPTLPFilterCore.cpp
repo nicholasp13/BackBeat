@@ -34,7 +34,7 @@ namespace BackBeat {
 	void TPTLPFilterCore::Update()
 	{
 		m_IsOn = m_Params->isOn;
-		// TODO: Evaluate prewarping vs not in a visualizier
+
 		if (!Audio::EqualsFloat(m_CutoffFreq, m_Params->cutoff, SynthBase::DeltaCentsHertz))
 		{
 			// No prewarping

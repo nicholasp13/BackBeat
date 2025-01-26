@@ -1,13 +1,8 @@
-// TODO: - Create editable timeline for entity/track objects
+// TODO: - Allow for user input and editing in ImGuiTimeline
 //       - Add the ability to save specific configs from certain entities i.e. Synth's to a config xml file
-//       - Allow user to change the audio input channel for RecordingTrack and between MONO and STEREO
+//       - Allow user to change the audio input channel for RecordingTrack and between MONO and STEREO andd
+//           allow for user to select where the recording starts in the file
 
-// TODO imminently : 
-// - Check all TODOs
-// - Fix GUI on some entity renders()
-//     - Volume on Synth and Sampler, volume bar on Canvas should control track volume not instrument volume
-//     - Fix it so that when PlayerMgr sets position that the Player is set to the same state
-//     - Fix volume changing on Synth when opening
 #include "MainLayer.h"
 namespace Exampler {
 
@@ -45,7 +40,7 @@ namespace Exampler {
 
 	void MainLayer::OnAttach()
 	{
-		m_Canvas.Init(m_Audio->GetProps(), m_PlayerMgr);
+		m_Canvas.Init(m_Audio->GetProps(), m_PlayerMgr, m_RecorderMgr);
 
 		m_NumMIDIDevices = m_MIDIDeviceManager->GetNumDevices();
 		for (unsigned int i = 0; i < m_NumMIDIDevices; i++) 
@@ -906,7 +901,6 @@ namespace Exampler {
 	bool MainLayer::LoadProject(std::string project)
 	{
 		m_State = AppState::Load;
-		m_Canvas.Reset();
 		// NOTE: Adding "\\" is a current lazy solution but this should happen in BackBeat::FileManager
 		auto projectPath = m_FileMgr.GetSubDirPath(project) + "\\";
 		// NOTE: May want to change into a class member or use exisitng member BackBeat::FileManager
@@ -942,6 +936,8 @@ namespace Exampler {
 		ClearEntities();
 		Deserialize(projectXMLPath);
 
+		m_PlayerMgr->ResetAll();
+		m_Canvas.Reset();
 		m_State = AppState::Play;
 		return true;
 	}
@@ -951,7 +947,6 @@ namespace Exampler {
 		m_ActiveProject = BackBeat::Project::New();
 		m_ActiveProject->GetConfig().app = "Exampler";
 		m_ActiveProject->GetConfig().tracksDirectoryPath = BackBeat::FileSystem::GetTempDir();
-		m_Canvas.Reset();
 
 		switch (m_State)
 		{
@@ -981,6 +976,9 @@ namespace Exampler {
 		}
 
 		}
+
+		m_PlayerMgr->ResetAll();
+		m_Canvas.Reset();
 	}
 
 	void MainLayer::SaveProject()

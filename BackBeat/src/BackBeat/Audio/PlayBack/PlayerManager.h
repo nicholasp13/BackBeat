@@ -35,7 +35,8 @@ namespace BackBeat {
 
 		bool m_Playing;
 		float m_TimeEclipsed;
-		BackBeat::Timer m_Timer;
+
+		Timer m_Timer;
 		std::vector< std::shared_ptr<Player> > m_Players;
 
 	private:

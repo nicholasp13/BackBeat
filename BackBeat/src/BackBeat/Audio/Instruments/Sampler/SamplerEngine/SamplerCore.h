@@ -1,7 +1,5 @@
 #pragma once
 
-// TODO:Make Sample a shared_ptr
-
 #include "BackBeat/Audio/Instruments/ModuleCore.h"
 #include "BackBeat/Audio/Instruments/Sampler/Sample.h"
 namespace BackBeat {

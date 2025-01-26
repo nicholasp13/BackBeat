@@ -18,7 +18,7 @@ namespace BackBeat {
 	int24::int24(short num)
 	{
 		auto x = reinterpret_cast<byte*>(&num);
-		if (Audio::IsBigEndian())
+		if (IsBigEndian())
 		{
 			m_UpperByte = x[0];
 			m_LowerByte = x[1];
@@ -43,7 +43,7 @@ namespace BackBeat {
 	{
 		auto x = reinterpret_cast<byte*>(&num);
 
-		if (Audio::IsBigEndian()) 
+		if (IsBigEndian()) 
 		{
 			m_SignedByte = x[0];
 			m_UpperByte = x[1];
@@ -61,7 +61,7 @@ namespace BackBeat {
 	{
 		auto x = reinterpret_cast<byte*>(&num);
 
-		if (Audio::IsBigEndian()) 
+		if (IsBigEndian()) 
 		{
 			m_SignedByte = x[0];
 			m_UpperByte = x[1];
@@ -79,7 +79,7 @@ namespace BackBeat {
 	{
 		auto x = (long)num;
 		auto y = reinterpret_cast<byte*>(&x);
-		if (Audio::IsBigEndian())
+		if (IsBigEndian())
 		{
 			m_SignedByte = y[0];
 			m_UpperByte = y[1];
@@ -97,7 +97,7 @@ namespace BackBeat {
 	{
 		auto x = (long)num;
 		auto y = reinterpret_cast<byte*>(&x);
-		if (Audio::IsBigEndian()) 
+		if (IsBigEndian()) 
 		{
 			m_SignedByte = y[0];
 			m_UpperByte = y[1];
@@ -180,12 +180,12 @@ namespace BackBeat {
 		if (*this == int24())
 			return long(0);
 
-		if (Audio::IsBigEndian()) 
+		if (IsBigEndian()) 
 		{
 			negativeByte = 0xFF;
-			signedByte = m_SignedByte << Audio::ByteBitSize;
-			upperByte = m_UpperByte << Audio::ByteBitSize * 2;
-			lowerByte = m_LowerByte << Audio::ByteBitSize * 3;
+			signedByte = m_SignedByte << s_ByteBitSize;
+			upperByte = m_UpperByte << s_ByteBitSize * 2;
+			lowerByte = m_LowerByte << s_ByteBitSize * 3;
 			if (IsPositive()) 
 			{
 				return signedByte | upperByte | lowerByte;
@@ -197,9 +197,9 @@ namespace BackBeat {
 		}
 		else 
 		{
-			negativeByte = 0xFF << Audio::ByteBitSize * 3;
-			signedByte = m_SignedByte << Audio::ByteBitSize * 2;
-			upperByte = m_UpperByte << Audio::ByteBitSize;
+			negativeByte = 0xFF << s_ByteBitSize * 3;
+			signedByte = m_SignedByte << s_ByteBitSize * 2;
+			upperByte = m_UpperByte << s_ByteBitSize;
 			lowerByte = m_LowerByte;
 
 			if (IsPositive()) 
@@ -235,14 +235,14 @@ namespace BackBeat {
 			else
 				src = int24(buffer[position + 2], buffer[position + 1], buffer[position]);
 			targetBuffer[i] = src;
-			position += Audio::Int24ByteSize;
+			position += s_Int24ByteSize;
 		}
 		return targetBuffer;
 	}
 
 	byte* int24::GetByteBuffer(int24* buffer, unsigned int numInts, bool bigEndian)
 	{
-		byte* targetBuffer = new byte[numInts * Audio::Int24ByteSize];
+		byte* targetBuffer = new byte[numInts * s_Int24ByteSize];
 		unsigned int position = 0;
 
 		for (unsigned int i = 0; i < numInts; i++) {
@@ -258,7 +258,7 @@ namespace BackBeat {
 				targetBuffer[position + 1] = buffer[i][1];
 				targetBuffer[position + 2] = buffer[i][0];
 			}
-			position += Audio::Int24ByteSize;
+			position += s_Int24ByteSize;
 		}
 		return targetBuffer;
 	}

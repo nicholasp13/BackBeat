@@ -1,5 +1,7 @@
 #include "Canvas.h"
 
+// TODO: Allow for timeline to track Recording the same as Playback
+
 namespace Exampler {
 
 	Canvas::Canvas()
@@ -10,7 +12,8 @@ namespace Exampler {
 		m_Buffer(std::make_shared<float[]>(s_BufferSize)), 
 		m_Props(BackBeat::AudioProps()),
 		m_Loader(s_BufferSize* BackBeat::Audio::Stereo * sizeof(float)),
-		m_PlayerMgr(nullptr)
+		m_PlayerMgr(nullptr),
+		m_RecorderMgr(nullptr)
 	{
 
 	}
@@ -20,10 +23,11 @@ namespace Exampler {
 
 	}
 
-	void Canvas::Init(BackBeat::AudioProps props, BackBeat::PlayerManager* playerMgr)
+	void Canvas::Init(BackBeat::AudioProps props, BackBeat::PlayerManager* playerMgr, BackBeat::RecorderManager* recorderMgr)
 	{
 		m_Props = props;
 		m_PlayerMgr = playerMgr;
+		m_RecorderMgr = recorderMgr;
 	}
 
 	void Canvas::Render(float width, float height, bool active)
@@ -80,8 +84,13 @@ namespace Exampler {
 			float positionBytes = (float)m_Position * (float)sizeof(float) / (float)m_Props.byteRate;
 			static float positionPercent = 0.0f;
 
-			// BackBeat::TimeMinSec time = BackBeat::Audio::GetTime(positionBytes);
-			BackBeat::TimeMinSec time = m_PlayerMgr->GetTime();
+			BackBeat::TimeMinSec time = BackBeat::TimeMinSec();
+
+			if (!m_RecorderMgr->IsRecording())
+				time = m_PlayerMgr->GetTime();
+			else
+				time = m_RecorderMgr->GetTime();
+
 			BackBeat::TimeMinSec length = BackBeat::Audio::GetTime(fileLimit / (float)m_Props.byteRate);
 
 			ImGui::Text("Time: %d:%02d", time.minutes, time.seconds); ImGui::SameLine();
@@ -165,7 +174,12 @@ namespace Exampler {
 		// Calculate the progress tracker
 		secondsPerBuffer = (float)(s_BufferSize * sizeof(float)) / (float)m_Props.byteRate * (float)m_Props.numChannels;
 		positionInSeconds = (float)pos / (float)m_Props.byteRate;
-		secondsPlayed = float(m_PlayerMgr->GetTimeMs().milliseconds) / 1000.0f;
+
+		if (!m_RecorderMgr->IsRecording())
+			secondsPlayed = float(m_PlayerMgr->GetTimeMs().milliseconds) / 1000.0f;
+		else
+			secondsPlayed = float(m_RecorderMgr->GetTimeMs().milliseconds) / 1000.0f;
+
 		progress = (secondsPlayed - positionInSeconds) / secondsPerBuffer;
 
 		if (progress > 1.0f)

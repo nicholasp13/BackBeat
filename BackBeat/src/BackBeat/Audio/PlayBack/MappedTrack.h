@@ -39,7 +39,6 @@ namespace BackBeat {
 		inline virtual FileType GetFileType() override { return m_Info.type; }
 		inline virtual void SetVolume(float vol) override { m_Volume = vol; }
 		inline virtual void SetName(std::string name) override { m_Info.name = name; }
-		inline virtual void SetDataSize(unsigned int size) override { m_Info.dataSize = size; } // TODO: See if delete this
 
 	private:
 		bool m_Done;

@@ -7,6 +7,7 @@ namespace BackBeat {
 		:
 		m_Recording(false),
 		m_Init(false),
+		m_TimeEclipsed(0.0f),
 		m_AudioRecorder(nullptr),
 		m_DeviceRecorder(nullptr),
 		m_ActiveID(UUID(0u))
@@ -50,6 +51,9 @@ namespace BackBeat {
 			std::function<void()> callback = std::bind(&Recorder::Start, m_DeviceRecorder);
 			m_Thread.Start(callback, 0, true, false);
 		}
+
+		m_TimeEclipsed = 0.0f;
+		m_Timer.Start();
 		m_Recording = true;
 	}
 
@@ -64,6 +68,8 @@ namespace BackBeat {
 			m_AudioRecorder->Stop();
 		else
 			m_DeviceRecorder->Stop();
+
+		m_TimeEclipsed = 0.0f;
 		m_Thread.Stop();
 		m_Recording = false;
 	}
@@ -132,6 +138,7 @@ namespace BackBeat {
 		if (m_ActiveID != id)
 			return;
 
+		m_TimeEclipsed = 0.0f;
 		m_AudioRecorder->ClearTrack();
 		m_DeviceRecorder->ClearTrack();
 		m_ActiveID = UUID(0);
@@ -147,6 +154,8 @@ namespace BackBeat {
 			return;
 
 		std::shared_ptr<Track> track = nullptr;
+		m_TimeEclipsed = 0.0f;
+
 		if (ContainsAudio(id))
 		{
 			track = m_AudioRecordings.at(id);
@@ -157,6 +166,7 @@ namespace BackBeat {
 			track = m_DeviceRecordings.at(id);
 			m_DeviceRecorder->SetRecordingTrack(track);
 		}
+
 		m_ActiveID = id;
 	}
 
@@ -168,6 +178,8 @@ namespace BackBeat {
 			return;
 		if (!Contains(id))
 			return;
+
+		m_TimeEclipsed = 0.0f;
 
 		if (ContainsAudio(id))
 			m_AudioRecorder->ClearTrack();
@@ -219,6 +231,50 @@ namespace BackBeat {
 			m_DeviceRecorder->Reset();
 
 		m_ActiveID = oldID;
+	}
+
+	TimeMinSec RecorderManager::GetTime()
+	{
+		TimeMinSec time = {
+			.minutes = 0,
+			.seconds = 0,
+			.milliseconds = 0
+		};
+
+		if (m_Recording)
+			return Audio::GetTime(m_Timer.GetTime() + m_TimeEclipsed);
+		else
+			return Audio::GetTime(m_TimeEclipsed);
+	}
+
+	TimeMinSec RecorderManager::GetTimeSeconds()
+	{
+		TimeMinSec time = {
+			.minutes = 0,
+			.seconds = 0,
+			.milliseconds = 0
+		};
+
+		if (m_Recording)
+			time.seconds = unsigned int(m_Timer.GetTime() + m_TimeEclipsed);
+		else
+			time.seconds = unsigned int(m_TimeEclipsed);
+
+		return time;
+	}
+
+	TimeMinSec RecorderManager::GetTimeMs()
+	{
+		TimeMinSec time = {
+			.minutes = 0,
+			.seconds = 0,
+			.milliseconds = 0
+		};
+
+		if (m_Recording)
+			return Audio::GetTimeMs(m_Timer.GetTime() + m_TimeEclipsed);
+		else
+			return Audio::GetTimeMs(m_TimeEclipsed);
 	}
 
 }

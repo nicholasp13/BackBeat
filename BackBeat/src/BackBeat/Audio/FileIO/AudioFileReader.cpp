@@ -1,5 +1,7 @@
 #include "bbpch.h"
 
+// TODO: Complete after making mp3 decoder
+
 #include "BackBeat/Audio/Audio.h"
 #include "BackBeat/Core/Core.h"
 #include "AudioFileReader.h"
@@ -11,7 +13,6 @@ namespace BackBeat {
 		char header[Audio::WAVHeaderSize] = {};
 		std::ifstream file;
 
-		// TODO: Implement Function to get mp3 file header info
 		file.open(filePath, std::ios::binary);
 		if (file.is_open())
 		{
@@ -98,7 +99,6 @@ namespace BackBeat {
 		return false;
 	}
 
-	// TODO: CREATE INITIALIZE AFTER CREATING MP3 decoder
 	AudioInfo AudioFileReader::ReadMP3Header(std::string filePath, unsigned int size)
 	{
 		return AudioInfo();

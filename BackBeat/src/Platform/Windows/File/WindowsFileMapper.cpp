@@ -17,7 +17,6 @@ namespace BackBeat {
 		
 	}
 
-	// TODO: Check size against max size in m_SystemInfo
 	std::shared_ptr<FileMap> WindowsFileMapper::MapFile(std::string filePath, unsigned long size)
 	{
 		LPCSTR lpcTheFile = filePath.c_str();  // Windows char pointer to the file path

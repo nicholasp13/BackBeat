@@ -114,7 +114,8 @@ namespace BackBeat {
 	}
 	
 	// Calls Voices update function
-	void SynthEngine::SetParam() // TODO: Implement if needed
+	// To implement if needed
+	void SynthEngine::SetParam()
 	{
 
 
@@ -164,8 +165,8 @@ namespace BackBeat {
 	void SynthEngine::InitParameters() 
 	{
 		auto DCAParams = std::make_shared<DCAParameters>();
-		DCAParams->leftAmp = 1.0f;
-		DCAParams->rightAmp = 1.0f;
+		DCAParams->leftAmp = SynthBase::AmpDefault;
+		DCAParams->rightAmp = SynthBase::AmpDefault;
 		DCAParams->volume = 1.0f;
 
 		auto AmpEGParams = std::make_shared<EGParameters>();
@@ -183,6 +184,7 @@ namespace BackBeat {
 		auto LFOParams1 = std::make_shared<LFOParameters>();
 		LFOParams1->amp = SynthBase::LFOAttentuationDefault;
 		LFOParams1->hertz = SynthBase::LFOFrequencyDefault;
+		LFOParams1->delay = SynthBase::LFOMinDelay;
 		LFOParams1->wave = WaveType::Sin;
 
 		auto OSCParams1 = std::make_shared<OscParameters>();

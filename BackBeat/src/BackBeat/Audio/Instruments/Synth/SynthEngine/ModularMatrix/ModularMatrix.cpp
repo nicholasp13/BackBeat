@@ -25,13 +25,13 @@ namespace BackBeat {
 		m_ModDestinations[index] = destination;
 	}
 
-	// TODO: Implement if needed for user programming 
+	// Implement if needed for user programming 
 	void ModularMatrix::ClearModSource(ModSources index)
 	{
 
 	}
 	
-	// TODO: Implement if needed for user programming 
+	// Implement if needed for user programming 
 	void ModularMatrix::ClearModDestination(ModDestinations index)
 	{
 	

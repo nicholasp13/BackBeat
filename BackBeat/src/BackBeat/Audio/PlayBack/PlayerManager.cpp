@@ -167,6 +167,9 @@ namespace BackBeat {
 			byteRate = (float)player->GetTrack()->GetProps().byteRate;
 			position = unsigned int(seconds * byteRate);
 			player->SetPosition(position);
+
+			if (m_Playing && !player->IsPlaying())
+				player->Play();
 		}
 		m_TimeEclipsed = seconds;
 		m_Timer.Reset();

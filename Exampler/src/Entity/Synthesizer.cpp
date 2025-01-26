@@ -2,23 +2,22 @@
 //      - Fix bug where changing the general octave range causes the note to hold forever if the original octave 
 //       is not returned to by the user. (NOTE: MIDI Devices handle this by not changing the MIDINote of keys that are
 //       currently pressed when the MIDI user changes the octave range on his MIDI device)
-//      - Fix bug where the parameters aren't set before open so the volume changes when the user first opens this
 
 #include "Synthesizer.h"
 namespace Exampler {
 
-	// TODO: Get rid of magic numbers for parameters
 	Synthesizer::Synthesizer()
 		: 
 		m_Open(false), 
 		m_KeyboardActive(true),
 		m_NoteVelocity(BackBeat::MIDI::MaxVelocity),
 		m_Pan(BackBeat::SynthBase::PanDefault),
-		m_LFOWave(0),
-		m_OscWave1(3),
-		m_OscWave2(3),
-		m_OscWave3(3),
-		m_OscWave4(3),
+		m_TrackVolume(1.0f),
+		m_LFOWave(s_SinIndex),
+		m_OscWave1(s_SawtoothUpIndex),
+		m_OscWave2(s_SawtoothUpIndex),
+		m_OscWave3(s_SawtoothUpIndex),
+		m_OscWave4(s_SawtoothUpIndex),
 		m_Octave1(0),
 		m_Octave2(0),
 		m_Octave3(0),
@@ -230,15 +229,24 @@ namespace Exampler {
 			}
 
 			}
+
 			ImGui::Spacing(); ImGui::Spacing();
 
 			float* LFOFreq1 = &(m_SynthParams->engineParams->voiceParams->LFOParams1->hertz);
-			ImGui::Text("    "); ImGui::SameLine(); ImGui::SliderFloat("LFO 1 Frequency", LFOFreq1, BackBeat::SynthBase::LFOFrequencyMin, BackBeat::SynthBase::LFOFrequencyMax);
+			ImGui::Text("    "); ImGui::SameLine(); 
+			ImGui::SliderFloat("LFO 1 Frequency", LFOFreq1, BackBeat::SynthBase::LFOFrequencyMin, BackBeat::SynthBase::LFOFrequencyMax);
 			ImGui::Spacing();
 
 			float* LFOAmp1 = &(m_SynthParams->engineParams->voiceParams->LFOParams1->amp);
-			ImGui::Text("    "); ImGui::SameLine(); ImGui::SliderFloat("LFO 1 Amp", LFOAmp1, BackBeat::SynthBase::LFOAttentuationMin, BackBeat::SynthBase::LFOAttentuationMax);
+			ImGui::Text("    "); ImGui::SameLine(); 
+			ImGui::SliderFloat("LFO 1 Amp", LFOAmp1, BackBeat::SynthBase::LFOAttentuationMin, BackBeat::SynthBase::LFOAttentuationMax);
 			ImGui::Spacing();
+
+			float* LFODelay1 = &(m_SynthParams->engineParams->voiceParams->LFOParams1->delay);
+			ImGui::Text("    "); ImGui::SameLine(); 
+			ImGui::SliderFloat("LFO 1 Delay", LFODelay1, BackBeat::SynthBase::LFOMinDelay, BackBeat::SynthBase::LFOMaxDelay);
+			ImGui::Spacing();
+
 			ImGui::PopID();
 		}
 
@@ -246,11 +254,14 @@ namespace Exampler {
 		{
 			ImGui::TableNextColumn();
 			ImGui::PushID("LPFilter");
+
 			ImGui::SeparatorText("Low Pass Filter");
 			bool* lpFilterOn = &(m_SynthParams->engineParams->voiceParams->LPFilterParams->isOn);
 			ImGui::Checkbox("Filter On", lpFilterOn);
 			float* lpCutoffFreq = &(m_SynthParams->engineParams->voiceParams->LPFilterParams->cutoff);
-			ImGui::Text("    "); ImGui::SameLine(); ImGui::SliderFloat("Cutoff Frequency", lpCutoffFreq, BackBeat::SynthBase::FilterCutoffMin, BackBeat::SynthBase::FilterCutoffMax);
+			ImGui::Text("    "); ImGui::SameLine(); 
+			ImGui::SliderFloat("Cutoff Frequency", lpCutoffFreq, BackBeat::SynthBase::FilterCutoffMin, BackBeat::SynthBase::FilterCutoffMax);
+
 			ImGui::Spacing();
 			ImGui::PopID();
 		}
@@ -258,11 +269,14 @@ namespace Exampler {
 		// High Pass Filter Controls
 		{
 			ImGui::PushID("HPFilter");
+
 			ImGui::SeparatorText("High Pass Filter");
 			bool* hpFilterOn = &(m_SynthParams->engineParams->voiceParams->HPFilterParams->isOn);
 			ImGui::Checkbox("Filter On", hpFilterOn);
 			float* hpCutoffFreq = &(m_SynthParams->engineParams->voiceParams->HPFilterParams->cutoff);
-			ImGui::Text("    "); ImGui::SameLine(); ImGui::SliderFloat("Cutoff Frequency", hpCutoffFreq, BackBeat::SynthBase::FilterCutoffMin, BackBeat::SynthBase::FilterCutoffMax);
+			ImGui::Text("    "); ImGui::SameLine(); 
+			ImGui::SliderFloat("Cutoff Frequency", hpCutoffFreq, BackBeat::SynthBase::FilterCutoffMin, BackBeat::SynthBase::FilterCutoffMax);
+
 			ImGui::Spacing();
 			ImGui::PopID();
 		}
@@ -271,15 +285,30 @@ namespace Exampler {
 		{
 			ImGui::PushID("AmpEG");
 			ImGui::TableNextColumn();
+
 			float* attackDuration = &(m_SynthParams->engineParams->voiceParams->AmpEGParams->attackDuration);
 			float* decayDuration = &(m_SynthParams->engineParams->voiceParams->AmpEGParams->decayDuration);
 			float* releaseDuration = &(m_SynthParams->engineParams->voiceParams->AmpEGParams->releaseDuration);
 			float* sustain = &(m_SynthParams->engineParams->voiceParams->AmpEGParams->sustainValue);
+
 			ImGui::SeparatorText("Amp Envelope Generator");
-			ImGui::Text("    "); ImGui::SameLine(); ImGui::SliderFloat("Attack ", attackDuration, BackBeat::SynthBase::EG1AttackTimeMin, BackBeat::SynthBase::EG1AttackTimeMax);
-			ImGui::Text("    "); ImGui::SameLine(); ImGui::SliderFloat("Decay  ", decayDuration, BackBeat::SynthBase::EG1DecayTimeMin, BackBeat::SynthBase::EG1DecayTimeMax);
-			ImGui::Text("    "); ImGui::SameLine(); ImGui::SliderFloat("Release", releaseDuration, BackBeat::SynthBase::EG1ReleaseTimeMin, BackBeat::SynthBase::EG1ReleaseTimeMax);
-			ImGui::Text("    "); ImGui::SameLine(); ImGui::SliderFloat("Sustain", sustain, BackBeat::SynthBase::EG1SustainLevelMin, BackBeat::SynthBase::EG1SustainLevelMax);
+
+			ImGui::Text("    "); ImGui::SameLine(); 
+			ImGui::SliderFloat("Attack ", attackDuration, BackBeat::SynthBase::EG1AttackTimeMin, BackBeat::SynthBase::EG1AttackTimeMax);
+			ImGui::Spacing();
+
+			ImGui::Text("    "); ImGui::SameLine(); 
+			ImGui::SliderFloat("Decay  ", decayDuration, BackBeat::SynthBase::EG1DecayTimeMin, BackBeat::SynthBase::EG1DecayTimeMax);
+			ImGui::Spacing();
+
+			ImGui::Text("    "); ImGui::SameLine(); 
+			ImGui::SliderFloat("Release", releaseDuration, BackBeat::SynthBase::EG1ReleaseTimeMin, BackBeat::SynthBase::EG1ReleaseTimeMax);
+			ImGui::Spacing();
+
+			ImGui::Text("    "); ImGui::SameLine(); 
+			ImGui::SliderFloat("Sustain", sustain, BackBeat::SynthBase::EG1SustainLevelMin, BackBeat::SynthBase::EG1SustainLevelMax);
+			ImGui::Spacing();
+			
 			ImGui::Spacing();
 			ImGui::PopID();
 		}
@@ -658,6 +687,7 @@ namespace Exampler {
 
 			lfoNode.append_child("Frequency").append_attribute("Value") = lfoParams->hertz;
 			lfoNode.append_child("Amp").append_attribute("Value") = lfoParams->amp;
+			lfoNode.append_child("Delay").append_attribute("Value") = lfoParams->delay;
 		}
 
 		// Low Pass Filter
@@ -919,6 +949,9 @@ namespace Exampler {
 		{
 			auto trackNode = synthNode.append_child("Track");
 
+			auto volumeNode = trackNode.append_child("Volume");
+			volumeNode.append_attribute("Value") = m_TrackVolume;
+
 			std::shared_ptr<BackBeat::Track> track = m_RecordingPlayer->GetTrack();
 			if (track)
 			{
@@ -997,6 +1030,7 @@ namespace Exampler {
 
 			lfoParams->hertz = lfoNode.child("Frequency").attribute("Value").as_float();
 			lfoParams->amp = lfoNode.child("Amp").attribute("Value").as_float();
+			lfoParams->delay = lfoNode.child("Delay").attribute("Value").as_float();
 		}
 
 		// Low Pass Filter
@@ -1236,6 +1270,11 @@ namespace Exampler {
 		// Audio track
 		{
 			auto trackNode = node->child("Track");
+
+			auto volumeNode = trackNode.child("Volume");
+			m_TrackVolume = volumeNode.attribute("Value").as_float();
+			m_RecordingMappedTrack->SetVolume(m_TrackVolume);
+
 			std::string trackFilePath = trackNode.attribute("FilePath").as_string();
 
 			if (!trackFilePath.empty())
@@ -1325,9 +1364,10 @@ namespace Exampler {
 
 		}
 
-		float* volume = &(m_SynthParams->engineParams->volume);
+		// Track volume control
 		ImGui::Text("Volume"); ImGui::SameLine();
-		BackBeat::ImGuiWidgets::ImGuiSeekBarFloat("##Volume", volume, 1.0f, "", ImGuiSliderFlags(0));
+		BackBeat::ImGuiWidgets::ImGuiSeekBarFloat("##Volume", &m_TrackVolume, 1.0f, "", ImGuiSliderFlags(0));
+		m_RecordingMappedTrack->SetVolume(m_TrackVolume);
 		
 		ImGui::Spacing();
 		ImGui::PopID();

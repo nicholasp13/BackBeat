@@ -61,6 +61,7 @@ namespace Exampler {
 		unsigned int m_DevicesOpen;
 		unsigned int m_NumPads;
 		unsigned int m_PadToProgram; // This is the display Pad # not the actual index number, actual index is this - 1
+		float m_TrackVolume;
 		std::string m_Name;
 
 		// BackBeat objects

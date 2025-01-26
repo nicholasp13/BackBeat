@@ -2,9 +2,8 @@
 
 #include "BackBeat/Audio/MIDI/MIDICodes.h"
 #include "BackBeat/Core/Core.h"
+#include "BackBeat/Core/int24.h"
 namespace BackBeat {
-
-	typedef unsigned char byte;
 
 	enum class FileType {
 		none = 0,
@@ -360,6 +359,26 @@ namespace BackBeat {
 				}
 			}
 		}
+		template<typename T>
+		static void TranslateDataToInt24(T inBuffer, byte* outputBuffer, unsigned int inBitDepth,
+			unsigned int numChannels, unsigned int numSamples, bool bigEndian)
+		{
+			float depthRatio = GetTypeRatio(Audio::FloatBitSize, inBitDepth);
+
+			int24* intBuffer = int24::GetInt24Buffer(outputBuffer, numChannels * numSamples, bigEndian);
+			for (unsigned int i = 0; i < numSamples * numChannels; i += numChannels)
+			{
+				for (unsigned int j = 0; j < numChannels; j++)
+				{
+					intBuffer[i + j] += int24((float)(inBuffer[i + j]) * depthRatio);
+				}
+			}
+			byte* byteBuffer = int24::GetByteBuffer(intBuffer, numChannels * numSamples, bigEndian);
+			CopyInputToOutput(outputBuffer, byteBuffer, numChannels * numSamples * Audio::Int24ByteSize);
+			delete[] intBuffer;
+			delete[] byteBuffer;
+		}
+
 
 		template<typename T>
 		static void TranslateDataToFloat(T inBuffer, float* outBuffer, unsigned int inBitDepth,
@@ -391,8 +410,6 @@ namespace BackBeat {
 			}
 		}
 
-		// TODO: Inverse the dependency of Int24
-		// Currently does nothing with Int24 buffer values
 		static void MultiplyBufferByValue(byte* buffer, unsigned int numBytes, AudioProps props, float value)
 		{
 			unsigned int numSamples = numBytes / props.blockAlign * props.numChannels;
@@ -419,7 +436,6 @@ namespace BackBeat {
 
 			case (Int24BitSize):
 			{
-				/**
 				int24* intBuffer = int24::GetInt24Buffer(buffer, numSamples, props.bigEndian);
 				for (unsigned int i = 0; i < numSamples; i++) {
 					intBuffer[i] = int24((float)intBuffer[i] * value);
@@ -430,7 +446,6 @@ namespace BackBeat {
 				delete[] intBuffer;
 				delete[] byteBuffer;
 				break;
-				/**/
 			}
 
 			case (FloatBitSize):

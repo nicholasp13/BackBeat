@@ -1,6 +1,4 @@
 // TODO: - Create ImGui Pad widget and Pad control popup/window
-//       - Fix panning volume level
-//       - Add panning to the SamplerPad class
 
 // NOTE: Current panning settings currently make the sample quieter compared to when the sample splicer makes them.
 
@@ -15,6 +13,7 @@ namespace Exampler {
 		m_ProgrammingNote(false),
 		m_DevicesOpen(0),
 		m_PadToProgram(0),
+		m_TrackVolume(1.0f),
 		m_RecordingPlayer(nullptr),
 		m_RecorderMgr(nullptr)
 	{
@@ -184,6 +183,9 @@ namespace Exampler {
 		{
 			auto trackNode = samplerNode.append_child("Track");
 
+			auto volumeNode = trackNode.append_child("Volume");
+			volumeNode.append_attribute("Value") = m_TrackVolume;
+
 			std::shared_ptr<BackBeat::Track> track = m_RecordingPlayer->GetTrack();
 			if (track)
 			{
@@ -263,6 +265,11 @@ namespace Exampler {
 		// Audio track
 		{
 			auto trackNode = node->child("Track");
+
+			auto volumeNode = trackNode.child("Volume");
+			m_TrackVolume = volumeNode.attribute("Value").as_float();
+			m_RecordingMappedTrack->SetVolume(m_TrackVolume);
+
 			std::string trackFilePath = trackNode.attribute("FilePath").as_string();
 
 			if (!trackFilePath.empty())
@@ -356,9 +363,9 @@ namespace Exampler {
 
 		}
 
-		float* volume = &(m_Sampler.GetEngineParams()->volume);
 		ImGui::Text("Volume"); ImGui::SameLine();
-		BackBeat::ImGuiWidgets::ImGuiSeekBarFloat("##Volume", volume, 1.0f, "", ImGuiSliderFlags(0));
+		BackBeat::ImGuiWidgets::ImGuiSeekBarFloat("##Volume", &m_TrackVolume, 1.0f, "", ImGuiSliderFlags(0));
+		m_RecordingMappedTrack->SetVolume(m_TrackVolume);
 
 		ImGui::Spacing();
 		ImGui::PopID();

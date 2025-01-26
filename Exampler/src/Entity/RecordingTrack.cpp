@@ -114,7 +114,6 @@ namespace Exampler {
 	}
 
 	// NOTE: - node is the parent of the node being written to
-	// TODO: Test this
 	void RecordingTrack::WriteObject(pugi::xml_node* node)
 	{
 		auto recorderNode = node->append_child("Recorder");

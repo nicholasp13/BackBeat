@@ -6,8 +6,6 @@
 #include "BackBeat/Audio/IO/AudioBuffer.h"
 namespace BackBeat {
 
-	// TODO: Add way to manage number of midi events
-
 	class RenderInfo
 	{
 	public:
