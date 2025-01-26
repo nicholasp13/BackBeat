@@ -90,8 +90,7 @@ namespace BackBeat {
 		auto readBuffer = m_Buffer;
 		auto writeBuffer = reinterpret_cast<char*>(m_Buffer);
 		unsigned int numFrames = m_BufferSize / m_AudioProps.numChannels;
-		float defaultVal = 0.0f;
-		Audio::FlushBufferT(readBuffer, &defaultVal, m_BufferSize);
+		Audio::FlushBuffer((byte*)writeBuffer, m_BufferSize * sizeof(float));
 
 		m_Sink->Reset();
 		while (m_IsRecording)

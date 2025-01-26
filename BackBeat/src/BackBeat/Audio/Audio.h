@@ -160,10 +160,10 @@ namespace BackBeat {
 		}
 
 		template<typename T>
-		static void FlushBufferT(T buffer, T defaultValue, unsigned int num)
+		static void FlushBufferT(T* buffer, T defaultValue, unsigned int num)
 		{
 			for (unsigned int i = 0; i < num; i++)
-				buffer[i] = *defaultValue;
+				buffer[i] = defaultValue;
 		}
 
 		// Taken from IBM developer

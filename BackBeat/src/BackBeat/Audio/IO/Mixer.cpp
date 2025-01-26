@@ -47,8 +47,7 @@ namespace BackBeat {
 			recording = m_RecordingManager->IsRecording();
 		unsigned int totalBytes = numFrames * m_Props.blockAlign;
 		unsigned int totalSamples = numFrames * m_Props.numChannels;
-		byte defaultVal = 0x00;
-		Audio::FlushBufferT(data, &defaultVal, totalBytes);
+		Audio::FlushBuffer(data, totalBytes);
 
 		for (unsigned int i = 0; i < m_Processors.size(); i++) {
 			if (!m_Processors[i]->IsOn())
@@ -197,8 +196,7 @@ namespace BackBeat {
 		unsigned int totalBytes = numFrames * m_Props.blockAlign;
 		unsigned int totalSamples = numFrames * m_Props.numChannels;
 
-		byte defaultVal = 0x00;
-		Audio::FlushBufferT(data, &defaultVal, totalBytes);
+		Audio::FlushBuffer(data, totalBytes);
 
 		for (unsigned int i = 0; i < m_Processors.size(); i++) {
 			if (!m_Processors[i]->IsOn())

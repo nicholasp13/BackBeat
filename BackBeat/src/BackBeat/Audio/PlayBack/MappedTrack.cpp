@@ -198,9 +198,8 @@ namespace BackBeat {
 		m_Position = 0;
 
 		const unsigned int bufferSize = 4800;
-		byte zero = 0;
 		byte buffer[bufferSize] = {};
-		Audio::FlushBufferT(buffer, &zero, bufferSize);
+		Audio::FlushBuffer(buffer, bufferSize);
 
 		while (!m_Done)
 		{
