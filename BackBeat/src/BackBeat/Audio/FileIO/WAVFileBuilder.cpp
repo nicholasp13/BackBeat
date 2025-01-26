@@ -1,7 +1,7 @@
 #include "bbpch.h"
 
 #include "WAVFileBuilder.h"
-#include "BackBeat/Core/FileDialog.h"
+#include "BackBeat/File/FileDialog.h"
 namespace BackBeat {
 
 	bool WAVFileBuilder::BuildWAVFile(Track* track, unsigned int start, unsigned int end)
@@ -11,11 +11,10 @@ namespace BackBeat {
 		if (end <= start)
 			return false;
 
-		const unsigned int arraySize = 5000;
-		char data[arraySize] = {};
-
 		std::string filePath = FileDialog::SaveFile("WAV Files (*.wav)\0*.wav\0");
 		AudioProps props = track->GetProps();
+		unsigned int arraySize = props.byteRate;
+		char* data = new char[arraySize];
 		unsigned int size = (end - (end % props.blockAlign)) - (start - (start % props.blockAlign));
 		
 		bool success = AudioFileWriter::WriteWAVFileHeader(filePath, props, size);
@@ -33,11 +32,13 @@ namespace BackBeat {
 			while (filePosition < fileSize && success)
 			{
 				dataIncrement = (dataSize + filePosition) <= fileSize ? dataSize : (fileSize - filePosition);
-				track->Render((byte*)data, dataIncrement);
+				track->Read((byte*)data, dataIncrement);
 				success = AudioFileWriter::WriteAudioFileData(filePath, data, dataIncrement);
 				filePosition += dataIncrement;
 			}
 		}
+
+		delete[arraySize] data;
 		return success;
 	}
 
@@ -48,12 +49,13 @@ namespace BackBeat {
 		if (end <= start)
 			return false;
 
-		const unsigned int arraySize = 5000;
-		char data[arraySize] = {};
 		AudioProps props = track->GetProps();
+		unsigned int arraySize = props.byteRate;
+		char* data = new char[arraySize];
 		unsigned int size = (end - (end % props.blockAlign)) - (start - (start % props.blockAlign));
 
 		bool success = AudioFileWriter::WriteWAVFileHeader(filePath, props, size);
+
 		if (success)
 		{
 			const unsigned int dataSize = arraySize;
@@ -67,11 +69,13 @@ namespace BackBeat {
 			while (filePosition < fileSize && success)
 			{
 				dataIncrement = (dataSize + filePosition) <= fileSize ? dataSize : (fileSize - filePosition);
-				track->Render((byte*)data, dataIncrement);
+				track->Read((byte*)data, dataIncrement);
 				success = AudioFileWriter::WriteAudioFileData(filePath, data, dataIncrement);
 				filePosition += dataIncrement;
 			}
 		}
+
+		delete[arraySize] data;
 		return success;
 	}
 }

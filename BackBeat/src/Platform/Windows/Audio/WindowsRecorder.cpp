@@ -1,23 +1,11 @@
 #include "bbpch.h"
 
-/** NOTES:
- *      - When the WINDOWS recording device is STEREO but is currently only is recording through one channel such that
- *      one audio channel is silent, this class produces files with only that live audio channel. As in, it produces
- *      an audio file with only one active audio channel. This is intended currently but comparing to ProTools specifically
- *      (and possibly other recording software) they fill all channels with the same audio data during such cases. 
- *      - POSSIBLE SOLUTIONS TO THE ABOVE -
- *        * Let the Recording class check the data as it is written and the class will mark channels as active if a non-zero
- *        data point is recorded in that channel. When the recording is saved to a file the Recording class matches the requested
- *        number of channels by the user and fills the silent audio channels with the singular active channel.
- *        * Check WASAPI if there is a way to see which channels are active using their classes.
-/**/
-
 /**
  *  Windows API code: https://learn.microsoft.com/en-us/windows/win32/coreaudio/capturing-a-stream
 /**/
 
 // TODO: 
-// - Fix mono/stereo problem noted above through automation or user
+// - Allow user to select between MONO and STEREO andd allow them to specifically choose the audio channel that is recorded (This is how most DAWs work)
 #include "WindowsRecorder.h"  
 namespace BackBeat {
 

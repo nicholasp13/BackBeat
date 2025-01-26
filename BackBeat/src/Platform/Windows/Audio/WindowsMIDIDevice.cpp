@@ -198,7 +198,6 @@ namespace BackBeat {
 		// byte b2 = (byte)((part2 & 0x0000FF00) >> BYTE_BIT_SIZE);  // More
 		// byte b3 = (byte)((part2 & 0x00FF0000) >> BYTE_BIT_SIZE * 2); // Lesser
 		// byte b4 = (byte)((part2 & 0xFF000000) >> BYTE_BIT_SIZE * 3); // Least
-
 		// BB_CORE_INFO("BYTES FOR PART 2: {4}\n1: {0} \n2: {1}\n3: {2}\n4: {3}", b1, b2, b3, b4, part2);
 		
 		// This byte is either CHANNEL_1_NOTE_ON or CHANNEL_1_NOTE_OFF | NOTE: This might change with multiple MIDI devices plugged in

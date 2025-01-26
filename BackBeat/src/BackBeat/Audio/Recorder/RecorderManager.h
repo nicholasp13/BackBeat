@@ -10,6 +10,7 @@
 #include "BackBeat/Core/UUID.h"
 #include "BackBeat/Audio/PlayBack/TrackFactory.h"
 #include "BackBeat/Audio/Helpers/AudioThread.h"
+#include "BackBeat/Core/Timer.h"
 #include "Recorder.h"
 namespace BackBeat {
 
@@ -23,13 +24,17 @@ namespace BackBeat {
 		void Start();
 		void Stop();
 		std::shared_ptr<Track> AddRecordingTrack(UUID id, RecorderType type);
-		void AddRecordingTrack(UUID id, std::shared_ptr<Track> track, RecorderType type);
+		std::shared_ptr<MappedTrack> AddRecordingMappedTrack(UUID id, RecorderType type);
 		void SetRecorderActive(UUID id);
 		void SetRecorderInactive(UUID id);
 		void SetRecordingTrack(UUID id);
 		void ClearTrack(UUID id);
 		void DeleteTrack(UUID id);
 		void ResetRecording(UUID id);
+
+		TimeMinSec GetTime();
+		TimeMinSec GetTimeSeconds();
+		TimeMinSec GetTimeMs();
 		
 		inline bool IsActive(UUID id) { return m_ActiveID == id; }
 		inline bool IsRecording() { return m_Recording; }
@@ -39,6 +44,9 @@ namespace BackBeat {
 	private:
 		bool m_Recording;
 		bool m_Init;
+		float m_TimeEclipsed;
+
+		Timer m_Timer;
 		AudioThread m_Thread;
 		Recorder* m_AudioRecorder;
 		Recorder* m_DeviceRecorder;

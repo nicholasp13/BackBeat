@@ -1,17 +1,7 @@
 #pragma once
 
-// New Multitrack Player class/system
-// NEEDS:
-// 1. Ability to play tracks of all bitdepths and samples
-// 2. Ability to sync tracks to play at 0 at the same time or at least reset them all at the same time
-// 3. Compatable with current mixer - processor relationship but not necessarily the current Player class and PlayerProc class
-// 4. Compatable with current Track class
-// 5. Able to display info from all Tracks
-// 6. Able to add / delete tracks as desired (probably need to add the ability for Mixer to delete procs)
-// 7. Able to play Recordings
-// 8. Able to control all classes individually and insync
-#include "Track.h"
 #include "BackBeat/Audio/Recorder/Recording.h"
+#include "BackBeat/Core/Timer.h"
 #include "Player.h"
 namespace BackBeat {
 
@@ -29,12 +19,24 @@ namespace BackBeat {
 		std::shared_ptr<Player> AddNewPlayer();
 		void Delete(UUID id);
 
+		unsigned int GetPosition();
+		TimeMinSec GetTime();
+		TimeMinSec GetTimeSeconds();
+		TimeMinSec GetTimeMs();
+		void SetPosition(float seconds);
+
 		inline bool IsPlaying() { return m_Playing; }
+		inline unsigned long GetFileLimit() { return s_FileLimitSize; }
 		inline std::shared_ptr<Player> GetPlayer(UUID id) { return Find(id); }
 		
 	private:
+		static const unsigned long s_FileLimitSize = 230400000ul; // 10 mins in bytes at the byteRate of 384k
+		                                                          // (48k sample rate, 32bit floating point, stereo)
+
 		bool m_Playing;
-		unsigned int m_Position;
+		float m_TimeEclipsed;
+
+		Timer m_Timer;
 		std::vector< std::shared_ptr<Player> > m_Players;
 
 	private:

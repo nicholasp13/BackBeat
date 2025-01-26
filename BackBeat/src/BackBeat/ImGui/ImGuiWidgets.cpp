@@ -24,7 +24,7 @@ namespace BackBeat {
 		const ImVec2 labelSize = ImGui::CalcTextSize(label, NULL, true);
 		const ImRect frameRect(window->DC.CursorPos, Add(window->DC.CursorPos, ImVec2(w, labelSize.y + style.FramePadding.y * 2.0f)));
 		const ImRect totalRect(frameRect.Min, Add(frameRect.Max, ImVec2(labelSize.x > 0.0f ? style.ItemInnerSpacing.x + labelSize.x : 0.0f, 0.0f)));
-
+		
 		ImGui::ItemSize(totalRect, style.FramePadding.y);
 		if (!ImGui::ItemAdd(totalRect, id, &frameRect, 0))
 			return false;
@@ -112,6 +112,8 @@ namespace BackBeat {
 	//           the bar does not update while the track plays but does change only when released OR the
 	//           bar does not move or change with the track position) The following example code shows an
 	//           implementation that avoids the constant audio playing while the user is using the seekbar().
+	//       - Another implemntation of the following code might not want to pause the player at all and instead
+	//           SetPosition() after the item is deactivated checking so with ImGui::IsItemDeactivated()
 	//  ---- Example Code ----
 	// if (BackBeat::ImGuiWidgets::ImGuiSeekBarInt("##", &position, m_Player->GetSize(), "", ImGuiSliderFlags(0)))
 	// {
@@ -211,6 +213,15 @@ namespace BackBeat {
 	// NOTE: Might want to change fraction calcultation to inside ImGuiSeekBar() depending on what is needed for future implementation.
 	//       Fine for now
 	bool ImGuiWidgets::ImGuiSeekBarInt(const char* label, int* v, int vMax, const char* format, ImGuiSliderFlags flags)
+	{
+		int vMin = 0;
+		float fraction = float(*v) / (float)vMax;
+		return ImGuiSeekBar(label, ImGuiDataType_S32, fraction, v, &vMin, &vMax, format, flags);
+	}
+
+	// NOTE: Might want to change fraction calcultation to inside ImGuiSeekBar() depending on what is needed for future implementation.
+	//       Fine for now
+	bool ImGuiWidgets::ImGuiSeekBarUnsignedInt(const char* label, unsigned int* v, unsigned vMax, const char* format, ImGuiSliderFlags flags)
 	{
 		int vMin = 0;
 		float fraction = float(*v) / (float)vMax;

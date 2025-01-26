@@ -23,6 +23,7 @@ namespace BackBeat {
 		void ClearTrack();
 
 		TimeMinSec GetTime();
+		TimeMinSec GetTimeMs();
 		TimeMinSec GetLength();
 		unsigned int GetByteRate();
 		unsigned int GetNumChannels();

@@ -10,7 +10,8 @@ namespace Exampler {
 
 	PlaybackTrack::~PlaybackTrack()
 	{
-		m_Player->Stop();
+		if (m_Player)
+			m_Player->Stop();
 	}
 
 	void PlaybackTrack::Update()
@@ -31,6 +32,8 @@ namespace Exampler {
 		unsigned int count = SetPlaybackColors();
 		ImGui::SeparatorText(m_Name.c_str());
 
+		ImGui::Text(m_Track->GetName().c_str());
+
 		if (!m_Player->IsOn())
 		{
 			if (ImGui::Button("On "))
@@ -40,58 +43,13 @@ namespace Exampler {
 		{
 			if (ImGui::Button("Off"))
 				m_Player->Off();
-		} ImGui::SameLine();
-
-		// Render Playback controls/info
-		{
-			// ImGui::Text("Title:"); ImGui::SameLine();
-			ImGui::Text(m_Player->GetTrackName().c_str());
-
-			BackBeat::TimeMinSec trackTime = m_Player->GetTime();
-			BackBeat::TimeMinSec trackLength = m_Player->GetLength();
-
-			int position = m_Player->GetPosition();
-			int size = m_Player->GetSize();
-			static bool wasPlaying = false;
-			ImGui::Text("%d:%02d", trackTime.minutes, trackTime.seconds); ImGui::SameLine();
-
-			// Placeholder for future implementation of a custom ImGui::Timeline widget
-			if (m_Player->IsLoaded())
-			{
-				ImGui::PushID("Seekbar");
-				if (BackBeat::ImGuiWidgets::ImGuiSeekBarInt("##", &position, m_Player->GetSize(), "", ImGuiSliderFlags(0)))
-				{
-					if (m_Player->IsPlaying())
-					{
-						m_Player->Pause();
-						wasPlaying = true;
-					}
-					m_Player->SetPosition(position);
-				}
-				if (ImGui::IsItemDeactivated() && wasPlaying)
-				{
-					m_Player->Play();
-					wasPlaying = false;
-				}
-				ImGui::SameLine(); ImGui::Text("%d:%02d", trackLength.minutes, trackLength.seconds);
-				ImGui::PopID();
-			}
-			else
-			{
-				// Renders an empty, uninteractable seek bar if no track is loaded
-				ImGui::PushID("EmptySeekbar");
-				int temp = 0;
-				BackBeat::ImGuiWidgets::ImGuiSeekBarInt("##", &temp, 10000, "", ImGuiSliderFlags(0));
-				ImGui::SameLine(); ImGui::Text("%d:%02d", trackLength.minutes, trackLength.seconds);
-				ImGui::PopID();
-
-			}
-			ImGui::Spacing();
-			
-			ImGui::Text("    "); ImGui::SameLine();
-			BackBeat::ImGuiWidgets::ImGuiSeekBarFloat("Volume", &m_Volume, 1.0f, "", ImGuiSliderFlags(0));
-			m_Player->SetVolume(m_Volume);
 		}
+
+		ImGui::Spacing();
+			
+		ImGui::Text("Volume"); ImGui::SameLine();
+		BackBeat::ImGuiWidgets::ImGuiSeekBarFloat("##Volume", &m_Volume, 1.0f, "", ImGuiSliderFlags(0));
+		m_Player->SetVolume(m_Volume);
 
 		ImGui::Spacing();
 		ImGui::PopStyleColor(count);
@@ -104,9 +62,35 @@ namespace Exampler {
 		BackBeat::Mixer* mixer,
 		BackBeat::MIDIDeviceManager* midiDeviceManager)
 	{
+		auto filePath = BackBeat::FileDialog::OpenFile("WAV Files (*.wav)\0*.wav\0");
+		if (filePath.empty())
+			return;
+
 		m_Player = playerMgr->AddNewPlayer();
+		auto playerID = m_Player->GetID();
+
+		auto trackToCopy = BackBeat::TrackFactory::BuildTrack(filePath);
+		if (!trackToCopy)
+			return;
+
+		BackBeat::AudioProps tempProps = trackToCopy->GetProps();
+
+		// Temps are always floating point
+		if (tempProps.bitDepth != BackBeat::Audio::FloatBitSize)
+		{
+			tempProps.bitDepth = BackBeat::Audio::FloatBitSize;
+			tempProps.blockAlign = tempProps.numChannels * BackBeat::Audio::FloatByteSize;
+			tempProps.format = BackBeat::Audio::FormatFloatingPoint;
+			tempProps.byteRate = tempProps.sampleRate * tempProps.blockAlign;
+		}
+
+		m_Track = BackBeat::TrackFactory::BuildMappedTempTrack(playerID, tempProps);
+		
+		BackBeat::TrackFactory::CopyTrackData(trackToCopy, m_Track);
+
 		mixer->PushProcessor(m_Player->GetProc());
-		m_Player->LoadTrack(BackBeat::FileDialog::OpenFile("WAV Files (*.wav)\0*.wav\0"));
+		m_Player->LoadTrack(m_Track);
+		m_Player->Reset();
 	}
 
 	void PlaybackTrack::Add(
@@ -116,9 +100,34 @@ namespace Exampler {
 		BackBeat::MIDIDeviceManager* midiDeviceManager,
 		std::string filePath)
 	{
+		if (filePath.empty())
+			return;
+
 		m_Player = playerMgr->AddNewPlayer();
+		auto playerID = m_Player->GetID();
+
+		auto trackToCopy = BackBeat::TrackFactory::BuildTrack(filePath);
+		if (!trackToCopy)
+			return;
+
+		BackBeat::AudioProps tempProps = trackToCopy->GetProps();
+
+		// Temps are always floating point
+		if (tempProps.bitDepth != BackBeat::Audio::FloatBitSize)
+		{
+			tempProps.bitDepth = BackBeat::Audio::FloatBitSize;
+			tempProps.blockAlign = tempProps.numChannels * BackBeat::Audio::FloatByteSize;
+			tempProps.format = BackBeat::Audio::FormatFloatingPoint;
+			tempProps.byteRate = tempProps.sampleRate * tempProps.blockAlign;
+		}
+
+		m_Track = BackBeat::TrackFactory::BuildMappedTempTrack(playerID, tempProps);
+		
+		BackBeat::TrackFactory::CopyTrackData(trackToCopy, m_Track);
+
 		mixer->PushProcessor(m_Player->GetProc());
-		m_Player->LoadTrack(filePath);
+		m_Player->LoadTrack(m_Track);
+		m_Player->Reset();
 	}
 
 	void PlaybackTrack::Delete(
@@ -148,10 +157,23 @@ namespace Exampler {
 
 		auto fileNode = playbackNode.append_child("File");
 		auto track = m_Player->GetTrack();
+
 		if (track)
-			fileNode.append_attribute("Path") = track->GetFilePath();
+		{
+			fileNode.append_attribute("Name") = track->GetName();
+
+			std::string trackFilePath = BackBeat::Project::GetActive()->GetConfig().tracksDirectoryPath
+				+ m_Name + ".wav";
+			if (BackBeat::WAVFileBuilder::BuildWAVFile(track.get(), track->GetStart(), track->GetEnd(), trackFilePath))
+				fileNode.append_attribute("Path") = trackFilePath;
+			else
+				fileNode.append_attribute("Path") = "";
+		}
 		else
+		{
+			fileNode.append_attribute("Name");
 			fileNode.append_attribute("Path");
+		}
 	}
 
 	// NOTE: - node is the node being read from. This is different to WriteObject() || Might want to specify in
@@ -163,8 +185,17 @@ namespace Exampler {
 		m_Volume = node->child("Volume").attribute("Value").as_float();
 
 		auto fileNode = node->child("File");
-		if (!fileNode.attribute("Path").empty())
-			m_Player->LoadTrack(fileNode.attribute("Path").as_string());
+		std::string fileName = fileNode.attribute("Name").as_string();
+		std::string filePath = fileNode.attribute("Path").as_string();
+
+		if (!filePath.empty())
+		{
+			auto trackToCopy = BackBeat::TrackFactory::BuildTrack(filePath);
+			BackBeat::TrackFactory::CopyTrackData(trackToCopy, m_Track);
+			m_Track->SetName(fileName);
+			m_Player->Reset();
+		}
+		
 	}
 
 	unsigned int PlaybackTrack::SetPlaybackColors()

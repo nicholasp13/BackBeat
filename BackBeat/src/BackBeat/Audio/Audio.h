@@ -2,9 +2,8 @@
 
 #include "BackBeat/Audio/MIDI/MIDICodes.h"
 #include "BackBeat/Core/Core.h"
+#include "BackBeat/Core/int24.h"
 namespace BackBeat {
-
-	typedef unsigned char byte;
 
 	enum class FileType {
 		none = 0,
@@ -76,12 +75,15 @@ namespace BackBeat {
 
 		// MISC CONSTANTS
 		constexpr unsigned int ByteBitSize   = 8;
+		constexpr unsigned int ByteByteSize  = 1;
 		constexpr unsigned int Int16BitSize  = 16;
+		constexpr unsigned int Int16ByteSize = 2;
 		constexpr unsigned int Int24BitSize  = 24;
-		constexpr unsigned int FloatBitSize  = 32;
-		constexpr unsigned int DoubleBitSize = 64;
 		constexpr unsigned int Int24ByteSize = 3;
+		constexpr unsigned int FloatBitSize  = 32;
 		constexpr unsigned int FloatByteSize = 4;
+		constexpr unsigned int DoubleBitSize = 64;
+		constexpr unsigned int DoubleByteSize = 8;
 		constexpr float Int24Max             = 8388607.0f;
 
 		// AUDIOFILE CONSTANTS
@@ -143,13 +145,18 @@ namespace BackBeat {
 		template<typename T>
 		static void CopyInputToOutput(T inputBuffer, T outputBuffer, unsigned int bytesToCopy)
 		{
-			memcpy(reinterpret_cast<void*>(inputBuffer), reinterpret_cast<void*>(outputBuffer), bytesToCopy);
+			memcpy(reinterpret_cast<void*>(outputBuffer), reinterpret_cast<void*>(inputBuffer), bytesToCopy);
 		}
 
 		static void FlushBuffer(std::shared_ptr<float[]> buffer, unsigned int numSamples, unsigned int numChannels, float defaultValue)
 		{
 			for (unsigned int i = 0; i < numSamples * numChannels; i++)
 				buffer[i] = defaultValue;
+		}
+
+		static void FlushBuffer(byte* buffer, unsigned int numBytes)
+		{
+			memset(buffer, 0, numBytes); 
 		}
 
 		template<typename T>
@@ -167,7 +174,7 @@ namespace BackBeat {
 			return !p[0] == 1;
 		}
 
-		// Gets time in minutes and seconds only. TODO: Refactor to reflect specific time units returned
+		// Gets time in minutes and seconds only.
 		static TimeMinSec GetTime(float totalSeconds)
 		{
 			TimeMinSec time = TimeMinSec();
@@ -176,6 +183,26 @@ namespace BackBeat {
 			time.minutes = minutes;
 			time.seconds = seconds;
 			time.milliseconds = 0;
+			return time;
+		}
+
+		// Gets time in seconds only.
+		static TimeMinSec GetTimeSecs(float totalSeconds)
+		{
+			TimeMinSec time = TimeMinSec();
+			time.minutes = 0;
+			time.seconds = unsigned int(totalSeconds);
+			time.milliseconds = 0;
+			return time;
+		}
+
+		// Gets time in milliseconds
+		static TimeMinSec GetTimeMs(float totalSeconds)
+		{
+			TimeMinSec time = TimeMinSec();
+			time.minutes = 0;
+			time.seconds = 0;
+			time.milliseconds = unsigned int(totalSeconds * 1000.0f);
 			return time;
 		}
 
@@ -332,6 +359,26 @@ namespace BackBeat {
 				}
 			}
 		}
+		template<typename T>
+		static void TranslateDataToInt24(T inBuffer, byte* outputBuffer, unsigned int inBitDepth,
+			unsigned int numChannels, unsigned int numSamples, bool bigEndian)
+		{
+			float depthRatio = GetTypeRatio(Audio::FloatBitSize, inBitDepth);
+
+			int24* intBuffer = int24::GetInt24Buffer(outputBuffer, numChannels * numSamples, bigEndian);
+			for (unsigned int i = 0; i < numSamples * numChannels; i += numChannels)
+			{
+				for (unsigned int j = 0; j < numChannels; j++)
+				{
+					intBuffer[i + j] += int24((float)(inBuffer[i + j]) * depthRatio);
+				}
+			}
+			byte* byteBuffer = int24::GetByteBuffer(intBuffer, numChannels * numSamples, bigEndian);
+			CopyInputToOutput(outputBuffer, byteBuffer, numChannels * numSamples * Audio::Int24ByteSize);
+			delete[] intBuffer;
+			delete[] byteBuffer;
+		}
+
 
 		template<typename T>
 		static void TranslateDataToFloat(T inBuffer, float* outBuffer, unsigned int inBitDepth,
@@ -362,5 +409,70 @@ namespace BackBeat {
 				}
 			}
 		}
+
+		static void MultiplyBufferByValue(byte* buffer, unsigned int numBytes, AudioProps props, float value)
+		{
+			unsigned int numSamples = numBytes / props.blockAlign * props.numChannels;
+
+			switch (props.bitDepth)
+			{
+
+			case (ByteBitSize):
+			{
+				for (unsigned int i = 0; i < numSamples; i++) {
+					buffer[i] = (byte)((float)(buffer[i]) * value);
+				}
+				break;
+			}
+
+			case (Int16BitSize):
+			{
+				auto shortbuffer = reinterpret_cast<signed short*>(buffer);
+				for (unsigned int i = 0; i < numSamples; i++) {
+					shortbuffer[i] = (signed short)((float)(shortbuffer[i]) * value);
+				}
+				break;
+			}
+
+			case (Int24BitSize):
+			{
+				int24* intBuffer = int24::GetInt24Buffer(buffer, numSamples, props.bigEndian);
+				for (unsigned int i = 0; i < numSamples; i++) {
+					intBuffer[i] = int24((float)intBuffer[i] * value);
+				}
+
+				byte* byteBuffer = int24::GetByteBuffer(intBuffer, numSamples, props.bigEndian);
+				Audio::CopyInputToOutput(buffer, byteBuffer, numSamples * Audio::Int24ByteSize);
+				delete[] intBuffer;
+				delete[] byteBuffer;
+				break;
+			}
+
+			case (FloatBitSize):
+			{
+				auto floatBuffer = reinterpret_cast<float*>(buffer);
+				for (unsigned int i = 0; i < numSamples; i++) {
+					floatBuffer[i] = floatBuffer[i] * value;
+				}
+				break;
+			}
+
+			case (DoubleBitSize):
+			{
+				auto doubleBuffer = reinterpret_cast<double*>(buffer);
+				for (unsigned int i = 0; i < numSamples; i++) {
+					doubleBuffer[i] = (double)(doubleBuffer[i] * value);
+				}
+				break;
+			}
+
+			default:
+			{
+				return;
+			}
+
+			}
+		}
+
 	}
 }

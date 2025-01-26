@@ -12,6 +12,8 @@ namespace BackBeat {
 		m_Position(0),
 		m_Amp(1.0f),
 		m_Hertz(0.0f),
+		m_Delay(SynthBase::LFOMinDelay),
+		m_DelayCount(0),
 		m_WaveType(params->wave),
 		m_Type(ModuleType::WaveOscCore),
 		m_Params(params),
@@ -35,9 +37,10 @@ namespace BackBeat {
 	void LFOCore::Update()
 	{
 		m_Amp = m_Params->amp;
-		if (!Audio::EqualsFloat(m_Hertz, m_Params->hertz, SynthBase::DeltaCentsHertz) || m_WaveType != m_Params->wave) {
+		if (!Audio::EqualsFloat(m_Hertz, m_Params->hertz, SynthBase::DeltaCentsHertz) || m_WaveType != m_Params->wave)
 			InitWave();
-		}
+
+		m_Delay = m_Params->delay;
 	}
 
 	// TODO: Change to allow for modulator input
@@ -45,16 +48,30 @@ namespace BackBeat {
 	{
 		Update();
 
+		unsigned int delaySamples = unsigned int(m_Delay * m_SampleRate * Audio::Stereo);
+
 		// auto inputBuffer = m_Input->GetBuffer();
 		auto outputBuffer = m_Output->GetBuffer();
-		for (unsigned int i = 0; i < numSamples * Audio::Stereo; i++) {
-			outputBuffer[i] = (m_Wave[m_Position] * m_Amp);
-			m_Position = (m_Position + 1) % (m_WaveSize);
+
+		// FLush outputBuffer
+		Audio::FlushBuffer(reinterpret_cast<byte*>(outputBuffer.get()), numSamples * sizeof(float) * Audio::Stereo);
+
+		for (unsigned int i = 0; i < numSamples * Audio::Stereo; i++) 
+		{
+			if (m_DelayCount > delaySamples)
+			{
+				outputBuffer[i] = (m_Wave[m_Position] * m_Amp);
+				m_Position = (m_Position + 1) % (m_WaveSize);
+			}
+
+			if (m_DelayCount <= SynthBase::LFOMaxDelay * m_SampleRate * Audio::Stereo)
+				m_DelayCount++;
 		}
 	}
 
 	void LFOCore::DoNoteOn(NoteEvent event)
 	{
+		m_DelayCount = 0;
 		m_Position = 0;
 		InitWave();
 	}

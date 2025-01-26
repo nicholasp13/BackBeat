@@ -2,8 +2,17 @@
 
 // Signed, two's complement 24 bit integer, always big endian
 
-#include "BackBeat/Audio/Audio.h"
 namespace BackBeat {
+
+	typedef unsigned char byte;
+
+	// Taken from IBM developer
+	static bool IsBigEndian()
+	{
+		int i = 1;
+		char* p = (char*)&i;
+		return !p[0] == 1;
+	}
 
 	class int24 
 	{
@@ -50,6 +59,9 @@ namespace BackBeat {
 		inline double ToDouble() { return (double)ToLong(); }
 
 	private:
+		static const unsigned int s_ByteBitSize = 8,
+			s_Int24ByteSize = 3;
+
 		byte m_SignedByte;
 		byte m_UpperByte;
 		byte m_LowerByte;
@@ -57,33 +69,6 @@ namespace BackBeat {
 	public:
 		static int24* GetInt24Buffer(byte* buffer, unsigned int numInts, bool bigEndian);
 		static byte* GetByteBuffer(int24* buffer, unsigned int numInts, bool bigEndian);
-
-		// NOTE(s): - Due to the way template functions are. This implementation, using include on a .cpp file,
-		//       or creating seperate functions for each type are the only solutions
-		//          - Allocating memory on the heap during important run time ESPECIALLY on the audio thread which requires
-		//       exact timing is generally looked down on. However in this case, this code is baked in here and in 
-		//       SampleBuilder and would take a bit of reworking to fix so this is for future reference in case I forget.
-		//       (Another thing is that creating an array or pointer of the class as a private member caused nontrivial compiler 
-		//       errors that made this tough to solve)
-		template<typename T>
-		static void TranslateDataToInt24(T inBuffer, byte* outputBuffer, unsigned int inBitDepth,
-			unsigned int numChannels, unsigned int numSamples, bool bigEndian)
-		{
-			float depthRatio = Audio::GetTypeRatio(Audio::FloatBitSize, inBitDepth);
-
-			int24* intBuffer = int24::GetInt24Buffer(outputBuffer, numChannels * numSamples, bigEndian);
-			for (unsigned int i = 0; i < numSamples * numChannels; i += numChannels)
-			{
-				for (unsigned int j = 0; j < numChannels; j++)
-				{
-					intBuffer[i + j] += int24((float)(inBuffer[i + j]) * depthRatio);
-				}
-			}
-			byte* byteBuffer = int24::GetByteBuffer(intBuffer, numChannels * numSamples, bigEndian);
-			Audio::CopyInputToOutput(outputBuffer, byteBuffer, numChannels * numSamples * Audio::Int24ByteSize);
-			delete[] intBuffer;
-			delete[] byteBuffer;
-		}
 
 	};
 

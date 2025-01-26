@@ -20,14 +20,11 @@ namespace BackBeat {
 
 	Track::~Track()
 	{
-		// NOTE: Usually the Recording class would delete its temp file during its destructrion
-		//       but this is a safeguard just in case its Track changes
-		if (m_Info.type == FileType::recordingTemp)
-			std::remove(m_Info.filePath.c_str());
+
 	}
 
 	// TODO: Implement endianness conversion if the track does not match the systems endianness
-	bool Track::Render(byte* output, unsigned int numBytes) 
+	bool Track::Read(byte* output, unsigned int numBytes) 
 	{
 		if (numBytes == 0)
 			return true;
@@ -71,7 +68,8 @@ namespace BackBeat {
 		else
 			return false; // TODO: Implement way to switch endianness of track data
 		
-		MultiplyVolume(output, bytesToRender);
+		// Multiply output by the volume
+		Audio::MultiplyBufferByValue(output, bytesToRender, m_Info.props, m_Volume);
 
 		m_Position += bytesToRender;
 		if (m_Position >= m_Info.dataSize + m_Info.dataZero)
@@ -81,56 +79,69 @@ namespace BackBeat {
 		return true;
 	}
 
-	// Rewrites/replaces current data data. May want to move this somewhere else for better SRP. Fine for now.
-	bool Track::CopyData(AudioInfo srcInfo)
+	// Usually want file to be an empty file or maybe just its header before writing to it
+	bool Track::Write(byte* input, unsigned int numBytes)
 	{
-		if (m_Info.props != srcInfo.props)
+		if (numBytes == 0)
+			return true;
+		if ((numBytes % m_Info.props.blockAlign) != 0)
 			return false;
-		if (m_Info.type != FileType::recordingTemp)
-			return false;
-			
+
+		unsigned int bytesToRender = numBytes;
+
+		std::ofstream file;
+		file.open(m_Info.filePath, std::ios::binary | std::ios::app);
+
+		if (Audio::IsBigEndian() == m_Info.props.bigEndian)
+			file.write((char*)input, bytesToRender);
+		else
+			return false; // TODO: Implement way to switch endianness of track data
+
+		m_Info.dataSize += bytesToRender;
+		m_EndPosition += bytesToRender;
+
+		file.close();
+		return true;
+	}
+
+	void Track::Reset()
+	{
 		std::remove(m_Info.filePath.c_str());
+		m_Position = 0;
+		m_StartPosition = 0;
+		m_EndPosition = 0;
+		m_Info.dataSize = 0;
+	}
 
-		const unsigned int arraySize = 5000;
-		char data[arraySize] = {};
-		unsigned int size = srcInfo.dataSize + srcInfo.dataZero;
-		const unsigned int dataSize = arraySize;
-		const unsigned int fileSize = size;
-		unsigned int filePosition = srcInfo.dataZero;
-		unsigned int dataIncrement = dataSize;
-		 
-		bool success = true;
-		while (filePosition < fileSize && success)
-		{
-			dataIncrement = (dataSize + filePosition) <= fileSize ? dataSize : (fileSize - filePosition);
-			success = AudioFileReader::ReadAudioFileData(srcInfo.filePath, data, filePosition, dataIncrement);
-			success = AudioFileWriter::WriteAudioFileData(m_Info.filePath, data, dataIncrement);
-			filePosition += dataIncrement;
-		}
+	void Track::Reset(AudioProps props)
+	{
+		m_Info.props = props;
+		Reset();
+	}
 
-		if (success)
-		{
-			m_Info.dataSize = srcInfo.dataSize;
-			m_Info.props.fileSize = srcInfo.props.fileSize;
-			m_StartPosition = 0;
-			m_Position = 0;
-			m_EndPosition = srcInfo.dataSize;
-		}
-
-		return success;
+	void Track::Clear()
+	{
+		Reset();
 	}
 
 	TimeMinSec Track::GetTime()
 	{
 		AudioProps props = m_Info.props;
-		float timeTotal = (float)((m_Position - m_Info.dataZero) / props.byteRate);
+		float timeTotal = ((float)m_Position - (float)m_Info.dataZero) / (float)props.byteRate;
 		return Audio::GetTime(timeTotal);
+	}
+
+	TimeMinSec Track::GetTimeMs()
+	{
+		AudioProps props = m_Info.props;
+		float timeTotal = (((float)m_Position - (float)m_Info.dataZero) / (float)props.byteRate);
+		return Audio::GetTimeMs(timeTotal);
 	}
 
 	TimeMinSec Track::GetLength()
 	{
 		AudioProps props = m_Info.props;
-		float timeTotal = (float)(m_Info.dataSize / props.byteRate);
+		float timeTotal = (float)m_Info.dataSize / (float)props.byteRate;
 		return Audio::GetTime(timeTotal);
 	}
 
@@ -174,71 +185,6 @@ namespace BackBeat {
 		else if (m_EndPosition <= m_Info.dataZero) 
 		{
 			m_EndPosition = m_Info.dataZero;
-		}
-	}
-
-	void Track::MultiplyVolume(byte* output, unsigned int numBytes)
-	{
-		AudioProps props = m_Info.props;
-		unsigned int numSamples = numBytes / props.blockAlign * props.numChannels;
-		
-		switch (props.bitDepth)
-		{
-
-		case (Audio::ByteBitSize):
-		{
-			for (unsigned int i = 0; i < numSamples; i++) {
-				output[i] = (byte)((float)(output[i]) * m_Volume);
-			}
-			break;
-		}
-
-		case (Audio::Int16BitSize):
-		{
-			auto buffer = reinterpret_cast<signed short*>(output);
-			for (unsigned int i = 0; i < numSamples; i++) {
-				buffer[i] = (signed short)((float)(buffer[i]) * m_Volume);
-			}
-			break;
-		}
-
-		case (Audio::Int24BitSize):
-		{
-			int24* intBuffer = int24::GetInt24Buffer(output, numSamples, m_Info.props.bigEndian);
-			for (unsigned int i = 0; i < numSamples; i++) {
-				intBuffer[i] = int24((float)intBuffer[i] * m_Volume);
-			}
-
-			byte* byteBuffer = int24::GetByteBuffer(intBuffer, numSamples, m_Info.props.bigEndian);
-			Audio::CopyInputToOutput(output, byteBuffer, numSamples * Audio::Int24ByteSize);
-			delete[] intBuffer;
-			delete[] byteBuffer;
-			break;
-		}
-
-		case (Audio::FloatBitSize):
-		{
-			auto buffer = reinterpret_cast<float*>(output);
-			for (unsigned int i = 0; i < numSamples; i++) {
-				buffer[i] = buffer[i] * m_Volume;
-			}
-			break;
-		}
-
-		case (Audio::DoubleBitSize):
-		{
-			auto buffer = reinterpret_cast<double*>(output);
-			for (unsigned int i = 0; i < numSamples; i++) {
-				buffer[i] = (double)(buffer[i] * m_Volume);
-			}
-			break;
-		}
-
-		default:
-		{
-			return;
-		}
-
 		}
 	}
 

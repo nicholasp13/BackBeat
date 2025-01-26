@@ -43,7 +43,7 @@ namespace BackBeat {
 
 		// -------- CONSTANTS FOR PARAMETERS --------- //
 		// MIDI Manufacturer's Association (MMA) min, max, and default values for Downloadable Sounds (DLS)
-		// Website: https://www.midi.org/specifications-old/item/dls-level-1-specification
+		// Website: https://midi.org/dls
 		// Specification level 1
 		// LFOs
 		constexpr float LFOMinDelay                 = 0.1f; // in seconds
@@ -104,14 +104,15 @@ namespace BackBeat {
 		constexpr float EG2ToPitchDefault          = 0.0f;
 		constexpr float EG2ToPitchMin              = -1200.0f;
 		constexpr float EG2ToPitchMax              = 1200.0f;
-		// MISC
-		constexpr float PanDefault = 0.0f;
-		constexpr float PanMin     = -0.50f;
-		constexpr float PanMax     = 0.50f;
+		// DCA
+		constexpr float AmpDefault    = 0.50; // NOTE: This should be 0.70 when pan is implemented properly with a nonlinear scale
+		constexpr float PanDefault    = 0.0f;
+		constexpr float PanMin        = -0.50f;
+		constexpr float PanMax        = 0.50f;
 
 		// MIDI Manufacturer's Association (MMA) min, max, and default values for Downloadable Sounds (DLS)
 		// Specification level 2
-		// Website: https://www.midi.org/specifications-old/item/dls-level-2-specification
+		// Website: https://midi.org/dls
 		// Filters
 		constexpr float FilterCutoffMin = 200.0f;      // Sample rate / 240
 		constexpr float FilterCutoffMax = 8000.0f;     // Sample rate / 6

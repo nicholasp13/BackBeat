@@ -6,6 +6,7 @@
 #include <backends/imgui_impl_glfw.h>
 #include <GLFW/glfw3.h>
 
+#include "Canvas.h"
 #include "Entity/Synthesizer.h"
 #include "Entity/Sampler.h"
 #include "Entity/RecordingTrack.h"
@@ -43,6 +44,7 @@ namespace Exampler {
 		unsigned int m_NumRecorders;
 		std::string m_AppFileDir;
 		std::thread m_Thread;
+		Canvas m_Canvas;
 		std::vector< std::string > m_DeviceNames;
 		std::vector< std::string > m_ProjectNames;
 		std::vector< std::shared_ptr<Entity> > m_Entities;
@@ -74,7 +76,6 @@ namespace Exampler {
 		void RenderCanvas();
 		void RenderAudioVisualizer();
 		void RenderMgrs();
-		void RenderEntities();
 		void RenderEntityMenubar(unsigned int index);
 		void RenderMenubarPopups();
 
@@ -101,8 +102,8 @@ namespace Exampler {
 		bool OnMouseButtonEvent(BackBeat::MouseButtonPressedEvent& event);
 
 		// ImGui functions
-		unsigned int SetCanvasColors();
 		unsigned int SetMainColors();
+		unsigned int SetProjectMgrColors();
 		ImVec2 Center(float width, float height);
 
 	};

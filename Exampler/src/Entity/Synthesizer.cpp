@@ -2,29 +2,29 @@
 //      - Fix bug where changing the general octave range causes the note to hold forever if the original octave 
 //       is not returned to by the user. (NOTE: MIDI Devices handle this by not changing the MIDINote of keys that are
 //       currently pressed when the MIDI user changes the octave range on his MIDI device)
-//      - Fix bug where the parameters aren't set before open so the volume changes when the user first opens this
 
 #include "Synthesizer.h"
 namespace Exampler {
 
-	// TODO: Get rid of magic numbers for 
 	Synthesizer::Synthesizer()
 		: 
 		m_Open(false), 
 		m_KeyboardActive(true),
 		m_NoteVelocity(BackBeat::MIDI::MaxVelocity),
 		m_Pan(BackBeat::SynthBase::PanDefault),
-		m_LFOWave(0),
-		m_OscWave1(3),
-		m_OscWave2(3),
-		m_OscWave3(3),
-		m_OscWave4(3),
+		m_TrackVolume(1.0f),
+		m_LFOWave(s_SinIndex),
+		m_OscWave1(s_SawtoothUpIndex),
+		m_OscWave2(s_SawtoothUpIndex),
+		m_OscWave3(s_SawtoothUpIndex),
+		m_OscWave4(s_SawtoothUpIndex),
 		m_Octave1(0),
 		m_Octave2(0),
 		m_Octave3(0),
 		m_Octave4(0),
 		m_RecordingPlayer(nullptr),
-		m_RecorderMgr(nullptr)
+		m_RecorderMgr(nullptr),
+		m_RecordingMappedTrack(nullptr)
 	{
 		m_SynthEventHandler = m_Synth.GetEventHandler();
 		m_SynthParams = m_Synth.GetParams();
@@ -229,15 +229,24 @@ namespace Exampler {
 			}
 
 			}
+
 			ImGui::Spacing(); ImGui::Spacing();
 
 			float* LFOFreq1 = &(m_SynthParams->engineParams->voiceParams->LFOParams1->hertz);
-			ImGui::Text("    "); ImGui::SameLine(); ImGui::SliderFloat("LFO 1 Frequency", LFOFreq1, BackBeat::SynthBase::LFOFrequencyMin, BackBeat::SynthBase::LFOFrequencyMax);
+			ImGui::Text("    "); ImGui::SameLine(); 
+			ImGui::SliderFloat("LFO 1 Frequency", LFOFreq1, BackBeat::SynthBase::LFOFrequencyMin, BackBeat::SynthBase::LFOFrequencyMax);
 			ImGui::Spacing();
 
 			float* LFOAmp1 = &(m_SynthParams->engineParams->voiceParams->LFOParams1->amp);
-			ImGui::Text("    "); ImGui::SameLine(); ImGui::SliderFloat("LFO 1 Amp", LFOAmp1, BackBeat::SynthBase::LFOAttentuationMin, BackBeat::SynthBase::LFOAttentuationMax);
+			ImGui::Text("    "); ImGui::SameLine(); 
+			ImGui::SliderFloat("LFO 1 Amp", LFOAmp1, BackBeat::SynthBase::LFOAttentuationMin, BackBeat::SynthBase::LFOAttentuationMax);
 			ImGui::Spacing();
+
+			float* LFODelay1 = &(m_SynthParams->engineParams->voiceParams->LFOParams1->delay);
+			ImGui::Text("    "); ImGui::SameLine(); 
+			ImGui::SliderFloat("LFO 1 Delay", LFODelay1, BackBeat::SynthBase::LFOMinDelay, BackBeat::SynthBase::LFOMaxDelay);
+			ImGui::Spacing();
+
 			ImGui::PopID();
 		}
 
@@ -245,11 +254,14 @@ namespace Exampler {
 		{
 			ImGui::TableNextColumn();
 			ImGui::PushID("LPFilter");
+
 			ImGui::SeparatorText("Low Pass Filter");
 			bool* lpFilterOn = &(m_SynthParams->engineParams->voiceParams->LPFilterParams->isOn);
 			ImGui::Checkbox("Filter On", lpFilterOn);
 			float* lpCutoffFreq = &(m_SynthParams->engineParams->voiceParams->LPFilterParams->cutoff);
-			ImGui::Text("    "); ImGui::SameLine(); ImGui::SliderFloat("Cutoff Frequency", lpCutoffFreq, BackBeat::SynthBase::FilterCutoffMin, BackBeat::SynthBase::FilterCutoffMax);
+			ImGui::Text("    "); ImGui::SameLine(); 
+			ImGui::SliderFloat("Cutoff Frequency", lpCutoffFreq, BackBeat::SynthBase::FilterCutoffMin, BackBeat::SynthBase::FilterCutoffMax);
+
 			ImGui::Spacing();
 			ImGui::PopID();
 		}
@@ -257,11 +269,14 @@ namespace Exampler {
 		// High Pass Filter Controls
 		{
 			ImGui::PushID("HPFilter");
+
 			ImGui::SeparatorText("High Pass Filter");
 			bool* hpFilterOn = &(m_SynthParams->engineParams->voiceParams->HPFilterParams->isOn);
 			ImGui::Checkbox("Filter On", hpFilterOn);
 			float* hpCutoffFreq = &(m_SynthParams->engineParams->voiceParams->HPFilterParams->cutoff);
-			ImGui::Text("    "); ImGui::SameLine(); ImGui::SliderFloat("Cutoff Frequency", hpCutoffFreq, BackBeat::SynthBase::FilterCutoffMin, BackBeat::SynthBase::FilterCutoffMax);
+			ImGui::Text("    "); ImGui::SameLine(); 
+			ImGui::SliderFloat("Cutoff Frequency", hpCutoffFreq, BackBeat::SynthBase::FilterCutoffMin, BackBeat::SynthBase::FilterCutoffMax);
+
 			ImGui::Spacing();
 			ImGui::PopID();
 		}
@@ -270,15 +285,30 @@ namespace Exampler {
 		{
 			ImGui::PushID("AmpEG");
 			ImGui::TableNextColumn();
+
 			float* attackDuration = &(m_SynthParams->engineParams->voiceParams->AmpEGParams->attackDuration);
 			float* decayDuration = &(m_SynthParams->engineParams->voiceParams->AmpEGParams->decayDuration);
 			float* releaseDuration = &(m_SynthParams->engineParams->voiceParams->AmpEGParams->releaseDuration);
 			float* sustain = &(m_SynthParams->engineParams->voiceParams->AmpEGParams->sustainValue);
+
 			ImGui::SeparatorText("Amp Envelope Generator");
-			ImGui::Text("    "); ImGui::SameLine(); ImGui::SliderFloat("Attack ", attackDuration, BackBeat::SynthBase::EG1AttackTimeMin, BackBeat::SynthBase::EG1AttackTimeMax);
-			ImGui::Text("    "); ImGui::SameLine(); ImGui::SliderFloat("Decay  ", decayDuration, BackBeat::SynthBase::EG1DecayTimeMin, BackBeat::SynthBase::EG1DecayTimeMax);
-			ImGui::Text("    "); ImGui::SameLine(); ImGui::SliderFloat("Release", releaseDuration, BackBeat::SynthBase::EG1ReleaseTimeMin, BackBeat::SynthBase::EG1ReleaseTimeMax);
-			ImGui::Text("    "); ImGui::SameLine(); ImGui::SliderFloat("Sustain", sustain, BackBeat::SynthBase::EG1SustainLevelMin, BackBeat::SynthBase::EG1SustainLevelMax);
+
+			ImGui::Text("    "); ImGui::SameLine(); 
+			ImGui::SliderFloat("Attack ", attackDuration, BackBeat::SynthBase::EG1AttackTimeMin, BackBeat::SynthBase::EG1AttackTimeMax);
+			ImGui::Spacing();
+
+			ImGui::Text("    "); ImGui::SameLine(); 
+			ImGui::SliderFloat("Decay  ", decayDuration, BackBeat::SynthBase::EG1DecayTimeMin, BackBeat::SynthBase::EG1DecayTimeMax);
+			ImGui::Spacing();
+
+			ImGui::Text("    "); ImGui::SameLine(); 
+			ImGui::SliderFloat("Release", releaseDuration, BackBeat::SynthBase::EG1ReleaseTimeMin, BackBeat::SynthBase::EG1ReleaseTimeMax);
+			ImGui::Spacing();
+
+			ImGui::Text("    "); ImGui::SameLine(); 
+			ImGui::SliderFloat("Sustain", sustain, BackBeat::SynthBase::EG1SustainLevelMin, BackBeat::SynthBase::EG1SustainLevelMax);
+			ImGui::Spacing();
+			
 			ImGui::Spacing();
 			ImGui::PopID();
 		}
@@ -558,8 +588,8 @@ namespace Exampler {
 		auto synthProc = m_Synth.GetProcessor();
 		auto synthID = synthProc->GetID();
 
-		auto synthTrack = m_RecorderMgr->AddRecordingTrack(synthID, BackBeat::RecorderType::audio);
-		m_RecordingPlayer->LoadTrack(synthTrack);
+		m_RecordingMappedTrack = m_RecorderMgr->AddRecordingMappedTrack(synthID, BackBeat::RecorderType::audio);
+		m_RecordingPlayer->LoadTrack(m_RecordingMappedTrack);
 		
 		mixer->PushProcessor(synthProc);
 		mixer->PushProcessor(m_RecordingPlayer->GetProc());
@@ -587,7 +617,6 @@ namespace Exampler {
 	}
 
 	// NOTE: - node is the parent of the node being written to
-	//       - TODO: Still need to implement serializing RecordingTracks
 	void Synthesizer::WriteObject(pugi::xml_node* node)
 	{
 		auto synthNode = node->append_child("Synthesizer");
@@ -658,6 +687,7 @@ namespace Exampler {
 
 			lfoNode.append_child("Frequency").append_attribute("Value") = lfoParams->hertz;
 			lfoNode.append_child("Amp").append_attribute("Value") = lfoParams->amp;
+			lfoNode.append_child("Delay").append_attribute("Value") = lfoParams->delay;
 		}
 
 		// Low Pass Filter
@@ -919,6 +949,9 @@ namespace Exampler {
 		{
 			auto trackNode = synthNode.append_child("Track");
 
+			auto volumeNode = trackNode.append_child("Volume");
+			volumeNode.append_attribute("Value") = m_TrackVolume;
+
 			std::shared_ptr<BackBeat::Track> track = m_RecordingPlayer->GetTrack();
 			if (track)
 			{
@@ -997,6 +1030,7 @@ namespace Exampler {
 
 			lfoParams->hertz = lfoNode.child("Frequency").attribute("Value").as_float();
 			lfoParams->amp = lfoNode.child("Amp").attribute("Value").as_float();
+			lfoParams->delay = lfoNode.child("Delay").attribute("Value").as_float();
 		}
 
 		// Low Pass Filter
@@ -1236,13 +1270,18 @@ namespace Exampler {
 		// Audio track
 		{
 			auto trackNode = node->child("Track");
+
+			auto volumeNode = trackNode.child("Volume");
+			m_TrackVolume = volumeNode.attribute("Value").as_float();
+			m_RecordingMappedTrack->SetVolume(m_TrackVolume);
+
 			std::string trackFilePath = trackNode.attribute("FilePath").as_string();
 
 			if (!trackFilePath.empty())
 			{
-				BackBeat::AudioInfo info = BackBeat::AudioFileReader::ReadFile(trackFilePath);
-				if (!m_RecordingPlayer->GetTrack()->CopyData(info))
-					BB_CLIENT_ERROR("ERROR LOADING AUDIO FILE FOR {0} from {1}", m_Name.c_str(), trackFilePath.c_str());
+				auto trackToCopy = BackBeat::TrackFactory::BuildTrack(trackFilePath);
+				BackBeat::TrackFactory::CopyTrackData(trackToCopy, m_RecordingPlayer->GetTrack());
+				m_RecordingPlayer->Reset();
 			}
 		}
 
@@ -1278,7 +1317,7 @@ namespace Exampler {
 		{
 			if (!m_RecorderMgr->IsActive(synthID))
 			{
-				if (ImGui::Button("Record On", ImVec2(125, 20)))
+				if (ImGui::Button("Record On"))
 				{
 					if (!m_RecorderMgr->IsRecording())
 					{
@@ -1289,16 +1328,11 @@ namespace Exampler {
 			}
 			else
 			{
-				if (ImGui::Button("Record Off", ImVec2(125, 20)))
+				if (ImGui::Button("Record Off"))
 					if (!m_RecorderMgr->IsRecording())
 						m_RecorderMgr->SetRecorderInactive(synthID);
 			}
-			ImGui::SameLine();
 
-		}
-
-		// Render Recording Track Player controls
-		{
 			int trackSize = m_RecordingPlayer->GetSize();
 			if (m_RecordingPlayer && trackSize > 0)
 			{
@@ -1311,65 +1345,29 @@ namespace Exampler {
 				{
 					if (ImGui::Button("Play Recording Off"))
 						m_RecordingPlayer->Off();
-				} ImGui::SameLine();
+				}
 
 				if (ImGui::Button("Clear Recording"))
 					if (!m_RecorderMgr->IsActive(synthID))
 						m_RecorderMgr->ResetRecording(synthID);
 
-				int position = m_RecordingPlayer->GetPosition();
-
-				static bool wasPlaying = false;
-				BackBeat::TimeMinSec trackTime = m_RecordingPlayer->GetTime();
-				BackBeat::TimeMinSec trackLength = m_RecordingPlayer->GetLength();
-
-				ImGui::Text("%d:%02d", trackTime.minutes, trackTime.seconds); ImGui::SameLine();
-
-				// Placeholder for future implementation of a custom ImGui::Timeline widget
-				ImGui::PushID("Seekbar");
-				if (BackBeat::ImGuiWidgets::ImGuiSeekBarInt("##", &position, trackSize, "", ImGuiSliderFlags(0)))
-				{
-					if (m_RecordingPlayer->IsPlaying())
-					{
-						m_RecordingPlayer->Pause();
-						wasPlaying = true;
-					}
-					m_RecordingPlayer->SetPosition(position);
-				}
-				if (ImGui::IsItemDeactivated() && wasPlaying)
-				{
-					m_RecordingPlayer->Play();
-					wasPlaying = false;
-				}
-				ImGui::SameLine(); ImGui::Text("%d:%02d", trackLength.minutes, trackLength.seconds);
-				ImGui::PopID();
-
 			}
 			else
 			{
 				if (ImGui::Button("Play Recording On "))
-				{ 
-				} ImGui::SameLine();
-				if (ImGui::Button("Clear Recording"))
-				{ 
+				{
 				}
-
-				// Renders an empty, uninteractable seek bar if no track is loaded
-				ImGui::PushID("EmptySeekbar");
-				int temp = 0;
-				ImGui::Text("%d:%02d", 0, 0); ImGui::SameLine();
-				BackBeat::ImGuiWidgets::ImGuiSeekBarInt("##", &temp, 10000, "", ImGuiSliderFlags(0)); ImGui::SameLine();
-				ImGui::Text("%d:%02d", 0, 0);
-				ImGui::PopID();
-
+				if (ImGui::Button("Clear Recording"))
+				{
+				}
 			}
-			ImGui::Spacing();
 
 		}
 
-		float* volume = &(m_SynthParams->engineParams->volume);
-		ImGui::Text("    "); ImGui::SameLine();
-		BackBeat::ImGuiWidgets::ImGuiSeekBarFloat("Volume", volume, 1.0f, "", ImGuiSliderFlags(0));
+		// Track volume control
+		ImGui::Text("Volume"); ImGui::SameLine();
+		BackBeat::ImGuiWidgets::ImGuiSeekBarFloat("##Volume", &m_TrackVolume, 1.0f, "", ImGuiSliderFlags(0));
+		m_RecordingMappedTrack->SetVolume(m_TrackVolume);
 		
 		ImGui::Spacing();
 		ImGui::PopID();

@@ -37,6 +37,7 @@ namespace Exampler {
 		inline virtual bool IsOpen() override { return false; }
 		inline virtual std::string GetName() override { return m_Name; }
 		inline virtual EntityType GetType() override { return EntityType::playback; }
+		inline virtual std::shared_ptr<BackBeat::MappedTrack> GetMappedTrack() override { return m_Track; }
 		inline virtual void SetName(std::string name) override { m_Name = name; }
 
 		// BackBeat::Serializable functions
@@ -44,7 +45,6 @@ namespace Exampler {
 		virtual void ReadObject(pugi::xml_node* node) override;
 
 		// Playback functions
-		inline std::shared_ptr<BackBeat::PlayerProcessor> GetProc() { return m_Player->GetProc(); }
 		void Add(
 			BackBeat::PlayerManager* playerMgr,
 			BackBeat::RecorderManager* recorderMgr,
@@ -52,10 +52,13 @@ namespace Exampler {
 			BackBeat::MIDIDeviceManager* midiDeviceManager,
 			std::string filePath);
 
+		inline std::shared_ptr<BackBeat::PlayerProcessor> GetProc() { return m_Player->GetProc(); }
+
 	private:
 		float m_Volume;
 		std::string m_Name;
 		std::shared_ptr<BackBeat::Player> m_Player;
+		std::shared_ptr<BackBeat::MappedTrack> m_Track;
 
 	private:
 		unsigned int SetPlaybackColors();

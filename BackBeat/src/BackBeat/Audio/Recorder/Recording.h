@@ -30,8 +30,6 @@ namespace BackBeat {
 		AudioProps m_Props;
 		std::shared_ptr<Track> m_Track;
 
-	private:
-		void Delete();
 	};
 
 }

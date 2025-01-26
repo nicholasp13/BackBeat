@@ -76,30 +76,29 @@ namespace BackBeat {
 		// If data is nullptr then silence is recordeded instead of samples from data
 		if (data)
 		{
-			bool success = AudioFileWriter::WriteAudioFileData(m_TempPath, data, numBytes);
-			if (success)
-				m_Size += numBytes;
+			if (m_Track->Write((byte*)data, numBytes))
+				m_Size += numBytes; 
 		}
 		else
 		{
-			bool success = AudioFileWriter::WriteAudioFileSilence(m_TempPath, numBytes);
-			if (success)
-				m_Size += numBytes;
+			// TODO: Write silence to Track 
+			//       (this only happens in WindowsRenderer where sometimes the function that returns the buffer of
+			//       data returns nullptr to indicate silence. However this has never happened in testing so it is 
+			//       fine for now for this to do nothing)
 		}
 
-		m_Track->SetDataSize(m_Size);
-		m_Track->SetEnd(m_Size);
 	}
 
 	void Recording::Reset()
 	{
-		Delete();
+		m_Track->Reset();
 	}
 
 	void Recording::Reset(AudioProps props)
 	{
 		m_Props = props;
-		Reset();
+		if (m_Track)
+			m_Track->Reset(props);
 	}
 
 	void Recording::ClearTrack()
@@ -113,9 +112,6 @@ namespace BackBeat {
 	{
 		if (!track)
 			return;
-		auto newProps = track->GetProps();
-		if (newProps != m_Props)
-			return;
 
 		m_Size = track->GetSize();
 		m_TempPath = track->GetInfo().filePath;
@@ -126,19 +122,6 @@ namespace BackBeat {
 	{
 		float totalSeconds = (float)m_Size / (float)m_Props.byteRate;
 		return Audio::GetTime(totalSeconds);
-	}
-
-	void Recording::Delete()
-	{
-		std::remove(m_TempPath.c_str());
-		m_Size = 0;
-		if (m_Track)
-		{
-			m_Track->SetPosition(0);
-			m_Track->SetStart(0);
-			m_Track->SetEnd(0);
-			m_Track->SetDataSize(0);
-		}
 	}
 
 }

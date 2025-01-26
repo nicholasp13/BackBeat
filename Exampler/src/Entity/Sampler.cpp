@@ -1,6 +1,4 @@
 // TODO: - Create ImGui Pad widget and Pad control popup/window
-//       - Fix panning volume level
-//       - Add panning to the SamplerPad class
 
 // NOTE: Current panning settings currently make the sample quieter compared to when the sample splicer makes them.
 
@@ -15,6 +13,7 @@ namespace Exampler {
 		m_ProgrammingNote(false),
 		m_DevicesOpen(0),
 		m_PadToProgram(0),
+		m_TrackVolume(1.0f),
 		m_RecordingPlayer(nullptr),
 		m_RecorderMgr(nullptr)
 	{
@@ -99,8 +98,9 @@ namespace Exampler {
 		auto samplerProc = m_Sampler.GetProcessor();
 		auto samplerID = samplerProc->GetID();
 		auto id = m_Sampler.GetID();
-		auto samplerTrack = m_RecorderMgr->AddRecordingTrack(samplerID, BackBeat::RecorderType::audio);
-		m_RecordingPlayer->LoadTrack(samplerTrack);
+
+		m_RecordingMappedTrack = m_RecorderMgr->AddRecordingMappedTrack(samplerID, BackBeat::RecorderType::audio);
+		m_RecordingPlayer->LoadTrack(m_RecordingMappedTrack);
 
 		mixer->PushProcessor(samplerProc);
 		mixer->PushProcessor(m_RecordingPlayer->GetProc());
@@ -131,7 +131,6 @@ namespace Exampler {
 	}
 
 	// NOTE: - node is the parent of the node being written to
-	//       - TODO: Still need to implement serializing RecordingTracks
 	void Sampler::WriteObject(pugi::xml_node* node)
 	{
 		auto samplerNode = node->append_child("Sampler");
@@ -183,6 +182,9 @@ namespace Exampler {
 		// Audio track
 		{
 			auto trackNode = samplerNode.append_child("Track");
+
+			auto volumeNode = trackNode.append_child("Volume");
+			volumeNode.append_attribute("Value") = m_TrackVolume;
 
 			std::shared_ptr<BackBeat::Track> track = m_RecordingPlayer->GetTrack();
 			if (track)
@@ -263,13 +265,18 @@ namespace Exampler {
 		// Audio track
 		{
 			auto trackNode = node->child("Track");
+
+			auto volumeNode = trackNode.child("Volume");
+			m_TrackVolume = volumeNode.attribute("Value").as_float();
+			m_RecordingMappedTrack->SetVolume(m_TrackVolume);
+
 			std::string trackFilePath = trackNode.attribute("FilePath").as_string();
 
 			if (!trackFilePath.empty())
 			{
-				BackBeat::AudioInfo info = BackBeat::AudioFileReader::ReadFile(trackFilePath);
-				if (!m_RecordingPlayer->GetTrack()->CopyData(info))
-					BB_CLIENT_ERROR("ERROR LOADING AUDIO FILE FOR {0} from {1}", m_Name.c_str(), trackFilePath.c_str());
+				auto trackToCopy = BackBeat::TrackFactory::BuildTrack(trackFilePath);
+				BackBeat::TrackFactory::CopyTrackData(trackToCopy, m_RecordingPlayer->GetTrack());
+				m_RecordingPlayer->Reset();
 			}
 		}
 	}
@@ -319,7 +326,6 @@ namespace Exampler {
 					if (!m_RecorderMgr->IsRecording())
 						m_RecorderMgr->SetRecorderInactive(samplerID);
 			}
-			ImGui::SameLine();
 
 		}
 
@@ -336,66 +342,30 @@ namespace Exampler {
 				{
 					if (ImGui::Button("Play Recording Off"))
 						m_RecordingPlayer->Off();
-				} ImGui::SameLine();
+				}
 
 				if (ImGui::Button("Clear Recording"))
 					if (!m_RecorderMgr->IsActive(samplerID))
 						m_RecorderMgr->ResetRecording(samplerID);
-
-
-				BackBeat::TimeMinSec trackTime = m_RecordingPlayer->GetTime();
-				BackBeat::TimeMinSec trackLength = m_RecordingPlayer->GetLength();
-
-				int position = m_RecordingPlayer->GetPosition();
-				int size = m_RecordingPlayer->GetSize();
-				static bool wasPlaying = false;
-				ImGui::Text("%d:%02d", trackTime.minutes, trackTime.seconds); ImGui::SameLine();
-
-				// Placeholder for future implementation of a custom ImGui::Timeline widget
-				ImGui::PushID("Seekbar");
-				if (BackBeat::ImGuiWidgets::ImGuiSeekBarInt("##", &position, m_RecordingPlayer->GetSize(), "", ImGuiSliderFlags(0)))
-				{
-					if (m_RecordingPlayer->IsPlaying())
-					{
-						m_RecordingPlayer->Pause();
-						wasPlaying = true;
-					}
-					m_RecordingPlayer->SetPosition(position);
-				}
-				if (ImGui::IsItemDeactivated() && wasPlaying)
-				{
-					m_RecordingPlayer->Play();
-					wasPlaying = false;
-				}
-				ImGui::SameLine(); ImGui::Text("%d:%02d", trackLength.minutes, trackLength.seconds);
-				ImGui::PopID();
 
 			}
 			else
 			{
 				if (ImGui::Button("Play Recording On "))
 				{
-				} ImGui::SameLine();
+				}
 				if (ImGui::Button("Clear Recording"))
 				{ 
 				}
-
-				// Renders an empty, uninteractable seek bar if no track is loaded
-				ImGui::PushID("EmptySeekbar");
-				int temp = 0;
-				ImGui::Text("%d:%02d", 0, 0); ImGui::SameLine();
-				BackBeat::ImGuiWidgets::ImGuiSeekBarInt("##", &temp, 10000, "", ImGuiSliderFlags(0)); ImGui::SameLine();
-				ImGui::Text("%d:%02d", 0, 0);
-				ImGui::PopID();
 
 			}
 			ImGui::Spacing();
 
 		}
 
-		float* volume = &(m_Sampler.GetEngineParams()->volume);
-		ImGui::Text("    "); ImGui::SameLine();
-		BackBeat::ImGuiWidgets::ImGuiSeekBarFloat("Volume", volume, 1.0f, "", ImGuiSliderFlags(0));
+		ImGui::Text("Volume"); ImGui::SameLine();
+		BackBeat::ImGuiWidgets::ImGuiSeekBarFloat("##Volume", &m_TrackVolume, 1.0f, "", ImGuiSliderFlags(0));
+		m_RecordingMappedTrack->SetVolume(m_TrackVolume);
 
 		ImGui::Spacing();
 		ImGui::PopID();

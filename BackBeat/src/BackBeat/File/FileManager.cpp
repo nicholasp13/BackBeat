@@ -47,11 +47,16 @@ namespace BackBeat {
 		std::filesystem::rename(source, target);
 	}
 
-	// TODO: Check if "//" is at the end of the filepath and if not: make sure it is added.
 	bool FileManager::SetWorkingDirectory(std::string dir)
 	{
-		std::filesystem::path workingDir = dir;
 		
+		std::string directory = dir;
+		
+		if (directory.back() != '\\')
+			directory += '\\';
+		
+		std::filesystem::path workingDir = directory;
+
 		if (workingDir.empty())
 			return false;
 		if (!std::filesystem::exists(workingDir))

@@ -2,7 +2,7 @@
 
 #include <filesystem>
 
-#include "Log.h"
+#include "BackBeat/Core/Log.h"
 #include "FileSystem.h"
 namespace BackBeat {
 
@@ -33,7 +33,7 @@ namespace BackBeat {
 	void FileSystem::CreateConfigsDir()
 	{
 		CreateAppDir();
-		std::string fullPathDir = s_AppDataLocalDir.c_str() + s_BackBeatDir + s_TempDir;
+		std::string fullPathDir = s_AppDataLocalDir.c_str() + s_BackBeatDir + s_ConfigsDir;
 		auto filePath = std::filesystem::path(fullPathDir);
 		std::filesystem::create_directory(filePath);
 	}
@@ -41,9 +41,22 @@ namespace BackBeat {
 	void FileSystem::CreateTempDir()
 	{
 		CreateAppDir();
-		std::string fullPathDir = s_AppDataLocalDir.c_str() + s_BackBeatDir + s_ConfigsDir;
+		std::string fullPathDir = s_AppDataLocalDir.c_str() + s_BackBeatDir + s_TempDir;
 		auto filePath = std::filesystem::path(fullPathDir);
 		std::filesystem::create_directory(filePath);
+	}
+
+	void FileSystem::ClearDir(std::string dir)
+	{
+		auto dirPath = std::filesystem::path(dir);
+		if (!std::filesystem::exists(dirPath))
+			return;
+
+		for (auto const& dirEntry : std::filesystem::directory_iterator{ dirPath })
+		{
+			if (dirEntry.is_regular_file())
+				std::filesystem::remove(dirEntry);
+		}
 	}
 
 	std::string FileSystem::GetAppDataLocalDir()
@@ -83,7 +96,7 @@ namespace BackBeat {
 	}
 
 	// NOTE: All directrories should start with '\\' (this may need to be checked but it works fine regardless)
-	std::string AddAppSubDir(std::string subDir)
+	std::string FileSystem::AddAppSubDir(std::string subDir)
 	{
 		std::string filePath = s_AppDataLocalDir.c_str() + s_BackBeatDir + 
 			s_AppDir + subDir + "\\";

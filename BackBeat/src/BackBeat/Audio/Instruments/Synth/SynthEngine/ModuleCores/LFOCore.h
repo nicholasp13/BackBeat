@@ -25,8 +25,10 @@ namespace BackBeat {
 		unsigned int m_SampleRate;
 		unsigned int m_Position;
 		unsigned int m_WaveSize;
+		unsigned int m_DelayCount;
 		float m_Amp;
 		float m_Hertz;
+		float m_Delay;
 		WaveType m_WaveType;
 		ModuleType m_Type;
 
@@ -36,7 +38,9 @@ namespace BackBeat {
 		std::unique_ptr<Modulator> m_Input;
 		std::unique_ptr<Modulator> m_Output;
 
+	private:
 		void InitWave();
+
 	};
 
 }

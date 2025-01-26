@@ -77,17 +77,16 @@ namespace BackBeat {
 		WaveType wave;
 	};
 
-	// TODO:
-	//	Add delay in LFO start
+	// TODO: Add delay in LFO start
 	struct LFOParameters
 	{
 		float amp;
 		float hertz;
+		float delay;
 		WaveType wave;
 	};
 
-	// TODO:
-	//	Add resonance hz
+	// TODO: Add resonance hz
 	struct FilterParameters
 	{
 		bool isOn;		// This will be controlled by Filter EG when implemented

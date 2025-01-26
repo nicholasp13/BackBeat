@@ -13,7 +13,6 @@ namespace Exampler {
 	};
 
 	// Externally referreed to as "Track" but not interally as it may be confused with BackBeat::Track
-	// Name of this class is subject to change
 	class Entity : public BackBeat::Serializable
 	{
 	public:
@@ -36,8 +35,10 @@ namespace Exampler {
 		virtual void Off() {}
 		virtual bool IsOpen() { return false; }
 		virtual bool IsOn() { return false; }
+
 		virtual std::string GetName() { return std::string(); }
 		virtual EntityType GetType() { return EntityType::none; }
+		virtual std::shared_ptr<BackBeat::MappedTrack> GetMappedTrack() { return nullptr; }
 		virtual void SetName(std::string name) {}
 		
 		inline BackBeat::UUID GetID() { return m_ID; }

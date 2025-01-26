@@ -6,10 +6,8 @@
 
 #include "BackBeat/Core/Application.h"
 #include "BackBeat/Core/Core.h"
-#include "BackBeat/Core/FileDialog.h"
-#include "BackBeat/Core/FileManager.h"
-#include "BackBeat/Core/FileSystem.h"
 #include "BackBeat/Core/Input.h"
+#include "BackBeat/Core/int24.h"
 #include "BackBeat/Core/KeyCodes.h"
 #include "BackBeat/Core/Layer.h"
 #include "BackBeat/Core/LayerStack.h"
@@ -20,12 +18,16 @@
 
 #include "BackBeat/Audio/Audio.h"
 #include "BackBeat/Audio/AudioSystem.h"
-#include "BackBeat/Audio/Helpers/int24.h"
+#include "BackBeat/Audio/FileIO/AudioFileLoader.h"
 #include "BackBeat/Audio/FileIO/WAVFileBuilder.h"
 #include "BackBeat/Audio/PlayBack/PlayerManager.h"
 #include "BackBeat/Audio/Recorder/RecorderManager.h"
 #include "BackBeat/Audio/Instruments/Sampler/Sampler.h"
 #include "BackBeat/Audio/Instruments/Synth/Synth.h"
+
+#include "BackBeat/File/FileDialog.h"
+#include "BackBeat/File/FileManager.h"
+#include "BackBeat/File/FileSystem.h"
 
 #include "BackBeat/Project/Project.h"
 #include "BackBeat/Project/ProjectSerializer.h"

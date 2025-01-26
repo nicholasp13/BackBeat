@@ -1,6 +1,7 @@
-// TODO: - Create editable timeline for entity/track objects
+// TODO: - Allow for user input and editing in ImGuiTimeline
 //       - Add the ability to save specific configs from certain entities i.e. Synth's to a config xml file
-//       - Allow user to change the audio input channel for RecordingTrack and between MONO and STEREO
+//       - Allow user to change the audio input channel for RecordingTrack and between MONO and STEREO andd
+//           allow for user to select where the recording starts in the file
 
 #include "MainLayer.h"
 namespace Exampler {
@@ -34,11 +35,13 @@ namespace Exampler {
 
 	MainLayer::~MainLayer()
 	{
-
+		
 	}
 
 	void MainLayer::OnAttach()
 	{
+		m_Canvas.Init(m_Audio->GetProps(), m_PlayerMgr, m_RecorderMgr);
+
 		m_NumMIDIDevices = m_MIDIDeviceManager->GetNumDevices();
 		for (unsigned int i = 0; i < m_NumMIDIDevices; i++) 
 		{
@@ -191,8 +194,7 @@ namespace Exampler {
 			childFlags |= ImGuiWindowFlags_NoResize;
 			childFlags |= ImGuiWindowFlags_AlwaysVerticalScrollbar;
 
-			// NOTE: Uses canvas colors for now as a placeholder
-			unsigned int cCount = SetCanvasColors();
+			unsigned int cCount = SetProjectMgrColors();
 
 			ImGui::BeginChild("Projects", ImVec2(startWidth - wBorder, startHeight - hBorder), false, childFlags);
 			
@@ -475,65 +477,10 @@ namespace Exampler {
 	{
 		unsigned int width = m_Window->GetWidth();
 		unsigned int height = m_Window->GetHeight();
-		const int wBorder = 20;
-		const int hBorder = 250;
-		ImGuiWindowFlags childFlags = 0;
-		childFlags |= ImGuiWindowFlags_NoTitleBar;
-		childFlags |= ImGuiWindowFlags_NoMove;
-		childFlags |= ImGuiWindowFlags_NoCollapse;
-		childFlags |= ImGuiWindowFlags_NoResize;
-		childFlags |= ImGuiWindowFlags_AlwaysVerticalScrollbar;
+		const unsigned int wBorder = 20;
+		const unsigned int hBorder = 250;
 
-		if (m_State != AppState::Play)
-			childFlags |= ImGuiWindowFlags_NoInputs;
-
-		unsigned int cCount = SetCanvasColors();
-
-		ImGui::BeginChild("Canvas", ImVec2((float)(width - wBorder), (float)(height - hBorder)), false, childFlags);
-
-		// Render Entities
-		if (m_Entities.size() == 0)
-			ImGui::TextDisabled("Right click to add tracks");
-		else
-		{
-			const float tWidth = (float)width;
-			const float tHeight = 1200.0f;
-			static ImGuiTableFlags tableFlags = 0;
-			tableFlags |= ImGuiTableFlags_RowBg;
-			tableFlags |= ImGuiTableFlags_BordersInner;
-			tableFlags |= ImGuiTableFlags_NoPadOuterX;
-			tableFlags |= ImGuiTableFlags_NoPadInnerX;
-			ImGui::BeginTable("Entities", 1, tableFlags, ImVec2(tWidth, tHeight), 0.0f);
-
-			RenderEntities();
-
-			ImGui::EndTable();
-		}
-		ImGui::EndChild();
-
-		// Render right click menu popup
-		if (ImGui::BeginPopupContextItem("PopUpCreator", ImGuiPopupFlags_MouseButtonRight))
-		{
-			bool limitSynths = (m_NumSynths < MaxSynths);
-			if (ImGui::MenuItem("Add Synth", "", false, limitSynths))
-				AddSynth();
-
-			bool limitSamplers = (m_NumSamplers < MaxSamplers);
-			if (ImGui::MenuItem("Add Sampler", "", false, limitSamplers))
-				AddSampler();
-
-			bool limitPlayback = (m_NumPlayback < MaxPlayback);
-			if (ImGui::MenuItem("Add Playback Track", "", false, limitPlayback))
-				AddPlaybackTrack();
-
-			bool limitRecorders = (m_NumRecorders < MaxRecordingDevices);
-			if (ImGui::MenuItem("Add Recording Track", "", false, limitRecorders))
-				AddRecordingTrack();
-			
-			ImGui::EndPopup();
-		}
-
-		ImGui::PopStyleColor(cCount);
+		m_Canvas.Render((float)(width - wBorder), (float)(height - hBorder), m_State == AppState::Play);
 	}
 
 	// BUG: When spamming the on and off button. It may cause the visuals to glitch (mostly show the data when it should have been flushed)
@@ -583,7 +530,6 @@ namespace Exampler {
 				visualMax * -1, visualMax, ImVec2(m_Window->GetWidth() - 200.0f, 60.0f));
 		}
 
-
 		ImGui::Spacing();
 	}
 
@@ -613,16 +559,6 @@ namespace Exampler {
 				m_RecorderMgr->Stop();
 		}
 
-	}
-
-	void MainLayer::RenderEntities()
-	{
-		for (auto itr = m_Entities.begin(); itr != m_Entities.end(); itr++)
-		{
-			ImGui::TableNextColumn();
-			std::shared_ptr<Entity> entity = *itr;
-			entity->ImGuiRender();
-		}
 	}
 
 	void MainLayer::RenderEntityMenubar(unsigned int index)
@@ -832,6 +768,7 @@ namespace Exampler {
 		std::string synthName = "Synth " + std::to_string(++m_NumSynths);
 		synth->SetName(synthName);
 		m_Entities.push_back(synth);
+		m_Canvas.AddEntity(synth);
 	}
 
 	void MainLayer::AddSampler()
@@ -844,6 +781,7 @@ namespace Exampler {
 		std::string samplerName = "Sampler " + std::to_string(++m_NumSamplers);
 		sampler->SetName(samplerName);
 		m_Entities.push_back(sampler);
+		m_Canvas.AddEntity(sampler);
 	}
 
 	void MainLayer::AddPlaybackTrack()
@@ -853,9 +791,15 @@ namespace Exampler {
 
 		auto playback = std::make_shared<PlaybackTrack>();
 		playback->Add(m_PlayerMgr, m_RecorderMgr, m_AudioRenderer->GetMixer(), m_MIDIDeviceManager);
-		std::string playerName = "Playback " + std::to_string(++m_NumPlayback);
-		playback->SetName(playerName);
-		m_Entities.push_back(playback);
+
+		// If playback loads incorrectly GetMappedTrack() will return a nullptr
+		if (playback->GetMappedTrack())
+		{
+			std::string playerName = "Playback " + std::to_string(++m_NumPlayback);
+			playback->SetName(playerName);
+			m_Entities.push_back(playback);
+			m_Canvas.AddEntity(playback);
+		}
 	}
 
 	void MainLayer::AddPlaybackTrack(std::string filePath)
@@ -865,9 +809,15 @@ namespace Exampler {
 
 		auto playback = std::make_shared<PlaybackTrack>();
 		playback->Add(m_PlayerMgr, m_RecorderMgr, m_AudioRenderer->GetMixer(), m_MIDIDeviceManager, filePath);
-		std::string playerName = "Playback " + std::to_string(++m_NumPlayback);
-		playback->SetName(playerName);
-		m_Entities.push_back(playback);
+
+		// If playback loads incorrectly GetMappedTrack() will return a nullptr
+		if (playback->GetMappedTrack())
+		{
+			std::string playerName = "Playback " + std::to_string(++m_NumPlayback);
+			playback->SetName(playerName);
+			m_Entities.push_back(playback);
+			m_Canvas.AddEntity(playback);
+		}
 	}
 
 	void MainLayer::AddRecordingTrack()
@@ -882,6 +832,7 @@ namespace Exampler {
 		std::string trackName = "Recording " + std::to_string(++m_NumRecorders);
 		recordingTrack->SetName(trackName);
 		m_Entities.push_back(recordingTrack);
+		m_Canvas.AddEntity(recordingTrack);
 	}
 
 	void MainLayer::DeleteEntity()
@@ -899,6 +850,8 @@ namespace Exampler {
 				break;
 			}
 		}
+
+		m_Canvas.DeleteEntity(m_EtyToDelete);
 
 		m_EtyToDelete->Delete(m_PlayerMgr, m_RecorderMgr, m_AudioRenderer->GetMixer(), m_MIDIDeviceManager);
 
@@ -942,6 +895,7 @@ namespace Exampler {
 			m_EtyToDelete = m_Entities.front();
 			DeleteEntity();
 		}
+		// BackBeat::FileSystem::ClearTempDir();
 	}
 
 	bool MainLayer::LoadProject(std::string project)
@@ -982,6 +936,8 @@ namespace Exampler {
 		ClearEntities();
 		Deserialize(projectXMLPath);
 
+		m_PlayerMgr->ResetAll();
+		m_Canvas.Reset();
 		m_State = AppState::Play;
 		return true;
 	}
@@ -1019,8 +975,10 @@ namespace Exampler {
 			break;
 		}
 
-
 		}
+
+		m_PlayerMgr->ResetAll();
+		m_Canvas.Reset();
 	}
 
 	void MainLayer::SaveProject()
@@ -1208,7 +1166,18 @@ namespace Exampler {
 		return true;
 	}
 
-	unsigned int MainLayer::SetCanvasColors()
+	unsigned int MainLayer::SetMainColors()
+	{
+		unsigned int count = 0;
+
+		ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 255, 255, 255)); count++;
+		ImGui::PushStyleColor(ImGuiCol_MenuBarBg, IM_COL32(189, 197, 206, 255)); count++;
+		ImGui::PushStyleColor(ImGuiCol_WindowBg, IM_COL32(189, 197, 206, 255)); count++;
+
+		return count;
+	}
+
+	unsigned int MainLayer::SetProjectMgrColors()
 	{
 		unsigned int count = 0;
 
@@ -1221,17 +1190,6 @@ namespace Exampler {
 		ImGui::PushStyleColor(ImGuiCol_TableRowBgAlt, IM_COL32(147, 157, 169, 255)); count++;
 		ImGui::PushStyleColor(ImGuiCol_TableBorderStrong, IM_COL32(72, 72, 72, 255)); count++;
 		ImGui::PushStyleColor(ImGuiCol_TableBorderLight, IM_COL32(72, 72, 72, 255)); count++;
-
-		return count;
-	}
-
-	unsigned int MainLayer::SetMainColors()
-	{
-		unsigned int count = 0;
-
-		ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 255, 255, 255)); count++;
-		ImGui::PushStyleColor(ImGuiCol_MenuBarBg, IM_COL32(189, 197, 206, 255)); count++;
-		ImGui::PushStyleColor(ImGuiCol_WindowBg, IM_COL32(189, 197, 206, 255)); count++;
 
 		return count;
 	}

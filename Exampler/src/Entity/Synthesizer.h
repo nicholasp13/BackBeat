@@ -1,10 +1,5 @@
 #pragma once
 
-// TODO:
-//  Create way to save GUI settings after closing app
-//  Implement ModMatrix GUI after creating ModMatrix
-//	Create visualizer for wavelength
-
 #include <BackBeat.h>
 #include <imgui.h>
 #include <backends/imgui_impl_opengl3.h>
@@ -42,6 +37,7 @@ namespace Exampler {
 		inline virtual bool IsOpen() override { return m_Open; }
 		inline virtual std::string GetName() override { return m_Name; }
 		inline virtual EntityType GetType() override { return EntityType::synth; }
+		inline virtual std::shared_ptr<BackBeat::MappedTrack> GetMappedTrack() override { return m_RecordingMappedTrack; }
 		inline virtual void SetName(std::string name) override { m_Name = name; }
 
 		// BackBeat::Serializable functions
@@ -54,12 +50,20 @@ namespace Exampler {
 		inline void SetRecordingPlayer(std::shared_ptr<BackBeat::Player> player) { m_RecordingPlayer = player; }
 
 	private:
+		static const int
+			s_SinIndex = 0,
+			s_TriangleIndex = 1,
+			s_SquareIndex = 2,
+			s_SawtoothUpIndex = 3,
+			s_SawtoothDownIndex = 4;
+
 		bool m_Open;
 		bool m_KeyboardActive;
 		std::string m_Name;
-		// Synthesizer params || TODO: Make this a struct in SynthParams header
+		// Synthesizer params
 		int m_NoteVelocity;
 		float m_Pan;
+		float m_TrackVolume;
 		int m_LFOWave,
 			m_OscWave1,
 			m_OscWave2,
@@ -75,6 +79,7 @@ namespace Exampler {
 		std::shared_ptr<BackBeat::SynthEventHandler> m_SynthEventHandler;
 		std::shared_ptr<BackBeat::Player> m_RecordingPlayer;
 		BackBeat::RecorderManager* m_RecorderMgr;
+		std::shared_ptr<BackBeat::MappedTrack> m_RecordingMappedTrack;
 
 	private:
 		void RenderCanvasEntity();

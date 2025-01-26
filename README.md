@@ -1,11 +1,11 @@
 # ![BackBeat](BackBeat/assets/logos/BackbeatLogo_NoFilter_32x32.png?raw=true "BackBeat")  BackBeat
 
-Currently a music application engine for Windows 10/11 written in C++.
-Currently implements a basic polyphonic synth and a sampler both with recording capabilities,
+Music application engine for Windows 10/11 written in C++.
+Currently implements a basic Digital Audio Workstation (DAW) with a polyphonic synth, a sampler with custom sample splicing,
 recording audio devices like mics using Windows API, and WAV file playback as shown in the example _Exampler_ application
 
 ## Goal
-The goal is to create an open source, simple digital audio workstation (DAW) with the ability to easily customize sounds and interface
+The goal is to create an open source, simple DAW with the ability to easily customize sounds and interface
 ### Current features:
 - Synthesizer with 4 wave oscillators, bilinear low pass and high pass filters, low frequency oscillator, panning, and volume control
 - Sampler with the ability to cut and program your own samples with control over panning and volume of each individual sample
@@ -16,13 +16,16 @@ The goal is to create an open source, simple digital audio workstation (DAW) wit
 - GUI using ImGui to fully control, add, and delete BackBeat objects during runtime
 - XML serialization to save and load any work done as projects
 ### Upcoming features:
-- Custom ImGui widget for a timeline that allows the user to edit multiple different audio tracks at the same time
 - Rework aux input recording to allow for selecting specific audio channels and choosing MONO vs STEREO
 ### Planned features:
+- Add more GUI controls like copy-paste, grabbing, selecting, deleting, etc. to BackBeat::ImGui::Timeline
+- More instruments like drumsets and other synths
+- WaveTable oscillators
+- Resonance and more advanced filters
 - Modular Matrix for interactive GUI implementation to customize synth sounds
 - Add downsampling and upsampling to support different sample rates (only 48k sample rate supported currently)
 - Other Synth modes including monophonic, legatto, gliding, etc.
-- Add support to play MP3 file
+- Add support to play MP3 files
 - 2D Renderer for custom sprites and animations for audio visualization
 - Linux support
 
@@ -56,10 +59,8 @@ Set `Exampler` as Startup project to run and make sure to clone recursively. If 
 - personal uses:
 	* To start the project for implementation of OpenGL, ImGui, logging, event handling, etc. 
 #### MIDI Association Documents
-- DLS Level 1 Specification
-  	* link: https://www.midi.org/specifications-old/item/dls-level-1-specification
-- DLS Level 2 Specification
-  	* link: https://www.midi.org/specifications-old/item/dls-level-2-specification
+- DLS Level 1 & 2 Specification
+  	* link: https://midi.org/dls
 - personal uses:
   	* To ensure BackBeat follows MIDI industry standards
 #### _The Art of VA Filter Design_ by Vadim Zavalishin

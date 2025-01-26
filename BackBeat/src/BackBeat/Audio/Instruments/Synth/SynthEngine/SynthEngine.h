@@ -37,7 +37,7 @@ namespace BackBeat {
 
 		virtual void Reset(unsigned int sampleRate);
 		virtual void Render(std::shared_ptr<RenderInfo> info);
-		virtual void SetParam(); // TODO: Implement if needed
+		virtual void SetParam(); // To be implemented if neededed
 		virtual std::shared_ptr<EngineParameters> GetParam();
 		virtual void ProcessMIDIEvent(MIDIEvent event);
 

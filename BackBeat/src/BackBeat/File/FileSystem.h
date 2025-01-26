@@ -10,6 +10,7 @@ namespace BackBeat {
 		void CreateAppDir();
 		void CreateConfigsDir();
 		void CreateTempDir();
+		void ClearDir(std::string dir);
 
 		std::string GetAppDataLocalDir();
 		std::string GetBackBeatDir();
