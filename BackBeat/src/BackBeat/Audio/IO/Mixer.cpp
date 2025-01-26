@@ -1,6 +1,5 @@
 #include "bbpch.h"
 
-#include "BackBeat/Audio/Helpers/int24.h"
 #include "Mixer.h"
 namespace BackBeat {
 
@@ -68,7 +67,7 @@ namespace BackBeat {
 				else if (m_Props.bitDepth == Audio::Int16BitSize)
 					Audio::TranslateDataToShort(srcBuffer, (signed short*)data, inProps.bitDepth, m_Props.numChannels, numFrames);
 				else if (m_Props.bitDepth == Audio::Int24BitSize)
-					int24::TranslateDataToInt24(srcBuffer, (byte*)data, inProps.bitDepth, m_Props.numChannels, numFrames, inProps.bigEndian);
+					Audio::TranslateDataToInt24(srcBuffer, (byte*)data, inProps.bitDepth, m_Props.numChannels, numFrames, inProps.bigEndian);
 				else if (m_Props.bitDepth == Audio::FloatBitSize)
 					Audio::TranslateDataToFloat(srcBuffer, (float*)data, inProps.bitDepth, m_Props.numChannels, numFrames);
 				else if (m_Props.bitDepth == Audio::DoubleBitSize)
@@ -86,7 +85,7 @@ namespace BackBeat {
 				else if (m_Props.bitDepth == Audio::Int16BitSize)
 					Audio::TranslateDataToShort(srcBuffer, (signed short*)data, inProps.bitDepth, m_Props.numChannels, numFrames);
 				else if (m_Props.bitDepth == Audio::Int24BitSize)
-					int24::TranslateDataToInt24(srcBuffer, (byte*)data, inProps.bitDepth, m_Props.numChannels, numFrames, inProps.bigEndian);
+					Audio::TranslateDataToInt24(srcBuffer, (byte*)data, inProps.bitDepth, m_Props.numChannels, numFrames, inProps.bigEndian);
 				else if (m_Props.bitDepth == Audio::FloatBitSize)
 					Audio::TranslateDataToFloat(srcBuffer, (float*)data, inProps.bitDepth, m_Props.numChannels, numFrames);
 				else if (m_Props.bitDepth == Audio::DoubleBitSize)
@@ -110,7 +109,7 @@ namespace BackBeat {
 				else if (m_Props.bitDepth == Audio::Int16BitSize)
 					Audio::TranslateDataToShort(srcBuffer, (signed short*)data, inProps.bitDepth, m_Props.numChannels, numFrames);
 				else if (m_Props.bitDepth == Audio::Int24BitSize)
-					int24::TranslateDataToInt24(srcBuffer, (byte*)data, inProps.bitDepth, m_Props.numChannels, numFrames, inProps.bigEndian);
+					Audio::TranslateDataToInt24(srcBuffer, (byte*)data, inProps.bitDepth, m_Props.numChannels, numFrames, inProps.bigEndian);
 				else if (m_Props.bitDepth == Audio::FloatBitSize)
 					Audio::TranslateDataToFloat(srcBuffer, (float*)data, inProps.bitDepth, m_Props.numChannels, numFrames);
 				else if (m_Props.bitDepth == Audio::DoubleBitSize)
@@ -129,7 +128,7 @@ namespace BackBeat {
 				else if (m_Props.bitDepth == Audio::Int16BitSize)
 					Audio::TranslateDataToShort(srcBuffer, (signed short*)data, inProps.bitDepth, m_Props.numChannels, numFrames);
 				else if (m_Props.bitDepth == Audio::Int24BitSize)
-					int24::TranslateDataToInt24(srcBuffer, (byte*)data, inProps.bitDepth, m_Props.numChannels, numFrames, inProps.bigEndian);
+					Audio::TranslateDataToInt24(srcBuffer, (byte*)data, inProps.bitDepth, m_Props.numChannels, numFrames, inProps.bigEndian);
 				else if (m_Props.bitDepth == Audio::FloatBitSize)
 					Audio::TranslateDataToFloat(srcBuffer, (float*)data, inProps.bitDepth, m_Props.numChannels, numFrames);
 				else if (m_Props.bitDepth == Audio::DoubleBitSize)
@@ -147,7 +146,7 @@ namespace BackBeat {
 				else if (m_Props.bitDepth == Audio::Int16BitSize)
 					Audio::TranslateDataToShort(srcBuffer, (signed short*)data, inProps.bitDepth, m_Props.numChannels, numFrames);
 				else if (m_Props.bitDepth == Audio::Int24BitSize)
-					int24::TranslateDataToInt24(srcBuffer, (byte*)data, inProps.bitDepth, m_Props.numChannels, numFrames, inProps.bigEndian);
+					Audio::TranslateDataToInt24(srcBuffer, (byte*)data, inProps.bitDepth, m_Props.numChannels, numFrames, inProps.bigEndian);
 				else if (m_Props.bitDepth == Audio::FloatBitSize)
 					Audio::TranslateDataToFloat(srcBuffer, (float*)data, inProps.bitDepth, m_Props.numChannels, numFrames);
 				else if (m_Props.bitDepth == Audio::DoubleBitSize)
@@ -218,7 +217,7 @@ namespace BackBeat {
 				else if (m_Props.bitDepth == Audio::Int16BitSize)
 					Audio::TranslateDataToShort(srcBuffer, (signed short*)data, inProps.bitDepth, m_Props.numChannels, numFrames);
 				else if (m_Props.bitDepth == Audio::Int24BitSize)
-					int24::TranslateDataToInt24(srcBuffer, (byte*)data, inProps.bitDepth, m_Props.numChannels, numFrames, inProps.bigEndian);
+					Audio::TranslateDataToInt24(srcBuffer, (byte*)data, inProps.bitDepth, m_Props.numChannels, numFrames, inProps.bigEndian);
 				else if (m_Props.bitDepth == Audio::FloatBitSize)
 					Audio::TranslateDataToFloat(srcBuffer, (float*)data, inProps.bitDepth, m_Props.numChannels, numFrames);
 				else if (m_Props.bitDepth == Audio::DoubleBitSize)
@@ -236,7 +235,7 @@ namespace BackBeat {
 				else if (m_Props.bitDepth == Audio::Int16BitSize)
 					Audio::TranslateDataToShort(srcBuffer, (signed short*)data, inProps.bitDepth, m_Props.numChannels, numFrames);
 				else if (m_Props.bitDepth == Audio::Int24BitSize)
-					int24::TranslateDataToInt24(srcBuffer, (byte*)data, inProps.bitDepth, m_Props.numChannels, numFrames, inProps.bigEndian);
+					Audio::TranslateDataToInt24(srcBuffer, (byte*)data, inProps.bitDepth, m_Props.numChannels, numFrames, inProps.bigEndian);
 				else if (m_Props.bitDepth == Audio::FloatBitSize)
 					Audio::TranslateDataToFloat(srcBuffer, (float*)data, inProps.bitDepth, m_Props.numChannels, numFrames);
 				else if (m_Props.bitDepth == Audio::DoubleBitSize)
@@ -260,7 +259,7 @@ namespace BackBeat {
 				else if (m_Props.bitDepth == Audio::Int16BitSize)
 					Audio::TranslateDataToShort(srcBuffer, (signed short*)data, inProps.bitDepth, m_Props.numChannels, numFrames);
 				else if (m_Props.bitDepth == Audio::Int24BitSize)
-					int24::TranslateDataToInt24(srcBuffer, (byte*)data, inProps.bitDepth, m_Props.numChannels, numFrames, inProps.bigEndian);
+					Audio::TranslateDataToInt24(srcBuffer, (byte*)data, inProps.bitDepth, m_Props.numChannels, numFrames, inProps.bigEndian);
 				else if (m_Props.bitDepth == Audio::FloatBitSize)
 					Audio::TranslateDataToFloat(srcBuffer, (float*)data, inProps.bitDepth, m_Props.numChannels, numFrames);
 				else if (m_Props.bitDepth == Audio::DoubleBitSize)
@@ -279,7 +278,7 @@ namespace BackBeat {
 				else if (m_Props.bitDepth == Audio::Int16BitSize)
 					Audio::TranslateDataToShort(srcBuffer, (signed short*)data, inProps.bitDepth, m_Props.numChannels, numFrames);
 				else if (m_Props.bitDepth == Audio::Int24BitSize)
-					int24::TranslateDataToInt24(srcBuffer, (byte*)data, inProps.bitDepth, m_Props.numChannels, numFrames, inProps.bigEndian);
+					Audio::TranslateDataToInt24(srcBuffer, (byte*)data, inProps.bitDepth, m_Props.numChannels, numFrames, inProps.bigEndian);
 				else if (m_Props.bitDepth == Audio::FloatBitSize)
 					Audio::TranslateDataToFloat(srcBuffer, (float*)data, inProps.bitDepth, m_Props.numChannels, numFrames);
 				else if (m_Props.bitDepth == Audio::DoubleBitSize)
@@ -297,7 +296,7 @@ namespace BackBeat {
 				else if (m_Props.bitDepth == Audio::Int16BitSize)
 					Audio::TranslateDataToShort(srcBuffer, (signed short*)data, inProps.bitDepth, m_Props.numChannels, numFrames);
 				else if (m_Props.bitDepth == Audio::Int24BitSize)
-					int24::TranslateDataToInt24(srcBuffer, (byte*)data, inProps.bitDepth, m_Props.numChannels, numFrames, inProps.bigEndian);
+					Audio::TranslateDataToInt24(srcBuffer, (byte*)data, inProps.bitDepth, m_Props.numChannels, numFrames, inProps.bigEndian);
 				else if (m_Props.bitDepth == Audio::FloatBitSize)
 					Audio::TranslateDataToFloat(srcBuffer, (float*)data, inProps.bitDepth, m_Props.numChannels, numFrames);
 				else if (m_Props.bitDepth == Audio::DoubleBitSize)
