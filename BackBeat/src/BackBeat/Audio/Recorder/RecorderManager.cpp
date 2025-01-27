@@ -20,7 +20,7 @@ namespace BackBeat {
 		Stop();
 	}
 
-	void RecorderManager::Init(Recorder* recorder, Recorder* deviceRecorder)
+	void RecorderManager::Init(Recorder* recorder, DeviceRecorder* deviceRecorder)
 	{
 		if (m_Init)
 			return;
@@ -74,30 +74,6 @@ namespace BackBeat {
 		m_Recording = false;
 	}
 
-	std::shared_ptr<Track> RecorderManager::AddRecordingTrack(UUID id, RecorderType type)
-	{
-		if (!m_Init)
-			return nullptr;
-		if (Contains(id))
-			return nullptr;
-		if (type == RecorderType::none)
-			return nullptr;
-
-		std::shared_ptr<Track> track = nullptr;
-		if (type == RecorderType::audio)
-		{
-			track = TrackFactory::BuildTempTrack(id, m_AudioRecorder->GetProps());
-			m_AudioRecordings[id] = track;
-		}
-		else
-		{
-			track = TrackFactory::BuildTempTrack(id, m_DeviceRecorder->GetProps());
-			m_DeviceRecordings[id] = track;
-		}
-
-		return track;
-	}
-
 	std::shared_ptr<MappedTrack> RecorderManager::AddRecordingMappedTrack(UUID id, RecorderType type)
 	{
 		if (!m_Init)
@@ -108,15 +84,19 @@ namespace BackBeat {
 			return nullptr;
 
 		std::shared_ptr<MappedTrack> track = nullptr;
+		std::shared_ptr<Recording> recording = nullptr;
+
 		if (type == RecorderType::audio)
 		{
 			track = TrackFactory::BuildMappedTempTrack(id, m_AudioRecorder->GetProps());
-			m_AudioRecordings[id] = track;
+			recording = std::make_shared<Recording>(track);
+			m_AudioRecordings[id] = recording;
 		}
 		else
 		{
 			track = TrackFactory::BuildMappedTempTrack(id, m_DeviceRecorder->GetProps());
-			m_DeviceRecordings[id] = track;
+			recording = std::make_shared<Recording>(track);
+			m_DeviceRecordings[id] = recording;
 		}
 
 		return track;
@@ -153,21 +133,38 @@ namespace BackBeat {
 		if (!Contains(id))
 			return;
 
-		std::shared_ptr<Track> track = nullptr;
+		std::shared_ptr<Recording> recording = nullptr;
 		m_TimeEclipsed = 0.0f;
 
 		if (ContainsAudio(id))
 		{
-			track = m_AudioRecordings.at(id);
-			m_AudioRecorder->SetRecordingTrack(track);
+			recording = m_AudioRecordings.at(id);
+			m_AudioRecorder->SetRecording(recording);
 		}
 		else
 		{
-			track = m_DeviceRecordings.at(id);
-			m_DeviceRecorder->SetRecordingTrack(track);
+			recording = m_DeviceRecordings.at(id);
+			m_DeviceRecorder->SetRecording(recording);
 		}
 
 		m_ActiveID = id;
+	}
+
+	void RecorderManager::SetDeviceRecorderIndex(UUID id, unsigned int index)
+	{
+		if (!m_Init)
+			return;
+		if (m_Recording)
+			return;
+		if (!ContainsDevice(id))
+			return;
+
+		std::shared_ptr<Recording> recording = m_DeviceRecordings.at(id);
+
+		if (!recording)
+			return;
+
+		recording->SetIndex(index);
 	}
 
 	void RecorderManager::ClearTrack(UUID id)
@@ -222,15 +219,41 @@ namespace BackBeat {
 		if (!Contains(id))
 			return;
 
-		auto oldID = m_ActiveID;
-		SetRecordingTrack(id);
-
-		if (ContainsAudio(id))
-			m_AudioRecorder->Reset();
+		if (m_ActiveID == id)
+		{
+			Stop();
+			if (ContainsAudio(id))
+				m_AudioRecorder->Reset();
+			else
+				m_DeviceRecorder->Reset();
+		}
+		else if (ContainsAudio(id))
+			m_AudioRecordings.at(id)->Reset();
 		else
-			m_DeviceRecorder->Reset();
+			m_DeviceRecordings.at(id)->Reset();
+	}
 
-		m_ActiveID = oldID;
+	void RecorderManager::ResetRecording(UUID id, AudioProps props)
+	{
+		if (!m_Init)
+			return;
+		if (m_Recording)
+			return;
+		if (!Contains(id))
+			return;
+
+		if (m_ActiveID == id)
+		{
+			Stop();
+			if (ContainsAudio(id))
+				m_AudioRecorder->Reset(props);
+			else
+				m_DeviceRecorder->Reset(props);
+		}
+		else if (ContainsAudio(id))
+			m_AudioRecordings.at(id)->Reset(props);
+		else
+			m_DeviceRecordings.at(id)->Reset(props);
 	}
 
 	TimeMinSec RecorderManager::GetTime()

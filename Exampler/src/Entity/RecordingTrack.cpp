@@ -1,11 +1,11 @@
 #include "RecordingTrack.h"
 
-// TODO: Allow user to split the audio channels input into MONO entities or 1 STEREO entities
-
 namespace Exampler {
 	
 	RecordingTrack::RecordingTrack()
 		: 
+		m_NumChannels(0),
+		m_ChannelIndex(0),
 		m_Volume(1.0f),
 		m_Track(nullptr),
 		m_Player(nullptr),
@@ -42,16 +42,18 @@ namespace Exampler {
 		{	
 			if (!m_RecorderMgr->IsActive(m_RecorderID))
 			{
-				if (ImGui::Button("Record On", ImVec2(125, 20)))
+				if (ImGui::Button("On"))
 					if (!m_RecorderMgr->IsRecording())
 						m_RecorderMgr->SetRecorderActive(m_RecorderID);
 			}
 			else
 			{
-				if (ImGui::Button("Record Off", ImVec2(125, 20)))
+				if (ImGui::Button("Off"))
 					if (!m_RecorderMgr->IsRecording())
 						m_RecorderMgr->SetRecorderInactive(m_RecorderID);
 			}
+
+			ImGui::SameLine();
 
 			if (!m_Player->IsOn())
 			{
@@ -67,6 +69,90 @@ namespace Exampler {
 			if (ImGui::Button("Clear Recording"))
 				if (!m_RecorderMgr->IsRecording())
 					m_RecorderMgr->ResetRecording(m_RecorderID);
+		}
+
+		// Render AudioProp selector
+		{
+			const char* numChannels[] = { "Mono (1 or 2)", "Stereo (1-2)"};
+			const char* channelIndeces[] = { "1", "2" };
+			const int numChannelTypes = 2;
+			const int numChannelIndeces = 2;
+			int numChannel = m_NumChannels;
+			int channelIndex = m_ChannelIndex;
+			BackBeat::AudioProps trackProps = m_Track->GetProps();
+
+			ImGui::Combo("Input", &numChannel, numChannels, numChannelTypes, numChannelTypes);
+
+			if (numChannel != m_NumChannels)
+			{
+				m_NumChannels = numChannel;
+				trackProps.numChannels = numChannel + 1;
+
+				unsigned int byteSize = 0;
+				
+				switch (trackProps.bitDepth)
+				{
+					
+				case (BackBeat::Audio::ByteBitSize):
+				{
+					byteSize = BackBeat::Audio::ByteByteSize;
+					break;
+				}
+
+				case (BackBeat::Audio::Int16BitSize):
+				{
+					byteSize = BackBeat::Audio::Int16ByteSize;
+					break;
+				}
+
+				case (BackBeat::Audio::Int24BitSize):
+				{
+					byteSize = BackBeat::Audio::Int24ByteSize;
+					break;
+				}
+
+				case (BackBeat::Audio::FloatBitSize):
+				{
+					byteSize = BackBeat::Audio::FloatByteSize;
+					break;
+				}
+
+				case (BackBeat::Audio::DoubleBitSize):
+				{
+					byteSize = BackBeat::Audio::DoubleByteSize;
+					break;
+				}
+
+				default:
+				{
+					BB_CLIENT_ERROR("BIT DEPTH NOT SUPPORTED");
+					byteSize = 0;
+					break;
+				}
+
+				}
+
+				if (byteSize != 0)
+				{
+					trackProps.blockAlign = trackProps.numChannels * byteSize;
+					trackProps.byteRate = trackProps.sampleRate * trackProps.blockAlign;
+
+					m_RecorderMgr->ResetRecording(m_RecorderID, trackProps);
+				}
+			}
+
+			ImGui::BeginDisabled(m_NumChannels == 1);
+
+			ImGui::Combo("Channel", &channelIndex, channelIndeces, numChannelIndeces, numChannelIndeces);
+
+			if (channelIndex != m_ChannelIndex)
+			{
+				m_ChannelIndex = channelIndex;
+				m_RecorderMgr->SetDeviceRecorderIndex(m_RecorderID, m_ChannelIndex);
+			}
+
+			ImGui::EndDisabled();
+
 		}
 
 		// Render Playback controls/info
@@ -92,6 +178,8 @@ namespace Exampler {
 		m_Track = m_RecorderMgr->AddRecordingMappedTrack(m_RecorderID, BackBeat::RecorderType::device);
 
 		m_Player->LoadTrack(m_Track);
+		m_NumChannels = m_Track->GetProps().numChannels - 1;
+		m_ChannelIndex = 0;
 
 		mixer->PushProcessor(m_Player->GetProc());
 	}

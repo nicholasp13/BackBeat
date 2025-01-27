@@ -2,10 +2,10 @@
 
 #include "BackBeat/Core/UUID.h"
 #include "Platform/Windows/Windows.h"
-#include "BackBeat/Audio/Recorder/Recorder.h"
+#include "BackBeat/Audio/Recorder/DeviceRecorder.h"
 namespace BackBeat {
 
-	class WindowsRecorder : public Recorder
+	class WindowsRecorder : public DeviceRecorder
 	{
 	public:
 		WindowsRecorder();
@@ -17,24 +17,26 @@ namespace BackBeat {
 		virtual void Reset() override; 
 		virtual void Reset(AudioProps props) override;
 		virtual bool SaveWAV(std::string filePath) override;
-		virtual std::shared_ptr<Track> GetRecordingTrack() override;
-
-		void Init();
+		virtual std::shared_ptr<MappedTrack> GetRecordingTrack() override;
 		
-		inline virtual void ClearTrack() override { m_Recording.ClearTrack(); }
+		inline virtual void ClearTrack() override { m_Recording->ClearTrack(); }
 		inline virtual bool IsRecording() { return m_IsRecording; }
-		inline virtual AudioProps GetProps() override { return m_AudioProps; }
-		inline virtual TimeMinSec GetLengthMinSec() override { return m_Recording.GetLengthMinSecs(); }
+		inline virtual AudioProps GetProps() override { return m_Props; }
+		inline virtual TimeMinSec GetLengthMinSec() override { return m_Recording->GetLengthMinSecs(); }
 		inline virtual RecorderType GetType() override { return RecorderType::device; }
 		inline virtual UUID GetID() override { return m_ID; }
-		inline virtual void SetRecordingTrack(std::shared_ptr<Track> track) override { m_Recording.SetTrack(track); }
+		inline virtual void SetRecording(std::shared_ptr<Recording> recording) override { m_Recording = recording; }
+
+		// WindowsRecorder functions
+		void Init();
 
 	private:
 		bool m_IsRecording;
 		bool m_Init;
+		unsigned int m_Index;
 		UUID m_ID;
-		AudioProps m_AudioProps;
-		Recording m_Recording;
+		AudioProps m_Props;
+		std::shared_ptr<Recording> m_Recording;
 
 		// Windows API members
 		UINT32 m_BufferSize;

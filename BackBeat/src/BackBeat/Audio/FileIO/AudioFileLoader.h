@@ -11,6 +11,8 @@ namespace BackBeat {
 
 		bool Load(std::shared_ptr<MappedTrack> track, byte* output, unsigned int numBytes, unsigned int position,
 			int channelIndex);
+		bool Unload(std::shared_ptr<MappedTrack> track, byte* input, AudioProps inputProps, unsigned int numInputBytes, 
+			int channelIndex);
 
 	private:
 		unsigned int m_BufferSize;
