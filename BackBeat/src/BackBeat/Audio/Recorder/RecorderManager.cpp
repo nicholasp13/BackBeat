@@ -119,8 +119,6 @@ namespace BackBeat {
 			return;
 
 		m_TimeEclipsed = 0.0f;
-		m_AudioRecorder->ClearTrack();
-		m_DeviceRecorder->ClearTrack();
 		m_ActiveID = UUID(0);
 	}
 
@@ -179,9 +177,9 @@ namespace BackBeat {
 		m_TimeEclipsed = 0.0f;
 
 		if (ContainsAudio(id))
-			m_AudioRecorder->ClearTrack();
+			m_AudioRecordings.at(id)->ClearTrack();
 		else
-			m_DeviceRecorder->ClearTrack();
+			m_DeviceRecordings.at(id)->ClearTrack();
 	}
 
 	void RecorderManager::DeleteTrack(UUID id)

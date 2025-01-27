@@ -10,11 +10,19 @@ namespace BackBeat {
 		MappedTrack(AudioInfo info, std::shared_ptr<FileMap> fileMap);
 		~MappedTrack();
 
-		virtual bool Read(byte* output, unsigned int numBytes) override;
-		virtual bool Write(byte* input, unsigned int numBytes) override;
-
+		// MappedTrack functions
 		bool Read(byte* output, unsigned int numBytes, unsigned int position);
 		bool Write(byte* input, unsigned int numBytes, unsigned int position);
+
+		void SetReadPosition(unsigned int position);
+		void SetWritePosition(unsigned int position);
+
+		inline unsigned int GetReadPosition() { return m_ReadPosition; }
+		inline unsigned int GetWritePosition() { return m_ReadPosition; }
+
+		// Track functions
+		virtual bool Read(byte* output, unsigned int numBytes) override;
+		virtual bool Write(byte* input, unsigned int numBytes) override;
 
 		virtual void Reset() override;
 		virtual void Reset(AudioProps props) override;
@@ -29,7 +37,7 @@ namespace BackBeat {
 
 		inline virtual bool IsDone() override { return m_Done; }
 		inline virtual unsigned int GetSize() override { return m_Info.dataSize; }
-		inline virtual unsigned int GetPosition() override { return m_Position - m_Info.dataZero; }
+		inline virtual unsigned int GetPosition() override { return m_ReadPosition - m_Info.dataZero; }
 		inline virtual unsigned int GetStart() override { return m_StartPosition - m_Info.dataZero; }
 		inline virtual unsigned int GetEnd() override { return m_EndPosition - m_Info.dataZero; }
 		inline virtual std::string GetName() override { return m_Info.name; }
@@ -42,7 +50,8 @@ namespace BackBeat {
 
 	private:
 		bool m_Done;
-		unsigned int m_Position;
+		unsigned int m_ReadPosition;
+		unsigned int m_WritePosition;
 		unsigned int m_StartPosition;
 		unsigned int m_EndPosition;
 		float m_Volume;

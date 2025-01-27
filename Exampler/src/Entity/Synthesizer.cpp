@@ -1348,7 +1348,7 @@ namespace Exampler {
 				}
 
 				if (ImGui::Button("Clear Recording"))
-					if (!m_RecorderMgr->IsActive(synthID))
+					if (!m_RecorderMgr->IsRecording())
 						m_RecorderMgr->ResetRecording(synthID);
 
 			}
