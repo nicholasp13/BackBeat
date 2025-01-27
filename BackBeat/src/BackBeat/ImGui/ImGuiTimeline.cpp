@@ -128,7 +128,7 @@ namespace BackBeat {
 		fraction = ImSaturate(fraction);
 		const float progressWidth = 2.0f;
 		const float progressHeight = totalRect.GetHeight();
-		const float xPos = totalRect.Min.x + (totalRect.GetWidth() * fraction);
+		const float xPos = totalRect.Min.x + (frameRect.GetWidth() * fraction);
 		const float yPos = totalRect.Min.y - 1.0f;
 		const ImRect progressMarker(ImVec2(xPos, yPos), ImVec2(xPos, yPos + progressHeight));
 		window->DrawList->AddLine(progressMarker.Min, progressMarker.Max, ImGui::GetColorU32(ImGuiCol_SliderGrab), progressWidth);
