@@ -173,7 +173,7 @@ namespace BackBeat {
 	}
 
 	TimeMinSec Recording::GetLengthMinSecs()
-	{
+	{ 
 		float totalSeconds = (float)m_Size / (float)m_Props.byteRate;
 		return Audio::GetTime(totalSeconds);
 	}

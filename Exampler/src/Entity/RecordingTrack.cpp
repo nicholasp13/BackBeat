@@ -1,5 +1,7 @@
 #include "RecordingTrack.h"
 
+// TODO: Add mono/stereo and channel index to serialization
+
 namespace Exampler {
 	
 	RecordingTrack::RecordingTrack()
@@ -86,59 +88,12 @@ namespace Exampler {
 			if (numChannel != m_NumChannels)
 			{
 				m_NumChannels = numChannel;
+				unsigned int byteSize = trackProps.bitDepth / BackBeat::Audio::ByteBitSize;
 				trackProps.numChannels = numChannel + 1;
+				trackProps.blockAlign = trackProps.numChannels * byteSize;
+				trackProps.byteRate = trackProps.sampleRate * trackProps.blockAlign;
 
-				unsigned int byteSize = 0;
-				
-				switch (trackProps.bitDepth)
-				{
-					
-				case (BackBeat::Audio::ByteBitSize):
-				{
-					byteSize = BackBeat::Audio::ByteByteSize;
-					break;
-				}
-
-				case (BackBeat::Audio::Int16BitSize):
-				{
-					byteSize = BackBeat::Audio::Int16ByteSize;
-					break;
-				}
-
-				case (BackBeat::Audio::Int24BitSize):
-				{
-					byteSize = BackBeat::Audio::Int24ByteSize;
-					break;
-				}
-
-				case (BackBeat::Audio::FloatBitSize):
-				{
-					byteSize = BackBeat::Audio::FloatByteSize;
-					break;
-				}
-
-				case (BackBeat::Audio::DoubleBitSize):
-				{
-					byteSize = BackBeat::Audio::DoubleByteSize;
-					break;
-				}
-
-				default:
-				{
-					BB_CLIENT_ERROR("BIT DEPTH NOT SUPPORTED");
-					byteSize = 0;
-					break;
-				}
-
-				}
-
-				if (byteSize != 0)
-				{
-					trackProps.blockAlign = trackProps.numChannels * byteSize;
-					trackProps.byteRate = trackProps.sampleRate * trackProps.blockAlign;
-
-					m_RecorderMgr->ResetRecording(m_RecorderID, trackProps);
-				}
+				m_RecorderMgr->ResetRecording(m_RecorderID, trackProps);
 			}
 
 			ImGui::BeginDisabled(m_NumChannels == 1);
@@ -214,6 +169,17 @@ namespace Exampler {
 			volumeNode.append_attribute("Value") = m_Volume;
 		}
 
+		// Audio channel
+		{
+			auto channelNode = recorderNode.append_child("Channels");
+
+			auto numNode = channelNode.append_child("Num");
+			numNode.append_attribute("Value") = m_NumChannels;
+
+			auto idxNode = channelNode.append_child("Index");
+			idxNode.append_attribute("Value") = m_ChannelIndex;
+		}
+
 		// Audio track
 		{
 			auto trackNode = recorderNode.append_child("Track");
@@ -232,6 +198,7 @@ namespace Exampler {
 			else
 				trackNode.append_attribute("FilePath") = "";
 		}
+
 	}
 
 	// NOTE: - node is the node being read from. This is different to WriteObject() || Might want to specify in
@@ -244,6 +211,30 @@ namespace Exampler {
 		{
 			auto volumeNode = node->child("Volume");
 			m_Volume = volumeNode.attribute("Value").as_float();
+		}
+
+		// Audio channel
+		{
+			auto channelNode = node->child("Channels");
+
+			auto numNode = channelNode.child("Num");
+			m_NumChannels = numNode.attribute("Value").as_uint();
+
+			auto idxNode = channelNode.child("Index");
+			m_ChannelIndex = idxNode.attribute("Value").as_uint();
+
+			// This means that the recording props is mono as m_NumChannels starts at 0
+			if (m_NumChannels == 0)
+			{
+				BackBeat::AudioProps trackProps = m_Track->GetProps();
+
+				unsigned int byteSize = trackProps.bitDepth / BackBeat::Audio::ByteBitSize;
+				trackProps.numChannels = BackBeat::Audio::Mono;
+				trackProps.blockAlign = trackProps.numChannels * byteSize;
+				trackProps.byteRate = trackProps.sampleRate * trackProps.blockAlign;
+
+				m_RecorderMgr->ResetRecording(m_RecorderID, trackProps);
+			}
 		}
 
 		// Audio track

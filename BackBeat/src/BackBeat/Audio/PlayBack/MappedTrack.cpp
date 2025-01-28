@@ -207,10 +207,10 @@ namespace BackBeat {
 	void MappedTrack::Reset()
 	{
 		Clear();
-		m_ReadPosition = 0;
-		m_WritePosition = 0;
-		m_StartPosition = 0;
-		m_EndPosition = 0;
+		m_ReadPosition = m_Info.dataZero;
+		m_WritePosition = m_Info.dataZero;
+		m_StartPosition = m_Info.dataZero;
+		m_EndPosition = m_Info.dataZero;
 		m_Info.dataSize = 0;
 	}
 

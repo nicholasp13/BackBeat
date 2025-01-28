@@ -87,7 +87,6 @@ namespace BackBeat {
 
 		if (inProps == outProps)
 		{
-			// const unsigned int bufferSize = 4800; // Must match block align checks
 			bool done = false;
 			byte* buffer = new byte[bufferSize];
 

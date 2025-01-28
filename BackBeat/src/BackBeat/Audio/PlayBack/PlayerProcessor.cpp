@@ -33,25 +33,24 @@ namespace BackBeat {
 			return;
 		}
 
-		const unsigned int bufferSize = 10000;
 		AudioProps props = m_Track->GetProps();
 		float actualSamples = (float)numSamples * (float)props.sampleRate / (float)sampleRate;
 		unsigned int actualBytes = (unsigned int)floor(actualSamples * (float)props.blockAlign);
 		
 		Audio::FlushBuffer(m_Output, actualBytes);
+		Audio::FlushBuffer(m_TempBuffer, actualBytes);
 
 		// Changes Mono to Stereo and vice versa
 		if (m_Track->GetProps().numChannels != numChannels)
 		{
-			byte temp[bufferSize] = {};
-			m_Track->Read(temp, actualBytes);
+			m_Track->Read(m_TempBuffer, actualBytes);
 			if (numChannels == Audio::Stereo)
 			{
-				MonoToStereo(actualBytes, props.bitDepth, temp, m_Output);
+				MonoToStereo(actualBytes, props.bitDepth, m_TempBuffer, m_Output);
 			}
 			else
 			{
-				StereoToMono(actualBytes, props.bitDepth, temp, m_Output);
+				StereoToMono(actualBytes, props.bitDepth, m_TempBuffer, m_Output);
 			}
 		}
 		else 
