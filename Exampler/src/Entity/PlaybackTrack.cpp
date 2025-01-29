@@ -176,8 +176,9 @@ namespace Exampler {
 		}
 	}
 
-	// NOTE: - node is the node being read from. This is different to WriteObject() || Might want to specify in
-	//       function declaration
+	// NOTES: - node is the node being read from. This is different to WriteObject() || Might want to specify in
+	//          function declaration
+	//        - Copying track data is handled by MainLayer as creating an empty PlaybackTrack entity is not currently possible
 	void PlaybackTrack::ReadObject(pugi::xml_node* node)
 	{
 		m_Name = node->attribute("Name").as_string();
@@ -187,15 +188,6 @@ namespace Exampler {
 		auto fileNode = node->child("File");
 		std::string fileName = fileNode.attribute("Name").as_string();
 		std::string filePath = fileNode.attribute("Path").as_string();
-
-		if (!filePath.empty())
-		{
-			auto trackToCopy = BackBeat::TrackFactory::BuildTrack(filePath);
-			BackBeat::TrackFactory::CopyTrackData(trackToCopy, m_Track);
-			m_Track->SetName(fileName);
-			m_Player->Reset();
-		}
-		
 	}
 
 	unsigned int PlaybackTrack::SetPlaybackColors()

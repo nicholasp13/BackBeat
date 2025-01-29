@@ -82,12 +82,11 @@ namespace BackBeat {
 
 		AudioProps inProps = input->GetProps();
 		AudioProps outProps = output->GetProps();
-		unsigned int bufferSize = outProps.byteRate;
+		unsigned int bufferSize = outProps.byteRate > inProps.byteRate ? outProps.byteRate : inProps.byteRate;
 		output->SetName(input->GetName());
 
 		if (inProps == outProps)
 		{
-			// const unsigned int bufferSize = 4800; // Must match block align checks
 			bool done = false;
 			byte* buffer = new byte[bufferSize];
 

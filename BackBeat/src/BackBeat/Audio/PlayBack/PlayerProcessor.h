@@ -30,7 +30,8 @@ namespace BackBeat {
 		bool m_On;
 		unsigned int m_BufferSize;
 		UUID m_ID;
-		byte m_Output[s_ActualBufferSize];
+		byte m_Output[s_ActualBufferSize] = {};
+		byte m_TempBuffer[s_ActualBufferSize] = {};
 		std::shared_ptr<Track> m_Track;
 
 	private:

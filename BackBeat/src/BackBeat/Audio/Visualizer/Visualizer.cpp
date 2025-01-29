@@ -35,15 +35,14 @@ namespace BackBeat {
 		m_ChannelBufferSize = s_ArraySize / props.numChannels;
 		m_ChannelUpdateSize = updateBufferSize / props.numChannels;
 
-		float defaultVal = 0.0f;
 		for (unsigned int i = 0; i < props.numChannels; i++)
 		{
 			m_ChannelBuffers.push_back(std::shared_ptr<float[]>(new float[m_ChannelBufferSize]));
-			Audio::FlushBufferT(m_ChannelBuffers[i].get(), &defaultVal, m_ChannelBufferSize);
+			Audio::FlushBuffer(reinterpret_cast<byte*>(m_ChannelBuffers[i].get()), m_ChannelBufferSize * sizeof(float));
 		}
 
-		Audio::FlushBufferT(m_OutputBuffer.get(), &defaultVal, s_ArraySize);
-		Audio::FlushBufferT(m_InputBuffer.get(), &defaultVal, s_ArraySize);
+		Audio::FlushBuffer(reinterpret_cast<byte*>(m_OutputBuffer.get()), s_ArraySize * sizeof(float));
+		Audio::FlushBuffer(reinterpret_cast<byte*>(m_InputBuffer.get()), s_ArraySize * sizeof(float));
 	}
 
 	void Visualizer::Update()
@@ -81,12 +80,11 @@ namespace BackBeat {
 	void Visualizer::Off()
 	{
 		m_On = false;
-		float defaultVal = 0.0f;
-		Audio::FlushBufferT(m_OutputBuffer.get(), &defaultVal, s_ArraySize);
-		Audio::FlushBufferT(m_InputBuffer.get(), &defaultVal, s_ArraySize);
+		Audio::FlushBuffer(reinterpret_cast<byte*>(m_OutputBuffer.get()), s_ArraySize * sizeof(float));
+		Audio::FlushBuffer(reinterpret_cast<byte*>(m_InputBuffer.get()), s_ArraySize * sizeof(float));
 		
 		for (unsigned int i = 0; i < m_Props.numChannels; i++)
-			Audio::FlushBufferT(m_ChannelBuffers[i].get(), &defaultVal, m_ChannelBufferSize);
+			Audio::FlushBuffer(reinterpret_cast<byte*>(m_ChannelBuffers[i].get()), m_ChannelBufferSize * sizeof(float));
 	}
 
 	float* Visualizer::GetChannelBuffer(unsigned int index)

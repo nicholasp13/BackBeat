@@ -11,7 +11,7 @@
 #include "BackBeat/Audio/PlayBack/TrackFactory.h"
 #include "BackBeat/Audio/Helpers/AudioThread.h"
 #include "BackBeat/Core/Timer.h"
-#include "Recorder.h"
+#include "DeviceRecorder.h"
 namespace BackBeat {
 
 	class RecorderManager
@@ -20,17 +20,18 @@ namespace BackBeat {
 		RecorderManager();
 		~RecorderManager();
 
-		void Init(Recorder* recorder, Recorder* deviceRecorder);
+		void Init(Recorder* recorder, DeviceRecorder* deviceRecorder);
 		void Start();
 		void Stop();
-		std::shared_ptr<Track> AddRecordingTrack(UUID id, RecorderType type);
 		std::shared_ptr<MappedTrack> AddRecordingMappedTrack(UUID id, RecorderType type);
 		void SetRecorderActive(UUID id);
 		void SetRecorderInactive(UUID id);
 		void SetRecordingTrack(UUID id);
+		void SetDeviceRecorderIndex(UUID id, unsigned int index);
 		void ClearTrack(UUID id);
 		void DeleteTrack(UUID id);
 		void ResetRecording(UUID id);
+		void ResetRecording(UUID id, AudioProps props);
 
 		TimeMinSec GetTime();
 		TimeMinSec GetTimeSeconds();
@@ -49,10 +50,10 @@ namespace BackBeat {
 		Timer m_Timer;
 		AudioThread m_Thread;
 		Recorder* m_AudioRecorder;
-		Recorder* m_DeviceRecorder;
+		DeviceRecorder* m_DeviceRecorder;
 		UUID m_ActiveID;
-		std::unordered_map<UUID, std::shared_ptr<Track>> m_AudioRecordings;
-		std::unordered_map<UUID, std::shared_ptr<Track>> m_DeviceRecordings;
+		std::unordered_map<UUID, std::shared_ptr<Recording>> m_AudioRecordings;
+		std::unordered_map<UUID, std::shared_ptr<Recording>> m_DeviceRecordings;
 
 	private:
 		inline bool Contains(UUID id) { return (ContainsAudio(id) || ContainsDevice(id)); }

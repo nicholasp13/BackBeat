@@ -67,6 +67,46 @@ namespace BackBeat {
 		unsigned int minutes;
 		unsigned int seconds;
 		unsigned int milliseconds;
+
+		bool operator > (TimeMinSec rhs)
+		{
+			if (this->minutes > rhs.minutes)
+				return true;
+			else if (this->minutes == rhs.minutes)
+			{
+				if (this->seconds > rhs.seconds)
+					return true;
+				else if (this->seconds == rhs.seconds)
+				{
+					if (this->milliseconds > rhs.milliseconds)
+						return true;
+					else
+						return false;
+				}
+				else
+					return false;
+			}
+			else
+				return false;
+		}
+
+		bool operator == (TimeMinSec rhs)
+		{
+			if (this->minutes != rhs.minutes)
+				return false;
+			if (this->seconds != rhs.seconds)
+				return false;
+			if (this->milliseconds != rhs.milliseconds)
+				return false;
+
+			return true;
+		}
+
+		inline bool operator != (TimeMinSec rhs) { return !(*this == rhs); }
+		inline bool operator >= (TimeMinSec rhs) { return (*this > rhs) || (*this == rhs); }
+		inline bool operator < (TimeMinSec rhs) { return !(*this >= rhs); }
+		inline bool operator <= (TimeMinSec rhs) { return (*this < rhs) || (*this == rhs); }
+
 	};
 
 	// NOTE: May want to move this to a Helpers.h file in the Helpers folder for better organization, not much sense to have these functions here
@@ -160,10 +200,10 @@ namespace BackBeat {
 		}
 
 		template<typename T>
-		static void FlushBufferT(T buffer, T defaultValue, unsigned int num)
+		static void FlushBufferT(T* buffer, T defaultValue, unsigned int num)
 		{
 			for (unsigned int i = 0; i < num; i++)
-				buffer[i] = *defaultValue;
+				buffer[i] = defaultValue;
 		}
 
 		// Taken from IBM developer

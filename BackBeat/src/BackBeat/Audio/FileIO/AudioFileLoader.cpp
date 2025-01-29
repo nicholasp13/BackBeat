@@ -15,10 +15,10 @@ namespace BackBeat {
 	}
 
 	// @params:
-	// - track        - MappedTrack to load from
-	// - output       - buffer to output data to
-	// - numBytes     - totalBytes to load into the output buffer
-	// - channelIndex - which channel (if audio is multi-channeled) to load the data to, starting from 0,
+	// - track        = MappedTrack to load from
+	// - output       = buffer to output data to
+	// - numBytes     = totalBytes to load into the output buffer
+	// - channelIndex = which channel (if audio is multi-channeled) to load the data to, starting from 0,
 	//                  -1 means load all data into output
 	bool AudioFileLoader::Load(std::shared_ptr<MappedTrack> track, byte* output, 
 		unsigned int numBytes, unsigned int position, int channelIndex)
@@ -43,7 +43,7 @@ namespace BackBeat {
 		else
 			bytesToLoad = numBytes * props.numChannels;
 
-		Audio::FlushBuffer((byte*)m_Buffer.get(), m_BufferSize);
+		Audio::FlushBuffer(m_Buffer.get(), m_BufferSize);
 
 		if (!track->Read(m_Buffer.get(), numBytes * props.numChannels, position))
 			return false;
@@ -112,4 +112,87 @@ namespace BackBeat {
 		}
 		return true;
 	}
+
+	// ONLY used for when inputProps != outputProps i.e. taking stereo audio data and recording only a single channel
+	// @params:
+	// - track        = MappedTrack to unload input data to
+	// - input        = buffer of the input data
+	// - inputProps   = AudioProps of the input data
+	// - numBytes     = totalBytes to load into the output buffer
+	// - channelIndex = which channel (if audio is multi-channeled) to load the data to, starting from 0,
+	//                  -1 means load all data into output
+	bool AudioFileLoader::Unload(std::shared_ptr<MappedTrack> track, byte * input, AudioProps inputProps, unsigned int numInputBytes,
+		int channelIndex)
+	{
+		if (!track)
+			return false;
+
+		AudioProps outputProps = track->GetProps();
+		
+		if (outputProps.numChannels != Audio::Mono)
+			return false;
+		
+		unsigned int byteSize = 0;
+		byte* output = m_Buffer.get();
+		unsigned int numOutputBytes = numInputBytes / inputProps.numChannels;
+
+		Audio::FlushBuffer(output, numInputBytes);
+
+		switch (inputProps.bitDepth)
+		{
+
+		case (Audio::ByteBitSize):
+		{
+			byteSize = Audio::ByteByteSize;
+			break;
+		}
+
+		case (Audio::Int16BitSize):
+		{
+			byteSize = Audio::Int16ByteSize;
+			break;
+		}
+
+		case (Audio::Int24BitSize):
+		{
+			byteSize = Audio::Int24ByteSize;
+			break;
+		}
+
+		case (Audio::FloatBitSize):
+		{
+			byteSize = Audio::FloatByteSize;
+			break;
+		}
+
+		case (Audio::DoubleBitSize):
+		{
+			byteSize = Audio::DoubleByteSize;
+			break;
+		}
+
+		default:
+		{
+			BB_CORE_ERROR("Unsupported bit depth");
+			return false;
+		}
+
+		}
+
+		unsigned int outputPosition = 0;
+		for (unsigned int i = 0; i < numInputBytes; i+= byteSize * inputProps.numChannels)
+		{
+			for (unsigned int j = 0; j < inputProps.numChannels; j++)
+			{
+				if (j == channelIndex)
+				{
+					Audio::CopyInputToOutput(input + i + (j * byteSize), output + outputPosition, byteSize);
+					outputPosition += byteSize;
+				}
+			}
+		}
+
+		return track->Write(output, numOutputBytes);
+	}
+
 }

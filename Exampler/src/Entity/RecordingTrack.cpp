@@ -1,11 +1,11 @@
 #include "RecordingTrack.h"
 
-// TODO: Allow user to split the audio channels input into MONO entities or 1 STEREO entities
-
 namespace Exampler {
 	
 	RecordingTrack::RecordingTrack()
 		: 
+		m_NumChannels(0),
+		m_ChannelIndex(0),
 		m_Volume(1.0f),
 		m_Track(nullptr),
 		m_Player(nullptr),
@@ -42,16 +42,18 @@ namespace Exampler {
 		{	
 			if (!m_RecorderMgr->IsActive(m_RecorderID))
 			{
-				if (ImGui::Button("Record On", ImVec2(125, 20)))
+				if (ImGui::Button("On"))
 					if (!m_RecorderMgr->IsRecording())
 						m_RecorderMgr->SetRecorderActive(m_RecorderID);
 			}
 			else
 			{
-				if (ImGui::Button("Record Off", ImVec2(125, 20)))
+				if (ImGui::Button("Off"))
 					if (!m_RecorderMgr->IsRecording())
 						m_RecorderMgr->SetRecorderInactive(m_RecorderID);
 			}
+
+			ImGui::SameLine();
 
 			if (!m_Player->IsOn())
 			{
@@ -67,6 +69,43 @@ namespace Exampler {
 			if (ImGui::Button("Clear Recording"))
 				if (!m_RecorderMgr->IsRecording())
 					m_RecorderMgr->ResetRecording(m_RecorderID);
+		}
+
+		// Render AudioProp selector
+		{
+			const char* numChannels[] = { "Mono (1 or 2)", "Stereo (1-2)"};
+			const char* channelIndeces[] = { "1", "2" };
+			const int numChannelTypes = 2;
+			const int numChannelIndeces = 2;
+			int numChannel = m_NumChannels;
+			int channelIndex = m_ChannelIndex;
+			BackBeat::AudioProps trackProps = m_Track->GetProps();
+
+			ImGui::Combo("Input", &numChannel, numChannels, numChannelTypes, numChannelTypes);
+
+			if (numChannel != m_NumChannels)
+			{
+				m_NumChannels = numChannel;
+				unsigned int byteSize = trackProps.bitDepth / BackBeat::Audio::ByteBitSize;
+				trackProps.numChannels = numChannel + 1;
+				trackProps.blockAlign = trackProps.numChannels * byteSize;
+				trackProps.byteRate = trackProps.sampleRate * trackProps.blockAlign;
+
+				m_RecorderMgr->ResetRecording(m_RecorderID, trackProps);
+			}
+
+			ImGui::BeginDisabled(m_NumChannels == 1);
+
+			ImGui::Combo("Channel", &channelIndex, channelIndeces, numChannelIndeces, numChannelIndeces);
+
+			if (channelIndex != m_ChannelIndex)
+			{
+				m_ChannelIndex = channelIndex;
+				m_RecorderMgr->SetDeviceRecorderIndex(m_RecorderID, m_ChannelIndex);
+			}
+
+			ImGui::EndDisabled();
+
 		}
 
 		// Render Playback controls/info
@@ -92,6 +131,8 @@ namespace Exampler {
 		m_Track = m_RecorderMgr->AddRecordingMappedTrack(m_RecorderID, BackBeat::RecorderType::device);
 
 		m_Player->LoadTrack(m_Track);
+		m_NumChannels = m_Track->GetProps().numChannels - 1;
+		m_ChannelIndex = 0;
 
 		mixer->PushProcessor(m_Player->GetProc());
 	}
@@ -126,6 +167,17 @@ namespace Exampler {
 			volumeNode.append_attribute("Value") = m_Volume;
 		}
 
+		// Audio channel
+		{
+			auto channelNode = recorderNode.append_child("Channels");
+
+			auto numNode = channelNode.append_child("Num");
+			numNode.append_attribute("Value") = m_NumChannels;
+
+			auto idxNode = channelNode.append_child("Index");
+			idxNode.append_attribute("Value") = m_ChannelIndex;
+		}
+
 		// Audio track
 		{
 			auto trackNode = recorderNode.append_child("Track");
@@ -144,6 +196,7 @@ namespace Exampler {
 			else
 				trackNode.append_attribute("FilePath") = "";
 		}
+
 	}
 
 	// NOTE: - node is the node being read from. This is different to WriteObject() || Might want to specify in
@@ -156,6 +209,36 @@ namespace Exampler {
 		{
 			auto volumeNode = node->child("Volume");
 			m_Volume = volumeNode.attribute("Value").as_float();
+		}
+
+		// Audio channel
+		{
+			auto channelNode = node->child("Channels");
+
+			auto numNode = channelNode.child("Num");
+			m_NumChannels = numNode.attribute("Value").as_uint();
+
+			// This means that the recording props is mono as m_NumChannels starts at 0
+			if (m_NumChannels == 0)
+			{
+				BackBeat::AudioProps trackProps = m_Track->GetProps();
+
+				unsigned int byteSize = trackProps.bitDepth / BackBeat::Audio::ByteBitSize;
+				trackProps.numChannels = BackBeat::Audio::Mono;
+				trackProps.blockAlign = trackProps.numChannels * byteSize;
+				trackProps.byteRate = trackProps.sampleRate * trackProps.blockAlign;
+
+				m_RecorderMgr->ResetRecording(m_RecorderID, trackProps);
+			}
+
+			auto idxNode = channelNode.child("Index");
+			m_ChannelIndex = idxNode.attribute("Value").as_uint();
+
+			if (m_ChannelIndex < BackBeat::Audio::Stereo)
+				m_RecorderMgr->SetDeviceRecorderIndex(m_RecorderID, m_ChannelIndex);
+			else
+				m_ChannelIndex = 0;
+
 		}
 
 		// Audio track

@@ -4,8 +4,6 @@
  *  Windows API code: https://learn.microsoft.com/en-us/windows/win32/coreaudio/capturing-a-stream
 /**/
 
-// TODO: 
-// - Allow user to select between MONO and STEREO andd allow them to specifically choose the audio channel that is recorded (This is how most DAWs work)
 #include "WindowsRecorder.h"  
 namespace BackBeat {
 
@@ -13,8 +11,9 @@ namespace BackBeat {
 		: 
 		m_IsRecording(false), 
 		m_Init(false),
-		m_AudioProps(AudioProps()), 
-		m_Recording(std::to_string(unsigned long long(m_ID)) , m_AudioProps),
+		m_Index(0),
+		m_Props(AudioProps()), 
+		m_Recording(nullptr),
 		m_BufferSize(0),
 		m_ActualBufferDuration(0),
 		m_Enumerator(NULL),
@@ -37,6 +36,7 @@ namespace BackBeat {
 		if (!m_Init)
 			return;
 
+		m_Recording->GetTrack()->SetWritePosition(0);
 		m_IsRecording = true;
 		Record();
 	}
@@ -49,26 +49,26 @@ namespace BackBeat {
 	void WindowsRecorder::Reset()
 	{
 		if (!m_IsRecording)
-			m_Recording.Reset();
+			m_Recording->Reset();
 	}
 	void WindowsRecorder::Reset(AudioProps props)
 	{
 		if (!m_IsRecording)
-			m_Recording.Reset(props);
+			m_Recording->Reset(props);
 	}
 
 	bool WindowsRecorder::SaveWAV(std::string filePath)
 	{
 		if (!m_IsRecording)
-			return m_Recording.SaveWAV(filePath);
+			return m_Recording->SaveWAV(filePath);
 		return false;
 	}
 
-	std::shared_ptr<Track> WindowsRecorder::GetRecordingTrack()
+	std::shared_ptr<MappedTrack> WindowsRecorder::GetRecordingTrack()
 	{
 		if (m_IsRecording)
 			return nullptr;
-		return m_Recording.GetTrack();
+		return m_Recording->GetTrack();
 	}
 
 	void WindowsRecorder::Init()
@@ -115,10 +115,12 @@ namespace BackBeat {
 		m_Init = true;
 		m_ActualBufferDuration = (REFERENCE_TIME)Windows::ReftimesPerSecond * m_BufferSize
 			/ m_DeviceProps->nSamplesPerSec;
-		m_AudioProps.bigEndian = Audio::IsBigEndian(); // NOTE: This assumes that Windows API keeps the endianness the same as the user
-		Windows::AudioPropsConversion(m_DeviceProps, &m_AudioProps);
-		m_AudioProps.format = Audio::GetAudioFormat(m_AudioProps.bitDepth, false);
-		m_Recording.Reset(m_AudioProps);
+		m_Props.bigEndian = Audio::IsBigEndian(); // NOTE: This assumes that Windows API keeps the endianness the same as the user
+		Windows::AudioPropsConversion(m_DeviceProps, &m_Props);
+		m_Props.format = Audio::GetAudioFormat(m_Props.bitDepth, false);
+		
+		if (m_Recording)
+			m_Recording->Reset(m_Props);
 
 		return;
 
@@ -162,7 +164,7 @@ namespace BackBeat {
 				if (flags & AUDCLNT_BUFFERFLAGS_SILENT)
 					data = nullptr;
 
-				m_Recording.Record((char*)data, framesAvailable);
+				m_Recording->Record((char*)data, framesAvailable, m_Props);
 
 				hr = m_CaptureClient->ReleaseBuffer(framesAvailable);
 				CHECK_FAILURE_HRESULT(hr);

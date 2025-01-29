@@ -74,8 +74,7 @@ namespace BackBeat {
 
 				track->Read((byte*)trackData, trackIncrement);
 
-				byte defaultValue = 0x00;
-				Audio::FlushBufferT((byte*)sampleData, &defaultValue, sampleDataIncrement);
+				Audio::FlushBuffer((byte*)sampleData, sampleDataIncrement);
 
 				switch (trackProps.bitDepth)
 				{

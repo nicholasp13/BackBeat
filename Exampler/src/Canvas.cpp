@@ -1,7 +1,5 @@
 #include "Canvas.h"
 
-// TODO: Allow for timeline to track Recording the same as Playback
-
 namespace Exampler {
 
 	Canvas::Canvas()
@@ -11,7 +9,7 @@ namespace Exampler {
 		m_Height(0.0f),
 		m_Buffer(std::make_shared<float[]>(s_BufferSize)), 
 		m_Props(BackBeat::AudioProps()),
-		m_Loader(s_BufferSize* BackBeat::Audio::Stereo * sizeof(float)),
+		m_Loader(s_BufferSize * BackBeat::Audio::Stereo * sizeof(float)),
 		m_PlayerMgr(nullptr),
 		m_RecorderMgr(nullptr)
 	{
@@ -83,15 +81,21 @@ namespace Exampler {
 			float fileLimit = (float)m_PlayerMgr->GetFileLimit();
 			float positionBytes = (float)m_Position * (float)sizeof(float) / (float)m_Props.byteRate;
 			static float positionPercent = 0.0f;
-
 			BackBeat::TimeMinSec time = BackBeat::TimeMinSec();
+			BackBeat::TimeMinSec length = BackBeat::Audio::GetTime(fileLimit / (float)m_Props.byteRate);
 
 			if (!m_RecorderMgr->IsRecording())
+			{
 				time = m_PlayerMgr->GetTime();
+				if (time >= length && m_PlayerMgr->IsPlaying())
+					m_PlayerMgr->StopAll();
+			}
 			else
+			{
 				time = m_RecorderMgr->GetTime();
-
-			BackBeat::TimeMinSec length = BackBeat::Audio::GetTime(fileLimit / (float)m_Props.byteRate);
+				if (time >= length)
+					m_RecorderMgr->Stop();
+			}
 
 			ImGui::Text("Time: %d:%02d", time.minutes, time.seconds); ImGui::SameLine();
 			ImGui::Text("Total: %d:%02d", length.minutes, length.seconds); ImGui::SameLine();
@@ -175,7 +179,7 @@ namespace Exampler {
 		secondsPerBuffer = (float)(s_BufferSize * sizeof(float)) / (float)m_Props.byteRate * (float)m_Props.numChannels;
 		positionInSeconds = (float)pos / (float)m_Props.byteRate;
 
-		if (!m_RecorderMgr->IsRecording())
+		 if (!m_RecorderMgr->IsRecording())
 			secondsPlayed = float(m_PlayerMgr->GetTimeMs().milliseconds) / 1000.0f;
 		else
 			secondsPlayed = float(m_RecorderMgr->GetTimeMs().milliseconds) / 1000.0f;

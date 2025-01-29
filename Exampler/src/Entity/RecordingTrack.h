@@ -51,6 +51,8 @@ namespace Exampler {
 
 	private:
 		std::string m_Name;
+		int m_NumChannels;
+		int m_ChannelIndex;
 		float m_Volume;
 		BackBeat::UUID m_RecorderID;
 		std::shared_ptr<BackBeat::MappedTrack> m_Track;

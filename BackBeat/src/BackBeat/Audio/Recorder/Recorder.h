@@ -24,9 +24,9 @@ namespace BackBeat {
 		virtual AudioProps GetProps() { return AudioProps(); }
 		virtual TimeMinSec GetLengthMinSec() { return TimeMinSec(); }
 		virtual RecorderType GetType() { return RecorderType::none; }
-		virtual std::shared_ptr<Track> GetRecordingTrack() { return nullptr; }
+		virtual std::shared_ptr<MappedTrack> GetRecordingTrack() { return nullptr; }
 		virtual UUID GetID() { return UUID(0); }
-		virtual void SetRecordingTrack(std::shared_ptr<Track> track) {}
+		virtual void SetRecording(std::shared_ptr<Recording> recording) {}
 
 	};
 }
