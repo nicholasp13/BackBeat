@@ -36,6 +36,7 @@ namespace BackBeat {
 		if (!m_Init)
 			return;
 
+		m_Recording->GetTrack()->SetWritePosition(0);
 		m_IsRecording = true;
 		Record();
 	}

@@ -1,7 +1,5 @@
 #include "RecordingTrack.h"
 
-// TODO: Add mono/stereo and channel index to serialization
-
 namespace Exampler {
 	
 	RecordingTrack::RecordingTrack()
@@ -220,9 +218,6 @@ namespace Exampler {
 			auto numNode = channelNode.child("Num");
 			m_NumChannels = numNode.attribute("Value").as_uint();
 
-			auto idxNode = channelNode.child("Index");
-			m_ChannelIndex = idxNode.attribute("Value").as_uint();
-
 			// This means that the recording props is mono as m_NumChannels starts at 0
 			if (m_NumChannels == 0)
 			{
@@ -235,6 +230,15 @@ namespace Exampler {
 
 				m_RecorderMgr->ResetRecording(m_RecorderID, trackProps);
 			}
+
+			auto idxNode = channelNode.child("Index");
+			m_ChannelIndex = idxNode.attribute("Value").as_uint();
+
+			if (m_ChannelIndex < BackBeat::Audio::Stereo)
+				m_RecorderMgr->SetDeviceRecorderIndex(m_RecorderID, m_ChannelIndex);
+			else
+				m_ChannelIndex = 0;
+
 		}
 
 		// Audio track

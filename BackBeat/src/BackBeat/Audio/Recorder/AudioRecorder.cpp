@@ -24,7 +24,10 @@ namespace BackBeat {
 	{
 		if (!m_Init)
 			return;
+		if (!m_Recording)
+			return;
 
+		m_Recording->GetTrack()->SetWritePosition(0);
 		m_IsRecording = true;
 		Record();
 	}

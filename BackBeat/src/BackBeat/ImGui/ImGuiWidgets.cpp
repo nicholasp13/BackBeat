@@ -188,7 +188,7 @@ namespace BackBeat {
 			window->DrawList->AddRectFilled(grabRect.Min, grabRect.Max, ImGui::GetColorU32(g.ActiveId == id ? ImGuiCol_SliderGrabActive : ImGuiCol_SliderGrab), style.GrabRounding);
 
 		// Display value from format
-		char valueBuf[64];
+		char valueBuf[64] = {};
 		const char* valueBufEnd = valueBuf + ImGui::DataTypeFormatString(valueBuf, IM_ARRAYSIZE(valueBuf), dataType, pData, format);
 		if (g.LogEnabled)
 			ImGui::LogSetNextTextDecoration("{", "}");

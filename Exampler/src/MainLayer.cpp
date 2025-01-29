@@ -1,8 +1,3 @@
-// TODO: - Allow for user input and editing in ImGuiTimeline
-//       - Add the ability to save specific configs from certain entities i.e. Synth's to a config xml file
-//       - Allow user to change the audio input channel for RecordingTrack and between MONO and STEREO andd
-//           allow for user to select where the recording starts in the file
-
 #include "MainLayer.h"
 namespace Exampler {
 
