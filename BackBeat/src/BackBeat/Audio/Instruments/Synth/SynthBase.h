@@ -122,8 +122,8 @@ namespace BackBeat {
 		constexpr float WaveAmpDefault      = 0.0f;
 		constexpr float WaveOctaveDefault   = 1.0f;
 		constexpr float WaveDutyCyleDefault = 0.5f;
-		constexpr float WaveDutyCyleMin     = 0.0f;
-		constexpr float WaveDutyCyleMax     = 1.0f;
+		constexpr float WaveDutyCyleMin     = 0.0f; // Only half a cycle (50% or 0.50f) matters as it sounds
+		constexpr float WaveDutyCyleMax     = 1.0f; // the same i.e. .05 and 0.95 are the same audibly
 		constexpr float WaveDetuneDefault   = 0.0f; // In centz
 		constexpr float WaveDetuneMin       = -50.0f;
 		constexpr float WaveDetuneMax       = 50.0f;

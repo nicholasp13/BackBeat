@@ -4,7 +4,6 @@
 //       currently pressed when the MIDI user changes the octave range on his MIDI device)
 
 // TODO IMMENTLY:
-// - Add detuning
 // - Add pseudo Moog Lowpass Filter
 
 #include "Synthesizer.h"
@@ -80,8 +79,10 @@ namespace Exampler {
 		const ImGuiViewport* mainViewport = ImGui::GetMainViewport();
 		float x = mainViewport->WorkPos.x;
 		float y = mainViewport->WorkPos.y;
+		const float width = 1200.0f;
+		const float height = 650.0f;
 		ImGui::SetNextWindowPos(ImVec2(x, y), ImGuiCond_FirstUseEver);
-		ImGui::SetNextWindowSize(ImVec2(1200.0f, 600.0f), ImGuiCond_Once);
+		ImGui::SetNextWindowSize(ImVec2(width, height), ImGuiCond_Once);
 
 		// Synth flags
 		ImGuiWindowFlags synth_window_flags = 0;
@@ -344,6 +345,15 @@ namespace Exampler {
 			}
 			m_SynthParams->engineParams->voiceParams->OscParams1->octave = pow(2.0f, (float)m_Octave1);
 
+			float* detune1 = &(m_SynthParams->engineParams->voiceParams->OscParams1->detune);
+			
+			if (ImGui::Button("Reset##Detune1"))
+				*detune1 = BackBeat::SynthBase::WaveDetuneDefault;
+			ImGui::SameLine();
+
+			ImGui::SliderFloat("Wave 1 Detune (cents)", detune1, BackBeat::SynthBase::WaveDetuneMin, BackBeat::SynthBase::WaveDetuneMax);
+			ImGui::Spacing(); ImGui::Spacing();
+
 			BackBeat::WaveType* wave = &(m_SynthParams->engineParams->voiceParams->OscParams1->wave);
 			ImGui::Text("    "); ImGui::SameLine(); 
 			ImGui::Combo("Waveform", &m_OscWave1, waveTypes, numWaveforms, numWaveforms);
@@ -452,6 +462,15 @@ namespace Exampler {
 			}
 			m_SynthParams->engineParams->voiceParams->OscParams2->octave = pow(2.0f, (float)m_Octave2);
 
+			float* detune2 = &(m_SynthParams->engineParams->voiceParams->OscParams2->detune);
+
+			if (ImGui::Button("Reset##Detune2"))
+				*detune2 = BackBeat::SynthBase::WaveDetuneDefault;
+			ImGui::SameLine();
+
+			ImGui::SliderFloat("Wave 2 Detune (cents)", detune2, BackBeat::SynthBase::WaveDetuneMin, BackBeat::SynthBase::WaveDetuneMax);
+			ImGui::Spacing(); ImGui::Spacing();
+
 			BackBeat::WaveType* wave = &(m_SynthParams->engineParams->voiceParams->OscParams2->wave);
 			ImGui::Text("    "); ImGui::SameLine(); ImGui::Combo("Waveform", &m_OscWave2, waveTypes, numWaveforms, numWaveforms);
 
@@ -535,6 +554,7 @@ namespace Exampler {
 			float* waveAmp2 = &(m_SynthParams->engineParams->voiceParams->OscParams2->amp);
 			ImGui::Text("    "); ImGui::SameLine(); ImGui::SliderFloat("Wave 2 Amp", waveAmp2, 0.0f, 1.0f);
 			ImGui::Spacing();
+
 			ImGui::PopID();
 		}
 
@@ -556,6 +576,15 @@ namespace Exampler {
 					m_Octave3--;
 			}
 			m_SynthParams->engineParams->voiceParams->OscParams3->octave = pow(2.0f, (float)m_Octave3);
+
+			float* detune3 = &(m_SynthParams->engineParams->voiceParams->OscParams3->detune);
+
+			if (ImGui::Button("Reset##Detune3"))
+				*detune3 = BackBeat::SynthBase::WaveDetuneDefault;
+			ImGui::SameLine();
+
+			ImGui::SliderFloat("Wave 3 Detune (cents)", detune3, BackBeat::SynthBase::WaveDetuneMin, BackBeat::SynthBase::WaveDetuneMax);
+			ImGui::Spacing(); ImGui::Spacing();
 
 			BackBeat::WaveType* wave = &(m_SynthParams->engineParams->voiceParams->OscParams3->wave);
 			ImGui::Text("    "); ImGui::SameLine(); ImGui::Combo("Waveform", &m_OscWave3, waveTypes, numWaveforms, numWaveforms);
@@ -640,6 +669,7 @@ namespace Exampler {
 			float* waveAmp3 = &(m_SynthParams->engineParams->voiceParams->OscParams3->amp);
 			ImGui::Text("    "); ImGui::SameLine(); ImGui::SliderFloat("Wave 3 Amp", waveAmp3, 0.0f, 1.0f);
 			ImGui::Spacing();
+
 			ImGui::PopID();
 		}
 
@@ -661,6 +691,14 @@ namespace Exampler {
 					m_Octave4--;
 			}
 			m_SynthParams->engineParams->voiceParams->OscParams4->octave = pow(2.0f, (float)m_Octave4);
+
+			float* detune4 = &(m_SynthParams->engineParams->voiceParams->OscParams4->detune);
+			if (ImGui::Button("Reset##Detune44"))
+				*detune4 = BackBeat::SynthBase::WaveDetuneDefault;
+			ImGui::SameLine();
+
+			ImGui::SliderFloat("Wave 4 Detune (cents)", detune4, BackBeat::SynthBase::WaveDetuneMin, BackBeat::SynthBase::WaveDetuneMax);
+			ImGui::Spacing(); ImGui::Spacing();
 
 			BackBeat::WaveType* wave = &(m_SynthParams->engineParams->voiceParams->OscParams4->wave);
 			ImGui::Text("    "); ImGui::SameLine(); ImGui::Combo("Waveform", &m_OscWave4, waveTypes, numWaveforms, numWaveforms);
@@ -745,6 +783,7 @@ namespace Exampler {
 			float* waveAmp4 = &(m_SynthParams->engineParams->voiceParams->OscParams4->amp);
 			ImGui::Text("    "); ImGui::SameLine(); ImGui::SliderFloat("Wave 4 Amp", waveAmp4, 0.0f, 1.0f);
 			ImGui::Spacing();
+
 			ImGui::PopID();
 		}
 
@@ -958,6 +997,7 @@ namespace Exampler {
 			}
 
 			oscNode.append_child("Amp").append_attribute("Value") = oscParams->amp;
+			oscNode.append_child("Detune").append_attribute("Value") = oscParams->detune;
 		}
 
 		// Oscillator 2
@@ -1014,6 +1054,7 @@ namespace Exampler {
 			}
 
 			oscNode.append_child("Amp").append_attribute("Value") = oscParams->amp;
+			oscNode.append_child("Detune").append_attribute("Value") = oscParams->detune;
 		}
 
 		// Oscillator 3
@@ -1070,6 +1111,7 @@ namespace Exampler {
 			}
 
 			oscNode.append_child("Amp").append_attribute("Value") = oscParams->amp;
+			oscNode.append_child("Detune").append_attribute("Value") = oscParams->detune;
 		}
 
 		// Oscillator 4
@@ -1126,6 +1168,7 @@ namespace Exampler {
 			}
 
 			oscNode.append_child("Amp").append_attribute("Value") = oscParams->amp;
+			oscNode.append_child("Detune").append_attribute("Value") = oscParams->detune;
 		}
 
 		// Audio track
@@ -1326,6 +1369,7 @@ namespace Exampler {
 			}
 
 			oscParams->amp = oscNode.child("Amp").attribute("Value").as_float();
+			oscParams->detune = oscNode.child("Detune").attribute("Value").as_float();
 		}
 
 		// Oscillator 2
@@ -1403,6 +1447,7 @@ namespace Exampler {
 			}
 
 			oscParams->amp = oscNode.child("Amp").attribute("Value").as_float();
+			oscParams->detune = oscNode.child("Detune").attribute("Value").as_float();
 		}
 
 		// Oscillator 3
@@ -1480,6 +1525,7 @@ namespace Exampler {
 			}
 
 			oscParams->amp = oscNode.child("Amp").attribute("Value").as_float();
+			oscParams->detune = oscNode.child("Detune").attribute("Value").as_float();
 		}
 
 		// Oscillator 4
@@ -1557,6 +1603,7 @@ namespace Exampler {
 			}
 
 			oscParams->amp = oscNode.child("Amp").attribute("Value").as_float();
+			oscParams->detune = oscNode.child("Detune").attribute("Value").as_float();
 		}
 
 		// Audio track
