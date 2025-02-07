@@ -73,6 +73,10 @@ namespace Exampler {
 			m_Octave2,
 			m_Octave3,
 			m_Octave4;
+		int m_PWM1,
+			m_PWM2,
+			m_PWM3,
+			m_PWM4;
 		// BackBeat objects
 		BackBeat::Synth m_Synth;
 		std::shared_ptr<BackBeat::SynthParameters> m_SynthParams;

@@ -22,6 +22,10 @@ namespace Exampler {
 		m_Octave2(0),
 		m_Octave3(0),
 		m_Octave4(0),
+		m_PWM1(3),
+		m_PWM2(3),
+		m_PWM3(3),
+		m_PWM4(3),
 		m_RecordingPlayer(nullptr),
 		m_RecorderMgr(nullptr),
 		m_RecordingMappedTrack(nullptr)
@@ -74,6 +78,7 @@ namespace Exampler {
 		float y = mainViewport->WorkPos.y;
 		ImGui::SetNextWindowPos(ImVec2(x, y), ImGuiCond_FirstUseEver);
 		ImGui::SetNextWindowSize(ImVec2(1200.0f, 600.0f), ImGuiCond_Once);
+
 		// Synth flags
 		ImGuiWindowFlags synth_window_flags = 0;
 		synth_window_flags |= ImGuiWindowFlags_NoCollapse;
@@ -141,6 +146,12 @@ namespace Exampler {
 		table_flags |= ImGuiTableFlags_BordersV;
 		ImGui::BeginTable("Controls", 2, table_flags, ImVec2(0.0f, 0.0f), 0.0f);
 
+		const char* dutyCycles[] = { "10%", "25%", "40%", "50%" };
+		const int numDutyCycles = 4;
+		const char* waveTypes[] = { "Sin", "Triangle", "Square", "SawtoothUp", "SawtoothDown" };
+		const int numWaveforms = 5;
+		const float comboDutyCycleWidth = 60.0f;
+
 		// Note controls
 		{
 			ImGui::TableNextColumn();
@@ -183,9 +194,6 @@ namespace Exampler {
 			ImGui::Spacing();
 		}
 
-		const char* waveTypes[] = { "Sin", "Triangle", "Square", "SawtoothUp", "SawtoothDown" };
-		const int numWaveforms = 5;
-
 		// LFO 1 Controls
 		{
 			ImGui::PushID("LFO1");
@@ -198,31 +206,31 @@ namespace Exampler {
 			switch (m_LFOWave)
 			{
 
-			case (0):
+			case (s_SinIndex):
 			{
 				*wave = BackBeat::WaveType::Sin;
 				break;
 			}
 
-			case (1):
+			case (s_TriangleIndex):
 			{
 				*wave = BackBeat::WaveType::Triangle;
 				break;
 			}
 
-			case (2):
+			case (s_SquareIndex):
 			{
 				*wave = BackBeat::WaveType::Square;
 				break;
 			}
 
-			case (3):
+			case (s_SawtoothUpIndex):
 			{
 				*wave = BackBeat::WaveType::SawtoothUp;
 				break;
 			}
 
-			case (4):
+			case (s_SawtoothDownIndex):
 			{
 				*wave = BackBeat::WaveType::SawtoothDown;
 				break;
@@ -333,47 +341,91 @@ namespace Exampler {
 			m_SynthParams->engineParams->voiceParams->OscParams1->octave = pow(2.0f, (float)m_Octave1);
 
 			BackBeat::WaveType* wave = &(m_SynthParams->engineParams->voiceParams->OscParams1->wave);
-			ImGui::Text("    "); ImGui::SameLine(); ImGui::Combo("Waveform", &m_OscWave1, waveTypes, numWaveforms, numWaveforms);
+			ImGui::Text("    "); ImGui::SameLine(); 
+			ImGui::Combo("Waveform", &m_OscWave1, waveTypes, numWaveforms, numWaveforms);
 
 			switch (m_OscWave1)
 			{
 
-			case (0):
+			case (s_SinIndex):
 			{
 				*wave = BackBeat::WaveType::Sin;
 				break;
 			}
 
-			case (1):
+			case (s_TriangleIndex):
 			{
 				*wave = BackBeat::WaveType::Triangle;
 				break;
 			}
 
-			case (2):
+			case (s_SquareIndex):
 			{
 				*wave = BackBeat::WaveType::Square;
 				break;
 			}
 
-			case (3):
+			case (s_SawtoothUpIndex):
 			{
 				*wave = BackBeat::WaveType::SawtoothUp;
 				break;
 			}
 
-			case (4):
+			case (s_SawtoothDownIndex):
 			{
 				*wave = BackBeat::WaveType::SawtoothDown;
 				break;
 			}
 
 			}
+
+			// Square Wave Pulse Width Modulation
+			if (*wave == BackBeat::WaveType::Square)
+			{
+				ImGui::SameLine();
+				ImGui::SetNextItemWidth(comboDutyCycleWidth);
+				ImGui::Combo("##DutyCycle1", &m_PWM1, dutyCycles, numDutyCycles, numDutyCycles);
+				ImGui::SameLine(); 
+				HelpMarker("Square Wave Pulse Width Modulation (PWM) \nChanges the length of the active duty cycle of the wave by the percentage");
+
+				switch (m_PWM1)
+				{
+
+				case (0):
+				{
+					m_SynthParams->engineParams->voiceParams->OscParams1->dutyCycle = 0.10f;
+					break;
+				}
+
+				case (1):
+				{
+					m_SynthParams->engineParams->voiceParams->OscParams1->dutyCycle = 0.25f;
+					break;
+				}
+
+				case (2):
+				{
+					m_SynthParams->engineParams->voiceParams->OscParams1->dutyCycle = 0.40f;
+					break;
+				}
+
+				case (3):
+				{
+					m_SynthParams->engineParams->voiceParams->OscParams1->dutyCycle = 0.50f;
+					break;
+				}
+
+				}
+
+			}
+
+
 			ImGui::Spacing(); ImGui::Spacing();
 
 			float* waveAmp1 = &(m_SynthParams->engineParams->voiceParams->OscParams1->amp);
 			ImGui::Text("    "); ImGui::SameLine(); ImGui::SliderFloat("Wave 1 Amp", waveAmp1, 0.0f, 1.0f);
 			ImGui::Spacing();
+
 			ImGui::PopID();
 		}
 
@@ -402,37 +454,78 @@ namespace Exampler {
 			switch (m_OscWave2)
 			{
 
-			case (0):
+			case (s_SinIndex):
 			{
 				*wave = BackBeat::WaveType::Sin;
 				break;
 			}
 
-			case (1):
+			case (s_TriangleIndex):
 			{
 				*wave = BackBeat::WaveType::Triangle;
 				break;
 			}
 
-			case (2):
+			case (s_SquareIndex):
 			{
 				*wave = BackBeat::WaveType::Square;
 				break;
 			}
 
-			case (3):
+			case (s_SawtoothUpIndex):
 			{
 				*wave = BackBeat::WaveType::SawtoothUp;
 				break;
 			}
 
-			case (4):
+			case (s_SawtoothDownIndex):
 			{
 				*wave = BackBeat::WaveType::SawtoothDown;
 				break;
 			}
 
 			}
+
+			// Square Wave Pulse Width Modulation
+			if (*wave == BackBeat::WaveType::Square)
+			{
+				ImGui::SameLine();
+				ImGui::SetNextItemWidth(comboDutyCycleWidth);
+				ImGui::Combo("##DutyCycle2", &m_PWM2, dutyCycles, numDutyCycles, numDutyCycles);
+				ImGui::SameLine();
+				HelpMarker("Square Wave Pulse Width Modulation (PWM) \nChanges the length of the active duty cycle of the wave by the percentage");
+
+				switch (m_PWM2)
+				{
+
+				case (0):
+				{
+					m_SynthParams->engineParams->voiceParams->OscParams2->dutyCycle = 0.10f;
+					break;
+				}
+
+				case (1):
+				{
+					m_SynthParams->engineParams->voiceParams->OscParams2->dutyCycle = 0.25f;
+					break;
+				}
+
+				case (2):
+				{
+					m_SynthParams->engineParams->voiceParams->OscParams2->dutyCycle = 0.40f;
+					break;
+				}
+
+				case (3):
+				{
+					m_SynthParams->engineParams->voiceParams->OscParams2->dutyCycle = 0.50f;
+					break;
+				}
+
+				}
+
+			}
+
 			ImGui::Spacing(); ImGui::Spacing();
 
 			float* waveAmp2 = &(m_SynthParams->engineParams->voiceParams->OscParams2->amp);
@@ -466,37 +559,78 @@ namespace Exampler {
 			switch (m_OscWave3)
 			{
 
-			case (0):
+			case (s_SinIndex):
 			{
 				*wave = BackBeat::WaveType::Sin;
 				break;
 			}
 
-			case (1):
+			case (s_TriangleIndex):
 			{
 				*wave = BackBeat::WaveType::Triangle;
 				break;
 			}
 
-			case (2):
+			case (s_SquareIndex):
 			{
 				*wave = BackBeat::WaveType::Square;
 				break;
 			}
 
-			case (3):
+			case (s_SawtoothUpIndex):
 			{
 				*wave = BackBeat::WaveType::SawtoothUp;
 				break;
 			}
 
-			case (4):
+			case (s_SawtoothDownIndex):
 			{
 				*wave = BackBeat::WaveType::SawtoothDown;
 				break;
 			}
 
 			}
+
+			// Square Wave Pulse Width Modulation
+			if (*wave == BackBeat::WaveType::Square)
+			{
+				ImGui::SameLine();
+				ImGui::SetNextItemWidth(comboDutyCycleWidth);
+				ImGui::Combo("##DutyCycle2", &m_PWM3, dutyCycles, numDutyCycles, numDutyCycles);
+				ImGui::SameLine();
+				HelpMarker("Square Wave Pulse Width Modulation (PWM) \nChanges the length of the active duty cycle of the wave by the percentage");
+
+				switch (m_PWM3)
+				{
+
+				case (0):
+				{
+					m_SynthParams->engineParams->voiceParams->OscParams3->dutyCycle = 0.10f;
+					break;
+				}
+
+				case (1):
+				{
+					m_SynthParams->engineParams->voiceParams->OscParams3->dutyCycle = 0.25f;
+					break;
+				}
+
+				case (2):
+				{
+					m_SynthParams->engineParams->voiceParams->OscParams3->dutyCycle = 0.40f;
+					break;
+				}
+
+				case (3):
+				{
+					m_SynthParams->engineParams->voiceParams->OscParams3->dutyCycle = 0.50f;
+					break;
+				}
+
+				}
+
+			}
+
 			ImGui::Spacing(); ImGui::Spacing();
 
 			float* waveAmp3 = &(m_SynthParams->engineParams->voiceParams->OscParams3->amp);
@@ -530,37 +664,78 @@ namespace Exampler {
 			switch (m_OscWave4)
 			{
 
-			case (0):
+			case (s_SinIndex):
 			{
 				*wave = BackBeat::WaveType::Sin;
 				break;
 			}
 
-			case (1):
+			case (s_TriangleIndex):
 			{
 				*wave = BackBeat::WaveType::Triangle;
 				break;
 			}
 
-			case (2):
+			case (s_SquareIndex):
 			{
 				*wave = BackBeat::WaveType::Square;
 				break;
 			}
 
-			case (3):
+			case (s_SawtoothUpIndex):
 			{
 				*wave = BackBeat::WaveType::SawtoothUp;
 				break;
 			}
 
-			case (4):
+			case (s_SawtoothDownIndex):
 			{
 				*wave = BackBeat::WaveType::SawtoothDown;
 				break;
 			}
 
 			}
+
+			// Square Wave Pulse Width Modulation
+			if (*wave == BackBeat::WaveType::Square)
+			{
+				ImGui::SameLine();
+				ImGui::SetNextItemWidth(comboDutyCycleWidth);
+				ImGui::Combo("##DutyCycle2", &m_PWM4, dutyCycles, numDutyCycles, numDutyCycles);
+				ImGui::SameLine();
+				HelpMarker("Square Wave Pulse Width Modulation (PWM) \nChanges the length of the active duty cycle of the wave by the percentage");
+
+				switch (m_PWM4)
+				{
+
+				case (0):
+				{
+					m_SynthParams->engineParams->voiceParams->OscParams4->dutyCycle = 0.10f;
+					break;
+				}
+
+				case (1):
+				{
+					m_SynthParams->engineParams->voiceParams->OscParams4->dutyCycle = 0.25f;
+					break;
+				}
+
+				case (2):
+				{
+					m_SynthParams->engineParams->voiceParams->OscParams4->dutyCycle = 0.40f;
+					break;
+				}
+
+				case (3):
+				{
+					m_SynthParams->engineParams->voiceParams->OscParams4->dutyCycle = 0.50f;
+					break;
+				}
+
+				}
+
+			}
+
 			ImGui::Spacing(); ImGui::Spacing();
 
 			float* waveAmp4 = &(m_SynthParams->engineParams->voiceParams->OscParams4->amp);
@@ -765,6 +940,7 @@ namespace Exampler {
 			case BackBeat::WaveType::Square:
 			{
 				waveformNode.append_attribute("Type") = "Square";
+				waveformNode.append_attribute("DutyCycle") = oscParams->dutyCycle;
 				break;
 			}
 
@@ -820,6 +996,7 @@ namespace Exampler {
 			case BackBeat::WaveType::Square:
 			{
 				waveformNode.append_attribute("Type") = "Square";
+				waveformNode.append_attribute("DutyCycle") = oscParams->dutyCycle;
 				break;
 			}
 
@@ -875,6 +1052,7 @@ namespace Exampler {
 			case BackBeat::WaveType::Square:
 			{
 				waveformNode.append_attribute("Type") = "Square";
+				waveformNode.append_attribute("DutyCycle") = oscParams->dutyCycle;
 				break;
 			}
 
@@ -930,6 +1108,7 @@ namespace Exampler {
 			case BackBeat::WaveType::Square:
 			{
 				waveformNode.append_attribute("Type") = "Square";
+				waveformNode.append_attribute("DutyCycle") = oscParams->dutyCycle;
 				break;
 			}
 
@@ -998,27 +1177,27 @@ namespace Exampler {
 
 			if (strcmp(waveType, "Sin") == 0)
 			{
-				m_LFOWave = 0;
+				m_LFOWave = s_SinIndex;
 				lfoParams->wave = BackBeat::WaveType::Sin;
 			}
 			else if (strcmp(waveType, "SawtoothUp") == 0)
 			{
-				m_LFOWave = 3;
+				m_LFOWave = s_SawtoothUpIndex;
 				lfoParams->wave = BackBeat::WaveType::SawtoothUp;
 			}
 			else if (strcmp(waveType, "SawtoothDown") == 0)
 			{
-				m_LFOWave = 4;
+				m_LFOWave = s_SawtoothDownIndex;
 				lfoParams->wave = BackBeat::WaveType::SawtoothDown;
 			}
 			else if (strcmp(waveType, "Triangle") == 0)
 			{
-				m_LFOWave = 1;
+				m_LFOWave = s_TriangleIndex;
 				lfoParams->wave = BackBeat::WaveType::Triangle;
 			}
 			else if (strcmp(waveType, "Square") == 0)
 			{
-				m_LFOWave = 2;
+				m_LFOWave = s_SquareIndex;
 				lfoParams->wave = BackBeat::WaveType::Square;
 			}
 			else
@@ -1084,34 +1263,61 @@ namespace Exampler {
 
 			if (strcmp(waveType, "Sin") == 0)
 			{
-				m_OscWave1 = 0;
+				m_OscWave1 = s_SinIndex;
 				oscParams->wave = BackBeat::WaveType::Sin;
 			}
 			else if (strcmp(waveType, "SawtoothUp") == 0)
 			{
-				m_OscWave1 = 3;
+				m_OscWave1 = s_SawtoothUpIndex;
 				oscParams->wave = BackBeat::WaveType::SawtoothUp;
 			}
 			else if (strcmp(waveType, "SawtoothDown") == 0)
 			{
-				m_OscWave1 = 4;
+				m_OscWave1 = s_SawtoothDownIndex;
 				oscParams->wave = BackBeat::WaveType::SawtoothDown;
 			}
 			else if (strcmp(waveType, "Triangle") == 0)
 			{
-				m_OscWave1 = 1;
+				m_OscWave1 = s_TriangleIndex;
 				oscParams->wave = BackBeat::WaveType::Triangle;
 			}
 			else if (strcmp(waveType, "Square") == 0)
 			{
-				m_OscWave1 = 2;
+				// Error for floating point as there's usually some error in floating point percision
+				const float errOffset = 0.01f;
+
+				float dutyCycle = waveformNode.attribute("DutyCycle").as_float();
+
+				if (dutyCycle <= 0.10f + errOffset)
+				{
+					dutyCycle = 0.10f;
+					m_PWM1 = 0;
+				}
+				else if (dutyCycle <= 0.25f + errOffset)
+				{
+					dutyCycle = 0.25f;
+					m_PWM1 = 1;
+				}
+				else if (dutyCycle <= 0.40f + errOffset)
+				{
+					dutyCycle = 0.40f;
+					m_PWM1 = 2;
+				}
+				else
+				{
+					dutyCycle = 0.50f;
+					m_PWM1 = 3;
+				}
+
+				m_OscWave1 = s_SquareIndex;
 				oscParams->wave = BackBeat::WaveType::Square;
+				oscParams->dutyCycle = dutyCycle;
 			}
 			else
 			{
 				BB_CLIENT_ERROR("UNRECOGNIZED WAVETYPE FOR Oscillator1 IN XML FOR {0} TRACK! Loading Sin Wav",
 					m_Name.c_str());
-				m_OscWave1 = 0;
+				m_OscWave1 = s_SinIndex;
 				oscParams->wave = BackBeat::WaveType::Sin;
 			}
 
@@ -1134,34 +1340,61 @@ namespace Exampler {
 
 			if (strcmp(waveType, "Sin") == 0)
 			{
-				m_OscWave2 = 0;
+				m_OscWave2 = s_SinIndex;
 				oscParams->wave = BackBeat::WaveType::Sin;
 			}
 			else if (strcmp(waveType, "SawtoothUp") == 0)
 			{
-				m_OscWave2 = 3;
+				m_OscWave2 = s_SawtoothUpIndex;
 				oscParams->wave = BackBeat::WaveType::SawtoothUp;
 			}
 			else if (strcmp(waveType, "SawtoothDown") == 0)
 			{
-				m_OscWave2 = 4;
+				m_OscWave2 = s_SawtoothDownIndex;
 				oscParams->wave = BackBeat::WaveType::SawtoothDown;
 			}
 			else if (strcmp(waveType, "Triangle") == 0)
 			{
-				m_OscWave2 = 1;
+				m_OscWave2 = s_TriangleIndex;
 				oscParams->wave = BackBeat::WaveType::Triangle;
 			}
 			else if (strcmp(waveType, "Square") == 0)
 			{
-				m_OscWave2 = 2;
+				// Error for floating point as there's usually some error in floating point percision
+				const float errOffset = 0.01f;
+
+				float dutyCycle = waveformNode.attribute("DutyCycle").as_float();
+
+				if (dutyCycle <= 0.10f + errOffset)
+				{
+					dutyCycle = 0.10f;
+					m_PWM2 = 0;
+				}
+				else if (dutyCycle <= 0.25f + errOffset)
+				{
+					dutyCycle = 0.25f;
+					m_PWM2 = 1;
+				}
+				else if (dutyCycle <= 0.40f + errOffset)
+				{
+					dutyCycle = 0.40f;
+					m_PWM2 = 2;
+				}
+				else
+				{
+					dutyCycle = 0.50f;
+					m_PWM2 = 3;
+				}
+
+				m_OscWave2 = s_SquareIndex;
 				oscParams->wave = BackBeat::WaveType::Square;
+				oscParams->dutyCycle = dutyCycle;
 			}
 			else
 			{
 				BB_CLIENT_ERROR("UNRECOGNIZED WAVETYPE FOR Oscillator2 IN XML FOR {0} TRACK! Loading Sin Wav",
 					m_Name.c_str());
-				m_OscWave2 = 0;
+				m_OscWave2 = s_SinIndex;
 				oscParams->wave = BackBeat::WaveType::Sin;
 			}
 
@@ -1184,34 +1417,61 @@ namespace Exampler {
 
 			if (strcmp(waveType, "Sin") == 0)
 			{
-				m_OscWave3 = 0;
+				m_OscWave3 = s_SinIndex;
 				oscParams->wave = BackBeat::WaveType::Sin;
 			}
 			else if (strcmp(waveType, "SawtoothUp") == 0)
 			{
-				m_OscWave3 = 3;
+				m_OscWave3 = s_SawtoothUpIndex;
 				oscParams->wave = BackBeat::WaveType::SawtoothUp;
 			}
 			else if (strcmp(waveType, "SawtoothDown") == 0)
 			{
-				m_OscWave3 = 4;
+				m_OscWave3 = s_SawtoothDownIndex;
 				oscParams->wave = BackBeat::WaveType::SawtoothDown;
 			}
 			else if (strcmp(waveType, "Triangle") == 0)
 			{
-				m_OscWave3 = 1;
+				m_OscWave3 = s_TriangleIndex;
 				oscParams->wave = BackBeat::WaveType::Triangle;
 			}
 			else if (strcmp(waveType, "Square") == 0)
 			{
-				m_OscWave3 = 2;
+				// Error for floating point as there's usually some error in floating point percision
+				const float errOffset = 0.01f;
+
+				float dutyCycle = waveformNode.attribute("DutyCycle").as_float();
+
+				if (dutyCycle <= 0.10f + errOffset)
+				{
+					dutyCycle = 0.10f;
+					m_PWM3 = 0;
+				}
+				else if (dutyCycle <= 0.25f + errOffset)
+				{
+					dutyCycle = 0.25f;
+					m_PWM3 = 1;
+				}
+				else if (dutyCycle <= 0.40f + errOffset)
+				{
+					dutyCycle = 0.40f;
+					m_PWM3 = 2;
+				}
+				else
+				{
+					dutyCycle = 0.50f;
+					m_PWM3 = 3;
+				}
+
+				m_OscWave3 = s_SquareIndex;
 				oscParams->wave = BackBeat::WaveType::Square;
+				oscParams->dutyCycle = dutyCycle;
 			}
 			else
 			{
 				BB_CLIENT_ERROR("UNRECOGNIZED WAVETYPE FOR Oscillator3 IN XML FOR {0} TRACK! Loading Sin Wav",
 					m_Name.c_str());
-				m_OscWave3 = 0;
+				m_OscWave3 = s_SinIndex;
 				oscParams->wave = BackBeat::WaveType::Sin;
 			}
 
@@ -1234,33 +1494,61 @@ namespace Exampler {
 
 			if (strcmp(waveType, "Sin") == 0)
 			{
-				m_OscWave4 = 0;
+				m_OscWave4 = s_SinIndex;
 				oscParams->wave = BackBeat::WaveType::Sin;
 			}
 			else if (strcmp(waveType, "SawtoothUp") == 0)
 			{
-				m_OscWave4 = 3;
+				m_OscWave4 = s_SawtoothUpIndex;
 				oscParams->wave = BackBeat::WaveType::SawtoothUp;
 			}
 			else if (strcmp(waveType, "SawtoothDown") == 0)
 			{
-				m_OscWave4 = 4;
+				m_OscWave4 = s_SawtoothDownIndex;
 				oscParams->wave = BackBeat::WaveType::SawtoothDown;
 			}
 			else if (strcmp(waveType, "Triangle") == 0)
 			{
-				m_OscWave4 = 1;
+				m_OscWave4 = s_TriangleIndex;
 				oscParams->wave = BackBeat::WaveType::Triangle;
 			}
 			else if (strcmp(waveType, "Square") == 0)
 			{
-				m_OscWave4 = 2;
+				// Error for floating point as there's usually some error in floating point percision
+				const float errOffset = 0.01f;
+
+				float dutyCycle = waveformNode.attribute("DutyCycle").as_float();
+
+				if (dutyCycle <= 0.10f + errOffset)
+				{
+					dutyCycle = 0.10f;
+					m_PWM4 = 0;
+				}
+				else if (dutyCycle <= 0.25f + errOffset)
+				{
+					dutyCycle = 0.25f;
+					m_PWM4 = 1;
+				}
+				else if (dutyCycle <= 0.40f + errOffset)
+				{
+					dutyCycle = 0.40f;
+					m_PWM4 = 2;
+				}
+				else
+				{
+					dutyCycle = 0.50f;
+					m_PWM4 = 3;
+				}
+
+				m_OscWave4 = s_SquareIndex;
 				oscParams->wave = BackBeat::WaveType::Square;
+				oscParams->dutyCycle = dutyCycle;
 			}
 			else
 			{
 				BB_CLIENT_ERROR("UNRECOGNIZED WAVETYPE FOR Oscillator4 IN XML FOR {0} TRACK! Loading Sin Wav",
 					m_Name.c_str());
+				m_OscWave4 = s_SinIndex;
 				oscParams->wave = BackBeat::WaveType::Sin;
 			}
 

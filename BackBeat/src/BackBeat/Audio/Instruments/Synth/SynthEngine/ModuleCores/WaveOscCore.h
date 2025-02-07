@@ -1,7 +1,7 @@
 #pragma once
 
 #include "BackBeat/Audio/Instruments/ModuleCore.h"
-#include "BackBeat/Audio/Helpers/Wave.h"
+#include "BackBeat/Audio/Wave/Wave.h"
 #include "BackBeat/Audio/Instruments/Synth/SynthBase.h"
 namespace BackBeat {
 
@@ -28,6 +28,7 @@ namespace BackBeat {
 		unsigned int m_WaveSize;
 		float m_Amp;
 		float m_Hertz;
+		float m_DutyCycle; // Only used in square waves
 		WaveType m_WaveType;
 		ModuleType m_Type;
 		std::shared_ptr<float[]> m_Wave;

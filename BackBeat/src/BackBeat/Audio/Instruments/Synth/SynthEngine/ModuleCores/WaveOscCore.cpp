@@ -12,6 +12,7 @@ namespace BackBeat {
 		m_Position(0),
 		m_Amp(1.0f),
 		m_Hertz(0.0f),
+		m_DutyCycle(SynthBase::WaveDutyCyleDefault),
 		m_WaveType(params->wave),
 		m_Wave(new float[s_BufferSize]),
 		m_ModInput(std::make_unique<Modulator>(sampleRate)),
@@ -73,12 +74,15 @@ namespace BackBeat {
 	void WaveOscCore::InitWave()
 	{
 		float freq = m_Hertz * m_Params->octave;
+
 		if (freq > SynthBase::G9Frequency)
 			freq = SynthBase::G9Frequency;
 		else if (freq < SynthBase::CMinus1Frequency)
 			freq = SynthBase::CMinus1Frequency;
+
 		m_Position = 0;
 		m_WaveSize = (unsigned int)(m_SampleRate / freq);
+		m_DutyCycle = m_Params->dutyCycle;
 		m_WaveType = m_Params->wave;
 
 		switch(m_WaveType)
@@ -110,7 +114,7 @@ namespace BackBeat {
 
 		case WaveType::Square:
 		{
-			Wave::GetSquareWave(m_Wave, m_WaveSize, Audio::Stereo);
+			Wave::GetSquareWave(m_Wave, m_WaveSize, Audio::Stereo, m_DutyCycle);
 			break;
 		}
 

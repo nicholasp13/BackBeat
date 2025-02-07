@@ -67,7 +67,6 @@ namespace BackBeat {
 		}
 	}
 
-	// TODO: Add Pulse Width Modulation
 	void Wave::GetSquareWave(std::shared_ptr<float[]> buffer, unsigned int bufferSize, unsigned int numChannels)
 	{
 		for (unsigned int i = 0; i < bufferSize; i += numChannels) {
@@ -80,11 +79,33 @@ namespace BackBeat {
 			}
 		}
 	}
+
+	void Wave::GetSquareWave(std::shared_ptr<float[]> buffer, unsigned int bufferSize, unsigned int numChannels, float dutyCycle)
+	{
+		unsigned int activeNum = 0;
+
+		if (dutyCycle < 0.0f)
+			activeNum = 0;
+		else if (dutyCycle >= 1.0f)
+			activeNum = bufferSize;
+		else
+			activeNum = unsigned int((float)bufferSize * dutyCycle);
+
+		for (unsigned int i = 0; i < bufferSize; i += numChannels) {
+			for (unsigned int j = 0; j < numChannels; j++) {
+				unsigned int index = i + j;
+				if (i < activeNum)
+					buffer[index] = 1.0f;
+				else
+					buffer[index] = -1.0f;
+			}
+		}
+	}
 	
-	// NOTE: Might want this in another file for greater access or change into a static function if not needed anywhere else
+	// Might want this in another file for greater access or change into a static function if not needed anywhere else
 	float Wave::ConvertRadians(float degrees)
 	{
-		return (degrees * SynthBase::Pi) / 180;
+		return (degrees * SynthBase::Pi) / 180.0f;
 	}
 
 }

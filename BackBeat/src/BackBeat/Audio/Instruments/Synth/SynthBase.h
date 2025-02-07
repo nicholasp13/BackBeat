@@ -117,6 +117,18 @@ namespace BackBeat {
 		constexpr float FilterCutoffMin = 200.0f;      // Sample rate / 240
 		constexpr float FilterCutoffMax = 8000.0f;     // Sample rate / 6
 
+		// BackBeat default values
+		// WaveOsc
+		constexpr float WaveAmpDefault      = 0.0f;
+		constexpr float WaveOctaveDefault   = 1.0f;
+		constexpr float WaveDutyCyleDefault = 0.5f;
+		constexpr float WaveDutyCyleMin     = 0.0f;
+		constexpr float WaveDutyCyleMax     = 1.0f;
+		constexpr float WaveDetuneDefault   = 0.0f; // In centz
+		constexpr float WaveDetuneMin       = -50.0f;
+		constexpr float WaveDetuneMax       = 50.0f;
+
+		// ------------------------------------------- //
 
 		// Time should be in milliseconds
 		static unsigned int MsToSamples(float time, unsigned int sampleRate)

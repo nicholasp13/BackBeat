@@ -13,7 +13,7 @@
 //       either make the variables part of the class and keep them as pointers in the widgets, OR
 //       retest the old way but going into the debugger to see what happens to the atomic values)
 
-#include "BackBeat/Audio/Helpers/Wave.h"
+#include "BackBeat/Audio/Wave/Wave.h"
 namespace BackBeat {
 
 	// NOTE: Modular structs here temporarily as they are needed for the ModMatrix Parameters but
@@ -74,10 +74,11 @@ namespace BackBeat {
 	{
 		float amp;
 		float octave;
+		float dutyCycle;  // Only used for square wave
+		float detune;
 		WaveType wave;
 	};
 
-	// TODO: Add delay in LFO start
 	struct LFOParameters
 	{
 		float amp;

@@ -189,22 +189,30 @@ namespace BackBeat {
 
 		auto OSCParams1 = std::make_shared<OscParameters>();
 		OSCParams1->amp = 1.0f;
-		OSCParams1->octave = 1.0f; 
+		OSCParams1->octave = SynthBase::WaveOctaveDefault;
+		OSCParams1->dutyCycle = SynthBase::WaveDutyCyleDefault;
+		OSCParams1->detune = SynthBase::WaveDetuneDefault;
 		OSCParams1->wave = WaveType::SawtoothUp;
 
 		auto OSCParams2 = std::make_shared<OscParameters>();
 		OSCParams2->amp = 0.0f;
-		OSCParams2->octave = 1.0f;
+		OSCParams2->octave = SynthBase::WaveOctaveDefault;
+		OSCParams2->dutyCycle = SynthBase::WaveDutyCyleDefault;
+		OSCParams2->detune = SynthBase::WaveDetuneDefault;
 		OSCParams2->wave = WaveType::SawtoothUp;
 
 		auto OSCParams3 = std::make_shared<OscParameters>();
 		OSCParams3->amp = 0.0f;
-		OSCParams3->octave = 1.0f;
+		OSCParams3->octave = SynthBase::WaveOctaveDefault;
+		OSCParams3->dutyCycle = SynthBase::WaveDutyCyleDefault;
+		OSCParams3->detune = SynthBase::WaveDetuneDefault;
 		OSCParams3->wave = WaveType::SawtoothUp;
 
 		auto OSCParams4 = std::make_shared<OscParameters>();
 		OSCParams4->amp = 0.0f;
-		OSCParams4->octave = 1.0f;
+		OSCParams4->octave = SynthBase::WaveOctaveDefault;
+		OSCParams4->dutyCycle = SynthBase::WaveDutyCyleDefault;
+		OSCParams4->detune = SynthBase::WaveDetuneDefault;
 		OSCParams4->wave = WaveType::SawtoothUp;
 
 		auto LPFilterParams = std::make_shared<FilterParameters>();
