@@ -3,6 +3,10 @@
 //       is not returned to by the user. (NOTE: MIDI Devices handle this by not changing the MIDINote of keys that are
 //       currently pressed when the MIDI user changes the octave range on his MIDI device)
 
+// TODO IMMENTLY:
+// - Add detuning
+// - Add pseudo Moog Lowpass Filter
+
 #include "Synthesizer.h"
 namespace Exampler {
 
@@ -198,7 +202,7 @@ namespace Exampler {
 		{
 			ImGui::PushID("LFO1");
 			ImGui::TableNextColumn();
-			ImGui::SeparatorText("LFO1 ");
+			ImGui::SeparatorText("LFO 1");
 			HelpMarker("Connected directly to Oscillator1");
 			BackBeat::WaveType* wave = &(m_SynthParams->engineParams->voiceParams->LFOParams1->wave);
 			ImGui::Text("    "); ImGui::SameLine(); ImGui::Combo("Waveform", &m_LFOWave, waveTypes, numWaveforms, numWaveforms);
@@ -247,7 +251,7 @@ namespace Exampler {
 
 			float* LFOAmp1 = &(m_SynthParams->engineParams->voiceParams->LFOParams1->amp);
 			ImGui::Text("    "); ImGui::SameLine(); 
-			ImGui::SliderFloat("LFO 1 Amp", LFOAmp1, BackBeat::SynthBase::LFOAttentuationMin, BackBeat::SynthBase::LFOAttentuationMax);
+			ImGui::SliderFloat("LFO 1 Amp", LFOAmp1, 0.0f, 1.0f);
 			ImGui::Spacing();
 
 			float* LFODelay1 = &(m_SynthParams->engineParams->voiceParams->LFOParams1->delay);

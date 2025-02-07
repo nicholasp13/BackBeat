@@ -113,18 +113,21 @@ namespace BackBeat {
 	//       other than consolidation
 	namespace Audio {
 
+		// ----- CONSTANTS ----- //
+
 		// MISC CONSTANTS
-		constexpr unsigned int ByteBitSize   = 8;
-		constexpr unsigned int ByteByteSize  = 1;
-		constexpr unsigned int Int16BitSize  = 16;
-		constexpr unsigned int Int16ByteSize = 2;
-		constexpr unsigned int Int24BitSize  = 24;
-		constexpr unsigned int Int24ByteSize = 3;
-		constexpr unsigned int FloatBitSize  = 32;
-		constexpr unsigned int FloatByteSize = 4;
-		constexpr unsigned int DoubleBitSize = 64;
+		constexpr unsigned int ByteBitSize    = 8;
+		constexpr unsigned int ByteByteSize   = 1;
+		constexpr unsigned int Int16BitSize   = 16;
+		constexpr unsigned int Int16ByteSize  = 2;
+		constexpr unsigned int Int24BitSize   = 24;
+		constexpr unsigned int Int24ByteSize  = 3;
+		constexpr unsigned int FloatBitSize   = 32;
+		constexpr unsigned int FloatByteSize  = 4;
+		constexpr unsigned int DoubleBitSize  = 64;
 		constexpr unsigned int DoubleByteSize = 8;
-		constexpr float Int24Max             = 8388607.0f;
+		constexpr float Int24Max              = 8388607.0f;
+		constexpr float CentsPerOctave        = 1200.0f;
 
 		// AUDIOFILE CONSTANTS
 		constexpr unsigned int Mono                  = 1;
@@ -145,6 +148,12 @@ namespace BackBeat {
 		constexpr unsigned int SAMPLEDataSize        = 8;
 		constexpr unsigned int SAMPLETotalHeaderSize = 42;
 		const auto SAMPLE = "SAMPLE";
+
+		// ----- HELPER FUNCTIONS ----- //
+
+		inline static float Lerp(float a, float b, float fraction) { return ((b - a) * fraction + a); }
+
+		inline static float Bound(float value, float min, float max) { return (value < min) ? min : (value > max) ? max : value; }
 
 		static unsigned short EndianConverterShort(char num1, char num2)
 		{

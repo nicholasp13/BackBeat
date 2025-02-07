@@ -24,11 +24,13 @@ namespace BackBeat {
 		static const unsigned int s_BufferSize = 100000;
 		
 		unsigned int m_SampleRate;
-		unsigned int m_Position;
 		unsigned int m_WaveSize;
 		float m_Amp;
 		float m_Hertz;
 		float m_DutyCycle; // Only used in square waves
+		float m_FloatPos;
+		float m_Increment;
+
 		WaveType m_WaveType;
 		ModuleType m_Type;
 		std::shared_ptr<float[]> m_Wave;
