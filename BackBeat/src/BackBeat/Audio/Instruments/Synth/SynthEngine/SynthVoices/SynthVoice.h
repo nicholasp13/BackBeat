@@ -12,7 +12,7 @@
 *    - 1 main oscillator (m_Osc1) with an LFO to modulate its sound
 *    - 3 other oscillators to produce a chorus like effect
 *    - 5 different waveforms: Sin, Triangle, Square, SawtoothUp, SawtoothDown
-*    - Produce the same note but can be scaled by octaves (pitch shifting on the backburner)
+*    - Produce the same note but can be scaled by octaves or detuned by cents
 *    - Seperate amp controllers to change the balance between the 4
 *  - Digitally Controlled Amplifier (DCA)
 *    - Controls the amplitude/volume of the SynthVoice
@@ -20,11 +20,13 @@
 *    - Controlled by parameters and Amp EG
 *  - 2 Linear Envelope Generators (EGs)
 *    - Amp Eg connected directly to the DCA to produce more natural sound shaping
-*    - Another Linear EG to be connected to a filter or another modulator (not implemented / on the backburner)
+*    - Filter EG connected to the low pass ladder filter (LPLadderFilter)
 *  - 1 Low Frequency Oscillator (LFO)
-*    - Currently one singular LFO connected to the main oscillator (m_Osc1) (more to be added / on the backburner)
-*  - Low pass filter (LPFilter)
-*    - Basic first degree filter mimicking a resistor capacitor (RC) filter using a bilinear transform
+*    - Currently one singular LFO connected to the main oscillator (m_Osc1)
+*  - Low pass ladder filter (LPLadderFilter)
+*    - 4th degree filter mimicking a classic ladder filter like the MiniMoog
+*    - Has resonance and bass boosting
+*    - Connected to FilterEg
 *  - High pass filter (HPFilter)
 *    - Basic first degree filter mimicking a capacitor resistor (CR) filter using a bilinear transform
 * 
@@ -48,10 +50,8 @@
 */
 
 // TODO:
-//	Add EG for filters specifically
 //  Implement ModularMatrix
 
-// #include "BackBeat/Audio/SynthIO/RenderInfo.h"
 #include "BackBeat/Audio/Instruments/Module.h"
 #include "BackBeat/Audio/Instruments/Synth/SynthEngine/SynthModules/DCA.h"
 #include "BackBeat/Audio/Instruments/Synth/SynthEngine/SynthModules/WaveOscillator.h"
@@ -61,6 +61,8 @@
 #include "BackBeat/Audio/Instruments/Synth/SynthEngine/SynthModules/TPTLowPassFilter.h"
 #include "BackBeat/Audio/Instruments/Synth/SynthEngine/SynthModules/TPTHighPassFilter.h"
 #include "BackBeat/Audio/Instruments/Synth/SynthBase.h"
+
+#include "BackBeat/Audio/Instruments/Synth/SynthEngine/SynthModules/LowPassLadderFilter.h"
 namespace BackBeat {
 
 	class SynthVoice
@@ -89,16 +91,14 @@ namespace BackBeat {
 		std::shared_ptr<float[]> m_InputBuffer;
 		std::shared_ptr<float[]> m_OutputBuffer;
 		std::unique_ptr<DCA> m_DCA;
-		// NOTE: Might change to one SynthModule with Four Oscillator cores
-		//       Might change to stack allocation for objects for performance
 		std::unique_ptr<WaveOscillator> m_Osc1;
 		std::unique_ptr<WaveOscillator> m_Osc2;
 		std::unique_ptr<WaveOscillator> m_Osc3;
 		std::unique_ptr<WaveOscillator> m_Osc4;
-		// std::unique_ptr<LinearEG> m_EG; // TODO: Link this EG to one of or both of the filters
 		std::unique_ptr<AmpEG> m_AmpEG;
+		std::unique_ptr<LinearEG> m_FilterEG;
 		std::unique_ptr<LowFrequencyOscillator> m_LFO1;
-		std::unique_ptr<TPTLowPassFilter> m_LPFilter;
+		std::unique_ptr<LowPassLadderFilter> m_LPLadderFilter;
 		std::unique_ptr<TPTHighPassFilter> m_HPFilter;
 
 	private:

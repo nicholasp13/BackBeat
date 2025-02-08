@@ -2,9 +2,7 @@
 //      - Fix bug where changing the general octave range causes the note to hold forever if the original octave 
 //       is not returned to by the user. (NOTE: MIDI Devices handle this by not changing the MIDINote of keys that are
 //       currently pressed when the MIDI user changes the octave range on his MIDI device)
-
-// TODO IMMENTLY:
-// - Add pseudo Moog Lowpass Filter
+//      - Fix this Entity Render by importing ImGui knob library
 
 #include "Synthesizer.h"
 namespace Exampler {
@@ -263,17 +261,26 @@ namespace Exampler {
 			ImGui::PopID();
 		}
 
-		// Low Pass Filter Controls
+		// Low Pass Ladder Filter Controls
 		{
 			ImGui::TableNextColumn();
-			ImGui::PushID("LPFilter");
+			ImGui::PushID("LadderLPFilter");
 
-			ImGui::SeparatorText("Low Pass Filter");
-			bool* lpFilterOn = &(m_SynthParams->engineParams->voiceParams->LPFilterParams->isOn);
+			ImGui::SeparatorText("Low Pass Ladder Filter");
+			bool* lpFilterOn = &(m_SynthParams->engineParams->voiceParams->LPLadderFilterParams->isOn);
 			ImGui::Checkbox("Filter On", lpFilterOn);
-			float* lpCutoffFreq = &(m_SynthParams->engineParams->voiceParams->LPFilterParams->cutoff);
-			ImGui::Text("    "); ImGui::SameLine(); 
+
+			float* lpCutoffFreq = &(m_SynthParams->engineParams->voiceParams->LPLadderFilterParams->cutoff);
+			ImGui::Text("    "); ImGui::SameLine();
 			ImGui::SliderFloat("Cutoff Frequency", lpCutoffFreq, BackBeat::SynthBase::FilterCutoffMin, BackBeat::SynthBase::FilterCutoffMax);
+
+			float* resonance = &(m_SynthParams->engineParams->voiceParams->LPLadderFilterParams->Q);
+			ImGui::Text("    "); ImGui::SameLine();
+			ImGui::SliderFloat("Resonance", resonance, BackBeat::SynthBase::LadderFilterQMin, BackBeat::SynthBase::LadderFilterQMax);
+
+			float* bassBoost = &(m_SynthParams->engineParams->voiceParams->LPLadderFilterParams->bassBoostPercent);
+			ImGui::Text("    "); ImGui::SameLine();
+			ImGui::SliderFloat("Bass Boost", bassBoost, BackBeat::SynthBase::LadderFilterBassBoostMin, BackBeat::SynthBase::LadderFilterBassBoostMax);
 
 			ImGui::Spacing();
 			ImGui::PopID();
@@ -299,12 +306,15 @@ namespace Exampler {
 			ImGui::PushID("AmpEG");
 			ImGui::TableNextColumn();
 
+			bool* tracking = &(m_SynthParams->engineParams->voiceParams->AmpEGParams->tracking);
 			float* attackDuration = &(m_SynthParams->engineParams->voiceParams->AmpEGParams->attackDuration);
 			float* decayDuration = &(m_SynthParams->engineParams->voiceParams->AmpEGParams->decayDuration);
 			float* releaseDuration = &(m_SynthParams->engineParams->voiceParams->AmpEGParams->releaseDuration);
 			float* sustain = &(m_SynthParams->engineParams->voiceParams->AmpEGParams->sustainValue);
 
 			ImGui::SeparatorText("Amp Envelope Generator");
+
+			ImGui::Checkbox("Tracking", tracking);
 
 			ImGui::Text("    "); ImGui::SameLine(); 
 			ImGui::SliderFloat("Attack ", attackDuration, BackBeat::SynthBase::EG1AttackTimeMin, BackBeat::SynthBase::EG1AttackTimeMax);
@@ -322,6 +332,40 @@ namespace Exampler {
 			ImGui::SliderFloat("Sustain", sustain, BackBeat::SynthBase::EG1SustainLevelMin, BackBeat::SynthBase::EG1SustainLevelMax);
 			ImGui::Spacing();
 			
+			ImGui::Spacing();
+			ImGui::PopID();
+		}
+
+		// Filter Envelope Generator Controls
+		{
+			ImGui::PushID("FilterEG");
+
+			bool* tracking = &(m_SynthParams->engineParams->voiceParams->EGParams->tracking);
+			float* attackDuration = &(m_SynthParams->engineParams->voiceParams->EGParams->attackDuration);
+			float* decayDuration = &(m_SynthParams->engineParams->voiceParams->EGParams->decayDuration);
+			float* releaseDuration = &(m_SynthParams->engineParams->voiceParams->EGParams->releaseDuration);
+			float* sustain = &(m_SynthParams->engineParams->voiceParams->EGParams->sustainValue);
+
+			ImGui::SeparatorText("Filter Envelope Generator");
+
+			ImGui::Checkbox("Tracking", tracking);
+
+			ImGui::Text("    "); ImGui::SameLine();
+			ImGui::SliderFloat("Attack ", attackDuration, BackBeat::SynthBase::EG1AttackTimeMin, BackBeat::SynthBase::EG1AttackTimeMax);
+			ImGui::Spacing();
+
+			ImGui::Text("    "); ImGui::SameLine();
+			ImGui::SliderFloat("Decay  ", decayDuration, BackBeat::SynthBase::EG1DecayTimeMin, BackBeat::SynthBase::EG1DecayTimeMax);
+			ImGui::Spacing();
+
+			ImGui::Text("    "); ImGui::SameLine();
+			ImGui::SliderFloat("Release", releaseDuration, BackBeat::SynthBase::EG1ReleaseTimeMin, BackBeat::SynthBase::EG1ReleaseTimeMax);
+			ImGui::Spacing();
+
+			ImGui::Text("    "); ImGui::SameLine();
+			ImGui::SliderFloat("Sustain", sustain, BackBeat::SynthBase::EG1SustainLevelMin, BackBeat::SynthBase::EG1SustainLevelMax);
+			ImGui::Spacing();
+
 			ImGui::Spacing();
 			ImGui::PopID();
 		}
@@ -908,15 +952,17 @@ namespace Exampler {
 			lfoNode.append_child("Delay").append_attribute("Value") = lfoParams->delay;
 		}
 
-		// Low Pass Filter
+		// Low Pass Ladder Filter
 		{
-			std::shared_ptr<BackBeat::FilterParameters> lowpassParams = 
-				m_SynthParams->engineParams->voiceParams->LPFilterParams;
+			std::shared_ptr<BackBeat::LadderFilterParameters> lowpassParams =
+				m_SynthParams->engineParams->voiceParams->LPLadderFilterParams;
 
 			auto lowpassNode = synthNode.append_child("LowPassFilter");
 
 			lowpassNode.append_child("FilterOn").append_attribute("Value") = lowpassParams->isOn;
 			lowpassNode.append_child("CutoffFrequency").append_attribute("Value") = lowpassParams->cutoff;
+			lowpassNode.append_child("Resonance").append_attribute("Value") = lowpassParams->Q;
+			lowpassNode.append_child("BassBoost").append_attribute("Value") = lowpassParams->bassBoostPercent;
 		}
 
 		// High Pass Filter
@@ -937,10 +983,25 @@ namespace Exampler {
 
 			auto ampEGNode = synthNode.append_child("AmpEnvelopeGenerator");
 
+			ampEGNode.append_child("Tracking").append_attribute("Value") = ampEGParams->tracking;
 			ampEGNode.append_child("Attack").append_attribute("Value") = ampEGParams->attackDuration;
 			ampEGNode.append_child("Decay").append_attribute("Value") = ampEGParams->decayDuration;
 			ampEGNode.append_child("Release").append_attribute("Value") = ampEGParams->releaseDuration;
 			ampEGNode.append_child("Sustain").append_attribute("Value") = ampEGParams->sustainValue;
+		}
+
+		// Filter Envelope Generator
+		{
+			std::shared_ptr<BackBeat::EGParameters> filterEGParams =
+				m_SynthParams->engineParams->voiceParams->EGParams;
+
+			auto filterEGNode = synthNode.append_child("FilterEnvelopeGenerator");
+
+			filterEGNode.append_child("Tracking").append_attribute("Value") = filterEGParams->tracking;
+			filterEGNode.append_child("Attack").append_attribute("Value") = filterEGParams->attackDuration;
+			filterEGNode.append_child("Decay").append_attribute("Value") = filterEGParams->decayDuration;
+			filterEGNode.append_child("Release").append_attribute("Value") = filterEGParams->releaseDuration;
+			filterEGNode.append_child("Sustain").append_attribute("Value") = filterEGParams->sustainValue;
 		}
 
 		// Oscillator 1
@@ -1259,15 +1320,17 @@ namespace Exampler {
 			lfoParams->delay = lfoNode.child("Delay").attribute("Value").as_float();
 		}
 
-		// Low Pass Filter
+		// Low Pass Ladder Filter
 		{
-			std::shared_ptr<BackBeat::FilterParameters> lowpassParams =
-				m_SynthParams->engineParams->voiceParams->LPFilterParams;
+			std::shared_ptr<BackBeat::LadderFilterParameters> lowpassParams =
+				m_SynthParams->engineParams->voiceParams->LPLadderFilterParams;
 
 			auto lowpassNode = node->child("LowPassFilter");
 
 			lowpassParams->isOn = lowpassNode.child("FilterOn").attribute("Value").as_bool();
 			lowpassParams->cutoff = lowpassNode.child("CutoffFrequency").attribute("Value").as_float();
+			lowpassParams->Q = lowpassNode.child("Resonance").attribute("Value").as_float();
+			lowpassParams->bassBoostPercent = lowpassNode.child("BassBoost").attribute("Value").as_float();
 		}
 
 		// High Pass Filter
@@ -1288,10 +1351,25 @@ namespace Exampler {
 
 			auto ampEGNode = node->child("AmpEnvelopeGenerator");
 
+			ampEGParams->tracking = ampEGNode.child("Tracking").attribute("Value").as_bool();
 			ampEGParams->attackDuration = ampEGNode.child("Attack").attribute("Value").as_float();
 			ampEGParams->decayDuration = ampEGNode.child("Decay").attribute("Value").as_float();
 			ampEGParams->releaseDuration = ampEGNode.child("Release").attribute("Value").as_float();
 			ampEGParams->sustainValue = ampEGNode.child("Sustain").attribute("Value").as_float();
+		}
+
+		// Amp Envelope Generator
+		{
+			std::shared_ptr<BackBeat::EGParameters> filterEGParams =
+				m_SynthParams->engineParams->voiceParams->EGParams;
+
+			auto filterEGNode = node->child("FilterEnvelopeGenerator");
+
+			filterEGParams->tracking = filterEGNode.child("Tracking").attribute("Value").as_bool();
+			filterEGParams->attackDuration = filterEGNode.child("Attack").attribute("Value").as_float();
+			filterEGParams->decayDuration = filterEGNode.child("Decay").attribute("Value").as_float();
+			filterEGParams->releaseDuration = filterEGNode.child("Release").attribute("Value").as_float();
+			filterEGParams->sustainValue = filterEGNode.child("Sustain").attribute("Value").as_float();
 		}
 
 		// Oscillator 1

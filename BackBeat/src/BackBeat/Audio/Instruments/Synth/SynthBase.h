@@ -127,8 +127,19 @@ namespace BackBeat {
 		constexpr float WaveDetuneDefault   = 0.0f; // In centz
 		constexpr float WaveDetuneMin       = -50.0f;
 		constexpr float WaveDetuneMax       = 50.0f;
+		// LPLadderFilter
+		// based off Will Pirkle's design for a ladder filter
+		// link: https://willpirkle.com/Downloads/Addendum_A1_Moog.pdf
+		constexpr float LadderFilterQDefault = 1.0f;
+		constexpr float LadderFilterQMin = 1.0f;
+		constexpr float LadderFilterQMax = 10.0f;
+		constexpr float LadderFilterBassBoostDefault = 0.0f;
+		constexpr float LadderFilterBassBoostMin = 0.0f;
+		constexpr float LadderFilterBassBoostMax = 100.0f;
 
 		// ------------------------------------------- //
+
+		// ---- HELPER FUNCTIONS ---- //
 
 		// Time should be in milliseconds
 		static unsigned int MsToSamples(float time, unsigned int sampleRate)

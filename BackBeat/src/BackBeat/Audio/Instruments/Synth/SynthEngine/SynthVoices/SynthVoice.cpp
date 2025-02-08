@@ -30,10 +30,11 @@ namespace BackBeat {
 		m_Osc2->Reset(sampleRate);
 		m_Osc3->Reset(sampleRate);
 		m_Osc4->Reset(sampleRate);
-		// m_EG->Reset(sampleRate);
+		m_AmpEG->Reset(sampleRate);
+		m_FilterEG->Reset(sampleRate);
 		m_DCA->Reset(sampleRate);
 		m_LFO1->Reset(sampleRate);
-		m_LPFilter->Reset(sampleRate);
+		m_LPLadderFilter->Reset(sampleRate);
 		m_HPFilter->Reset(sampleRate);
 	}
 
@@ -47,18 +48,18 @@ namespace BackBeat {
 	{
 #if 1
 		// Render ModSources
-		// m_EG->Render(numSamples);
 		m_AmpEG->Render(numSamples);
+		m_FilterEG->Render(numSamples);
 		m_LFO1->Render(numSamples);
 
-		// TODO: Run ModMatrix here
+		// Run ModMatrix here
 
 		// Render ModDestinations 
 		m_Osc1->Render(numSamples);
 		m_Osc2->Render(numSamples);
 		m_Osc3->Render(numSamples);
 		m_Osc4->Render(numSamples);
-		m_LPFilter->Render(numSamples);
+		m_LPLadderFilter->Render(numSamples);	
 		m_HPFilter->Render(numSamples);
 		m_DCA->Render(numSamples);
 
@@ -111,9 +112,9 @@ namespace BackBeat {
 		BB_CORE_INFO("OSC4 TIME (in nanoseconds):     {0}", time - lastTimeFrame);
 		lastTimeFrame = time;
 
-		m_LPFilter->Render(numSamples);
+		m_LPLadderFilter->Render(numSamples);
 		time = timer.GetTimeNano();
-		BB_CORE_INFO("LPfilter TIME (in nanoseconds): {0}", time - lastTimeFrame);
+		BB_CORE_INFO("LPLadderFilter TIME (in nanoseconds): {0}", time - lastTimeFrame);
 		lastTimeFrame = time;
 
 		m_HPFilter->Render(numSamples);
@@ -155,15 +156,16 @@ namespace BackBeat {
 		m_Active = true;
 		m_Channel = event.channel;
 		m_NotePressed = event.midiNote;
+
 		m_Osc1->DoNoteOn(event);
 		m_Osc2->DoNoteOn(event);
 		m_Osc3->DoNoteOn(event);
 		m_Osc4->DoNoteOn(event);
-		// m_EG->DoNoteOn(event);
 		m_AmpEG->DoNoteOn(event);
+		m_FilterEG->DoNoteOn(event);
 		m_DCA->DoNoteOn(event);
 		m_LFO1->DoNoteOn(event);
-		m_LPFilter->DoNoteOn(event);
+		m_LPLadderFilter->DoNoteOn(event);
 		m_HPFilter->DoNoteOn(event);
 	}
 
@@ -175,11 +177,11 @@ namespace BackBeat {
 		m_Osc2->DoNoteOff(event);
 		m_Osc3->DoNoteOff(event);
 		m_Osc4->DoNoteOff(event);
-		// m_EG->DoNoteOff(event);
 		m_AmpEG->DoNoteOff(event);
+		m_FilterEG->DoNoteOff(event);
 		m_DCA->DoNoteOff(event);
 		m_LFO1->DoNoteOff(event);
-		m_LPFilter->DoNoteOff(event);
+		m_LPLadderFilter->DoNoteOff(event);
 		m_HPFilter->DoNoteOff(event);
 	}
 
@@ -190,10 +192,10 @@ namespace BackBeat {
 		m_Osc2 = std::make_unique<WaveOscillator>(m_SampleRate, m_InputBuffer, m_Params->OscParams2);
 		m_Osc3 = std::make_unique<WaveOscillator>(m_SampleRate, m_InputBuffer, m_Params->OscParams3);
 		m_Osc4 = std::make_unique<WaveOscillator>(m_SampleRate, m_InputBuffer, m_Params->OscParams4);
-		// m_EG = std::make_unique<LinearEG>(m_SampleRate, m_SampleRate, m_Params->EGParams);
 		m_AmpEG = std::make_unique<AmpEG>(m_SampleRate, m_SampleRate, m_DCA->GetInputBuffer(), m_Params->AmpEGParams);
 		m_LFO1 = std::make_unique<LowFrequencyOscillator>(m_SampleRate, m_SampleRate, m_Osc1->GetModInputBuffer(), m_Params->LFOParams1);
-		m_LPFilter = std::make_unique<TPTLowPassFilter>(m_SampleRate, m_SampleRate, m_InputBuffer, m_Params->LPFilterParams);
+		m_LPLadderFilter = std::make_unique<LowPassLadderFilter>(m_SampleRate, m_SampleRate, m_InputBuffer, m_Params->LPLadderFilterParams);
 		m_HPFilter = std::make_unique<TPTHighPassFilter>(m_SampleRate, m_SampleRate, m_InputBuffer, m_Params->HPFilterParams);
+		m_FilterEG = std::make_unique<LinearEG>(m_SampleRate, m_SampleRate, m_LPLadderFilter->GetModInputBuffer(), m_Params->EGParams);
 	}
 }

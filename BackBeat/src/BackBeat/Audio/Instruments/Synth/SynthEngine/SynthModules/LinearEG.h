@@ -6,7 +6,8 @@ namespace BackBeat {
 	class LinearEG : public EnvelopeGenerator
 	{
 	public:
-		LinearEG(unsigned int sampleRate, unsigned int bufferSize, std::shared_ptr<EGParameters> params);
+		LinearEG(unsigned int sampleRate, unsigned int bufferSize, std::shared_ptr<float[]> outputBuffer,
+			std::shared_ptr<EGParameters> params);
 		~LinearEG();
 
 		virtual void Reset(unsigned int sampleRate) override;
@@ -20,5 +21,7 @@ namespace BackBeat {
 
 	private:
 		std::shared_ptr<LinearEGCore> m_Core;
+		std::shared_ptr<float[]> m_InputBuffer;
+		std::shared_ptr<float[]> m_OutputBuffer;
 	};
 }

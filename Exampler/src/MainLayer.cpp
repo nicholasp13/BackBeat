@@ -1,3 +1,10 @@
+// TODO: 
+//     - Fix Synth's entity render by importing ImGui knob library
+//     - Create panel class for Canvas and sampler pads
+//         - Create sample pads that are programmable through a right click and play with a left click and have a 
+//           simple blank look that might change colors when played
+//     - Create new entity AudioVisualizer and have it pop out and be its own window instead of what it is now
+
 #include "MainLayer.h"
 namespace Exampler {
 

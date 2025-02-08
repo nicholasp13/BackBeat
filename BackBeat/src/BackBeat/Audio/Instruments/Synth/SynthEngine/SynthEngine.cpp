@@ -170,12 +170,14 @@ namespace BackBeat {
 		DCAParams->volume = 1.0f;
 
 		auto AmpEGParams = std::make_shared<EGParameters>();
+		AmpEGParams->tracking = true;
 		AmpEGParams->attackDuration = SynthBase::EG1AttackTimeDefault;
 		AmpEGParams->decayDuration = SynthBase::EG1DecayTimeDefault;
 		AmpEGParams->releaseDuration = SynthBase::EG1ReleaseTimeDefault;
 		AmpEGParams->sustainValue = SynthBase::EG1SustainLevelDefault;
 		
 		auto EGParams = std::make_shared<EGParameters>();
+		EGParams->tracking = true;
 		EGParams->attackDuration = SynthBase::EG1AttackTimeDefault;
 		EGParams->decayDuration = SynthBase::EG1DecayTimeDefault;
 		EGParams->releaseDuration = SynthBase::EG1ReleaseTimeDefault;
@@ -215,9 +217,12 @@ namespace BackBeat {
 		OSCParams4->detune = SynthBase::WaveDetuneDefault;
 		OSCParams4->wave = WaveType::SawtoothUp;
 
-		auto LPFilterParams = std::make_shared<FilterParameters>();
-		LPFilterParams->isOn = false;
-		LPFilterParams->cutoff = SynthBase::FilterCutoffMax;
+		auto LPLadderFilterParams = std::make_shared<LadderFilterParameters>();
+		LPLadderFilterParams->isOn = false;
+		LPLadderFilterParams->enableAutoLimiter = false;
+		LPLadderFilterParams->cutoff = SynthBase::FilterCutoffMax;
+		LPLadderFilterParams->Q = SynthBase::LadderFilterQDefault;
+		LPLadderFilterParams->bassBoostPercent = SynthBase::LadderFilterBassBoostDefault;
 
 		auto HPFilterParams = std::make_shared<FilterParameters>();
 		HPFilterParams->isOn = false;
@@ -234,7 +239,7 @@ namespace BackBeat {
 		voiceParams->OscParams2 = OSCParams2;
 		voiceParams->OscParams3 = OSCParams3;
 		voiceParams->OscParams4 = OSCParams4;
-		voiceParams->LPFilterParams = LPFilterParams;
+		voiceParams->LPLadderFilterParams = LPLadderFilterParams;
 		voiceParams->HPFilterParams = HPFilterParams;
 		voiceParams->ModMatrixParams = modMatrixParams;
 

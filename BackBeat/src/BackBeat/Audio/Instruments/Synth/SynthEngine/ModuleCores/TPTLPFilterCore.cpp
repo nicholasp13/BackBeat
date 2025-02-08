@@ -70,7 +70,6 @@ namespace BackBeat {
 
 	void TPTLPFilterCore::DoNoteOn(NoteEvent event)
 	{
-		float noteFreq = event.note / m_SampleRate;
 		m_S = 0.0f;
 
 		// No prewarping

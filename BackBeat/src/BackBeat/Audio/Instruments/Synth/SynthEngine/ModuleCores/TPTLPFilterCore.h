@@ -1,5 +1,7 @@
 #pragma once
 
+// NOTE: DEPRECIATED use LowPassLadderFilter instead for the more interesting filter sound
+
 /**
 * Basic Resistor-Capacitor Low Pass Filter represented by a 1-pole topology-preserving transform (TPT) based on the 
 * trapezoidal integrator replacement method using a bilinear transform. Follows the design by Vadim Zavalishin in The Art of VA Filter Design
@@ -7,8 +9,6 @@
 * NOTE: There is no prewarping to more closely match analog filters as the difference is negligible audibly. May be implemented later 
 *       Prewarping cutoff equation: m_CutoffFreq = tan(m_Params->cutoff / m_SampleRate / 2);
 */
-
-// TODO: Add resonance
 
 #include "BackBeat/Audio/Instruments/ModuleCore.h"
 namespace BackBeat {

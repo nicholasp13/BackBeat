@@ -3,9 +3,12 @@
 #include "LinearEG.h"
 namespace BackBeat {
 
-	LinearEG::LinearEG(unsigned int sampleRate, unsigned int bufferSize, std::shared_ptr<EGParameters> params)
+	LinearEG::LinearEG(unsigned int sampleRate, unsigned int bufferSize, std::shared_ptr<float[]> outputBuffer,
+		std::shared_ptr<EGParameters> params)
 		:
-		m_Core(std::make_shared<LinearEGCore>(sampleRate, bufferSize, params))
+		m_Core(std::make_shared<LinearEGCore>(sampleRate, bufferSize, params)),
+		m_InputBuffer(m_Core->GetOutputBuffer()),
+		m_OutputBuffer(outputBuffer)
 	{
 
 	}
@@ -29,6 +32,13 @@ namespace BackBeat {
 	{
 		Update();
 		m_Core->Render(numSamples);
+
+		// NOTE: This step will be implemented by the ModularMatrix for all other modulations
+		unsigned int totalSamples = numSamples * Audio::Stereo;
+		for (unsigned int i = 0; i < totalSamples; i++)
+		{
+			m_OutputBuffer[i] *= m_InputBuffer[i];
+		}
 	}
 
 	void LinearEG::DoNoteOn(NoteEvent event)
