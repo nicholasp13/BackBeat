@@ -47,7 +47,8 @@ project "BackBeat"
 		"%{prj.name}/vendor/Glad/include",
 		"%{prj.name}/vendor/imgui",
 		"%{prj.name}/vendor/lodepng",
-		"%{prj.name}/vendor/pugixml"
+		"%{prj.name}/vendor/pugixml",
+		"%{prj.name}/vendor/imgui-knobs"
 	}
 
 	links
@@ -57,6 +58,7 @@ project "BackBeat"
 		"imgui",
 		"lodepng",
 		"pugixml",
+		"imgui-knobs",
 		"opengl32.lib"
 	}
 
@@ -108,6 +110,7 @@ project "Exampler"
 		"BackBeat/vendor/glfw/include",
 		"BackBeat/vendor/lodepng",
 		"BackBeat/vendor/pugixml",
+		"BackBeat/vendor/imgui-knobs",
 		"BackBeat/src"
 	}
 	
@@ -160,6 +163,7 @@ project "UnitTests"
 		"BackBeat/vendor/glfw/include",
 		"BackBeat/vendor/lodepng",
 		"BackBeat/vendor/pugixml",
+		"BackBeat/vendor/imgui-knobs",
 		"BackBeat/src"
 	}
 	
