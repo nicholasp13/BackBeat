@@ -6,5 +6,6 @@ BackBeat.sln
 *.vcxproj
 *.vcxproj.filters
 *.vcxproj.user
+*.obj
 imgui.ini
 packages.config
