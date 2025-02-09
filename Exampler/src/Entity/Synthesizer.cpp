@@ -1296,7 +1296,7 @@ namespace Exampler {
 			ImGui::PushID("LadderLPFilter");
 			ImGui::TableNextColumn();
 
-			ImGui::SeparatorText("Low Pass Ladder Filter");
+			ImGui::SeparatorText("Low Pass Filter");
 
 			bool* lpFilterOn = &(m_SynthParams->engineParams->voiceParams->LPLadderFilterParams->isOn);
 			float* lpCutoffFreq = &(m_SynthParams->engineParams->voiceParams->LPLadderFilterParams->cutoff);
