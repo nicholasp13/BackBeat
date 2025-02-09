@@ -65,6 +65,7 @@ project "BackBeat"
 
 	filter "system:windows"
 		systemversion "latest"
+		buildoptions "/utf-8"
 
 		defines
 		{
@@ -122,6 +123,7 @@ project "Exampler"
 
 	filter "system:windows"
 		systemversion "latest"
+		buildoptions "/utf-8"
 
 		defines
 		{
@@ -180,6 +182,7 @@ project "UnitTests"
 
 	filter "system:windows"
 		systemversion "latest"
+		buildoptions "/utf-8"
 
 		defines
 		{
