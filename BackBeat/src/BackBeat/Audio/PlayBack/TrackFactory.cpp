@@ -128,103 +128,103 @@ namespace BackBeat {
 				switch (inProps.bitDepth)
 				{
 
-				case (Audio::ByteBitSize):
-				{
-					auto srcBuffer = reinterpret_cast<byte*>(inBuffer);
-					if (outProps.bitDepth == Audio::ByteBitSize)
-						Audio::TranslateDataToByte(srcBuffer, (byte*)outBuffer, inProps.bitDepth, outProps.numChannels, numFrames);
-					else if (outProps.bitDepth == Audio::Int16BitSize)
-						Audio::TranslateDataToShort(srcBuffer, (signed short*)outBuffer, inProps.bitDepth, outProps.numChannels, numFrames);
-					else if (outProps.bitDepth == Audio::Int24BitSize)
-						Audio::TranslateDataToInt24(srcBuffer, (byte*)outBuffer, inProps.bitDepth, outProps.numChannels, numFrames, inProps.bigEndian);
-					else if (outProps.bitDepth == Audio::FloatBitSize)
-						Audio::TranslateDataToFloat(srcBuffer, (float*)outBuffer, inProps.bitDepth, outProps.numChannels, numFrames);
-					else if (outProps.bitDepth == Audio::DoubleBitSize)
-						Audio::TranslateDataToDouble(srcBuffer, (double*)outBuffer, inProps.bitDepth, outProps.numChannels, numFrames);
-					else
-						BB_CORE_ERROR("Bit depth not supported");
-					break;
-				}
+					case (Audio::ByteBitSize):
+					{
+						auto srcBuffer = reinterpret_cast<byte*>(inBuffer);
+						if (outProps.bitDepth == Audio::ByteBitSize)
+							Audio::TranslateDataToByte(srcBuffer, (byte*)outBuffer, inProps.bitDepth, outProps.numChannels, numFrames);
+						else if (outProps.bitDepth == Audio::Int16BitSize)
+							Audio::TranslateDataToShort(srcBuffer, (signed short*)outBuffer, inProps.bitDepth, outProps.numChannels, numFrames);
+						else if (outProps.bitDepth == Audio::Int24BitSize)
+							Audio::TranslateDataToInt24(srcBuffer, (byte*)outBuffer, inProps.bitDepth, outProps.numChannels, numFrames, inProps.bigEndian);
+						else if (outProps.bitDepth == Audio::FloatBitSize)
+							Audio::TranslateDataToFloat(srcBuffer, (float*)outBuffer, inProps.bitDepth, outProps.numChannels, numFrames);
+						else if (outProps.bitDepth == Audio::DoubleBitSize)
+							Audio::TranslateDataToDouble(srcBuffer, (double*)outBuffer, inProps.bitDepth, outProps.numChannels, numFrames);
+						else
+							BB_CORE_ERROR("Bit depth not supported");
+						break;
+					}
 
-				case (Audio::Int16BitSize):
-				{
-					auto srcBuffer = reinterpret_cast<signed short*>(inBuffer);
-					if (outProps.bitDepth == Audio::ByteBitSize)
-						Audio::TranslateDataToByte(srcBuffer, (byte*)outBuffer, inProps.bitDepth, outProps.numChannels, numFrames);
-					else if (outProps.bitDepth == Audio::Int16BitSize)
-						Audio::TranslateDataToShort(srcBuffer, (signed short*)outBuffer, inProps.bitDepth, outProps.numChannels, numFrames);
-					else if (outProps.bitDepth == Audio::Int24BitSize)
-						Audio::TranslateDataToInt24(srcBuffer, (byte*)outBuffer, inProps.bitDepth, outProps.numChannels, numFrames, inProps.bigEndian);
-					else if (outProps.bitDepth == Audio::FloatBitSize)
-						Audio::TranslateDataToFloat(srcBuffer, (float*)outBuffer, inProps.bitDepth, outProps.numChannels, numFrames);
-					else if (outProps.bitDepth == Audio::DoubleBitSize)
-						Audio::TranslateDataToDouble(srcBuffer, (double*)outBuffer, inProps.bitDepth, outProps.numChannels, numFrames);
-					else
-						BB_CORE_ERROR("Bit depth not supported");
-					break;
-				}
+					case (Audio::Int16BitSize):
+					{
+						auto srcBuffer = reinterpret_cast<signed short*>(inBuffer);
+						if (outProps.bitDepth == Audio::ByteBitSize)
+							Audio::TranslateDataToByte(srcBuffer, (byte*)outBuffer, inProps.bitDepth, outProps.numChannels, numFrames);
+						else if (outProps.bitDepth == Audio::Int16BitSize)
+							Audio::TranslateDataToShort(srcBuffer, (signed short*)outBuffer, inProps.bitDepth, outProps.numChannels, numFrames);
+						else if (outProps.bitDepth == Audio::Int24BitSize)
+							Audio::TranslateDataToInt24(srcBuffer, (byte*)outBuffer, inProps.bitDepth, outProps.numChannels, numFrames, inProps.bigEndian);
+						else if (outProps.bitDepth == Audio::FloatBitSize)
+							Audio::TranslateDataToFloat(srcBuffer, (float*)outBuffer, inProps.bitDepth, outProps.numChannels, numFrames);
+						else if (outProps.bitDepth == Audio::DoubleBitSize)
+							Audio::TranslateDataToDouble(srcBuffer, (double*)outBuffer, inProps.bitDepth, outProps.numChannels, numFrames);
+						else
+							BB_CORE_ERROR("Bit depth not supported");
+						break;
+					}
 
-				case (Audio::Int24BitSize):
-				{
-					auto buffer = reinterpret_cast<byte*>(inBuffer);
-					int24* srcBuffer = int24::GetInt24Buffer(buffer, numFrames * outProps.numChannels, inProps.bigEndian);
-					if (outProps.bitDepth == Audio::ByteBitSize)
-						Audio::TranslateDataToByte(srcBuffer, (byte*)outBuffer, inProps.bitDepth, outProps.numChannels, numFrames);
-					else if (outProps.bitDepth == Audio::Int16BitSize)
-						Audio::TranslateDataToShort(srcBuffer, (signed short*)outBuffer, inProps.bitDepth, outProps.numChannels, numFrames);
-					else if (outProps.bitDepth == Audio::Int24BitSize)
-						Audio::TranslateDataToInt24(srcBuffer, (byte*)outBuffer, inProps.bitDepth, outProps.numChannels, numFrames, inProps.bigEndian);
-					else if (outProps.bitDepth == Audio::FloatBitSize)
-						Audio::TranslateDataToFloat(srcBuffer, (float*)outBuffer, inProps.bitDepth, outProps.numChannels, numFrames);
-					else if (outProps.bitDepth == Audio::DoubleBitSize)
-						Audio::TranslateDataToDouble(srcBuffer, (double*)outBuffer, inProps.bitDepth, outProps.numChannels, numFrames);
-					else
-						BB_CORE_ERROR("Bit depth not supported");
-					delete[] srcBuffer;
-					break;
-				}
+					case (Audio::Int24BitSize):
+					{
+						auto buffer = reinterpret_cast<byte*>(inBuffer);
+						int24* srcBuffer = int24::GetInt24Buffer(buffer, numFrames * outProps.numChannels, inProps.bigEndian);
+						if (outProps.bitDepth == Audio::ByteBitSize)
+							Audio::TranslateDataToByte(srcBuffer, (byte*)outBuffer, inProps.bitDepth, outProps.numChannels, numFrames);
+						else if (outProps.bitDepth == Audio::Int16BitSize)
+							Audio::TranslateDataToShort(srcBuffer, (signed short*)outBuffer, inProps.bitDepth, outProps.numChannels, numFrames);
+						else if (outProps.bitDepth == Audio::Int24BitSize)
+							Audio::TranslateDataToInt24(srcBuffer, (byte*)outBuffer, inProps.bitDepth, outProps.numChannels, numFrames, inProps.bigEndian);
+						else if (outProps.bitDepth == Audio::FloatBitSize)
+							Audio::TranslateDataToFloat(srcBuffer, (float*)outBuffer, inProps.bitDepth, outProps.numChannels, numFrames);
+						else if (outProps.bitDepth == Audio::DoubleBitSize)
+							Audio::TranslateDataToDouble(srcBuffer, (double*)outBuffer, inProps.bitDepth, outProps.numChannels, numFrames);
+						else
+							BB_CORE_ERROR("Bit depth not supported");
+						delete[] srcBuffer;
+						break;
+					}
 
-				case (Audio::FloatBitSize):
-				{
-					auto srcBuffer = reinterpret_cast<float*>(inBuffer);
-					if (outProps.bitDepth == Audio::ByteBitSize)
-						Audio::TranslateDataToByte(srcBuffer, (byte*)outBuffer, inProps.bitDepth, outProps.numChannels, numFrames);
-					else if (outProps.bitDepth == Audio::Int16BitSize)
-						Audio::TranslateDataToShort(srcBuffer, (signed short*)outBuffer, inProps.bitDepth, outProps.numChannels, numFrames);
-					else if (outProps.bitDepth == Audio::Int24BitSize)
-						Audio::TranslateDataToInt24(srcBuffer, (byte*)outBuffer, inProps.bitDepth, outProps.numChannels, numFrames, inProps.bigEndian);
-					else if (outProps.bitDepth == Audio::FloatBitSize)
-						Audio::TranslateDataToFloat(srcBuffer, (float*)outBuffer, inProps.bitDepth, outProps.numChannels, numFrames);
-					else if (outProps.bitDepth == Audio::DoubleBitSize)
-						Audio::TranslateDataToDouble(srcBuffer, (double*)outBuffer, inProps.bitDepth, outProps.numChannels, numFrames);
-					else
-						BB_CORE_ERROR("Bit depth not supported");
-					break;
-				}
+					case (Audio::FloatBitSize):
+					{
+						auto srcBuffer = reinterpret_cast<float*>(inBuffer);
+						if (outProps.bitDepth == Audio::ByteBitSize)
+							Audio::TranslateDataToByte(srcBuffer, (byte*)outBuffer, inProps.bitDepth, outProps.numChannels, numFrames);
+						else if (outProps.bitDepth == Audio::Int16BitSize)
+							Audio::TranslateDataToShort(srcBuffer, (signed short*)outBuffer, inProps.bitDepth, outProps.numChannels, numFrames);
+						else if (outProps.bitDepth == Audio::Int24BitSize)
+							Audio::TranslateDataToInt24(srcBuffer, (byte*)outBuffer, inProps.bitDepth, outProps.numChannels, numFrames, inProps.bigEndian);
+						else if (outProps.bitDepth == Audio::FloatBitSize)
+							Audio::TranslateDataToFloat(srcBuffer, (float*)outBuffer, inProps.bitDepth, outProps.numChannels, numFrames);
+						else if (outProps.bitDepth == Audio::DoubleBitSize)
+							Audio::TranslateDataToDouble(srcBuffer, (double*)outBuffer, inProps.bitDepth, outProps.numChannels, numFrames);
+						else
+							BB_CORE_ERROR("Bit depth not supported");
+						break;
+					}
 
-				case (Audio::DoubleBitSize):
-				{
-					auto srcBuffer = reinterpret_cast<double*>(inBuffer);
-					if (outProps.bitDepth == Audio::ByteBitSize)
-						Audio::TranslateDataToByte(srcBuffer, (byte*)outBuffer, inProps.bitDepth, outProps.numChannels, numFrames);
-					else if (outProps.bitDepth == Audio::Int16BitSize)
-						Audio::TranslateDataToShort(srcBuffer, (signed short*)outBuffer, inProps.bitDepth, outProps.numChannels, numFrames);
-					else if (outProps.bitDepth == Audio::Int24BitSize)
-						Audio::TranslateDataToInt24(srcBuffer, (byte*)outBuffer, inProps.bitDepth, outProps.numChannels, numFrames, inProps.bigEndian);
-					else if (outProps.bitDepth == Audio::FloatBitSize)
-						Audio::TranslateDataToFloat(srcBuffer, (float*)outBuffer, inProps.bitDepth, outProps.numChannels, numFrames);
-					else if (outProps.bitDepth == Audio::DoubleBitSize)
-						Audio::TranslateDataToDouble(srcBuffer, (double*)outBuffer, inProps.bitDepth, outProps.numChannels, numFrames);
-					else
-						BB_CORE_ERROR("Bit depth not supported");
-					break;
-				}
+					case (Audio::DoubleBitSize):
+					{
+						auto srcBuffer = reinterpret_cast<double*>(inBuffer);
+						if (outProps.bitDepth == Audio::ByteBitSize)
+							Audio::TranslateDataToByte(srcBuffer, (byte*)outBuffer, inProps.bitDepth, outProps.numChannels, numFrames);
+						else if (outProps.bitDepth == Audio::Int16BitSize)
+							Audio::TranslateDataToShort(srcBuffer, (signed short*)outBuffer, inProps.bitDepth, outProps.numChannels, numFrames);
+						else if (outProps.bitDepth == Audio::Int24BitSize)
+							Audio::TranslateDataToInt24(srcBuffer, (byte*)outBuffer, inProps.bitDepth, outProps.numChannels, numFrames, inProps.bigEndian);
+						else if (outProps.bitDepth == Audio::FloatBitSize)
+							Audio::TranslateDataToFloat(srcBuffer, (float*)outBuffer, inProps.bitDepth, outProps.numChannels, numFrames);
+						else if (outProps.bitDepth == Audio::DoubleBitSize)
+							Audio::TranslateDataToDouble(srcBuffer, (double*)outBuffer, inProps.bitDepth, outProps.numChannels, numFrames);
+						else
+							BB_CORE_ERROR("Bit depth not supported");
+						break;
+					}
 
-				default:
-				{
-					BB_CORE_ERROR("Bit depth not supported");
-					break;
-				}
+					default:
+					{
+						BB_CORE_ERROR("Bit depth not supported");
+						break;
+					}
 
 				}
 

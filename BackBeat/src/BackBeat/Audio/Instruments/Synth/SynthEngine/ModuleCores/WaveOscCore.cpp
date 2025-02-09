@@ -94,35 +94,35 @@ namespace BackBeat {
 		switch(m_WaveType)
 		{
 
-		case WaveType::Sin:
-		{
-			Wave::GetSinWave(m_Wave, m_WaveSize, Audio::Stereo);
-			break;
-		}
+			case WaveType::Sin:
+			{
+				Wave::GetSinWave(m_Wave, m_WaveSize, Audio::Stereo);
+				break;
+			}
 
-		case WaveType::SawtoothUp:
-		{
-			Wave::GetSawtoothUpWave(m_Wave, m_WaveSize, Audio::Stereo);
-			break;
-		}
+			case WaveType::SawtoothUp:
+			{
+				Wave::GetSawtoothUpWave(m_Wave, m_WaveSize, Audio::Stereo);
+				break;
+			}
 
-		case WaveType::SawtoothDown:
-		{
-			Wave::GetSawtoothDownWave(m_Wave, m_WaveSize, Audio::Stereo);
-			break;
-		}
+			case WaveType::SawtoothDown:
+			{
+				Wave::GetSawtoothDownWave(m_Wave, m_WaveSize, Audio::Stereo);
+				break;
+			}
 
-		case WaveType::Triangle:
-		{
-			Wave::GetTriangleWave(m_Wave, m_WaveSize, Audio::Stereo);
-			break;
-		}
+			case WaveType::Triangle:
+			{
+				Wave::GetTriangleWave(m_Wave, m_WaveSize, Audio::Stereo);
+				break;
+			}
 
-		case WaveType::Square:
-		{
-			Wave::GetSquareWave(m_Wave, m_WaveSize, Audio::Stereo, m_DutyCycle);
-			break;
-		}
+			case WaveType::Square:
+			{
+				Wave::GetSquareWave(m_Wave, m_WaveSize, Audio::Stereo, m_DutyCycle);
+				break;
+			}
 
 		}
 	}

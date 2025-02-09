@@ -1254,6 +1254,11 @@ namespace Exampler {
 				break;
 			}
 
+			default:
+			{
+				break;
+			}
+
 		}
 
 		float* LFOFreq1 = &(m_SynthParams->engineParams->voiceParams->LFOParams1->hertz);
@@ -1494,35 +1499,40 @@ namespace Exampler {
 		switch (*waveIndex)
 		{
 
-		case (s_SinIndex):
-		{
-			*wave = BackBeat::WaveType::Sin;
-			break;
-		}
+			case (s_SinIndex):
+			{
+				*wave = BackBeat::WaveType::Sin;
+				break;
+			}
 
-		case (s_TriangleIndex):
-		{
-			*wave = BackBeat::WaveType::Triangle;
-			break;
-		}
+			case (s_TriangleIndex):
+			{
+				*wave = BackBeat::WaveType::Triangle;
+				break;
+			}
 
-		case (s_SquareIndex):
-		{
-			*wave = BackBeat::WaveType::Square;
-			break;
-		}
+			case (s_SquareIndex):
+			{
+				*wave = BackBeat::WaveType::Square;
+				break;
+			}
 
-		case (s_SawtoothUpIndex):
-		{
-			*wave = BackBeat::WaveType::SawtoothUp;
-			break;
-		}
+			case (s_SawtoothUpIndex):
+			{
+				*wave = BackBeat::WaveType::SawtoothUp;
+				break;
+			}
 
-		case (s_SawtoothDownIndex):
-		{
-			*wave = BackBeat::WaveType::SawtoothDown;
-			break;
-		}
+			case (s_SawtoothDownIndex):
+			{
+				*wave = BackBeat::WaveType::SawtoothDown;
+				break;
+			}
+
+			default:
+			{
+				break;
+			}
 
 		}
 

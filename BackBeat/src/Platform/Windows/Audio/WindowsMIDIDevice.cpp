@@ -23,59 +23,59 @@ namespace BackBeat {
 		switch (msg)
 		{
 
-		case (MIM_CLOSE):
-		{
-			break;
-		}
+			case (MIM_CLOSE):
+			{
+				break;
+			}
 
-		case (MIM_DATA):
-		{
-			device->MIDIInput(param1, param2);
-			break;
-		}
+			case (MIM_DATA):
+			{
+				device->MIDIInput(param1, param2);
+				break;
+			}
 
-		case (MIM_ERROR):
-		{
-			// When error occurs from the MIDI input device
-			// param1 = dwMidiMessage - Error message in two bytes, High: 2nd part, Low: 1st part
-			// param2 = dwTimestamp   - Time error occured from midiInStart()
-			break;
-		}
+			case (MIM_ERROR):
+			{
+				// When error occurs from the MIDI input device
+				// param1 = dwMidiMessage - Error message in two bytes, High: 2nd part, Low: 1st part
+				// param2 = dwTimestamp   - Time error occured from midiInStart()
+				break;
+			}
 
-		// NOTE: System exclusive messages not implemented currently
-		case (MIM_LONGDATA):
-		{
-			// System exclusive message that is processed in given buffer by midiInAddBuffer() by instance
-			// param1 = (DWORD) lpMidiHdr - Header to the input buffer with the message
-			// param2 = dwTimestamp
-			break;
-		}
-		case (MIM_LONGERROR):
-		{
-			// Incomplete or invalid system-exclusive method
-			// param1 = (DWORD) lpMidiHdr - Header to the input buffer with the error message
-			// param2 = dwTimestamp
-			break;
-		}
+			// NOTE: System exclusive messages not implemented currently
+			case (MIM_LONGDATA):
+			{
+				// System exclusive message that is processed in given buffer by midiInAddBuffer() by instance
+				// param1 = (DWORD) lpMidiHdr - Header to the input buffer with the message
+				// param2 = dwTimestamp
+				break;
+			}
+			case (MIM_LONGERROR):
+			{
+				// Incomplete or invalid system-exclusive method
+				// param1 = (DWORD) lpMidiHdr - Header to the input buffer with the error message
+				// param2 = dwTimestamp
+				break;
+			}
 
-		case (MIM_MOREDATA):
-		{
-			// Application is not processing MIDI data fast enough
-			// NOTE: Only is called when app specifies MIDI_IO_STATUS in the call to the midiInOpen()
-			//       Params same as MIM_DATA
-			device->MIDIInput(param1, param2);
-			break;
-		}
+			case (MIM_MOREDATA):
+			{
+				// Application is not processing MIDI data fast enough
+				// NOTE: Only is called when app specifies MIDI_IO_STATUS in the call to the midiInOpen()
+				//       Params same as MIM_DATA
+				device->MIDIInput(param1, param2);
+				break;
+			}
 
-		case (MIM_OPEN):
-		{
-			break;
-		}
+			case (MIM_OPEN):
+			{
+				break;
+			}
 
-		default:
-		{
-			break;
-		}
+			default:
+			{
+				break;
+			}
 
 		}
 	};

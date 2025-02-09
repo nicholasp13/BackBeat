@@ -71,44 +71,44 @@ namespace BackBeat {
 					switch (m_State)
 					{
 
-					case EGState::Attack:
-					{
-						m_Value += m_AttackIncrement;
-						if (m_Value >= 1.0f)
+						case EGState::Attack:
 						{
-							m_Value = 1.0f;
-							m_State = EGState::Decay;
+							m_Value += m_AttackIncrement;
+							if (m_Value >= 1.0f)
+							{
+								m_Value = 1.0f;
+								m_State = EGState::Decay;
+							}
+							break;
 						}
-						break;
-					}
 
-					case EGState::Decay:
-					{
-						m_Value -= m_DecayDecrement;
-						if (m_Value <= m_SustainValue)
+						case EGState::Decay:
+						{
+							m_Value -= m_DecayDecrement;
+							if (m_Value <= m_SustainValue)
+							{
+								m_Value = m_SustainValue;
+								m_State = EGState::Sustain;
+							}
+							break;
+						}
+
+						case EGState::Sustain:
 						{
 							m_Value = m_SustainValue;
-							m_State = EGState::Sustain;
+							break;
 						}
-						break;
-					}
 
-					case EGState::Sustain:
-					{
-						m_Value = m_SustainValue;
-						break;
-					}
-
-					case EGState::Release:
-					{
-						m_Value -= m_ReleaseDecrement;
-						if (m_Value <= 0)
+						case EGState::Release:
 						{
-							m_Value = 0;
-							m_State = EGState::Off;
+							m_Value -= m_ReleaseDecrement;
+							if (m_Value <= 0)
+							{
+								m_Value = 0;
+								m_State = EGState::Off;
+							}
+							break;
 						}
-						break;
-					}
 
 					}
 				}

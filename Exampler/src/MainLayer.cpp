@@ -69,20 +69,25 @@ namespace Exampler {
 		switch (m_State)
 		{
 
-		case AppState::Start:
-		{
-			break;
-		}
-
-		case AppState::Play:
-		{
-			for (auto itr = m_Entities.begin(); itr != m_Entities.end(); itr++)
+			case AppState::Start:
 			{
-				(*itr)->Update();
+				break;
 			}
-			m_Visualizer->Update();
-			break;
-		}
+
+			case AppState::Play:
+			{
+				for (auto itr = m_Entities.begin(); itr != m_Entities.end(); itr++)
+				{
+					(*itr)->Update();
+				}
+				m_Visualizer->Update();
+				break;
+			}
+
+			default:
+			{
+				break;
+			}
 
 		}
 	}
@@ -92,19 +97,24 @@ namespace Exampler {
 		switch (m_State)
 		{
 
-		case AppState::Start:
-		{
-			break;
-		}
-
-		case AppState::Play:
-		{
-			for (auto itr = m_Entities.begin(); itr != m_Entities.end(); itr++)
+			case AppState::Start:
 			{
-				(*itr)->OnEvent(event);
+				break;
 			}
-			break;
-		}
+
+			case AppState::Play:
+			{
+				for (auto itr = m_Entities.begin(); itr != m_Entities.end(); itr++)
+				{
+					(*itr)->OnEvent(event);
+				}
+				break;
+			}
+
+			default:
+			{
+				break;
+			}
 
 		}
 
@@ -858,32 +868,41 @@ namespace Exampler {
 
 		switch (m_EtyToDelete->GetType())
 		{
-		case EntityType::none:
-		{
-			break;
-		}
-		case EntityType::synth:
-		{
-			m_NumSynths--;
-			break;
-		}
-		case EntityType::sampler:
-		{
-			m_NumSamplers--;
-			break;
-		}
-		case EntityType::playback:
-		{
-			m_NumPlayback--;
-			break;
-		}
-		case EntityType::recording:
-		{
-			m_NumRecorders--;
-			break;
-		}
-		default:
-			break;
+		
+			case EntityType::none:
+			{
+				break;
+			}
+
+			case EntityType::synth:
+			{
+				m_NumSynths--;
+				break;
+			}
+
+			case EntityType::sampler:
+			{
+				m_NumSamplers--;
+				break;
+			}
+
+			case EntityType::playback:
+			{
+				m_NumPlayback--;
+				break;
+			}
+
+			case EntityType::recording:
+			{
+				m_NumRecorders--;
+				break;
+			}
+
+			default:
+			{
+				break;
+			}
+
 		}
 
 		m_EtyToDelete = nullptr;
@@ -952,29 +971,29 @@ namespace Exampler {
 		switch (m_State)
 		{
 		
-		case AppState::Start:
-		{
-			m_State = AppState::Play;
-			break;
-		}
+			case AppState::Start:
+			{
+				m_State = AppState::Play;
+				break;
+			}
 		
-		case AppState::Play:
-		{
-			ClearEntities();
-			break;
-		}
+			case AppState::Play:
+			{
+				ClearEntities();
+				break;
+			}
 
-		case AppState::SelectProject:
-		{
-			ClearEntities();
-			m_State = AppState::Play;
-			break;
-		}
+			case AppState::SelectProject:
+			{
+				ClearEntities();
+				m_State = AppState::Play;
+				break;
+			}
 
-		default:
-		{
-			break;
-		}
+			default:
+			{
+				break;
+			}
 
 		}
 
