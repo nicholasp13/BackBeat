@@ -13,3 +13,6 @@
 [submodule "BackBeat/vendor/pugixml"]
 	path = BackBeat/vendor/pugixml
 	url = https://github.com/nicholasp13/pugixml.git
+[submodule "BackBeat/vendor/imgui-knobs"]
+	path = BackBeat/vendor/imgui-knobs
+	url = https://github.com/nicholasp13/imgui-knobs.git

@@ -9,9 +9,11 @@ namespace BackBeat {
 		m_SampleRate(sampleRate),
 		m_Buffer(buffer),
 		m_WaveSize(sampleRate),
-		m_Position(0),
 		m_Amp(1.0f),
 		m_Hertz(0.0f),
+		m_DutyCycle(SynthBase::WaveDutyCyleDefault),
+		m_FloatPos(0.0f),
+		m_Increment(1.0f),
 		m_WaveType(params->wave),
 		m_Wave(new float[s_BufferSize]),
 		m_ModInput(std::make_unique<Modulator>(sampleRate)),
@@ -28,31 +30,39 @@ namespace BackBeat {
 
 	void WaveOscCore::Reset(unsigned int sampleRate)
 	{
-		m_Position = 0;
+		m_FloatPos = 0.0f;
 	}
 
 	void WaveOscCore::Update()
 	{
+		auto modInput = m_ModInput->GetBuffer();
 		m_Amp = m_Params->amp;
+		
+		float pitchShiftCents = m_Params->detune + modInput[0] * SynthBase::LFOModToPitchMax;
+		float pitchShift = powf(2.0f, pitchShiftCents / Audio::CentsPerOctave);
+		m_Increment = pitchShift;
+		
 		if (m_WaveType != m_Params->wave)
 			InitWave();
 	}
 	
-	// NOTE: FM Synthesis implementation is only roughly estimated and might not fully recreate the exact sound effect of
-	//       FM Synthesis. Code subject to change.
 	void WaveOscCore::Render(unsigned int numSamples)
 	{
 		Update();
 
-		auto modInput = m_ModInput->GetBuffer();
-		int offset = 0;
-		int position = m_Position;
-		
-		for (unsigned int i = 0; i < numSamples * Audio::Stereo; i++) {
-			offset = (int)ceil(modInput[i]) * Audio::Stereo;
-			position = (m_Position + offset) % m_WaveSize;
-			m_Buffer[i] += (m_Wave[position] * m_Amp);
-			m_Position = (m_Position + 1) % (m_WaveSize);
+		unsigned int position = 0;
+		for (unsigned int i = 0; i < numSamples * Audio::Stereo; i+= Audio::Stereo)
+		{
+			for (unsigned int j = 0; j < Audio::Stereo; j++)
+			{
+				if (m_FloatPos + (float)j >= (float)m_WaveSize)
+					m_FloatPos = m_FloatPos - (float)m_WaveSize;
+
+				position = (unsigned int)floor(m_FloatPos) + j;
+				m_Buffer.get()[i + j] += (m_Wave.get()[position] * m_Amp);
+			}
+
+			m_FloatPos += m_Increment * Audio::Stereo;
 		}
 
 		m_ModInput->FlushBuffer(numSamples, 0.0f);
@@ -73,46 +83,46 @@ namespace BackBeat {
 	void WaveOscCore::InitWave()
 	{
 		float freq = m_Hertz * m_Params->octave;
-		if (freq > SynthBase::G9Frequency)
-			freq = SynthBase::G9Frequency;
-		else if (freq < SynthBase::CMinus1Frequency)
-			freq = SynthBase::CMinus1Frequency;
-		m_Position = 0;
+
+		Audio::Bound(freq, SynthBase::CMinus1Frequency, (float)m_SampleRate / 2.0f);
+
+		m_FloatPos = 0.0f;
 		m_WaveSize = (unsigned int)(m_SampleRate / freq);
+		m_DutyCycle = m_Params->dutyCycle;
 		m_WaveType = m_Params->wave;
 
 		switch(m_WaveType)
 		{
 
-		case WaveType::Sin:
-		{
-			Wave::GetSinWave(m_Wave, m_WaveSize, Audio::Stereo);
-			break;
-		}
+			case WaveType::Sin:
+			{
+				Wave::GetSinWave(m_Wave, m_WaveSize, Audio::Stereo);
+				break;
+			}
 
-		case WaveType::SawtoothUp:
-		{
-			Wave::GetSawtoothUpWave(m_Wave, m_WaveSize, Audio::Stereo);
-			break;
-		}
+			case WaveType::SawtoothUp:
+			{
+				Wave::GetSawtoothUpWave(m_Wave, m_WaveSize, Audio::Stereo);
+				break;
+			}
 
-		case WaveType::SawtoothDown:
-		{
-			Wave::GetSawtoothDownWave(m_Wave, m_WaveSize, Audio::Stereo);
-			break;
-		}
+			case WaveType::SawtoothDown:
+			{
+				Wave::GetSawtoothDownWave(m_Wave, m_WaveSize, Audio::Stereo);
+				break;
+			}
 
-		case WaveType::Triangle:
-		{
-			Wave::GetTriangleWave(m_Wave, m_WaveSize, Audio::Stereo);
-			break;
-		}
+			case WaveType::Triangle:
+			{
+				Wave::GetTriangleWave(m_Wave, m_WaveSize, Audio::Stereo);
+				break;
+			}
 
-		case WaveType::Square:
-		{
-			Wave::GetSquareWave(m_Wave, m_WaveSize, Audio::Stereo);
-			break;
-		}
+			case WaveType::Square:
+			{
+				Wave::GetSquareWave(m_Wave, m_WaveSize, Audio::Stereo, m_DutyCycle);
+				break;
+			}
 
 		}
 	}

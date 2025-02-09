@@ -16,11 +16,12 @@ The goal is to create an open source, simple DAW with the ability to easily cust
 - GUI using ImGui to fully control, add, and delete BackBeat objects during runtime
 - XML serialization to save and load any work done as projects
 ### Upcoming features:
-- WaveTable oscillators
-- Resonance and more advanced filters
-- A new synth
+- Add custom Sampler GUI pads that are clickable
+- Improve sampler splicer with zero crossing finder
+- Other GUI overhauls including for Sampler, AudioVisualizer, etc.
 ### Planned features:
 - Add more GUI controls like copy-paste, grabbing, selecting, deleting, etc. to BackBeat::ImGuiTimeline
+- WaveTable oscillators
 - More instruments like drumsets and other synths
 - Modular Matrix for interactive GUI implementation to customize synth sounds
 - Add downsampling and upsampling to support different sample rates (only 48k sample rate supported currently)

@@ -60,41 +60,41 @@ namespace BackBeat {
 			switch (props.bitDepth)
 			{
 
-			case (Audio::ByteBitSize):
-			{
-				byteSize = Audio::ByteByteSize;
-				break;
-			}
+				case (Audio::ByteBitSize):
+				{
+					byteSize = Audio::ByteByteSize;
+					break;
+				}
 
-			case (Audio::Int16BitSize):
-			{
-				byteSize = Audio::Int16ByteSize;
-				break;
-			}
+				case (Audio::Int16BitSize):
+				{
+					byteSize = Audio::Int16ByteSize;
+					break;
+				}
 
-			case (Audio::Int24BitSize):
-			{
-				byteSize = Audio::Int24ByteSize;
-				break;
-			}
+				case (Audio::Int24BitSize):
+				{
+					byteSize = Audio::Int24ByteSize;
+					break;
+				}
 
-			case (Audio::FloatBitSize):
-			{
-				byteSize = Audio::FloatByteSize;
-				break;
-			}
+				case (Audio::FloatBitSize):
+				{
+					byteSize = Audio::FloatByteSize;
+					break;
+				}
 
-			case (Audio::DoubleBitSize):
-			{
-				byteSize = Audio::DoubleByteSize;
-				break;
-			}
+				case (Audio::DoubleBitSize):
+				{
+					byteSize = Audio::DoubleByteSize;
+					break;
+				}
 
-			default:
-			{
-				BB_CORE_ERROR("Unsupported bit depth");
-				return false;
-			}
+				default:
+				{
+					BB_CORE_ERROR("Unsupported bit depth");
+					return false;
+				}
 
 			}
 
@@ -141,41 +141,41 @@ namespace BackBeat {
 		switch (inputProps.bitDepth)
 		{
 
-		case (Audio::ByteBitSize):
-		{
-			byteSize = Audio::ByteByteSize;
-			break;
-		}
+			case (Audio::ByteBitSize):
+			{
+				byteSize = Audio::ByteByteSize;
+				break;
+			}
 
-		case (Audio::Int16BitSize):
-		{
-			byteSize = Audio::Int16ByteSize;
-			break;
-		}
+			case (Audio::Int16BitSize):
+			{
+				byteSize = Audio::Int16ByteSize;
+				break;
+			}
 
-		case (Audio::Int24BitSize):
-		{
-			byteSize = Audio::Int24ByteSize;
-			break;
-		}
+			case (Audio::Int24BitSize):
+			{
+				byteSize = Audio::Int24ByteSize;
+				break;
+			}
 
-		case (Audio::FloatBitSize):
-		{
-			byteSize = Audio::FloatByteSize;
-			break;
-		}
+			case (Audio::FloatBitSize):
+			{
+				byteSize = Audio::FloatByteSize;
+				break;
+			}
 
-		case (Audio::DoubleBitSize):
-		{
-			byteSize = Audio::DoubleByteSize;
-			break;
-		}
+			case (Audio::DoubleBitSize):
+			{
+				byteSize = Audio::DoubleByteSize;
+				break;
+			}
 
-		default:
-		{
-			BB_CORE_ERROR("Unsupported bit depth");
-			return false;
-		}
+			default:
+			{
+				BB_CORE_ERROR("Unsupported bit depth");
+				return false;
+			}
 
 		}
 

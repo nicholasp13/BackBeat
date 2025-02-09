@@ -14,9 +14,9 @@
 #include "Entity/DummyEntity.h"
 namespace Exampler {
 
-	// Arbitrarily chosen but should be decided based on RAM size/ memory usage
+	// Arbitrarily chosen but should be decided based on RAM size / memory usage
 	constexpr unsigned int       // Memory:
-		MaxSynths = 2,           // ~90 mb
+		MaxSynths = 2,           // ~97 mb
 		MaxSamplers = 1,         // ~10 mb
 		MaxPlayback = 8,         //  ~0 mb
 		MaxRecordingDevices = 4; //  ~2 mb

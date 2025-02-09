@@ -54,7 +54,6 @@ namespace BackBeat {
 		byte data2;
 	};
 
-	// TODO: Add other members as needed for other MIDI data i.e. pitch modulation
 	struct NoteEvent {
 		bool noteOn;
 		int channel;
@@ -113,18 +112,21 @@ namespace BackBeat {
 	//       other than consolidation
 	namespace Audio {
 
+		// ----- CONSTANTS ----- //
+
 		// MISC CONSTANTS
-		constexpr unsigned int ByteBitSize   = 8;
-		constexpr unsigned int ByteByteSize  = 1;
-		constexpr unsigned int Int16BitSize  = 16;
-		constexpr unsigned int Int16ByteSize = 2;
-		constexpr unsigned int Int24BitSize  = 24;
-		constexpr unsigned int Int24ByteSize = 3;
-		constexpr unsigned int FloatBitSize  = 32;
-		constexpr unsigned int FloatByteSize = 4;
-		constexpr unsigned int DoubleBitSize = 64;
+		constexpr unsigned int ByteBitSize    = 8;
+		constexpr unsigned int ByteByteSize   = 1;
+		constexpr unsigned int Int16BitSize   = 16;
+		constexpr unsigned int Int16ByteSize  = 2;
+		constexpr unsigned int Int24BitSize   = 24;
+		constexpr unsigned int Int24ByteSize  = 3;
+		constexpr unsigned int FloatBitSize   = 32;
+		constexpr unsigned int FloatByteSize  = 4;
+		constexpr unsigned int DoubleBitSize  = 64;
 		constexpr unsigned int DoubleByteSize = 8;
-		constexpr float Int24Max             = 8388607.0f;
+		constexpr float Int24Max              = 8388607.0f;
+		constexpr float CentsPerOctave        = 1200.0f;
 
 		// AUDIOFILE CONSTANTS
 		constexpr unsigned int Mono                  = 1;
@@ -145,6 +147,14 @@ namespace BackBeat {
 		constexpr unsigned int SAMPLEDataSize        = 8;
 		constexpr unsigned int SAMPLETotalHeaderSize = 42;
 		const auto SAMPLE = "SAMPLE";
+
+		// ----- HELPER FUNCTIONS ----- //
+
+		inline static float Lerp(float a, float b, float fraction) { return ((b - a) * fraction + a); }
+
+		inline static float Bound(float value, float min, float max) { return (value < min) ? min : (value > max) ? max : value; }
+		
+		inline static void BoundValueUnipolar(float* value) { *value = Bound(*value, 0.0f, 1.0f); }
 
 		static unsigned short EndianConverterShort(char num1, char num2)
 		{
@@ -290,80 +300,80 @@ namespace BackBeat {
 			switch (bitDepth1)
 			{
 
-			case (ByteBitSize):
-			{
-				max1 = INT8_MAX;
-				break;
-			}
+				case (ByteBitSize):
+				{
+					max1 = INT8_MAX;
+					break;
+				}
 
-			case (Int16BitSize):
-			{
-				max1 = INT16_MAX;
-				break;
-			}
+				case (Int16BitSize):
+				{
+					max1 = INT16_MAX;
+					break;
+				}
 
-			case (Int24BitSize):
-			{
-				max1 = Int24Max;
-				break;
-			}
+				case (Int24BitSize):
+				{
+					max1 = Int24Max;
+					break;
+				}
 
-			case (FloatBitSize):
-			{
-				max1 = 1.0f;
-				break;
-			}
+				case (FloatBitSize):
+				{
+					max1 = 1.0f;
+					break;
+				}
 
-			case (DoubleBitSize):
-			{
-				max1 = 1.0f;
-				break;
-			}
+				case (DoubleBitSize):
+				{
+					max1 = 1.0f;
+					break;
+				}
 
-			default:
-			{
-				return 0.0f;
-			}
+				default:
+				{
+					return 0.0f;
+				}
 
 			}
 
 			switch (bitDepth2)
 			{
 
-			case (ByteBitSize):
-			{
-				max2 = INT8_MAX;
-				break;
-			}
+				case (ByteBitSize):
+				{
+					max2 = INT8_MAX;
+					break;
+				}
 
-			case (Int16BitSize):
-			{
-				max2 = INT16_MAX;
-				break;
-			}
+				case (Int16BitSize):
+				{
+					max2 = INT16_MAX;
+					break;
+				}
 
-			case (Int24BitSize):
-			{
-				max2 = Int24Max;
-				break;
-			}
+				case (Int24BitSize):
+				{
+					max2 = Int24Max;
+					break;
+				}
 
-			case (FloatBitSize):
-			{
-				max2 = 1.0f;
-				break;
-			}
+				case (FloatBitSize):
+				{
+					max2 = 1.0f;
+					break;
+				}
 
-			case (DoubleBitSize):
-			{
-				max2 = 1.0f;
-				break;
-			}
+				case (DoubleBitSize):
+				{
+					max2 = 1.0f;
+					break;
+				}
 
-			default:
-			{
-				return 0.0f;
-			}
+				default:
+				{
+					return 0.0f;
+				}
 
 			}
 
@@ -457,61 +467,79 @@ namespace BackBeat {
 			switch (props.bitDepth)
 			{
 
-			case (ByteBitSize):
-			{
-				for (unsigned int i = 0; i < numSamples; i++) {
-					buffer[i] = (byte)((float)(buffer[i]) * value);
-				}
-				break;
-			}
-
-			case (Int16BitSize):
-			{
-				auto shortbuffer = reinterpret_cast<signed short*>(buffer);
-				for (unsigned int i = 0; i < numSamples; i++) {
-					shortbuffer[i] = (signed short)((float)(shortbuffer[i]) * value);
-				}
-				break;
-			}
-
-			case (Int24BitSize):
-			{
-				int24* intBuffer = int24::GetInt24Buffer(buffer, numSamples, props.bigEndian);
-				for (unsigned int i = 0; i < numSamples; i++) {
-					intBuffer[i] = int24((float)intBuffer[i] * value);
+				case (ByteBitSize):
+				{
+					for (unsigned int i = 0; i < numSamples; i++) 
+					{
+						buffer[i] = (byte)((float)(buffer[i]) * value);
+					}
+					break;
 				}
 
-				byte* byteBuffer = int24::GetByteBuffer(intBuffer, numSamples, props.bigEndian);
-				Audio::CopyInputToOutput(buffer, byteBuffer, numSamples * Audio::Int24ByteSize);
-				delete[] intBuffer;
-				delete[] byteBuffer;
-				break;
-			}
-
-			case (FloatBitSize):
-			{
-				auto floatBuffer = reinterpret_cast<float*>(buffer);
-				for (unsigned int i = 0; i < numSamples; i++) {
-					floatBuffer[i] = floatBuffer[i] * value;
+				case (Int16BitSize):
+				{
+					auto shortbuffer = reinterpret_cast<signed short*>(buffer);
+					for (unsigned int i = 0; i < numSamples; i++) {
+						shortbuffer[i] = (signed short)((float)(shortbuffer[i]) * value);
+					}
+					break;
 				}
-				break;
-			}
 
-			case (DoubleBitSize):
-			{
-				auto doubleBuffer = reinterpret_cast<double*>(buffer);
-				for (unsigned int i = 0; i < numSamples; i++) {
-					doubleBuffer[i] = (double)(doubleBuffer[i] * value);
+				case (Int24BitSize):
+				{
+					int24* intBuffer = int24::GetInt24Buffer(buffer, numSamples, props.bigEndian);
+					for (unsigned int i = 0; i < numSamples; i++) 
+					{
+						intBuffer[i] = int24((float)intBuffer[i] * value);
+					}
+
+					byte* byteBuffer = int24::GetByteBuffer(intBuffer, numSamples, props.bigEndian);
+					Audio::CopyInputToOutput(buffer, byteBuffer, numSamples * Audio::Int24ByteSize);
+					delete[] intBuffer;
+					delete[] byteBuffer;
+					break;
 				}
-				break;
-			}
 
-			default:
-			{
-				return;
-			}
+				case (FloatBitSize):
+				{
+					auto floatBuffer = reinterpret_cast<float*>(buffer);
+					for (unsigned int i = 0; i < numSamples; i++) 
+					{
+						floatBuffer[i] = floatBuffer[i] * value;
+					}
+					break;
+				}
+
+				case (DoubleBitSize):
+				{
+					auto doubleBuffer = reinterpret_cast<double*>(buffer);
+					for (unsigned int i = 0; i < numSamples; i++) 
+					{
+						doubleBuffer[i] = (double)(doubleBuffer[i] * value);
+					}
+					break;
+				}
+
+				default:
+				{
+					return;
+				}
 
 			}
+		}
+
+		// Taken from Will Pirkle's SynthFunctions
+		// link: https://github.com/willpirkleaudio/SynthLab/blob/main/source/synthfunctions.h
+		static void CalculatePanValues(float pan, float* leftVal, float* rightVal)
+		{
+			const float piOverFour = 3.141592653589793f / 4.0f;
+				
+			//leftPanValue = cos((kPiOverFour)*(bipolarModulator + 1.0));
+			//rightPanValue = sin((kPiOverFour)*(bipolarModulator + 1.0));
+			*leftVal = cos(piOverFour * (pan + 1));
+			*rightVal = sin(piOverFour * (pan + 1));
+			BoundValueUnipolar(leftVal);
+			BoundValueUnipolar(rightVal);
 		}
 
 	}

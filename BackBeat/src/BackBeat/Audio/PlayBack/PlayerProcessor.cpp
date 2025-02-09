@@ -61,15 +61,15 @@ namespace BackBeat {
 		bool downSampling = m_Track->GetProps().sampleRate > sampleRate;
 		if (downSampling) 
 		{
-			// TODO: Implement downscaling by integer factor
-			//       1. Reduce high frequency noise using a low pass filter with a cutoff frequency of
-			//       2. Decimate by leaving only every Mth sample
+			// Implement downscaling by integer factor
+			//     1. Reduce high frequency noise using a low pass filter with a cutoff frequency of
+			//     2. Decimate by leaving only every Mth sample
 		}
 		else 
 		{
-			// TODO: Implement upsampling. 
-			//       1. Create a new sequence of xL[n] where x[n] is the original samples seperated by L - 1 zero samples
-			//       2. Fill zeros by passing through a low pass filter
+			// Implement upsampling. 
+			//     1. Create a new sequence of xL[n] where x[n] is the original samples seperated by L - 1 zero samples
+			//     2. Fill zeros by passing through a low pass filter
 		}
 
 		if (m_Track->IsDone())

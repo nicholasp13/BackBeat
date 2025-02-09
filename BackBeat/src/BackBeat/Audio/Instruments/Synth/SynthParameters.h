@@ -13,12 +13,13 @@
 //       either make the variables part of the class and keep them as pointers in the widgets, OR
 //       retest the old way but going into the debugger to see what happens to the atomic values)
 
-#include "BackBeat/Audio/Helpers/Wave.h"
+#include "BackBeat/Audio/Wave/Wave.h"
 namespace BackBeat {
 
 	// NOTE: Modular structs here temporarily as they are needed for the ModMatrix Parameters but
 	//       these will probably be put in another or new header file
-	enum ModSources {
+	enum ModSources 
+	{
 		SrcLFOsc1 = 0,
 		SrcLFOsc2 = 1,
 		SrcEG1 = 2,
@@ -61,23 +62,24 @@ namespace BackBeat {
 
 	struct EGParameters
 	{
+		bool tracking; // Note tracking means that EGS will scale decay time with the note 
+		               // i.e. the higher the note the faster the decay. This is common among synths
+		               // but some like the MiniMoog do not have tracking
 		float attackDuration;
 		float decayDuration;
 		float releaseDuration;
 		float sustainValue;
 	};
 
-	// TODO: 
-	//	Add pitch shifting by cents
-	//	Add panning to individual oscillators	
 	struct OscParameters
 	{
 		float amp;
 		float octave;
+		float dutyCycle;  // Only used for square wave
+		float detune;
 		WaveType wave;
 	};
 
-	// TODO: Add delay in LFO start
 	struct LFOParameters
 	{
 		float amp;
@@ -86,14 +88,31 @@ namespace BackBeat {
 		WaveType wave;
 	};
 
-	// TODO: Add resonance hz
 	struct FilterParameters
 	{
 		bool isOn;		// This will be controlled by Filter EG when implemented
 		float cutoff;	// Wave cutoff in hz
 	};
 
-	// TODO: Add params for multiple LFOs, filters, and other SynthModules as needed
+	struct LadderFilterParameters
+	{
+		bool isOn;
+		bool enableAutoLimiter; // Not currently in use
+		float cutoff;           // in hz
+		float Q;                // GUI resonance variable, range: 1.0 -> 10.0
+		float bassBoostPercent; // At 0 this acts as a regular filter
+	};
+
+	// Not currently used, may be needed for sound fx or to prevent ladder filters from self oscillating
+	struct DetectorParameters
+	{
+		bool detectDB;
+		bool clampToUnityMax;
+		int detectMode;
+		float attackTime;  // in ms
+		float releaseTime; // in ms
+	};
+
 	struct VoiceParameters
 	{
 		std::shared_ptr<DCAParameters> DCAParams;
@@ -104,7 +123,7 @@ namespace BackBeat {
 		std::shared_ptr<OscParameters> OscParams2;
 		std::shared_ptr<OscParameters> OscParams3;
 		std::shared_ptr<OscParameters> OscParams4;
-		std::shared_ptr<FilterParameters> LPFilterParams;
+		std::shared_ptr<LadderFilterParameters> LPLadderFilterParams;
 		std::shared_ptr<FilterParameters> HPFilterParams;
 		std::shared_ptr<ModMatrixParameters> ModMatrixParams;
 	};

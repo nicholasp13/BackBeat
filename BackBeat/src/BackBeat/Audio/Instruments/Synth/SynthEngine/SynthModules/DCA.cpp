@@ -6,6 +6,7 @@ namespace BackBeat {
 	DCA::DCA(unsigned int bufferSize, std::shared_ptr<float[]> buffer, std::shared_ptr<DCAParameters> params)
 		: 
 		m_Position(0),
+		m_BufferSize(bufferSize),
 		m_LeftAmp(params->leftAmp),
 		m_RightAmp(params->rightAmp),
 		m_Volume(1.0f),
@@ -14,7 +15,7 @@ namespace BackBeat {
 		m_ModInput(std::make_unique<Modulator>(bufferSize)),
 		m_Type(ModuleType::DCA)
 	{
-		m_ModInput->FlushBuffer(bufferSize / Audio::Stereo, 1.0f);
+		
 	}
 
 	DCA::~DCA()
@@ -40,7 +41,8 @@ namespace BackBeat {
 
 		std::shared_ptr<float[]> modulator = m_ModInput->GetBuffer();
 
-		for (unsigned int i = 0; i < numSamples * Audio::Stereo; i++) {
+		for (unsigned int i = 0; i < numSamples * Audio::Stereo; i++) 
+		{
 			if (i % 2 == 0) 
 			{
 				m_Buffer[i] *= m_LeftAmp * m_Volume * modulator[i] / SynthBase::NumOscillators;
@@ -56,7 +58,7 @@ namespace BackBeat {
 	
 	void DCA::DoNoteOn(NoteEvent event) 
 	{
-
+		m_ModInput->FlushBuffer(m_BufferSize / Audio::Stereo, 1.0f);
 	}
 	
 	void DCA::DoNoteOff(NoteEvent event)

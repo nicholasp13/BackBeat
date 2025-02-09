@@ -1,7 +1,5 @@
 #include "bbpch.h"
 
-// TODO: Make a Read and Write position instead of just a single m_Position
-
 #include "MappedTrack.h"
 namespace BackBeat {
 

@@ -22,6 +22,7 @@ namespace BackBeat {
 
 	private:
 		unsigned int m_Position;
+		unsigned int m_BufferSize;
 		float m_LeftAmp;
 		float m_RightAmp;
 		float m_Volume;
@@ -29,6 +30,7 @@ namespace BackBeat {
 		std::shared_ptr<DCAParameters> m_Params;
 		std::shared_ptr<float[]> m_Buffer;
 		std::unique_ptr<Modulator> m_ModInput;
+
 		ModuleType m_Type;
 	};
 }

@@ -22,7 +22,7 @@
 */
 
 // ------------------------------------------------------------------------------- //
-// TODO:
+//                             FUTURE FEATURES:
 // - Create SynthModule Modulation Matrix that has access to EnvelopeGenerators(EGs), 
 //       Low Frequency Oscillators(LFOs), and filters to allow for personal
 //       customizable sounds
@@ -33,16 +33,11 @@
 //	     for volume
 // - Create nonlinear EGs
 // - Create other types of oscillators or wave types
-// - Add resonance to filters
 // - Upgrade to MMA DLS level 2
 // - Create method for voice stealing ("stealing" a SynthVoice object already playing 
 //       a note to to play a new note on that voice when all voices are active)
 // - Reimplement memory by changing most pointers/objects into stack allocation 
 //       for improved performance. NOTE: Not necessary but good practice
-// 
-// NOTE: ModularMatrix on backburner until at least MIDI input devices,
-//       multiple audio formats are supported, and string names are added to
-//       ModuleCores
 // ------------------------------------------------------------------------------- //
 #include "SynthBase.h"
 #include "BackBeat/Audio/Audio.h"

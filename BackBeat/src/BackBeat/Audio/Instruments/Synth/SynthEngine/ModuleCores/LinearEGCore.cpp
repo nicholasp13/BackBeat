@@ -38,32 +38,21 @@ namespace BackBeat {
 		float decayDuration = m_Params->decayDuration * m_ScalarNote;
 		float releaseDuration = m_Params->releaseDuration;
 		m_SustainValue = m_Params->sustainValue;
+		
 		if (attackDuration <= 0) 
-		{
 			m_AttackIncrement = 1.0f;
-		}
 		else 
-		{
 			m_AttackIncrement = 1.0f / m_SampleRate / attackDuration;
-		}
 
 		if (decayDuration <= 0) 
-		{
 			m_DecayDecrement = 1.0f - m_SustainValue;
-		}
 		else 
-		{
 			m_DecayDecrement = (1.0f - m_SustainValue) / m_SampleRate / decayDuration;
-		}
 
 		if (releaseDuration <= 0) 
-		{
 			m_ReleaseDecrement = 1.0f;
-		}
 		else 
-		{
 			m_ReleaseDecrement = 1.0f / m_SampleRate / releaseDuration;
-		}
 	}
 
 	void LinearEGCore::Render(unsigned int numSamples)
@@ -82,83 +71,86 @@ namespace BackBeat {
 					switch (m_State)
 					{
 
-					case EGState::Attack:
-					{
-						m_Value += m_AttackIncrement;
-						if (m_Value >= 1.0f)
+						case EGState::Attack:
 						{
-							m_Value = 1.0f;
-							m_State = EGState::Decay;
+							m_Value += m_AttackIncrement;
+							if (m_Value >= 1.0f)
+							{
+								m_Value = 1.0f;
+								m_State = EGState::Decay;
+							}
+							break;
 						}
-						break;
-					}
 
-					case EGState::Decay:
-					{
-						m_Value -= m_DecayDecrement;
-						if (m_Value <= m_SustainValue)
+						case EGState::Decay:
+						{
+							m_Value -= m_DecayDecrement;
+							if (m_Value <= m_SustainValue)
+							{
+								m_Value = m_SustainValue;
+								m_State = EGState::Sustain;
+							}
+							break;
+						}
+
+						case EGState::Sustain:
 						{
 							m_Value = m_SustainValue;
-							m_State = EGState::Sustain;
+							break;
 						}
-						break;
-					}
 
-					case EGState::Sustain:
-					{
-						m_Value = m_SustainValue;
-						break;
-					}
-
-					case EGState::Release:
-					{
-						m_Value -= m_ReleaseDecrement;
-						if (m_Value <= 0)
+						case EGState::Release:
 						{
-							m_Value = 0;
-							m_State = EGState::Off;
+							m_Value -= m_ReleaseDecrement;
+							if (m_Value <= 0)
+							{
+								m_Value = 0;
+								m_State = EGState::Off;
+							}
+							break;
 						}
-						break;
-					}
 
 					}
 				}
-				outputBuffer[i + j] = m_Value;
+				outputBuffer.get()[i + j] = m_Value;
 			}
 		}
 	}
 
 	void LinearEGCore::DoNoteOn(NoteEvent event) 
 	{
-		m_ScalarNote = 1.0f - ((float)event.midiNote / 127.0f);
+		m_ScalarNote = 1.0f;
+		if (m_Params->tracking) 
+			m_ScalarNote -= ((float)event.midiNote / 127.0f);
+
 		m_ScalarVelocity = 1.0f - ((float)event.velocity / 127.0f);
+
 		float attackDuration = m_Params->attackDuration * m_ScalarVelocity;
 		float decayDuration = m_Params->decayDuration * m_ScalarNote;
 		float releaseDuration = m_Params->releaseDuration;
 		m_SustainValue = m_Params->sustainValue;
 
-		if (attackDuration <= 0.0f) {
+		if (attackDuration <= 0.0f) 
+		{
 			m_AttackIncrement = 1.0f;
 			m_Value = 1.0f;
 		} 
-		else {
+		else
+		{
 			m_AttackIncrement = 1.0f / m_SampleRate / attackDuration;
 			m_Value = -1.0f * m_AttackIncrement;
 		}
 		
-		if (decayDuration <= 0.0f) {
+		if (decayDuration <= 0.0f) 
 			m_DecayDecrement = 1.0f - m_SustainValue;
-		}
-		else {
+		else
 			m_DecayDecrement = (1.0f - m_SustainValue) / m_SampleRate / decayDuration;
-		}
 		
-		if (releaseDuration <= 0.0f) {
+		if (releaseDuration <= 0.0f)
 			m_ReleaseDecrement = m_SustainValue;
-		}
-		else {
+		else
 			m_ReleaseDecrement = m_SustainValue / m_SampleRate / releaseDuration;
-		}
+
 
 		m_State = EGState::Attack;
 	}

@@ -149,7 +149,7 @@ namespace BackBeat {
 			}
 		}
 		
-		// TODO: Add switch cases for other status bytes
+		// Add switch cases for other status bytes as needed
 	}
 	
 	// Custom for each engine. Current engine for a basic synth piano
@@ -170,12 +170,14 @@ namespace BackBeat {
 		DCAParams->volume = 1.0f;
 
 		auto AmpEGParams = std::make_shared<EGParameters>();
+		AmpEGParams->tracking = true;
 		AmpEGParams->attackDuration = SynthBase::EG1AttackTimeDefault;
 		AmpEGParams->decayDuration = SynthBase::EG1DecayTimeDefault;
 		AmpEGParams->releaseDuration = SynthBase::EG1ReleaseTimeDefault;
 		AmpEGParams->sustainValue = SynthBase::EG1SustainLevelDefault;
 		
 		auto EGParams = std::make_shared<EGParameters>();
+		EGParams->tracking = true;
 		EGParams->attackDuration = SynthBase::EG1AttackTimeDefault;
 		EGParams->decayDuration = SynthBase::EG1DecayTimeDefault;
 		EGParams->releaseDuration = SynthBase::EG1ReleaseTimeDefault;
@@ -184,32 +186,43 @@ namespace BackBeat {
 		auto LFOParams1 = std::make_shared<LFOParameters>();
 		LFOParams1->amp = SynthBase::LFOAttentuationDefault;
 		LFOParams1->hertz = SynthBase::LFOFrequencyDefault;
-		LFOParams1->delay = SynthBase::LFOMinDelay;
+		LFOParams1->delay = SynthBase::LFODelayMin;
 		LFOParams1->wave = WaveType::Sin;
 
 		auto OSCParams1 = std::make_shared<OscParameters>();
 		OSCParams1->amp = 1.0f;
-		OSCParams1->octave = 1.0f; 
+		OSCParams1->octave = SynthBase::WaveOctaveDefault;
+		OSCParams1->dutyCycle = SynthBase::WaveDutyCyleDefault;
+		OSCParams1->detune = SynthBase::WaveDetuneDefault;
 		OSCParams1->wave = WaveType::SawtoothUp;
 
 		auto OSCParams2 = std::make_shared<OscParameters>();
 		OSCParams2->amp = 0.0f;
-		OSCParams2->octave = 1.0f;
+		OSCParams2->octave = SynthBase::WaveOctaveDefault;
+		OSCParams2->dutyCycle = SynthBase::WaveDutyCyleDefault;
+		OSCParams2->detune = SynthBase::WaveDetuneDefault;
 		OSCParams2->wave = WaveType::SawtoothUp;
 
 		auto OSCParams3 = std::make_shared<OscParameters>();
 		OSCParams3->amp = 0.0f;
-		OSCParams3->octave = 1.0f;
+		OSCParams3->octave = SynthBase::WaveOctaveDefault;
+		OSCParams3->dutyCycle = SynthBase::WaveDutyCyleDefault;
+		OSCParams3->detune = SynthBase::WaveDetuneDefault;
 		OSCParams3->wave = WaveType::SawtoothUp;
 
 		auto OSCParams4 = std::make_shared<OscParameters>();
 		OSCParams4->amp = 0.0f;
-		OSCParams4->octave = 1.0f;
+		OSCParams4->octave = SynthBase::WaveOctaveDefault;
+		OSCParams4->dutyCycle = SynthBase::WaveDutyCyleDefault;
+		OSCParams4->detune = SynthBase::WaveDetuneDefault;
 		OSCParams4->wave = WaveType::SawtoothUp;
 
-		auto LPFilterParams = std::make_shared<FilterParameters>();
-		LPFilterParams->isOn = false;
-		LPFilterParams->cutoff = SynthBase::FilterCutoffMax;
+		auto LPLadderFilterParams = std::make_shared<LadderFilterParameters>();
+		LPLadderFilterParams->isOn = false;
+		LPLadderFilterParams->enableAutoLimiter = false;
+		LPLadderFilterParams->cutoff = SynthBase::FilterCutoffMax;
+		LPLadderFilterParams->Q = SynthBase::LadderFilterQDefault;
+		LPLadderFilterParams->bassBoostPercent = SynthBase::LadderFilterBassBoostDefault;
 
 		auto HPFilterParams = std::make_shared<FilterParameters>();
 		HPFilterParams->isOn = false;
@@ -226,7 +239,7 @@ namespace BackBeat {
 		voiceParams->OscParams2 = OSCParams2;
 		voiceParams->OscParams3 = OSCParams3;
 		voiceParams->OscParams4 = OSCParams4;
-		voiceParams->LPFilterParams = LPFilterParams;
+		voiceParams->LPLadderFilterParams = LPLadderFilterParams;
 		voiceParams->HPFilterParams = HPFilterParams;
 		voiceParams->ModMatrixParams = modMatrixParams;
 

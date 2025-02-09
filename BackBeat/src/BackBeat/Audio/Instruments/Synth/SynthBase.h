@@ -46,8 +46,8 @@ namespace BackBeat {
 		// Website: https://midi.org/dls
 		// Specification level 1
 		// LFOs
-		constexpr float LFOMinDelay                 = 0.1f; // in seconds
-		constexpr float LFOMaxDelay                 = 10.0f;
+		constexpr float LFODelayMin                 = 0.1f; // in seconds
+		constexpr float LFODelayMax                 = 10.0f;
 		constexpr float LFOFrequencyDefault         = 5.0f;
 		constexpr float LFOFrequencyMin             = 0.1f;
 		constexpr float LFOFrequencyMax             = 10.0f;
@@ -105,7 +105,7 @@ namespace BackBeat {
 		constexpr float EG2ToPitchMin              = -1200.0f;
 		constexpr float EG2ToPitchMax              = 1200.0f;
 		// DCA
-		constexpr float AmpDefault    = 0.50; // NOTE: This should be 0.70 when pan is implemented properly with a nonlinear scale
+		constexpr float AmpDefault    = 0.70f;
 		constexpr float PanDefault    = 0.0f;
 		constexpr float PanMin        = -0.50f;
 		constexpr float PanMax        = 0.50f;
@@ -117,6 +117,29 @@ namespace BackBeat {
 		constexpr float FilterCutoffMin = 200.0f;      // Sample rate / 240
 		constexpr float FilterCutoffMax = 8000.0f;     // Sample rate / 6
 
+		// BackBeat default values
+		// WaveOsc
+		constexpr float WaveAmpDefault      = 0.0f;
+		constexpr float WaveOctaveDefault   = 1.0f;
+		constexpr float WaveDutyCyleDefault = 0.5f;
+		constexpr float WaveDutyCyleMin     = 0.0f; // Only half a cycle (50% or 0.50f) matters as it sounds
+		constexpr float WaveDutyCyleMax     = 1.0f; // the same i.e. .05 and 0.95 are the same audibly
+		constexpr float WaveDetuneDefault   = 0.0f; // In centz
+		constexpr float WaveDetuneMin       = -50.0f;
+		constexpr float WaveDetuneMax       = 50.0f;
+		// LPLadderFilter
+		// based off Will Pirkle's design for a ladder filter
+		// link: https://willpirkle.com/Downloads/Addendum_A1_Moog.pdf
+		constexpr float LadderFilterQDefault = 1.0f;
+		constexpr float LadderFilterQMin = 1.0f;
+		constexpr float LadderFilterQMax = 10.0f;
+		constexpr float LadderFilterBassBoostDefault = 0.0f;
+		constexpr float LadderFilterBassBoostMin = 0.0f;
+		constexpr float LadderFilterBassBoostMax = 100.0f;
+
+		// ------------------------------------------- //
+
+		// ---- HELPER FUNCTIONS ---- //
 
 		// Time should be in milliseconds
 		static unsigned int MsToSamples(float time, unsigned int sampleRate)

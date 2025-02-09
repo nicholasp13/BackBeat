@@ -1,5 +1,7 @@
 #pragma once
 
+// NOTE: DEPRECIATED use LowPassLadderFilter instead for the more interesting filter sound
+
 #include "BackBeat/Audio/Instruments/Synth/SynthEngine/ModuleCores/TPTLPFilterCore.h"
 #include "BackBeat/Audio/Instruments/Module.h"
 namespace BackBeat {

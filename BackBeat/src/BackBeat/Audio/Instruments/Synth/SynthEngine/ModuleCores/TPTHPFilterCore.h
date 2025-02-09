@@ -8,8 +8,6 @@
 *       Prewarping cutoff equation: m_CutoffFreq = tan(m_Params->cutoff / m_SampleRate / 2);
 */
 
-// TODO: Add resonance
-
 #include "BackBeat/Audio/Instruments/ModuleCore.h"
 namespace BackBeat {
 

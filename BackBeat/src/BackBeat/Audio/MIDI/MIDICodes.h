@@ -1,7 +1,8 @@
 #pragma once
 
 // -------- CONSTANTS FOR MIDI EVENTS --------- //
-// Website: https://midi.org/specifications/midi-reference-tables/
+// Links: https://midi.org/expanded-midi-1-0-messages-list
+//        https://midi.org/midi-1-0-control-change-messages
 
 namespace BackBeat
 {
@@ -12,6 +13,9 @@ namespace BackBeat
 	{
 			constexpr MIDICode
 				// ---- MIDI status ---- //
+
+				// FIRST BYTE MESSAGES
+
 				ChannelOff1 = 0x80,
 				ChannelOff2 = 0x81,
 				ChannelOff3 = 0x82,
@@ -46,9 +50,32 @@ namespace BackBeat
 				ChannelOn15 = 0x9E,
 				ChannelOn16 = 0x9F,
 
+				// Can be a control or mode message
+				ChannelControlMode1 = 0xB0,
+				ChannelControlMode2 = 0xB1,
+				ChannelControlMode3 = 0xB2,
+				ChannelControlMode4 = 0xB3,
+				ChannelControlMode5 = 0xB4,
+				ChannelControlMode6 = 0xB5,
+				ChannelControlMode7 = 0xB6,
+				ChannelControlMode8 = 0xB7,
+				ChannelControlMode9 = 0xB8,
+				ChannelControlMode10 = 0xB9,
+				ChannelControlMode11 = 0xBA,
+				ChannelControlMode12 = 0xBB,
+				ChannelControlMode13 = 0xBC,
+				ChannelControlMode14 = 0xBD,
+				ChannelControlMode15 = 0xBE,
+				ChannelControlMode16 = 0xBF,
+
 				Start = 0xFA,
 				Continue = 0xFB,
 				Stop = 0xFC,
+
+				// SECOND BYTE MESSAGES (CONTROL AND MODE CHANGES)
+
+				// Channel mode message
+				AllNotesOff = 0x7B, // Third byte is 0
 
 				// ---- MIDI notes ---- //
 				//	-1st octave (0-11)
