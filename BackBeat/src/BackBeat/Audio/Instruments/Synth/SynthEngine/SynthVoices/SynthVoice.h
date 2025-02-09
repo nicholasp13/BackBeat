@@ -49,9 +49,6 @@
 *       SynthParameters.h file (location subject to change) Function call order does not matter for all other functions.
 */
 
-// TODO:
-//  Implement ModularMatrix
-
 #include "BackBeat/Audio/Instruments/Module.h"
 #include "BackBeat/Audio/Instruments/Synth/SynthEngine/SynthModules/DCA.h"
 #include "BackBeat/Audio/Instruments/Synth/SynthEngine/SynthModules/WaveOscillator.h"

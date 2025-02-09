@@ -71,8 +71,6 @@ namespace BackBeat {
 		float sustainValue;
 	};
 
-	// TODO: 
-	//	Add panning to individual oscillators	
 	struct OscParameters
 	{
 		float amp;

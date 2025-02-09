@@ -17,6 +17,7 @@ include "BackBeat/vendor/Glad"
 include "BackBeat/vendor/imgui"
 include "BackBeat/vendor/lodepng"
 include "BackBeat/vendor/pugixml"
+include "BackBeat/vendor/imgui-knobs"
 
 project "BackBeat"
 	location "BackBeat"

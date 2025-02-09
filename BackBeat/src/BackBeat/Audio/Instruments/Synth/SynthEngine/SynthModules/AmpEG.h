@@ -3,8 +3,6 @@
 // Envelope Generator dedicated specifically to the DCA for envelope control of note amplitude
 // All voices have this EG and it is always routed to the DCA and cannot be changed
 
-// TODO: Allow for swapping to other EG cores when/if made
-
 #include "EnvelopeGenerator.h"
 namespace BackBeat {
 

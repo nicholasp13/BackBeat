@@ -22,9 +22,11 @@ namespace BackBeat {
 
 	private:
 		std::map<KeyCode, MIDIEvent> m_MIDIMap;
+		std::map<KeyCode, MIDIEvent> m_ReleaseMap;
 		std::shared_ptr<RenderInfo> m_RenderInfo;
 		std::shared_ptr<EventHandlerParameters> m_Params;
 
+	private:
 		void InitMIDIMap();
 		bool OnKeyPressed(KeyPressedEvent& event);
 		bool OnKeyReleased(KeyReleasedEvent& event);

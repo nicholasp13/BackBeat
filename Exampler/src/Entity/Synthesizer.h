@@ -5,6 +5,7 @@
 #include <backends/imgui_impl_opengl3.h>
 #include <backends/imgui_impl_glfw.h>
 #include <GLFW/glfw3.h>
+#include <imgui-knobs.h>
 
 #include "Entity.h"
 namespace Exampler {
@@ -50,13 +51,6 @@ namespace Exampler {
 		inline void SetRecordingPlayer(std::shared_ptr<BackBeat::Player> player) { m_RecordingPlayer = player; }
 
 	private:
-		static const int
-			s_SinIndex = 0,
-			s_TriangleIndex = 1,
-			s_SquareIndex = 2,
-			s_SawtoothUpIndex = 3,
-			s_SawtoothDownIndex = 4;
-
 		bool m_Open;
 		bool m_KeyboardActive;
 		std::string m_Name;
@@ -87,7 +81,18 @@ namespace Exampler {
 
 	private:
 		void RenderCanvasEntity();
-		unsigned int SetSynthColors();
+		void RenderMenubar();
+		void RenderGeneralControls();
+		void RenderVolumePanControls();
+		void RenderLFO();
+		void RenderFilters();
+		void RenderEGs();
+		void RenderOscs();
+		void RenderOsc(const char* label, int* octave, std::shared_ptr<BackBeat::OscParameters> params,
+			int* waveIndex, int* PWMIndex);
+
+		unsigned int SetCanvasColors();
+		unsigned int SetEntityColors();
 		void HelpMarker(const char* desc);
 
 		inline bool OnKeyEvent(BackBeat::KeyPressedEvent& event) { return false; }

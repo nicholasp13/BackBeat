@@ -38,6 +38,9 @@ namespace BackBeat {
 
 	void Application::Run()
 	{
+		// About 60 fps
+		auto sleepTime = std::chrono::nanoseconds(16666666);
+
 		while (m_Running)
 		{
 			for (Layer* layer : m_LayerStack)
@@ -51,6 +54,8 @@ namespace BackBeat {
 			m_ImGuiLayer->End();
 
 			m_Window->OnUpdate();
+
+			std::this_thread::sleep_for(sleepTime);
 		}
 	}
 

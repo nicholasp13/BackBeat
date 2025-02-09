@@ -46,8 +46,8 @@ namespace BackBeat {
 		// Website: https://midi.org/dls
 		// Specification level 1
 		// LFOs
-		constexpr float LFOMinDelay                 = 0.1f; // in seconds
-		constexpr float LFOMaxDelay                 = 10.0f;
+		constexpr float LFODelayMin                 = 0.1f; // in seconds
+		constexpr float LFODelayMax                 = 10.0f;
 		constexpr float LFOFrequencyDefault         = 5.0f;
 		constexpr float LFOFrequencyMin             = 0.1f;
 		constexpr float LFOFrequencyMax             = 10.0f;
@@ -105,7 +105,7 @@ namespace BackBeat {
 		constexpr float EG2ToPitchMin              = -1200.0f;
 		constexpr float EG2ToPitchMax              = 1200.0f;
 		// DCA
-		constexpr float AmpDefault    = 0.50; // NOTE: This should be 0.70 when pan is implemented properly with a nonlinear scale
+		constexpr float AmpDefault    = 0.70f;
 		constexpr float PanDefault    = 0.0f;
 		constexpr float PanMin        = -0.50f;
 		constexpr float PanMax        = 0.50f;

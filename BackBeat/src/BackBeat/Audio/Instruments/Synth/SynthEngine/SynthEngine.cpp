@@ -149,7 +149,7 @@ namespace BackBeat {
 			}
 		}
 		
-		// TODO: Add switch cases for other status bytes
+		// Add switch cases for other status bytes as needed
 	}
 	
 	// Custom for each engine. Current engine for a basic synth piano
@@ -186,7 +186,7 @@ namespace BackBeat {
 		auto LFOParams1 = std::make_shared<LFOParameters>();
 		LFOParams1->amp = SynthBase::LFOAttentuationDefault;
 		LFOParams1->hertz = SynthBase::LFOFrequencyDefault;
-		LFOParams1->delay = SynthBase::LFOMinDelay;
+		LFOParams1->delay = SynthBase::LFODelayMin;
 		LFOParams1->wave = WaveType::Sin;
 
 		auto OSCParams1 = std::make_shared<OscParameters>();

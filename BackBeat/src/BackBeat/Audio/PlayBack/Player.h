@@ -1,12 +1,8 @@
 #pragma once
 
-// TODO: Create upsamplers and downsamplers for support of other sample rates
-
 #include "TrackFactory.h"
 #include "PlayerProcessor.h"
 namespace BackBeat {
-
-	// NOTE: Tracklist / multiple tracks will be implemented later as needed
 
 	class Player
 	{
@@ -17,7 +13,7 @@ namespace BackBeat {
 		void Off();
 		void Start();
 		void Stop();
-		void Play();// { m_PlayerProcessor->On(); }
+		void Play();
 		void LoadTrack(std::string filePath);
 		void LoadTrack(std::shared_ptr<Track> track);
 		void ClearTrack();

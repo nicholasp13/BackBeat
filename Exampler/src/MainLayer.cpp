@@ -1,5 +1,4 @@
 // TODO: 
-//     - Fix Synth's entity render by importing ImGui knob library
 //     - Create panel class for Canvas and sampler pads
 //         - Create sample pads that are programmable through a right click and play with a left click and have a 
 //           simple blank look that might change colors when played

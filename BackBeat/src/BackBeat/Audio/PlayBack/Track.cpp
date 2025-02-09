@@ -22,7 +22,7 @@ namespace BackBeat {
 
 	}
 
-	// TODO: Implement endianness conversion if the track does not match the systems endianness
+	// Implement endianness conversion if the track does not match the systems endianness
 	bool Track::Read(byte* output, unsigned int numBytes) 
 	{
 		if (numBytes == 0)
@@ -65,7 +65,7 @@ namespace BackBeat {
 		if (Audio::IsBigEndian() == m_Info.props.bigEndian)
 			file.read((char*)output, bytesToRender);
 		else
-			return false; // TODO: Implement way to switch endianness of track data
+			return false; // Implement way to switch endianness of track data
 		
 		// Multiply output by the volume
 		Audio::MultiplyBufferByValue(output, bytesToRender, m_Info.props, m_Volume);
@@ -94,7 +94,7 @@ namespace BackBeat {
 		if (Audio::IsBigEndian() == m_Info.props.bigEndian)
 			file.write((char*)input, bytesToRender);
 		else
-			return false; // TODO: Implement way to switch endianness of track data
+			return false; // Implement way to switch endianness of track data
 
 		m_Info.dataSize += bytesToRender;
 		m_EndPosition += bytesToRender;

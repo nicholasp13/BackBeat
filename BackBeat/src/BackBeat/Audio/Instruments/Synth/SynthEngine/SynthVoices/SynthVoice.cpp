@@ -38,7 +38,7 @@ namespace BackBeat {
 		m_HPFilter->Reset(sampleRate);
 	}
 
-	// TODO: Implement after creating modulation matrix
+	// Implement after creating modulation matrix
 	void SynthVoice::Update()
 	{
 

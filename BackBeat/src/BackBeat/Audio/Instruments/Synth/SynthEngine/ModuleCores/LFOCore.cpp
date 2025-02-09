@@ -10,7 +10,7 @@ namespace BackBeat {
 		m_Position(0),
 		m_Amp(1.0f),
 		m_Hertz(0.0f),
-		m_Delay(SynthBase::LFOMinDelay),
+		m_Delay(SynthBase::LFODelayMin),
 		m_DelayCount(0),
 		m_WaveType(params->wave),
 		m_Type(ModuleType::WaveOscCore),
@@ -62,7 +62,7 @@ namespace BackBeat {
 				m_Position = (m_Position + 1) % (m_WaveSize);
 			}
 
-			if (m_DelayCount <= SynthBase::LFOMaxDelay * m_SampleRate * Audio::Stereo)
+			if (m_DelayCount <= SynthBase::LFODelayMax * m_SampleRate * Audio::Stereo)
 				m_DelayCount++;
 		}
 	}

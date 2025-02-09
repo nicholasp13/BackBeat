@@ -137,7 +137,7 @@ namespace BackBeat {
 				return false;
 			}
 
-			// TODO: Create way to deal with this error, possibly handled at the macro with a call to a Reset() function
+			// NOTE: Create way to deal with this error, possibly handled at the macro with a call to a Reset() function
 			// Windows API Function(s): 
 			// IMMDevice::Activate(), IAudioClient::GetMixFormat(), IAudioClient::GetDevicePeriod(),
 			// IAudioClient::Initialize(), IAudioClient::GetBufferSize(), IAudioClient::GetService(),

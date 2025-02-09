@@ -1,7 +1,5 @@
 #include "bbpch.h"
 
-// TODO: Complete after making mp3 decoder
-
 #include "BackBeat/Audio/Audio.h"
 #include "BackBeat/Core/Core.h"
 #include "AudioFileReader.h"

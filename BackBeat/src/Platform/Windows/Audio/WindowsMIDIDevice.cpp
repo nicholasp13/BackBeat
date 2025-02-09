@@ -2,7 +2,8 @@
 
 #include "MMSystem.h"
 
-// TODO: Create function(s) for MIDI messages and errors
+// Create function(s) for MIDI messages and errors as needed
+
 #include "BackBeat/Core/Timer.h"
 #include "WindowsMIDIDevice.h"
 namespace BackBeat {
