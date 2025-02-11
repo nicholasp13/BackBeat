@@ -19,6 +19,7 @@ namespace BackBeat {
 
 		inline void LoopOn() { m_Engine->LoopOn(m_Index); }
 		inline void LoopOff() { m_Engine->LoopOff(m_Index); }
+		inline bool IsActive() { return m_Engine->IsActive(m_Index); }
 		inline bool IsLooping() { return m_Engine->IsLooping(m_Index); }
 		inline std::string GetFilePath() { return m_FilePath; }
 		inline MIDICode GetNote() { return m_MIDINote; }

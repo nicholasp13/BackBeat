@@ -5,6 +5,7 @@
 #include <backends/imgui_impl_opengl3.h>
 #include <backends/imgui_impl_glfw.h>
 #include <GLFW/glfw3.h>
+#include <imgui-knobs.h>
 
 #include "Entity.h"
 namespace Exampler {
@@ -54,13 +55,18 @@ namespace Exampler {
 		inline void SetRecordingPlayer(std::shared_ptr<BackBeat::Player> player) { m_RecordingPlayer = player; }
 
 	private:
+		const float m_Width = 500.0f;
+		const float m_Height = m_Width + 38.0f; // Menu bar height and Window bar height is both 19 hence 38
+
 		bool m_Open;
 		bool m_KeyboardActive;
 		bool m_CreatingSample;
 		bool m_ProgrammingNote;
+		bool m_OpenPadControlsPopup;
 		unsigned int m_DevicesOpen;
 		unsigned int m_NumPads;
 		unsigned int m_PadToProgram; // This is the display Pad # not the actual index number, actual index is this - 1
+		unsigned int m_PadControlsToRender; // This is the display Pad # not the actual index number, actual index is this - 1
 		float m_TrackVolume;
 		std::string m_Name;
 
@@ -77,7 +83,12 @@ namespace Exampler {
 		void RenderSamplerPads();
 		void RenderSampleCreator();
 		void RenderNoteProgrammer();
-		unsigned int SetSamplerColors();
+		void RenderPadControls();
+		
+		unsigned int SetCanvasColors();
+		unsigned int SetEntityColors();
+		unsigned int SetPadColors();
+		unsigned int SetPadControlsColors();
 
 		inline bool OnKeyEvent(BackBeat::KeyPressedEvent& event) { return false; }
 		inline bool OnMouseButtonEvent(BackBeat::MouseButtonPressedEvent& event) { return false; }

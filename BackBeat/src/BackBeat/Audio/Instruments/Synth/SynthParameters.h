@@ -55,8 +55,7 @@ namespace BackBeat {
 
 	struct DCAParameters
 	{
-		float leftAmp;
-		float rightAmp;
+		float pan;
 		float volume;
 	};
 

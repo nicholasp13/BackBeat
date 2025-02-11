@@ -8,10 +8,6 @@ namespace Exampler {
 		s_SawtoothUpIndex = 3,
 		s_SawtoothDownIndex = 4;
 	static const float s_DummyHeight = 19.0f; // About the height of ImGui::Combo
-	static const float s_KnobSpeed = 0.0f;
-	static const char* s_KnobFormatFloat = "%.3f";
-	static const char* s_KnobFormatFloatFreq = "%.0f";
-	static const char* s_KnobFormatInt = "%i";
 	static const char* s_DutyCycles[] = { "10%", "25%", "40%", "50%" };
 	static const int s_NumDutyCycles = 4;
 	static const char* s_WaveTypes[] = { "Sin", "Triangle", "Square", "SawtoothUp", "SawtoothDown" };
@@ -1187,20 +1183,18 @@ namespace Exampler {
 	void Synthesizer::RenderVolumePanControls()
 	{
 		float* volume = &(m_SynthParams->engineParams->volume);
+		float* pan = &(m_SynthParams->engineParams->voiceParams->DCAParams->pan);
 		 
 		ImGui::SameLine();
 		ImGuiKnobs::Knob("Volume", volume, 0.0f, 1.0f, s_KnobSpeed, s_KnobFormatFloat, ImGuiKnobVariant_::ImGuiKnobVariant_Wiper);
 		
 		ImGui::SameLine();
 
-		ImGuiKnobs::Knob("Pan", &m_Pan, BackBeat::SynthBase::PanMin, BackBeat::SynthBase::PanMax,
+		ImGuiKnobs::Knob("Pan", pan, BackBeat::SynthBase::PanMin, BackBeat::SynthBase::PanMax,
 			s_KnobSpeed, s_KnobFormatFloat, ImGuiKnobVariant_::ImGuiKnobVariant_WiperDot);
 
 		if (ImGui::IsItemActive() && ImGui::IsMouseDoubleClicked(0)) 
-			m_Pan = 0.0f;
-
-		BackBeat::Audio::CalculatePanValues(m_Pan, &m_SynthParams->engineParams->voiceParams->DCAParams->leftAmp,
-			&m_SynthParams->engineParams->voiceParams->DCAParams->rightAmp);
+			*pan = 0.0f;
 
 		ImGui::Spacing();
 	}
@@ -1641,7 +1635,7 @@ namespace Exampler {
 
 		// Knobs colors
 		// Filled
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive, IM_COL32(41, 105, 232, 255)); count++;
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImGui::GetColorU32(ImGuiCol_SliderGrab)); count++;
 		// Filled (Hovered)
 		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, IM_COL32(0, 80, 255, 255)); count++;
 		// Track

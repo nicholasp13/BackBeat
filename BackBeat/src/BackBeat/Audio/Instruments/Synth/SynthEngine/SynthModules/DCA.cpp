@@ -7,8 +7,8 @@ namespace BackBeat {
 		: 
 		m_Position(0),
 		m_BufferSize(bufferSize),
-		m_LeftAmp(params->leftAmp),
-		m_RightAmp(params->rightAmp),
+		m_LeftAmp(SynthBase::AmpDefault),
+		m_RightAmp(SynthBase::AmpDefault),
 		m_Volume(1.0f),
 		m_Params(params),
 		m_Buffer(buffer),
@@ -30,8 +30,7 @@ namespace BackBeat {
 
 	void DCA::Update() 
 	{
-		m_LeftAmp = m_Params->leftAmp;
-		m_RightAmp = m_Params->rightAmp;
+		Audio::CalculatePanValues(m_Params->pan, &m_LeftAmp, &m_RightAmp);
 		m_Volume = m_Params->volume;
 	}
 	
@@ -44,13 +43,9 @@ namespace BackBeat {
 		for (unsigned int i = 0; i < numSamples * Audio::Stereo; i++) 
 		{
 			if (i % 2 == 0) 
-			{
 				m_Buffer[i] *= m_LeftAmp * m_Volume * modulator[i] / SynthBase::NumOscillators;
-			}
 			else 
-			{
 				m_Buffer[i] *= m_RightAmp * m_Volume * modulator[i] / SynthBase::NumOscillators;
-			}
 		}
 
 		m_ModInput->FlushBuffer(numSamples, 1.0f);

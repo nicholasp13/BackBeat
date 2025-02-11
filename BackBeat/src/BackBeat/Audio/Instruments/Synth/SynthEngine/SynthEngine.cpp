@@ -165,8 +165,7 @@ namespace BackBeat {
 	void SynthEngine::InitParameters() 
 	{
 		auto DCAParams = std::make_shared<DCAParameters>();
-		DCAParams->leftAmp = SynthBase::AmpDefault;
-		DCAParams->rightAmp = SynthBase::AmpDefault;
+		DCAParams->pan = SynthBase::PanDefault;
 		DCAParams->volume = 1.0f;
 
 		auto AmpEGParams = std::make_shared<EGParameters>();

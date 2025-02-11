@@ -1,4 +1,5 @@
-// TODO: - Create ImGui Pad widget and Pad control popup/window
+// TODO:
+//       - Make sample splicer its own Entity
 
 // NOTE: Current panning settings currently make the sample quieter compared to when the sample splicer makes them.
 
@@ -11,8 +12,10 @@ namespace Exampler {
 		m_KeyboardActive(true),
 		m_CreatingSample(false),
 		m_ProgrammingNote(false),
+		m_OpenPadControlsPopup(false),
 		m_DevicesOpen(0),
 		m_PadToProgram(0),
+		m_PadControlsToRender(0),
 		m_TrackVolume(1.0f),
 		m_RecordingPlayer(nullptr),
 		m_RecorderMgr(nullptr)
@@ -45,31 +48,32 @@ namespace Exampler {
 	void Sampler::ImGuiRender()
 	{
 		auto samplerID = m_Sampler.GetID();
-		unsigned int count = SetSamplerColors();
+		unsigned int count = SetCanvasColors();
 
 		ImGui::PushID(samplerID.ToString().c_str());
 
 		RenderCanvasEntity();
 
+		ImGui::PopStyleColor(count);
+
 		if (!m_Open)
 		{
-			ImGui::PopStyleColor(count);
 			ImGui::PopID();
 			return;
 		}
 
 		const ImGuiViewport* mainViewport = ImGui::GetMainViewport();
-		const float width = 1000.0f;
-		const float height = 600.0f;
 		float x = mainViewport->WorkPos.x;
 		float y = mainViewport->WorkPos.y;
 		ImGui::SetNextWindowPos(ImVec2(x, y), ImGuiCond_FirstUseEver);
-		ImGui::SetNextWindowSize(ImVec2(width, height), ImGuiCond_Once);
+		ImGui::SetNextWindowSize(ImVec2(m_Width, m_Height), ImGuiCond_Once);
 		// Sampler flags
 		ImGuiWindowFlags samplerWindowFlags = 0;
 		samplerWindowFlags |= ImGuiWindowFlags_NoCollapse;
 		samplerWindowFlags |= ImGuiWindowFlags_MenuBar;
 		samplerWindowFlags |= ImGuiWindowFlags_NoResize;
+
+		count = SetEntityColors();
 
 		// Creates a label ID for ImGui::Begin() that avoids collision to other ImGui::Begin() calls with the same name
 		const std::string hashDivider = "###";
@@ -81,6 +85,7 @@ namespace Exampler {
 		// PopUps
 		RenderSampleCreator();
 		RenderNoteProgrammer();
+		RenderPadControls();
 
 		ImGui::End();
 		ImGui::PopStyleColor(count);
@@ -401,6 +406,14 @@ namespace Exampler {
 								m_Sampler.GetProgrammer()->ProgramSample(i - 1);
 							}
 
+							ImGui::Separator();
+
+							if (ImGui::MenuItem("Open Pad Controls"))
+							{
+								m_OpenPadControlsPopup = true;
+								m_PadControlsToRender = i;
+							}
+
 							ImGui::EndMenu();
 						}
 					}
@@ -432,92 +445,87 @@ namespace Exampler {
 
 	}
 
-	// TODO: - Make each pad its own large square button/widget that left click plays the sample and right click opens
-	//         a menu to program the pad
 	void Sampler::RenderSamplerPads()
 	{
+		ImGuiWindow* window = ImGui::GetCurrentWindow();
 		auto sampleProgrammer = m_Sampler.GetProgrammer();
 		const unsigned int charLimit = 80;
-		static char sampleNameLabel[charLimit];
-		static std::string sampleName = "";
-		static char padNameLable[charLimit];
-		static char loopID[charLimit];
-		int padCode = 0;
+		const unsigned int padsPerRow = 4;
+		int colorCount = 0;
+		char padNameLable[charLimit] = {};
+		char popupNameLabel[charLimit] = {};
+		std::shared_ptr<BackBeat::SamplerPad> pad = nullptr;
 
-		ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing();
+		colorCount = SetPadColors();
 
-		static ImGuiTableFlags tableFlags = 0;
-		tableFlags |= ImGuiTableFlags_RowBg;
-		tableFlags |= ImGuiTableFlags_BordersH;
-		tableFlags |= ImGuiTableFlags_BordersV;
-		ImGui::BeginTable("SampleEditor", 4, tableFlags, ImVec2(0.0f, 0.0f), 0.0f);
+		// Calculate pad sizes, position, and framings
+		const float padding = 10.0f;
+		const float paddingTotal = padding * float(padsPerRow + 1);
+		const float padLength = (m_Width - paddingTotal) / padsPerRow;
+		float xPos = padding;
+		float yPos = padding + window->MenuBarHeight() + window->TitleBarHeight();
+		ImVec2 pos = ImVec2(xPos, yPos);
 
-		for (unsigned int i = 0; i < m_NumPads; i++) {
-			ImGui::TableNextColumn();
+		for (unsigned int i = 0; i < m_NumPads; i++) 
+		{
+			pad = sampleProgrammer->GetSamplePad(i);
 
-			sprintf_s(padNameLable, "PAD #%d", i + 1);
+			sprintf_s(padNameLable, "##PAD #%d", i + 1);
 			ImGui::PushID(padNameLable);
 
-			ImGui::SeparatorText(padNameLable);
-			ImGui::Spacing();
-
-			sampleName = sampleProgrammer->GetPadName(i);
-			padCode = (int)sampleProgrammer->GetPadNote(i);
-			strcpy_s(sampleNameLabel, sampleName.c_str());
-
-			ImGui::Text("   NAME:"); ImGui::SameLine();
-			ImGui::Text(sampleNameLabel);
-
-			// Keybinds
-			const unsigned int numCodes = 10;
-			if (padCode == BackBeat::MIDI::NoteOff)
-				ImGui::Text("   NOTE: NOTE OFF");
-			else
+			// Set position of pad
+			if (i != 0)
 			{
-				ImGui::Text("   NOTE:"); ImGui::SameLine();
-				ImGui::Text(BackBeat::MIDI::MIDINoteNames[padCode]);
-			}
-			if (i < numCodes - 1)
-				ImGui::Text("KEYBIND: %d", i + 1);
-			else if (i == numCodes - 1)
-				ImGui::Text("KEYBIND: 0");
-			else
-				ImGui::Text("KEYBIND: F%d", i - numCodes + 1);
-
-			ImGui::Spacing();
-
-			// Loop
-			bool looping = sampleProgrammer->IsLooping(i);
-			if (ImGui::Checkbox("Loop", &looping))
-			{
-				if (looping)
-					sampleProgrammer->LoopOn(i);
+				if (i % padsPerRow == 0)
+				{
+					yPos = yPos + padLength + padding;
+					xPos = padding;
+				}
 				else
-					sampleProgrammer->LoopOff(i);
+					xPos = xPos + padding + padLength;
 			}
-			ImGui::Spacing();
 
-			// Volume controls
-			float* volume = &(sampleProgrammer->GetSamplePad(i)->GetDCAParameters()->volume);
-			ImGui::Text("    "); ImGui::SameLine(); ImGui::SliderFloat("Volume", volume, 0.0f, 1.0f);
-			ImGui::Spacing();
+			pos = ImVec2(xPos, yPos);
+			ImGui::SetCursorPos(pos);
 
-			// Sample Pad DCA/panning controls
-			const float defaultAmp = 0.5f;
-			float pan = (sampleProgrammer->GetSamplePad(i)->GetDCAParameters()->rightAmp -
-				sampleProgrammer->GetSamplePad(i)->GetDCAParameters()->leftAmp) / 2;
-			ImGui::Text("Panning"); ImGui::SameLine();
-			if (ImGui::SmallButton("Reset"))
-				pan = 0.0f;
-			ImGui::Text("Left"); ImGui::SameLine(); ImGui::SliderFloat("Right", &pan, BackBeat::SynthBase::PanMin, BackBeat::SynthBase::PanMax);
-			sampleProgrammer->GetSamplePad(i)->GetDCAParameters()->leftAmp = defaultAmp - pan;
-			sampleProgrammer->GetSamplePad(i)->GetDCAParameters()->rightAmp = defaultAmp + pan;
+			if (BackBeat::ImGuiWidgets::ImGuiPad(padNameLable, pad->IsActive(), ImVec2(padLength, padLength)))
+			{
+				pad->Press();
+			}
+
+			sprintf_s(popupNameLabel, "##PopUpPAD #%d", i + 1);
+			const ImGuiMouseButton rightClick = 1;
+			if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(rightClick))
+				ImGui::OpenPopup(popupNameLabel);
+
+			if (ImGui::BeginPopup(popupNameLabel))
+			{
+				if (ImGui::MenuItem("Set Note"))
+				{
+					m_ProgrammingNote = true;
+					m_PadToProgram = i + 1;
+				}
+
+				if (ImGui::MenuItem("Set Sample"))
+				{
+					m_Sampler.GetProgrammer()->ProgramSample(i);
+				}
+
+				ImGui::Separator();
+
+				if (ImGui::MenuItem("Open Pad Controls"))
+				{
+					m_OpenPadControlsPopup = true;
+					m_PadControlsToRender = i + 1;
+				}
+
+				ImGui::EndPopup();
+			}
 
 			ImGui::PopID();
-			ImGui::Spacing();
 		}
 
-		ImGui::EndTable();
+		ImGui::PopStyleColor(colorCount);
 	}
 
 	void Sampler::RenderSampleCreator()
@@ -916,12 +924,106 @@ namespace Exampler {
 		}
 
 		if (!ImGui::IsPopupOpen(ProgrammingNoteID))
-		{
 			newCode = 0;
-		}
 	}
 
-	unsigned int Sampler::SetSamplerColors()
+	void Sampler::RenderPadControls()
+	{
+		if (m_PadControlsToRender <= 0)
+			return;
+
+		auto sampleProgrammer = m_Sampler.GetProgrammer();
+		const unsigned int charLimit = 80;
+		const unsigned int padsPerRow = 4;
+		unsigned int colorCount = SetPadControlsColors();
+		int padCode = 0;
+		int padIndex = m_PadControlsToRender - 1;
+		std::string sampleName = "";
+		char padNameLable[charLimit] = {};
+		char loopID[charLimit] = {};
+		char sampleNameLabel[charLimit] = {};
+		char popupNameLabel[charLimit] = {};
+		std::shared_ptr<BackBeat::SamplerPad> pad = nullptr;
+
+		sprintf_s(padNameLable, "PAD #%d", m_PadControlsToRender);
+		if (m_OpenPadControlsPopup)
+		{
+			ImGui::OpenPopup(popupNameLabel);
+			m_OpenPadControlsPopup = false;
+		}
+
+
+		if (ImGui::BeginPopup(popupNameLabel))
+		{
+			// MOVE THE FOLLOWING CODE TO A POPUP
+
+			ImGui::SeparatorText(padNameLable);
+			ImGui::Spacing();
+
+			sampleName = sampleProgrammer->GetPadName(padIndex);
+			padCode = (int)sampleProgrammer->GetPadNote(padIndex);
+			strcpy_s(sampleNameLabel, sampleName.c_str());
+
+			ImGui::Text("   NAME:"); ImGui::SameLine();
+			ImGui::Text(sampleNameLabel);
+
+			// Keybinds
+			const unsigned int numCodes = 10;
+			if (padCode == BackBeat::MIDI::NoteOff)
+				ImGui::Text("   NOTE: NOTE OFF");
+			else
+			{
+				ImGui::Text("   NOTE:"); ImGui::SameLine();
+				ImGui::Text(BackBeat::MIDI::MIDINoteNames[padCode]);
+			}
+			if (m_PadControlsToRender < numCodes - 1)
+				ImGui::Text("KEYBIND: %d", m_PadControlsToRender);
+			else if (m_PadControlsToRender == numCodes - 1)
+				ImGui::Text("KEYBIND: 0");
+			else
+				ImGui::Text("KEYBIND: F%d", m_PadControlsToRender - numCodes);
+
+			ImGui::Spacing();
+
+			// Loop
+			bool looping = sampleProgrammer->IsLooping(padIndex);
+			if (ImGui::Checkbox("Loop", &looping))
+			{
+				if (looping)
+					sampleProgrammer->LoopOn(padIndex);
+				else
+					sampleProgrammer->LoopOff(padIndex);
+			}
+			ImGui::Spacing();
+
+			// Sample Pad DCA/panning controls
+			auto params = sampleProgrammer->GetSamplePad(padIndex)->GetDCAParameters();
+			float* volume = &(params->volume);
+			float* pan = &(params->pan);
+
+			ImGui::SameLine();
+			ImGuiKnobs::Knob("Volume", volume, 0.0f, 1.0f, s_KnobSpeed, s_KnobFormatFloat, ImGuiKnobVariant_::ImGuiKnobVariant_Wiper);
+
+			ImGui::SameLine();
+
+			ImGuiKnobs::Knob("Pan", pan, BackBeat::SynthBase::PanMin, BackBeat::SynthBase::PanMax,
+				s_KnobSpeed, s_KnobFormatFloat, ImGuiKnobVariant_::ImGuiKnobVariant_WiperDot);
+
+			if (ImGui::IsItemActive() && ImGui::IsMouseDoubleClicked(0))
+				*pan = 0.0f;
+
+			ImGui::Spacing();
+
+			ImGui::EndPopup();
+		}
+
+		if (!ImGui::IsPopupOpen(popupNameLabel))
+			m_PadControlsToRender = 0;
+
+		ImGui::PopStyleColor(colorCount);
+	}
+
+	unsigned int Sampler::SetCanvasColors()
 	{
 		unsigned int count = 0;
 
@@ -942,6 +1044,65 @@ namespace Exampler {
 		ImGui::PushStyleColor(ImGuiCol_PlotHistogram, IM_COL32(61, 224, 144, 255)); count++;
 		ImGui::PushStyleColor(ImGuiCol_SliderGrab, IM_COL32(61, 224, 144, 255)); count++;
 		ImGui::PushStyleColor(ImGuiCol_SliderGrabActive, IM_COL32(61, 224, 144, 255)); count++;
+
+		return count;
+	}
+
+	unsigned int Sampler::SetEntityColors()
+	{
+		unsigned int count = 0;
+
+		// MenuBar colors
+		ImGui::PushStyleColor(ImGuiCol_MenuBarBg, IM_COL32(22, 46, 22, 255)); count++;
+
+		// Window colors
+		ImGui::PushStyleColor(ImGuiCol_Border, IM_COL32(91, 115, 109, 255)); count++;
+		ImGui::PushStyleColor(ImGuiCol_WindowBg, IM_COL32(91, 115, 109, 255)); count++;
+
+		// Table colors
+		ImGui::PushStyleColor(ImGuiCol_TableRowBg, IM_COL32(24, 38, 39, 255)); count++;
+		ImGui::PushStyleColor(ImGuiCol_TableRowBgAlt, IM_COL32(24, 38, 39, 255)); count++;
+		ImGui::PushStyleColor(ImGuiCol_TableBorderStrong, IM_COL32(44, 56, 59, 255)); count++;
+		ImGui::PushStyleColor(ImGuiCol_TableBorderLight, IM_COL32(44, 56, 59, 255)); count++;
+
+		// Misc colors
+		ImGui::PushStyleColor(ImGuiCol_Separator, IM_COL32(99, 115, 101, 255)); count++;
+		ImGui::PushStyleColor(ImGuiCol_PlotHistogram, IM_COL32(61, 224, 144, 255)); count++;
+		ImGui::PushStyleColor(ImGuiCol_SliderGrab, IM_COL32(61, 224, 144, 255)); count++;
+		ImGui::PushStyleColor(ImGuiCol_SliderGrabActive, IM_COL32(61, 224, 144, 255)); count++;
+
+		// Knobs colors
+		// Filled
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImGui::GetColorU32(ImGuiCol_SliderGrab)); count++;
+		// Filled (Hovered)
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, IM_COL32(0, 255, 0, 255)); count++;
+		// Track
+		ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(44, 49, 56, 255)); count++;
+
+		return count;
+	}
+
+	unsigned int Sampler::SetPadColors()
+	{
+		unsigned int count = 0;
+
+		// Pad frame color
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, IM_COL32(255, 255, 255, 100)); count++;
+		// Pad frame active color
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, IM_COL32(0, 255, 0, 255)); count++;
+		// Main pad color
+		ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(40, 40, 40, 255)); count++;
+
+		return count;
+	}
+
+	unsigned int Sampler::SetPadControlsColors()
+	{
+		unsigned int count = 0;
+
+		ImGui::PushStyleColor(ImGuiCol_Separator, IM_COL32(40, 40, 40, 255)); count++;
+		ImGui::PushStyleColor(ImGuiCol_Border, IM_COL32(40, 40, 40, 255)); count++;
+		ImGui::PushStyleColor(ImGuiCol_PopupBg, IM_COL32(91, 115, 109, 255)); count++;
 
 		return count;
 	}

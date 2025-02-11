@@ -24,7 +24,7 @@ namespace BackBeat {
 		const ImVec2 labelSize = ImGui::CalcTextSize(label, NULL, true);
 		const ImRect frameRect(window->DC.CursorPos, Add(window->DC.CursorPos, ImVec2(w, labelSize.y + style.FramePadding.y * 2.0f)));
 		const ImRect totalRect(frameRect.Min, Add(frameRect.Max, ImVec2(labelSize.x > 0.0f ? style.ItemInnerSpacing.x + labelSize.x : 0.0f, 0.0f)));
-		
+
 		ImGui::ItemSize(totalRect, style.FramePadding.y);
 		if (!ImGui::ItemAdd(totalRect, id, &frameRect, 0))
 			return false;
@@ -45,7 +45,7 @@ namespace BackBeat {
 
 		ImRect grabLower;
 		ImRect grabUpper;
-		bool valueChanged = ImGuiDoubleSliderBehavior(frameRect, id, lowerV, upperV, *pMin, *pMax, 
+		bool valueChanged = ImGuiDoubleSliderBehavior(frameRect, id, lowerV, upperV, *pMin, *pMax,
 			&grabLower, &grabUpper);
 
 		if (valueChanged)
@@ -71,7 +71,7 @@ namespace BackBeat {
 	}
 
 	// NOTE: Currently unused and unfinished as it will be worked on after serialization is finished
-	bool ImGuiWidgets::ImGuiTrackSnipper(const char* label, Snippets* snippets, const int* pMin, const int* pMax, 
+	bool ImGuiWidgets::ImGuiTrackSnipper(const char* label, Snippets* snippets, const int* pMin, const int* pMax,
 		const char* format, ImGuiSliderFlags flags)
 	{
 		ImGuiWindow* window = ImGui::GetCurrentWindow();
@@ -140,13 +140,13 @@ namespace BackBeat {
 		ImGuiWindow* window = ImGui::GetCurrentWindow();
 		if (window->SkipItems)
 			return false;
-		
+
 		ImGuiContext& g = *GImGui;
 		const ImGuiStyle& style = g.Style;
 		const ImGuiID id = window->GetID(label);
 		const float w = ImGui::CalcItemWidth();
 		const ImVec2 labelSize = ImGui::CalcTextSize(label, NULL, true);
-		const ImRect frameRect(window->DC.CursorPos, Add(window->DC.CursorPos , ImVec2(w, labelSize.y + style.FramePadding.y * 2.0f)));
+		const ImRect frameRect(window->DC.CursorPos, Add(window->DC.CursorPos, ImVec2(w, labelSize.y + style.FramePadding.y * 2.0f)));
 		const ImRect totalRect(frameRect.Min, Add(frameRect.Max, ImVec2(labelSize.x > 0.0f ? style.ItemInnerSpacing.x + labelSize.x : 0.0f, 0.0f)));
 
 		ImGui::ItemSize(totalRect, style.FramePadding.y);
@@ -159,7 +159,7 @@ namespace BackBeat {
 
 		const bool hovered = ImGui::ItemHoverable(frameRect, id, g.LastItemData.InFlags);
 		const bool clicked = hovered && ImGui::IsMouseClicked(0, id);
-        if (clicked)
+		if (clicked)
 		{
 			ImGui::SetActiveID(id, window);
 			ImGui::SetFocusID(id, window);
@@ -177,7 +177,7 @@ namespace BackBeat {
 		const ImU32 frameCol = ImGui::GetColorU32(g.ActiveId == id ? ImGuiCol_FrameBgActive : ImGuiCol_FrameBg);
 		float paddingX = grabRect.GetWidth() / 2.0f;
 		float paddingY = grabRect.GetHeight() / 4.0f;
-		ImRect bar(frameRect.Min.x + paddingX, grabRect.Min.y + paddingY, frameRect.Max.x - paddingX, grabRect.Max.y - paddingY);  
+		ImRect bar(frameRect.Min.x + paddingX, grabRect.Min.y + paddingY, frameRect.Max.x - paddingX, grabRect.Max.y - paddingY);
 		ImGui::RenderNavHighlight(frameRect, id);
 		ImGui::RenderFrame(bar.Min, bar.Max, frameCol, true, g.Style.FrameRounding);
 		ImGui::RenderRectFilledRangeH(window->DrawList, bar, ImGui::GetColorU32(ImGuiCol_FrameBgHovered), 0.0f, fraction, style.FrameRounding);
@@ -209,7 +209,7 @@ namespace BackBeat {
 		float fraction = *v / vMax;
 		return ImGuiSeekBar(label, ImGuiDataType_Float, fraction, v, &vMin, &vMax, format, flags);
 	}
-	
+
 	// NOTE: Might want to change fraction calcultation to inside ImGuiSeekBar() depending on what is needed for future implementation.
 	//       Fine for now
 	bool ImGuiWidgets::ImGuiSeekBarInt(const char* label, int* v, int vMax, const char* format, ImGuiSliderFlags flags)
@@ -221,7 +221,7 @@ namespace BackBeat {
 
 	// NOTE: Might want to change fraction calcultation to inside ImGuiSeekBar() depending on what is needed for future implementation.
 	//       Fine for now
-	bool ImGuiWidgets::ImGuiSeekBarUnsignedInt(const char* label, unsigned int* v, unsigned vMax, const char* format, ImGuiSliderFlags flags)
+	bool ImGuiWidgets::ImGuiSeekBarUnsignedInt(const char* label, unsigned int* v, unsigned int vMax, const char* format, ImGuiSliderFlags flags)
 	{
 		int vMin = 0;
 		float fraction = float(*v) / (float)vMax;
@@ -284,7 +284,7 @@ namespace BackBeat {
 					{
 						if (g.ActiveIdIsJustActivated)
 						{
-							
+
 							bool clickedNearGrab = (mouseTruePos >= upperTruePos - 2.0f) && (mouseTruePos <= upperTruePos + 2.0f);
 							g.SliderGrabClickOffset = clickedNearGrab ? mouseTruePos - upperTruePos : 0.0f;
 						}
@@ -296,7 +296,7 @@ namespace BackBeat {
 				}
 			}
 		}
-		if (valueChanged) 
+		if (valueChanged)
 		{
 			int newVal = (int)(clickedPos * ((float)vMax - (float)vMin) + (float)vMin);
 			if (lowerActive)
@@ -318,4 +318,59 @@ namespace BackBeat {
 
 		return valueChanged;
 	}
+
+	bool ImGuiWidgets::ImGuiPad(const char* label, const ImVec2& sizeArg)
+	{
+		return ImGuiPadEx(label, false, sizeArg, ImGuiButtonFlags_None);
+	}
+
+	bool ImGuiWidgets::ImGuiPad(const char* label, bool active, const ImVec2& sizeArg)
+	{
+		return ImGuiPadEx(label, active, sizeArg, ImGuiButtonFlags_None);
+	}
+
+	bool ImGuiWidgets::ImGuiPadEx(const char* label, bool active, const ImVec2& sizeArg, ImGuiButtonFlags flags)
+	{
+		ImGuiWindow* window = ImGui::GetCurrentWindow();
+		if (window->SkipItems)
+			return false;
+
+		ImGuiContext& g = *GImGui;
+		const ImGuiStyle& style = g.Style;
+		const ImGuiID id = window->GetID(label);
+		const ImVec2 labelSize = ImGui::CalcTextSize(label, NULL, true);
+
+		ImVec2 pos = window->DC.CursorPos;
+		if ((flags & ImGuiButtonFlags_AlignTextBaseLine) && style.FramePadding.y < window->DC.CurrLineTextBaseOffset) // Try to vertically align buttons that are smaller/have no padding so that text baseline matches (bit hacky, since it shouldn't be a flag)
+			pos.y += window->DC.CurrLineTextBaseOffset - style.FramePadding.y;
+		ImVec2 size = ImGui::CalcItemSize(sizeArg, labelSize.x + style.FramePadding.x * 2.0f, labelSize.y + style.FramePadding.y * 2.0f);
+
+		const ImRect bb(pos, Add(pos, size));
+		ImGui::ItemSize(size, style.FramePadding.y);
+		if (!ImGui::ItemAdd(bb, id))
+			return false;
+
+		bool hovered, held;
+		bool pressed = ImGui::ButtonBehavior(bb, id, &hovered, &held, flags);
+
+		// Render
+		const float padding = bb.GetWidth() / 25.0f;
+		const ImVec2 paddingVec2 = ImVec2(padding, padding);
+		ImRect pad(Add(bb.Min, paddingVec2), Sub(bb.Max, paddingVec2));
+		const ImU32 col = ImGui::GetColorU32(((held && hovered) || active) ? ImGuiCol_ButtonActive : ImGuiCol_ButtonHovered);
+		ImGui::RenderNavHighlight(bb, id);
+		ImGui::RenderFrame(bb.Min, bb.Max, col, true, style.FrameRounding);
+		ImGui::RenderFrame(pad.Min, pad.Max, ImGui::GetColorU32(ImGuiCol_Button), true, style.FrameRounding);
+
+		if (g.LogEnabled)
+			ImGui::LogSetNextTextDecoration("[", "]");
+		ImGui::RenderTextClipped(Add(bb.Min, style.FramePadding), Sub(bb.Max, style.FramePadding), label, NULL, &labelSize, style.ButtonTextAlign, &bb);
+
+		IMGUI_TEST_ENGINE_ITEM_INFO(id, label, g.LastItemData.StatusFlags);
+		return pressed;
+
+		return false;
+	}
+
+
 }

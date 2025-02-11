@@ -3,6 +3,11 @@
 #include "BackBeat.h"
 namespace Exampler {
 
+	static const float s_KnobSpeed = 0.0f;
+	static const char* s_KnobFormatFloat = "%.3f";
+	static const char* s_KnobFormatFloatFreq = "%.0f";
+	static const char* s_KnobFormatInt = "%i";
+
 	enum class EntityType
 	{
 		none = 0,
