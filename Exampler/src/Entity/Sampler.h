@@ -7,10 +7,10 @@
 #include <GLFW/glfw3.h>
 #include <imgui-knobs.h>
 
+#include "SampleSplicer.h"
 #include "Entity.h"
 namespace Exampler {
 
-	constexpr auto CreatingSampleID = "CreatingSample";
 	constexpr auto ProgrammingNoteID = "ProgrammingNote";
 
 	class Sampler : public Entity
@@ -50,7 +50,6 @@ namespace Exampler {
 
 		// Sampler functions
 		inline std::shared_ptr<BackBeat::MIDIInputHandler> GetMIDIInput() { return m_Sampler.GetMIDIInput(); }
-		inline std::shared_ptr<BackBeat::PlayerProcessor> GetTrackProcessor() { return m_TrackPlayer.GetProc(); }
 		inline std::shared_ptr<BackBeat::SamplerProcessor> GetSamplerProcessor() { return m_Sampler.GetProcessor(); }
 		inline void SetRecordingPlayer(std::shared_ptr<BackBeat::Player> player) { m_RecordingPlayer = player; }
 
@@ -60,7 +59,6 @@ namespace Exampler {
 
 		bool m_Open;
 		bool m_KeyboardActive;
-		bool m_CreatingSample;
 		bool m_ProgrammingNote;
 		bool m_OpenPadControlsPopup;
 		unsigned int m_DevicesOpen;
@@ -70,8 +68,9 @@ namespace Exampler {
 		float m_TrackVolume;
 		std::string m_Name;
 
+		SampleSplicer m_SampleSplicer;
+
 		// BackBeat objects
-		BackBeat::Player m_TrackPlayer;
 		BackBeat::Sampler m_Sampler;
 		std::shared_ptr<BackBeat::Player> m_RecordingPlayer;
 		BackBeat::RecorderManager* m_RecorderMgr;
@@ -81,7 +80,6 @@ namespace Exampler {
 		void RenderCanvasEntity();
 		void RenderMenuBar();
 		void RenderSamplerPads();
-		void RenderSampleCreator();
 		void RenderNoteProgrammer();
 		void RenderPadControls();
 		

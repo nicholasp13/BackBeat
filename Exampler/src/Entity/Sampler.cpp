@@ -1,6 +1,3 @@
-// TODO:
-//       - Make sample splicer its own Entity
-
 // NOTE: Current panning settings currently make the sample quieter compared to when the sample splicer makes them.
 
 #include "Sampler.h"
@@ -10,7 +7,6 @@ namespace Exampler {
 		:
 		m_Open(false),
 		m_KeyboardActive(true),
-		m_CreatingSample(false),
 		m_ProgrammingNote(false),
 		m_OpenPadControlsPopup(false),
 		m_DevicesOpen(0),
@@ -31,7 +27,7 @@ namespace Exampler {
 
 	void Sampler::Update()
 	{
-		
+		m_SampleSplicer.Update();
 	}
 
 	void Sampler::OnEvent(BackBeat::Event& event)
@@ -83,13 +79,14 @@ namespace Exampler {
 		RenderMenuBar();
 		RenderSamplerPads();
 		// PopUps
-		RenderSampleCreator();
 		RenderNoteProgrammer();
 		RenderPadControls();
 
 		ImGui::End();
 		ImGui::PopStyleColor(count);
 		ImGui::PopID();
+
+		m_SampleSplicer.Render();
 	}
 
 	void Sampler::Add(
@@ -109,8 +106,9 @@ namespace Exampler {
 
 		mixer->PushProcessor(samplerProc);
 		mixer->PushProcessor(m_RecordingPlayer->GetProc());
-		mixer->PushProcessor(m_TrackPlayer.GetProc());
 		midiDeviceManager->PushOutput(m_Sampler.GetMIDIInput());
+
+		m_SampleSplicer.Add(mixer);
 	}
 
 	void Sampler::Delete(
@@ -122,7 +120,6 @@ namespace Exampler {
 		auto samplerID = m_Sampler.GetID();
 		auto trackPlayerID = m_RecordingPlayer->GetID();
 		auto midiInputID = m_Sampler.GetMIDIInput()->GetID();
-		auto sampleTrackPlayerID = m_TrackPlayer.GetID();
 
 		m_Sampler.Stop();
 		m_RecordingPlayer->Stop();
@@ -131,8 +128,9 @@ namespace Exampler {
 		recorderMgr->DeleteTrack(samplerID);
 		mixer->DeleteProcessor(samplerID);
 		mixer->DeleteProcessor(trackPlayerID);
-		mixer->DeleteProcessor(sampleTrackPlayerID);
 		midiDeviceManager->DeleteOutput(midiInputID);
+
+		m_SampleSplicer.Delete(mixer);
 	}
 
 	// NOTE: - node is the parent of the node being written to
@@ -384,8 +382,7 @@ namespace Exampler {
 			{
 				if (ImGui::MenuItem("Create Sample"))
 				{
-					m_CreatingSample = true;
-					m_TrackPlayer.Start();
+					m_SampleSplicer.Open();
 				}
 
 				if (ImGui::BeginMenu("Program Pad"))
@@ -526,339 +523,6 @@ namespace Exampler {
 		}
 
 		ImGui::PopStyleColor(colorCount);
-	}
-
-	void Sampler::RenderSampleCreator()
-	{
-		const float width = 900.0f;
-		const float height = 200.0f;
-		ImGui::SetNextWindowSize(ImVec2(width, height));
-
-		const unsigned int charLimit = 80;
-		static char trackName[charLimit];
-		static std::string sampleName = "";
-		static bool trackSet = false;
-		static bool isLooping = false;
-		static int zero = 0;
-		static int start = 0;
-		static int end = 0;
-		static int size = 0;
-		static int startMs = 0;
-		static int endMs = 0;
-		static int bytesPerMs = 0;
-		float byteRate = 0.0f;
-
-		if (m_CreatingSample)
-		{
-			ImGui::OpenPopup(CreatingSampleID);
-			m_CreatingSample = false;
-		}
-
-		ImGui::PushStyleColor(ImGuiCol_PopupBg, IM_COL32(147, 157, 169, 255));
-		if (ImGui::BeginPopup(CreatingSampleID))
-		{
-			ImGui::SeparatorText("Sample Creator");
-
-			// Open button
-			{
-				ImGui::PushID("Open");
-
-				if (ImGui::Button("Open"))
-				{
-					m_TrackPlayer.Pause();
-					m_TrackPlayer.LoadTrack(BackBeat::FileDialog::OpenFile("WAV Files (*.wav)\0*.wav\0"));
-					strcpy_s(trackName, m_TrackPlayer.GetTrackName().c_str());
-					trackSet = m_TrackPlayer.IsLoaded();
-					zero = 0;
-					start = 0;
-					end = m_TrackPlayer.GetSize();
-					size = end;
-					bytesPerMs = m_TrackPlayer.GetByteRate() / 1000;
-					startMs = 0;
-					endMs = (int)((float)end / (float)bytesPerMs);
-				}
-				ImGui::SameLine();
-				ImGui::PopID();
-			}
-
-			// Save button
-			{
-				ImGui::PushID("Save");
-
-				if (ImGui::Button("Save"))
-				{
-					BackBeat::SampleBuilder::SaveSample(m_TrackPlayer.GetTrack(), start, end);
-					ImGui::CloseCurrentPopup();
-				}
-				ImGui::SameLine();
-				ImGui::PopID();
-			}
-
-			// Clear button
-			{
-				ImGui::PushID("Clear");
-
-				if (ImGui::Button("Clear"))
-				{
-					m_TrackPlayer.ClearTrack();
-					strcpy_s(trackName, "");
-					zero = 0;
-					start = 0;
-					end = 0;
-					size = 0;
-					bytesPerMs = 0;
-					startMs = 0;
-					endMs = 0;
-					m_CreatingSample = false;
-					trackSet = false;
-				}
-
-				ImGui::PopID();
-			}
-
-			// Track Name
-			ImGui::Text("Track: "); ImGui::SameLine(); ImGui::Text(trackName);
-
-			// Renders Track Editor
-			{
-				ImGui::PushID("SampleEditor");
-				ImGui::PushItemWidth(width - 200.0f);
-				byteRate = (float)m_TrackPlayer.GetByteRate();
-				BackBeat::TimeMinSec zeroTime = BackBeat::TimeMinSec();
-				BackBeat::TimeMinSec sizeTime = BackBeat::TimeMinSec();;
-				if (m_TrackPlayer.IsLoaded())
-				{
-					zeroTime = BackBeat::Audio::GetTime((float)zero / byteRate);
-					sizeTime = BackBeat::Audio::GetTime((float)size / byteRate);
-				}
-				else
-				{
-					zeroTime.minutes = 0;
-					zeroTime.seconds = 0;
-					sizeTime.minutes = 0;
-					sizeTime.seconds = 0;
-				}
-				ImGui::Text("%d:%02d", zeroTime.minutes, zeroTime.seconds); ImGui::SameLine();
-				if (BackBeat::ImGuiWidgets::ImGuiTrackEditor("##", &start, &end, &zero, &size, "", ImGuiSliderFlags(0)))
-				{
-					m_TrackPlayer.Pause();
-				}
-				ImGui::SameLine(); ImGui::Text("%d:%02d", sizeTime.minutes, sizeTime.seconds);
-				ImGui::PopID();
-				ImGui::Spacing();
-			}
-
-			// Renders volume seekbar
-			{
-				ImGui::PushID("Volume");
-				ImGui::PushItemWidth(width - 200.0f);
-				static float volume = 1.0f;
-				ImGui::Text("    "); ImGui::SameLine();
-				BackBeat::ImGuiWidgets::ImGuiSeekBarFloat("Volume", &volume, 1.0f, "", ImGuiSliderFlags(0));
-				m_TrackPlayer.SetVolume(volume);
-				ImGui::PopID();
-				ImGui::Spacing();
-			}
-
-			// Renders Editor Buttons
-			{
-				ImGui::PushID("Play");
-				if (!m_TrackPlayer.IsPlaying())
-				{
-					if (ImGui::Button("Play"))
-					{
-						m_TrackPlayer.SetPosition(start);
-						m_TrackPlayer.On();
-						m_TrackPlayer.Start();
-					}
-				}
-				else if (m_TrackPlayer.IsLoaded())
-				{
-					if (ImGui::Button("Stop"))
-						m_TrackPlayer.Pause();
-				}
-				ImGui::PopID();
-				ImGui::SameLine();
-
-				// Loop
-				ImGui::PushID("Loop");
-				ImGui::Checkbox("Loop", &isLooping);
-				ImGui::PopID();
-				ImGui::SameLine();
-
-				// Zoom In
-				int padding = bytesPerMs;
-				ImGui::PushID("ZoomIn");
-				if (ImGui::Button("Zoom in"))
-				{
-					if (trackSet && (end - start >= padding))
-					{
-						zero = start;
-						size = end;
-					}
-				}
-				ImGui::PopID();
-				ImGui::SameLine();
-
-				// Zoom Out
-				ImGui::PushID("ZoomOut");
-				if (ImGui::Button("Zoom Out"))
-				{
-					if (trackSet)
-					{
-						int zoomIncrement = (int)byteRate;
-						int trackSize = (int)m_TrackPlayer.GetSize();
-						zero = zoomIncrement > zero
-							? 0 : (zero - zoomIncrement);
-						size = (size + zoomIncrement) > trackSize
-							? trackSize : (size + zoomIncrement);
-					}
-				}
-				ImGui::PopID();
-				ImGui::SameLine();
-
-				// Zoom Reset
-				ImGui::PushID("ResetZoom");
-				if (ImGui::Button("Reset Zoom"))
-				{
-					if (trackSet)
-					{
-						zero = 0;
-						size = m_TrackPlayer.GetSize();
-					}
-				}
-				ImGui::PopID();
-			}
-
-			static ImGuiTableFlags table_flags = 0;
-			ImGui::BeginTable("SampleEditor", 2, table_flags, ImVec2(0.0f, 0.0f), 0.0f);
-			const unsigned int incrementMs = 10;
-			// Renders Start Input
-			{
-				ImGui::TableNextColumn();
-				ImGui::PushID("Start");
-
-				float byteRate = (float)m_TrackPlayer.GetByteRate();
-				BackBeat::TimeMinSec startTime = BackBeat::TimeMinSec();
-				if (m_TrackPlayer.IsLoaded())
-				{
-					startTime = BackBeat::Audio::GetTime((float)start / byteRate);
-				}
-				else
-				{
-					startTime.minutes = 0;
-					startTime.seconds = 0;
-				}
-
-				ImGui::Text("Start: %d:%02d", startTime.minutes, startTime.seconds); ImGui::SameLine();
-				if (trackSet)
-				{
-					startMs = (int)((float)start / (float)bytesPerMs);
-					if (ImGui::InputInt("(in ms)", &startMs, incrementMs, incrementMs * 10, ImGuiInputTextFlags(0)))
-					{
-						start = startMs < (endMs - (int)incrementMs) ? (startMs * bytesPerMs) : (endMs - (int)incrementMs);
-					}
-				}
-				else
-				{
-					int dummyStartZero = 0;
-					ImGui::InputInt("(in ms)", &dummyStartZero);
-					dummyStartZero = 0;
-				}
-				ImGui::PopID();
-			}
-
-			// Renders End Input
-			{
-				ImGui::TableNextColumn();
-				ImGui::PushID("End");
-
-				BackBeat::TimeMinSec endTime = BackBeat::TimeMinSec();
-				if (m_TrackPlayer.IsLoaded())
-				{
-					endTime = BackBeat::Audio::GetTime((float)end / byteRate);
-				}
-				else
-				{
-					endTime.minutes = 0;
-					endTime.seconds = 0;
-				}
-
-				ImGui::Text("End: %d:%02d", endTime.minutes, endTime.seconds); ImGui::SameLine();
-				if (trackSet)
-				{
-					endMs = (int)((float)end / (float)bytesPerMs);
-					if (ImGui::InputInt("(in ms)", &endMs, incrementMs, incrementMs * 10, ImGuiInputTextFlags(0)))
-					{
-						end = endMs > (startMs + (int)incrementMs) ? (endMs * bytesPerMs) : (startMs + (int)incrementMs);
-					}
-				}
-				else
-				{
-					int dummyEndZero = 0;
-					ImGui::InputInt("(in ms)", &dummyEndZero);
-					dummyEndZero = 0;
-				}
-				ImGui::PopID();
-			}
-
-			// Total Time
-			{
-				ImGui::TableNextColumn();
-				ImGui::PushID("TotalTime");
-
-				BackBeat::TimeMinSec totalTime = BackBeat::TimeMinSec();
-				if (m_TrackPlayer.IsLoaded())
-				{
-					float byteRate = (float)m_TrackPlayer.GetByteRate();
-					totalTime = BackBeat::Audio::GetTime((float)(end - start) / byteRate);
-					totalTime.milliseconds = endMs - startMs;
-				}
-				else
-				{
-					totalTime.minutes = 0;
-					totalTime.seconds = 0;
-					totalTime.milliseconds = 0;
-				}
-				ImGui::Text("Total: %d:%02d (%d ms)", totalTime.minutes, totalTime.seconds, totalTime.milliseconds);
-
-				ImGui::PopID();
-			}
-			ImGui::EndTable();
-
-			// Set Start and End values
-			if (m_TrackPlayer.IsLoaded())
-			{
-				m_TrackPlayer.SetStart(start);
-				m_TrackPlayer.SetEnd(end);
-				if ((int)m_TrackPlayer.GetPosition() >= end)
-				{
-					if (isLooping)
-						m_TrackPlayer.SetPosition(start);
-					else
-						m_TrackPlayer.Pause();
-				}
-			}
-
-			ImGui::EndPopup();
-		}
-		ImGui::PopStyleColor(1);
-
-		if (!ImGui::IsPopupOpen(CreatingSampleID))
-		{
-			m_TrackPlayer.Stop();
-			m_TrackPlayer.ClearTrack();
-			strcpy_s(trackName, "");
-			zero = 0;
-			start = 0;
-			end = 0;
-			size = 0;
-			bytesPerMs = 0;
-			startMs = 0;
-			endMs = 0;
-			m_CreatingSample = false;
-			trackSet = false;
-		}
 	}
 
 	void Sampler::RenderNoteProgrammer()
