@@ -55,6 +55,7 @@ namespace BackBeat {
 		// Run ModMatrix here
 
 		// Render ModDestinations 
+		m_NoiseGenerator->Render(numSamples);
 		m_Osc1->Render(numSamples);
 		m_Osc2->Render(numSamples);
 		m_Osc3->Render(numSamples);
@@ -157,6 +158,7 @@ namespace BackBeat {
 		m_Channel = event.channel;
 		m_NotePressed = event.midiNote;
 
+		m_NoiseGenerator->DoNoteOn(event);
 		m_Osc1->DoNoteOn(event);
 		m_Osc2->DoNoteOn(event);
 		m_Osc3->DoNoteOn(event);
@@ -173,6 +175,7 @@ namespace BackBeat {
 	//       to match function call hierarchy
 	void SynthVoice::DoNoteOff(NoteEvent event)
 	{
+		m_NoiseGenerator->DoNoteOff(event);
 		m_Osc1->DoNoteOff(event);
 		m_Osc2->DoNoteOff(event);
 		m_Osc3->DoNoteOff(event);
@@ -197,5 +200,6 @@ namespace BackBeat {
 		m_LPLadderFilter = std::make_unique<LowPassLadderFilter>(m_SampleRate, m_SampleRate, m_InputBuffer, m_Params->LPLadderFilterParams);
 		m_HPFilter = std::make_unique<TPTHighPassFilter>(m_SampleRate, m_SampleRate, m_InputBuffer, m_Params->HPFilterParams);
 		m_FilterEG = std::make_unique<LinearEG>(m_SampleRate, m_SampleRate, m_LPLadderFilter->GetModInputBuffer(), m_Params->EGParams);
+		m_NoiseGenerator = std::make_unique<NoiseGenerator>(m_SampleRate, m_SampleRate, m_InputBuffer, m_Params->NoiseGenParams);
 	}
 }

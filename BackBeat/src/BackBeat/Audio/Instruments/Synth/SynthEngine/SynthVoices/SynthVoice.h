@@ -55,11 +55,10 @@
 #include "BackBeat/Audio/Instruments/Synth/SynthEngine/SynthModules/LinearEG.h"
 #include "BackBeat/Audio/Instruments/Synth/SynthEngine/SynthModules/AmpEG.h"
 #include "BackBeat/Audio/Instruments/Synth/SynthEngine/SynthModules/LowFrequencyOscillator.h"
-#include "BackBeat/Audio/Instruments/Synth/SynthEngine/SynthModules/TPTLowPassFilter.h"
+#include "BackBeat/Audio/Instruments/Synth/SynthEngine/SynthModules/LowPassLadderFilter.h"
+#include "BackBeat/Audio/Instruments/Synth/SynthEngine/SynthModules/NoiseGenerator.h"
 #include "BackBeat/Audio/Instruments/Synth/SynthEngine/SynthModules/TPTHighPassFilter.h"
 #include "BackBeat/Audio/Instruments/Synth/SynthBase.h"
-
-#include "BackBeat/Audio/Instruments/Synth/SynthEngine/SynthModules/LowPassLadderFilter.h"
 namespace BackBeat {
 
 	class SynthVoice
@@ -97,6 +96,7 @@ namespace BackBeat {
 		std::unique_ptr<LowFrequencyOscillator> m_LFO1;
 		std::unique_ptr<LowPassLadderFilter> m_LPLadderFilter;
 		std::unique_ptr<TPTHighPassFilter> m_HPFilter;
+		std::unique_ptr<NoiseGenerator> m_NoiseGenerator;
 
 	private:
 		void DoNoteOn(NoteEvent event);

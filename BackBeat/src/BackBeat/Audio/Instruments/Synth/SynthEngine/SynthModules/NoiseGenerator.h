@@ -1,14 +1,18 @@
 #pragma once
 
-#include "BackBeat/Audio/Instruments/Synth/SynthEngine/ModuleCores/LFOCore.h"
+#include "BackBeat/Audio/Instruments/Synth/SynthEngine/ModuleCores/NoiseGeneratorCore.h"
 #include "BackBeat/Audio/Instruments/Module.h"
 namespace BackBeat {
 
-	class LowFrequencyOscillator : public Module
+	class NoiseGenerator : public Module
 	{
 	public:
-		LowFrequencyOscillator(unsigned int sampleRate, unsigned int bufferSize, std::shared_ptr<float[]> outputBuffer, std::shared_ptr<LFOParameters> params);
-		~LowFrequencyOscillator();
+		NoiseGenerator(
+			unsigned int sampleRate, 
+			unsigned int bufferSize, 
+			std::shared_ptr<float[]> outputBuffer, 
+			std::shared_ptr<NoiseGeneratorParameters> params);
+		~NoiseGenerator();
 
 		virtual void Reset(unsigned int sampleRate) override;
 		virtual void Update() override;
@@ -19,8 +23,7 @@ namespace BackBeat {
 		inline virtual std::shared_ptr<float[]> GetBuffer() override { return nullptr; }
 
 	private:
-		std::shared_ptr<LFOCore> m_Core;
-		std::shared_ptr<float[]> m_InputBuffer;
-		std::shared_ptr<float[]> m_OutputBuffer;
+		std::shared_ptr<NoiseGeneratorCore> m_Core;
+
 	};
 }

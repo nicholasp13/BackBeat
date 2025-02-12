@@ -1,3 +1,5 @@
+// TODO: Add noise generator to xml
+
 #include "Synthesizer.h"
 namespace Exampler {
 
@@ -83,10 +85,8 @@ namespace Exampler {
 		const ImGuiViewport* mainViewport = ImGui::GetMainViewport();
 		float x = mainViewport->WorkPos.x;
 		float y = mainViewport->WorkPos.y;
-		const float width = 780.0f;
-		const float height = 550.0f;
 		ImGui::SetNextWindowPos(ImVec2(x, y), ImGuiCond_FirstUseEver);
-		ImGui::SetNextWindowSize(ImVec2(width, height), ImGuiCond_Once);
+		ImGui::SetNextWindowSize(ImVec2(m_Width, m_Height), ImGuiCond_Once);
 
 		count = SetEntityColors();
 
@@ -103,6 +103,10 @@ namespace Exampler {
 
 		RenderMenubar();
 
+		// Table dimensions
+		const float padding = 5.0f;
+		const float tableLength = m_Width - padding * 2.0f;
+
 		// Table flags
 		ImGuiTableFlags tableFlags = 0;
 		tableFlags |= ImGuiTableFlags_RowBg;
@@ -111,7 +115,9 @@ namespace Exampler {
 		// First row
 		{
 			const int numColumns = 4;
-			ImGui::BeginTable("Row1", numColumns, tableFlags, ImVec2(0.0f, 0.0f), 0.0f);
+			ImVec2 position = ImVec2(padding, ImGui::GetCursorPos().y);
+			ImGui::SetCursorPos(position);
+			ImGui::BeginTable("Row1", numColumns, tableFlags, ImVec2(tableLength, 0.0f), 0.0f);
 
 			RenderGeneralControls();
 			RenderVolumePanControls();
@@ -123,10 +129,16 @@ namespace Exampler {
 
 		// Second row
 		{
-			const int numColumns = 2;
-			ImGui::BeginTable("Row2", numColumns, tableFlags, ImVec2(0.0f, 0.0f), 0.0f);
+			const int numColumns = 3;
+			const float columnLength = (tableLength * 0.75f) / 2.0f - 9.0f;
+			ImVec2 position = ImVec2(padding, ImGui::GetCursorPos().y);
+			ImGui::SetCursorPos(position);
+			ImGui::BeginTable("Row2", numColumns, tableFlags, ImVec2(tableLength, 0.0f), 0.0f);
+			ImGui::TableSetupColumn("one", ImGuiTableColumnFlags_WidthFixed, columnLength);
+			ImGui::TableSetupColumn("two", ImGuiTableColumnFlags_WidthFixed, columnLength - 1.0f);
 
 			RenderEGs();
+			RenderNoiseGenerator();
 
 			ImGui::EndTable();
 		}
@@ -134,7 +146,9 @@ namespace Exampler {
 		// Third row
 		{
 			const int numColumns = 4;
-			ImGui::BeginTable("Row3", numColumns, tableFlags, ImVec2(0.0f, 0.0f), 0.0f);
+			ImVec2 position = ImVec2(padding, ImGui::GetCursorPos().y);
+			ImGui::SetCursorPos(position);
+			ImGui::BeginTable("Row3", numColumns, tableFlags, ImVec2(tableLength, 0.0f), 0.0f);
 
 			RenderOscs();
 
@@ -311,6 +325,17 @@ namespace Exampler {
 			filterEGNode.append_child("Decay").append_attribute("Value") = filterEGParams->decayDuration;
 			filterEGNode.append_child("Release").append_attribute("Value") = filterEGParams->releaseDuration;
 			filterEGNode.append_child("Sustain").append_attribute("Value") = filterEGParams->sustainValue;
+		}
+
+		// Noise Generator
+		{
+			std::shared_ptr<BackBeat::NoiseGeneratorParameters> noiseGenParams =
+				m_SynthParams->engineParams->voiceParams->NoiseGenParams;
+
+			auto noiseGenNode = synthNode.append_child("NoiseGenerator");
+
+			noiseGenNode.append_child("On").append_attribute("Value") = noiseGenParams->isOn;
+			noiseGenNode.append_child("Level").append_attribute("Value") = noiseGenParams->level;
 		}
 
 		// Oscillator 1
@@ -683,6 +708,17 @@ namespace Exampler {
 			filterEGParams->decayDuration = filterEGNode.child("Decay").attribute("Value").as_float();
 			filterEGParams->releaseDuration = filterEGNode.child("Release").attribute("Value").as_float();
 			filterEGParams->sustainValue = filterEGNode.child("Sustain").attribute("Value").as_float();
+		}
+
+		// Noise Generator
+		{
+			std::shared_ptr<BackBeat::NoiseGeneratorParameters> noiseGenParams =
+				m_SynthParams->engineParams->voiceParams->NoiseGenParams;
+
+			auto noiseGenNode = node->child("NoiseGenerator");
+
+			noiseGenParams->isOn = noiseGenNode.child("On").attribute("Value").as_bool();
+			noiseGenParams->level = noiseGenNode.child("Level").attribute("Value").as_float();
 		}
 
 		// Oscillator 1
@@ -1447,6 +1483,28 @@ namespace Exampler {
 			ImGui::Spacing();
 			ImGui::PopID();
 		}
+	}
+
+	void Synthesizer::RenderNoiseGenerator()
+	{
+		ImGui::PushID("NoiseGenerator");
+		ImGui::TableNextColumn();
+
+		ImGui::SeparatorText("Noise");
+
+		bool* on = &(m_SynthParams->engineParams->voiceParams->NoiseGenParams->isOn);
+		float* level = &(m_SynthParams->engineParams->voiceParams->NoiseGenParams->level);
+
+		ImGui::Checkbox("On", on);
+
+		ImGuiKnobs::Knob("Level", level, BackBeat::SynthBase::NoiseGenMin, BackBeat::SynthBase::NoiseGenMax,
+			s_KnobSpeed, s_KnobFormatFloat, ImGuiKnobVariant_::ImGuiKnobVariant_Wiper);
+
+		if (ImGui::IsItemActive() && ImGui::IsMouseDoubleClicked(0))
+			*level = BackBeat::SynthBase::NoiseGenDefault;
+
+		ImGui::Spacing();
+		ImGui::PopID();
 	}
 
 	void Synthesizer::RenderOscs()

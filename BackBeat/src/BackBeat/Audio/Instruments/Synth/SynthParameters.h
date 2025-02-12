@@ -102,6 +102,12 @@ namespace BackBeat {
 		float bassBoostPercent; // At 0 this acts as a regular filter
 	};
 
+	struct NoiseGeneratorParameters
+	{
+		bool isOn;
+		float level;
+	};
+
 	// Not currently used, may be needed for sound fx or to prevent ladder filters from self oscillating
 	struct DetectorParameters
 	{
@@ -124,6 +130,7 @@ namespace BackBeat {
 		std::shared_ptr<OscParameters> OscParams4;
 		std::shared_ptr<LadderFilterParameters> LPLadderFilterParams;
 		std::shared_ptr<FilterParameters> HPFilterParams;
+		std::shared_ptr<NoiseGeneratorParameters> NoiseGenParams;
 		std::shared_ptr<ModMatrixParameters> ModMatrixParams;
 	};
 

@@ -542,5 +542,30 @@ namespace BackBeat {
 			BoundValueUnipolar(rightVal);
 		}
 
+		// Taken from ed.bew@hcrikdlef.dreg on musicdsp.org
+		// link: https://www.musicdsp.org/en/latest/Synthesis/216-fast-whitenoise-generator.html
+		static void WhiteNoise(float* buffer, unsigned int bufferSize, float level)
+		{
+			static float s_FScale = 2.0f / 0xffffffff;
+			static int s_X1 = 0x67452301;
+			static int s_X2 = 0xefcdab89;
+
+			level *= s_FScale;
+
+			/*while (bufferSize--)
+			{
+				s_X1 ^= s_X2;
+				*buffer++ = s_X2 * level;
+				s_X2 += s_X1;
+			}*/
+
+			for (unsigned int i = 0; i < bufferSize; i++)
+			{
+				s_X1 ^= s_X2;
+				buffer[i] = s_X2 * level;
+				s_X2 += s_X1;
+			}
+		}
+
 	}
 }

@@ -130,12 +130,16 @@ namespace BackBeat {
 		// LPLadderFilter
 		// based off Will Pirkle's design for a ladder filter
 		// link: https://willpirkle.com/Downloads/Addendum_A1_Moog.pdf
-		constexpr float LadderFilterQDefault = 1.0f;
-		constexpr float LadderFilterQMin = 1.0f;
-		constexpr float LadderFilterQMax = 10.0f;
+		constexpr float LadderFilterQDefault         = 1.0f;
+		constexpr float LadderFilterQMin             = 1.0f;
+		constexpr float LadderFilterQMax             = 10.0f;
 		constexpr float LadderFilterBassBoostDefault = 0.0f;
-		constexpr float LadderFilterBassBoostMin = 0.0f;
-		constexpr float LadderFilterBassBoostMax = 100.0f;
+		constexpr float LadderFilterBassBoostMin     = 0.0f;
+		constexpr float LadderFilterBassBoostMax     = 100.0f;
+		// Noise generator
+		constexpr float NoiseGenDefault = 0.0f;
+		constexpr float NoiseGenMin     = 0.0f;
+		constexpr float NoiseGenMax     = 1.0f;
 
 		// ------------------------------------------- //
 
