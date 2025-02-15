@@ -28,7 +28,7 @@ namespace BackBeat {
 
 		if (m_Track->GetProps().sampleRate != sampleRate) 
 		{
-			BB_CORE_ERROR("SAMPLE RATE NOT SUPPORTED");
+			BB_CORE_ERROR("SAMPLE RATE NOT SUPPORTED: {0}", m_Track->GetProps().sampleRate);
 			m_On = false;
 			return;
 		}

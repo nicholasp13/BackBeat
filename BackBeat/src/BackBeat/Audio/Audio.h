@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Algorithms/Algorithms.h"
 #include "BackBeat/Audio/MIDI/MIDICodes.h"
 #include "BackBeat/Core/Core.h"
 #include "BackBeat/Core/int24.h"
@@ -565,6 +566,18 @@ namespace BackBeat {
 				buffer[i] = s_X2 * level;
 				s_X2 += s_X1;
 			}
+		}
+
+		static float GetMaxUnipolar(float* buffer, unsigned int bufferSize)
+		{
+			float max = 0.0f;
+			for (unsigned int i = 0; i < bufferSize; i++)
+			{
+				if (buffer[i] > max)
+					max = buffer[i];
+			}
+
+			return max;
 		}
 
 	}

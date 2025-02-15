@@ -26,8 +26,11 @@ namespace Exampler {
 		inline bool IsOpen() { return m_Open; }
 
 	private:
+		const unsigned long BufferSize = 480000; // This is about 10 secondsd for 1 channel of a stereo 48k sample rate
+		                                         // floating point AudioProps
+
 		const float m_Width = 900.0f;
-		const float m_Height = 200.0f;
+		const float m_Height = 500.0f;
 
 		bool m_Open;
 		bool m_Looping;
@@ -39,9 +42,16 @@ namespace Exampler {
 		int m_StartMs;
 		int m_EndMs;
 		float m_Volume;
+		std::shared_ptr<float[]> m_Buffer;
 
+		BackBeat::AudioFileLoader m_Loader;
 		BackBeat::Player m_TrackPlayer;
+		BackBeat::AudioProps m_Props;
+		std::shared_ptr<BackBeat::MappedTrack> m_Track;
 
+
+	private:
+		void RenderBuffer();
 	};
 
 

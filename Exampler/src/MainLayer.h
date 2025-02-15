@@ -12,6 +12,7 @@
 #include "Entity/RecordingTrack.h"
 #include "Entity/PlaybackTrack.h"
 #include "Entity/DummyEntity.h"
+#include "Entity/AudioVisualizer.h"
 namespace Exampler {
 
 	// Arbitrarily chosen but should be decided based on RAM size / memory usage
@@ -36,7 +37,6 @@ namespace Exampler {
 	private:
 		bool m_NewPopupOpen;
 		bool m_SaveAsPopupOpen;
-		bool m_OpenAudioVisualizer;
 		unsigned int m_NumMIDIDevices;
 		unsigned int m_NumSynths;
 		unsigned int m_NumSamplers;
@@ -45,6 +45,7 @@ namespace Exampler {
 		std::string m_AppFileDir;
 		std::thread m_Thread;
 		Canvas m_Canvas;
+		AudioVisualizer m_Visualizer;
 		std::vector< std::string > m_DeviceNames;
 		std::vector< std::string > m_ProjectNames;
 		std::vector< std::shared_ptr<Entity> > m_Entities;
@@ -58,7 +59,6 @@ namespace Exampler {
 		BackBeat::RecorderManager* m_RecorderMgr;
 		BackBeat::Renderer* m_AudioRenderer;
 		BackBeat::MIDIDeviceManager* m_MIDIDeviceManager;
-		BackBeat::Visualizer* m_Visualizer;
 		BackBeat::FileManager m_FileMgr;
 		std::shared_ptr<BackBeat::Project> m_ActiveProject;
 
@@ -74,7 +74,6 @@ namespace Exampler {
 		void RenderProjectMgr();
 		void RenderMenubar();
 		void RenderCanvas();
-		void RenderAudioVisualizer();
 		void RenderMgrs();
 		void RenderEntityMenubar(unsigned int index);
 		void RenderMenubarPopups();

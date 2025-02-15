@@ -24,6 +24,7 @@
 #include "BackBeat/Audio/Recorder/RecorderManager.h"
 #include "BackBeat/Audio/Instruments/Sampler/Sampler.h"
 #include "BackBeat/Audio/Instruments/Synth/Synth.h"
+#include "BackBeat/Audio/Visualizers/Spectrogram.h"
 
 #include "BackBeat/File/FileDialog.h"
 #include "BackBeat/File/FileManager.h"

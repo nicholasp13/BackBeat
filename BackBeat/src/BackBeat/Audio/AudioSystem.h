@@ -5,7 +5,7 @@
 #include "BackBeat/Audio/PlayBack/PlayerManager.h"
 #include "BackBeat/Audio/Recorder/RecorderManager.h"
 #include "BackBeat/Audio/Helpers/AudioThread.h"
-#include "BackBeat/Audio/Visualizer/Visualizer.h"
+#include "BackBeat/Audio/Visualizers/Visualizer.h"
 #include "BackBeat/File/FileMapper.h"
 #include "AudioEngine.h"
 namespace BackBeat {

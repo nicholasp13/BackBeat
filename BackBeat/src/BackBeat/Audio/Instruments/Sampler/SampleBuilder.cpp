@@ -11,7 +11,7 @@ namespace BackBeat {
 			return;
 
 		AudioInfo trackInfo = track->GetInfo();
-		if (trackInfo.type != FileType::wav)
+		if (trackInfo.type != FileType::wav && trackInfo.type != FileType::recordingTemp)
 			return;
 
 		AudioProps trackProps = trackInfo.props;

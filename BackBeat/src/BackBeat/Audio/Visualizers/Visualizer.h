@@ -1,7 +1,5 @@
 #pragma once
 
-// NOTES: Will be created with use by 
-
 #include "BackBeat/Audio/IO/AudioSink.h"
 namespace BackBeat {
 

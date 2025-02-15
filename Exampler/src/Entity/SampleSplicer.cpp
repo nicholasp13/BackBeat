@@ -1,8 +1,13 @@
-// TODO: - Redesign GUI
-//           - Add ImGui::Timeline to show waveform/data
-//       - Switch to MappedTrack
-//       - Fix bug when sampling MONO tracks
+// TODO: Redesign GUI
+//       - Add way to decrease visual max
 //       - Add zero crossing finding tool
+//       - Seperate wave data shower and track player into two separate sections of splicer
+//             - Top part shows the 10 secs buffer of where m_start is
+//             - User can LOCK the sample into place where the player is
+//             - User can play the sample seperately
+//                 - The sample should be played perhaps by a new SampleSplicer BB object that allows for modulation
+//                   including panning, filtering, etc. 
+//             
 
 #include "SampleSplicer.h"
 namespace Exampler {
@@ -17,9 +22,13 @@ namespace Exampler {
 		m_Size(0),
 		m_StartMs(0),
 		m_EndMs(0),
-		m_Volume(1.0f)
+		m_Volume(1.0f),
+		m_Buffer(std::make_shared<float[]>(BufferSize)),
+		m_Loader(BufferSize * BackBeat::Audio::FloatByteSize* BackBeat::Audio::Stereo),
+		m_Props(BackBeat::AudioProps()),
+		m_Track(nullptr)
 	{
-
+		
 	}
 
 	SampleSplicer::~SampleSplicer()
@@ -45,8 +54,10 @@ namespace Exampler {
 		float byteRate = 0.0f;
 
 		if (trackSet)
+		{
 			bytesPerMs = m_TrackPlayer.GetByteRate() / 1000;
-
+			strcpy_s(trackName, m_TrackPlayer.GetTrackName().c_str());
+		}
 		const ImGuiViewport* mainViewport = ImGui::GetMainViewport();
 		float x = mainViewport->WorkPos.x;
 		float y = mainViewport->WorkPos.y;
@@ -66,16 +77,46 @@ namespace Exampler {
 				if (ImGui::Button("Open"))
 				{
 					m_TrackPlayer.Pause();
-					m_TrackPlayer.LoadTrack(BackBeat::FileDialog::OpenFile("WAV Files (*.wav)\0*.wav\0"));
-					strcpy_s(trackName, m_TrackPlayer.GetTrackName().c_str());
-					trackSet = m_TrackPlayer.IsLoaded();
-					m_Zero = 0;
-					m_Start = 0;
-					m_End = m_TrackPlayer.GetSize();
-					m_Size = m_End;
-					bytesPerMs = m_TrackPlayer.GetByteRate() / 1000;
-					m_StartMs = 0;
-					m_EndMs = (int)((float)m_End / (float)bytesPerMs);
+					auto filePath = BackBeat::FileDialog::OpenFile("WAV Files (*.wav)\0*.wav\0");
+					auto trackToCopy = BackBeat::TrackFactory::BuildMappedTrack(filePath);
+
+					if (trackToCopy)
+					{
+						m_Track = nullptr;
+						m_TrackPlayer.ClearTrack();
+
+						// Copy/translate data to a floating point track
+						m_Props = trackToCopy->GetProps();
+
+						if (m_Props.bitDepth != BackBeat::Audio::FloatBitSize)
+						{
+							m_Props.bitDepth = BackBeat::Audio::FloatBitSize;
+							m_Props.blockAlign = m_Props.numChannels * BackBeat::Audio::FloatByteSize;
+							m_Props.format = BackBeat::Audio::FormatFloatingPoint;
+							m_Props.byteRate = m_Props.sampleRate * m_Props.blockAlign;
+						}
+
+						m_Track = BackBeat::TrackFactory::BuildMappedTempTrack(m_TrackPlayer.GetID(), m_Props);
+
+						if (m_Track)
+						{
+							BackBeat::TrackFactory::CopyTrackData(trackToCopy, m_Track);
+
+							m_Track->SetName(trackToCopy->GetName());
+							m_TrackPlayer.LoadTrack(m_Track);
+							strcpy_s(trackName, m_TrackPlayer.GetTrackName().c_str());
+							trackSet = m_TrackPlayer.IsLoaded();
+							m_Zero = 0;
+							m_Start = 0;
+							m_End = m_Track->GetSize();
+							m_Size = m_End;
+							bytesPerMs = m_TrackPlayer.GetByteRate() / 1000;
+							m_StartMs = 0;
+							m_EndMs = (int)((float)m_End / (float)bytesPerMs);
+						}
+						else
+							BB_CLIENT_ERROR("Error loading track to SampleSplicer");
+					}
 				}
 				ImGui::SameLine();
 			}
@@ -85,7 +126,6 @@ namespace Exampler {
 				if (ImGui::Button("Save"))
 				{
 					BackBeat::SampleBuilder::SaveSample(m_TrackPlayer.GetTrack(), m_Start, m_End);
-					ImGui::CloseCurrentPopup();
 				}
 				ImGui::SameLine();
 			}
@@ -110,12 +150,15 @@ namespace Exampler {
 			// Track Name
 			ImGui::Text("Track: "); ImGui::SameLine(); ImGui::Text(trackName);
 
+			// Render actual buffer data
+			RenderBuffer();
+
 			// Renders Track Editor
 			{
 				ImGui::PushItemWidth(m_Width - 200.0f);
 				byteRate = (float)m_TrackPlayer.GetByteRate();
 				BackBeat::TimeMinSec zeroTime = BackBeat::TimeMinSec();
-				BackBeat::TimeMinSec sizeTime = BackBeat::TimeMinSec();;
+				BackBeat::TimeMinSec sizeTime = BackBeat::TimeMinSec();
 				if (m_TrackPlayer.IsLoaded())
 				{
 					zeroTime = BackBeat::Audio::GetTime((float)m_Zero / byteRate);
@@ -318,12 +361,11 @@ namespace Exampler {
 		{
 			m_TrackPlayer.Stop();
 			m_TrackPlayer.ClearTrack();
-			strcpy_s(trackName, "");
+			m_Track = nullptr;
 			m_Zero = 0;
 			m_Start = 0;
 			m_End = 0;
 			m_Size = 0;
-			bytesPerMs = 0;
 			m_StartMs = 0;
 			m_EndMs = 0;
 			m_Volume = 1.0f;
@@ -345,6 +387,7 @@ namespace Exampler {
 		m_Open = false;
 		m_TrackPlayer.Stop();
 		m_TrackPlayer.ClearTrack();
+		m_Track = nullptr;
 		m_Zero = 0;
 		m_Start = 0;
 		m_End = 0;
@@ -352,6 +395,85 @@ namespace Exampler {
 		m_StartMs = 0;
 		m_EndMs = 0;
 		m_Volume = 1.0f;
+	}
+
+	void SampleSplicer::RenderBuffer()
+	{
+		const float visualMax = 1.0f;
+		const float width = m_Width - 50.0f;
+		const float height = 200.0f;
+		unsigned int numBytes = BufferSize * BackBeat::Audio::FloatByteSize;
+		unsigned int numSamples = BufferSize;
+		unsigned int length = (m_End - m_Start);
+		float progress = 0.0f;
+
+		BackBeat::TimeMinSec sizeTime = BackBeat::TimeMinSec();
+		unsigned int sizeTimeMs = m_EndMs - m_StartMs;
+
+		BackBeat::Audio::FlushBuffer((byte*)m_Buffer.get(), numBytes);
+
+		if (m_Track)
+		{
+			auto props = m_Track->GetProps();
+			unsigned int position = m_Start - (m_Start % props.blockAlign);
+
+			// Calculate the size of the data displayed
+			if (numBytes > length / props.numChannels)
+			{
+				numBytes = length / props.numChannels;
+				numBytes -= (numBytes % props.blockAlign);
+				numSamples = numBytes / props.blockAlign * props.numChannels;
+
+				sizeTime = BackBeat::Audio::GetTime((float)numBytes / props.byteRate * props.numChannels);
+
+				// Calculate progress
+				if (m_TrackPlayer.IsPlaying())
+				{
+					unsigned int progressPos = m_Track->GetPosition();
+					progress = ((float)progressPos - (float)m_Start) / (float)numBytes / props.numChannels;
+				}
+				else
+					progress = 0.0f;
+
+			}
+			else
+			{
+				numBytes -= (numBytes % props.blockAlign);
+				numSamples = numBytes / props.blockAlign * props.numChannels;
+
+				sizeTime = BackBeat::Audio::GetTime((float)numBytes / props.byteRate * props.numChannels);
+				sizeTimeMs = 10000;
+
+				// Calculate progress
+				if (m_TrackPlayer.IsPlaying())
+				{
+					unsigned int progressPos = m_Track->GetPosition();
+					progress = ((float)progressPos - (float)m_Start) / (float)numBytes / m_Props.numChannels;
+				}
+				else
+					progress = 0.0f;
+			}
+
+			ImGui::Text("Size: %d:%02d", sizeTime.minutes, sizeTime.seconds); ImGui::SameLine();
+			ImGui::Text("(%d ms)", sizeTimeMs);
+
+			if (!m_Loader.Load(m_Track, (byte*)m_Buffer.get(), numBytes, position, 0))
+				BB_CLIENT_INFO("FAILED TO LOAD");
+
+			BackBeat::ImGuiWidgets::ImGuiTimeline("", m_Buffer.get(), numSamples, 1, "",
+				visualMax * -1, visualMax, ImVec2(width, height),
+				BackBeat::Audio::FloatByteSize, progress);
+		}
+		else
+		{
+			ImGui::Text("Size: %d:%02d", 0, 0); ImGui::SameLine();
+			ImGui::Text("(%d ms)", 0);
+
+			// Creates empty timeline
+			BackBeat::ImGuiWidgets::ImGuiTimeline("", m_Buffer.get(), BufferSize, 1, "",
+				visualMax * -1, visualMax, ImVec2(width, height),
+				BackBeat::Audio::FloatByteSize, progress);
+		}
 	}
 
 }
