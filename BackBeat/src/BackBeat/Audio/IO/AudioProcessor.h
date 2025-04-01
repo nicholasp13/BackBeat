@@ -9,7 +9,7 @@ namespace BackBeat {
 	class AudioProcessor
 	{
 	public:
-		virtual void ProcessSamples(unsigned int numSamples, unsigned int sampleRate, unsigned int numChannels) {}
+		virtual void ProcessSamples(unsigned int numFrames, unsigned int sampleRate, unsigned int numChannels) {}
 		virtual AudioProps GetProperties() { return AudioProps(); }
 		virtual AudioBus* GetBus() { return nullptr; }
 		virtual UUID GetID() { return UUID(0); }

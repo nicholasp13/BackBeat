@@ -59,9 +59,6 @@ namespace Exampler {
 		}
 
 		const ImGuiViewport* mainViewport = ImGui::GetMainViewport();
-		float x = mainViewport->WorkPos.x;
-		float y = mainViewport->WorkPos.y;
-		ImGui::SetNextWindowPos(ImVec2(x, y), ImGuiCond_FirstUseEver);
 		ImGui::SetNextWindowSize(ImVec2(m_Width, m_Height), ImGuiCond_Once);
 		// Sampler flags
 		ImGuiWindowFlags samplerWindowFlags = 0;

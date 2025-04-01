@@ -116,6 +116,7 @@ namespace BackBeat {
 		// ----- CONSTANTS ----- //
 
 		// MISC CONSTANTS
+		constexpr float Pi                    = 3.141592653589793f; // Float(32 bit) precise pi; 
 		constexpr unsigned int ByteBitSize    = 8;
 		constexpr unsigned int ByteByteSize   = 1;
 		constexpr unsigned int Int16BitSize   = 16;
@@ -149,7 +150,32 @@ namespace BackBeat {
 		constexpr unsigned int SAMPLETotalHeaderSize = 42;
 		const auto SAMPLE = "SAMPLE";
 
+		// DEFAULT AUDIO PROP CONSTANTS
+		constexpr unsigned short DefaultFormat      = FormatFloatingPoint;
+		constexpr unsigned short DefaultNumChannels = Stereo;
+		constexpr unsigned long DefaultSampleRate   = 48000ul;
+		constexpr unsigned long DefaultByteRate     = 384000ul;
+		constexpr unsigned short DefaultBlockAlign  = 8;
+		constexpr unsigned short DefaultBitDepth    = FloatBitSize;
+		constexpr unsigned long DefaultFileSize     = 0ul;
+		
+
 		// ----- HELPER FUNCTIONS ----- //
+
+		inline static AudioProps GetDefaultProps()
+		{
+			AudioProps props  = AudioProps();
+			props.bigEndian   = IsBigEndian();
+			props.format      = DefaultFormat;
+			props.numChannels = DefaultNumChannels;
+			props.sampleRate  = DefaultSampleRate;
+			props.byteRate    = DefaultByteRate;
+			props.blockAlign  = DefaultBlockAlign;
+			props.bitDepth    = DefaultBitDepth;
+			props.fileSize    = DefaultFileSize;
+
+			return props;
+		}
 
 		inline static float Lerp(float a, float b, float fraction) { return ((b - a) * fraction + a); }
 
@@ -553,6 +579,7 @@ namespace BackBeat {
 
 			level *= s_FScale;
 
+			// Original code
 			/*while (bufferSize--)
 			{
 				s_X1 ^= s_X2;
@@ -560,6 +587,7 @@ namespace BackBeat {
 				s_X2 += s_X1;
 			}*/
 
+			// Cleanup to match BackBeat style
 			for (unsigned int i = 0; i < bufferSize; i++)
 			{
 				s_X1 ^= s_X2;
@@ -580,5 +608,34 @@ namespace BackBeat {
 			return max;
 		}
 
+		inline static float GetMagnitude(float real, float im)
+		{
+			return sqrtf((real * real) + (im * im));
+		}
+
+
+		// @return - in radians
+		inline static float GetPhase(float real, float im)
+		{
+			return atan2(im, real);
+		}
+
+		inline static float GetRealCoef(float mag, float phase)
+		{
+			return mag * cos(phase);
+		}
+		
+		inline static float GetImCoef(float mag, float phase)
+		{
+			return mag * sin(phase);
+		}
+
+		inline static float PrincipalArg(float radians)
+		{
+			if (radians >= 0.0f)
+				return std::fmod(radians + Pi, 2.0f * Pi) - Pi;
+			else
+				return std::fmod(radians + Pi, -2.0f * Pi) + Pi;
+		}
 	}
 }

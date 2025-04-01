@@ -42,15 +42,20 @@ namespace Exampler {
 		int m_StartMs;
 		int m_EndMs;
 		float m_Volume;
+		float m_TimeRatio;
 		std::shared_ptr<float[]> m_Buffer;
 
+		BackBeat::SplicerParameters m_Params;
 		BackBeat::AudioFileLoader m_Loader;
 		BackBeat::Player m_TrackPlayer;
 		BackBeat::AudioProps m_Props;
+		BackBeat::Splicer m_Splicer;
 		std::shared_ptr<BackBeat::MappedTrack> m_Track;
 
 
 	private:
+		void RenderTrackControls();
+		void RenderSplicerControls();
 		void RenderBuffer();
 	};
 

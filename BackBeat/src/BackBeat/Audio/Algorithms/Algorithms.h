@@ -143,6 +143,7 @@ namespace BackBeat {
 		namespace Algorithms {
 
 			void fftw3(float* input, complexArray* output, unsigned int numSamples);
+			void ifftw3(complexArray* input, float* output, unsigned int numSamples);
 
 		}
 

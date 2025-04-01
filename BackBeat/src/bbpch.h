@@ -18,6 +18,7 @@
 #include <algorithm>
 #include <cstdio>
 #include <stdatomic.h>
+#include <cmath>
 
 #ifdef BB_PLATFORM_WINDOWS
 	#include <Windows.h>
