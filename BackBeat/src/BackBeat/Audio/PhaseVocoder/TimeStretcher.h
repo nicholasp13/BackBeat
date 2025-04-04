@@ -1,8 +1,5 @@
 #pragma once
 
-// TODO:
-//  - Add rule of 5 to TimeStretcherBinData
-
 // Uses Will Pirkle's peak finding and locking algorithms found in PSVocoder
 // This is essentially PSVocoder without the pitch shifting
 // link: https://www.willpirkle.com/fx-book/project-gallery/
@@ -47,8 +44,6 @@ namespace BackBeat {
 		TimeStretcher();
 		~TimeStretcher();
 
-		void FindPeaksAndRegionsOfInfluence();
-		int FindPreviousNearestPeak(unsigned int index);
 		void Update(TimeStretcherParameters params);
 		void ResetOutput();
 		void ProcessAudioFrame(float* input, unsigned int numSamples);
@@ -88,6 +83,8 @@ namespace BackBeat {
 		BinData m_BinDataPrevious[TimeStretcherFFTLength] = {};
 
 	private:
+		void FindPeaksAndRegionsOfInfluence();
+		int FindPreviousNearestPeak(unsigned int index);
 		void AddZeroPad(float* buffer, unsigned int num);
 		void OverlapAdd(float* buffer, unsigned int num);
 	};

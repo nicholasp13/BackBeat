@@ -23,133 +23,6 @@ namespace BackBeat {
 
 	} 
 
-	// Find bin index of nearest peak bin in previous FFT frame
-	int TimeStretcher::FindPreviousNearestPeak(unsigned int index)
-	{
-		// First run there are no peaks
-		if (m_PeakBinsPrevious[0] == -1)
-			return -1;
-
-		int delta = -1;
-		int previousPeak = -1;
-		for (unsigned int i = 0; i < TimeStretcherFFTLength; i++)
-		{
-			if (m_PeakBinsPrevious[i] < 0)
-				break;
-
-			int dist = std::abs((int)index - m_PeakBinsPrevious[i]);
-			if (dist > TimeStretcherFFTLength / 4)
-				break;
-
-			if (i == 0)
-			{
-				previousPeak = i;
-				delta = dist;
-			}
-			else if (dist < delta)
-			{
-				previousPeak = i;
-				delta = dist;
-			}
-		}
-
-		return previousPeak;
-	}
-
-	void TimeStretcher::FindPeaksAndRegionsOfInfluence()
-	{
-		// Find local maxima in 4-sample window
-		float localWindow[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
-		int m = 0;
-		for (unsigned int i = 0; i < TimeStretcherFFTLength; i++)
-		{
-			if (i == 0)
-			{
-				localWindow[0] = 0.0f;
-				localWindow[1] = 0.0f;
-				localWindow[2] = m_BinData[i + 1].magnitude;
-				localWindow[3] = m_BinData[i + 2].magnitude;
-			}
-			else  if (i == 1)
-			{
-				localWindow[0] = 0.0f;
-				localWindow[1] = m_BinData[i - 1].magnitude;
-				localWindow[2] = m_BinData[i + 1].magnitude;
-				localWindow[3] = m_BinData[i + 2].magnitude;
-			}
-			else  if (i == TimeStretcherFFTLength - 1)
-			{
-				localWindow[0] = m_BinData[i - 2].magnitude;
-				localWindow[1] = m_BinData[i - 1].magnitude;
-				localWindow[2] = 0.0f;
-				localWindow[3] = 0.0f;
-			}
-			else  if (i == TimeStretcherFFTLength - 2)
-			{
-				localWindow[0] = m_BinData[i - 2].magnitude;
-				localWindow[1] = m_BinData[i - 1].magnitude;
-				localWindow[2] = m_BinData[i + 1].magnitude;
-				localWindow[3] = 0.0f;
-			}
-			else
-			{
-				localWindow[0] = m_BinData[i - 2].magnitude;
-				localWindow[1] = m_BinData[i - 1].magnitude;
-				localWindow[2] = m_BinData[i + 1].magnitude;
-				localWindow[3] = m_BinData[i + 2].magnitude;
-			}
-
-			// Found peak bin
-			if (m_BinData[i].magnitude > 0.00001f &&
-				m_BinData[i].magnitude > localWindow[0]
-				&& m_BinData[i].magnitude > localWindow[1]
-				&& m_BinData[i].magnitude > localWindow[2]
-				&& m_BinData[i].magnitude > localWindow[3])
-			{
-				m_BinData[i].isPeak = true;
-				m_PeakBins[m++] = i;
-
-				// For peak bins, assume that it is part of a previous, moving peak
-				m_BinData[i].previousPeakBin = FindPreviousNearestPeak(i);
-			}
-		}
-
-		// Assign peak bosses
-		if (m > 0)
-		{
-			int n = 0;
-			int bossPeakBin = m_PeakBins[n];
-			double nextPeak = m_PeakBins[++n];
-			int midBoundary = int((nextPeak - (double)bossPeakBin) / 2.0) + bossPeakBin;
-
-			if (nextPeak >= 0)
-			{
-				for (int i = 0; i < TimeStretcherFFTLength; i++)
-				{
-					if (i <= bossPeakBin)
-					{
-						m_BinData[i].localPeakBin = bossPeakBin;
-					}
-					else if (i < midBoundary)
-					{
-						m_BinData[i].localPeakBin = bossPeakBin;
-					}
-					else // boundary, calc next set
-					{
-						bossPeakBin = (int)nextPeak;
-						nextPeak = m_PeakBins[++n];
-						if (nextPeak > bossPeakBin)
-							midBoundary = int((nextPeak - (double)bossPeakBin) / 2.0) + bossPeakBin;
-						else // nextPeak == -1
-							midBoundary = TimeStretcherFFTLength;
-
-						m_BinData[i].localPeakBin = bossPeakBin;
-					}
-				}
-			}
-		}
-	}
-
 	// Must call at least once before calling ProcessAudioFrame and whenever the user updates params
 	void TimeStretcher::Update(TimeStretcherParameters params)
 	{
@@ -306,10 +179,137 @@ namespace BackBeat {
 		OverlapAdd(m_IFFTOutput, TimeStretcherFFTLength);
 	}
 
+	// Find bin index of nearest peak bin in previous FFT frame
+	int TimeStretcher::FindPreviousNearestPeak(unsigned int index)
+	{
+		// First run there are no peaks
+		if (m_PeakBinsPrevious[0] == -1)
+			return -1;
+
+		int delta = -1;
+		int previousPeak = -1;
+		for (unsigned int i = 0; i < TimeStretcherFFTLength; i++)
+		{
+			if (m_PeakBinsPrevious[i] < 0)
+				break;
+
+			int dist = std::abs((int)index - m_PeakBinsPrevious[i]);
+			if (dist > TimeStretcherFFTLength / 4)
+				break;
+
+			if (i == 0)
+			{
+				previousPeak = i;
+				delta = dist;
+			}
+			else if (dist < delta)
+			{
+				previousPeak = i;
+				delta = dist;
+			}
+		}
+
+		return previousPeak;
+	}
+
+	void TimeStretcher::FindPeaksAndRegionsOfInfluence()
+	{
+		// Find local maxima in 4-sample window
+		float localWindow[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+		int m = 0;
+		for (unsigned int i = 0; i < TimeStretcherFFTLength; i++)
+		{
+			if (i == 0)
+			{
+				localWindow[0] = 0.0f;
+				localWindow[1] = 0.0f;
+				localWindow[2] = m_BinData[i + 1].magnitude;
+				localWindow[3] = m_BinData[i + 2].magnitude;
+			}
+			else  if (i == 1)
+			{
+				localWindow[0] = 0.0f;
+				localWindow[1] = m_BinData[i - 1].magnitude;
+				localWindow[2] = m_BinData[i + 1].magnitude;
+				localWindow[3] = m_BinData[i + 2].magnitude;
+			}
+			else  if (i == TimeStretcherFFTLength - 1)
+			{
+				localWindow[0] = m_BinData[i - 2].magnitude;
+				localWindow[1] = m_BinData[i - 1].magnitude;
+				localWindow[2] = 0.0f;
+				localWindow[3] = 0.0f;
+			}
+			else  if (i == TimeStretcherFFTLength - 2)
+			{
+				localWindow[0] = m_BinData[i - 2].magnitude;
+				localWindow[1] = m_BinData[i - 1].magnitude;
+				localWindow[2] = m_BinData[i + 1].magnitude;
+				localWindow[3] = 0.0f;
+			}
+			else
+			{
+				localWindow[0] = m_BinData[i - 2].magnitude;
+				localWindow[1] = m_BinData[i - 1].magnitude;
+				localWindow[2] = m_BinData[i + 1].magnitude;
+				localWindow[3] = m_BinData[i + 2].magnitude;
+			}
+
+			// Found peak bin
+			if (m_BinData[i].magnitude > 0.00001f &&
+				m_BinData[i].magnitude > localWindow[0]
+				&& m_BinData[i].magnitude > localWindow[1]
+				&& m_BinData[i].magnitude > localWindow[2]
+				&& m_BinData[i].magnitude > localWindow[3])
+			{
+				m_BinData[i].isPeak = true;
+				m_PeakBins[m++] = i;
+
+				// For peak bins, assume that it is part of a previous, moving peak
+				m_BinData[i].previousPeakBin = FindPreviousNearestPeak(i);
+			}
+		}
+
+		// Assign peak bosses
+		if (m > 0)
+		{
+			int n = 0;
+			int bossPeakBin = m_PeakBins[n];
+			double nextPeak = m_PeakBins[++n];
+			int midBoundary = int((nextPeak - (double)bossPeakBin) / 2.0) + bossPeakBin;
+
+			if (nextPeak >= 0)
+			{
+				for (int i = 0; i < TimeStretcherFFTLength; i++)
+				{
+					if (i <= bossPeakBin)
+					{
+						m_BinData[i].localPeakBin = bossPeakBin;
+					}
+					else if (i < midBoundary)
+					{
+						m_BinData[i].localPeakBin = bossPeakBin;
+					}
+					else // boundary, calc next set
+					{
+						bossPeakBin = (int)nextPeak;
+						nextPeak = m_PeakBins[++n];
+						if (nextPeak > bossPeakBin)
+							midBoundary = int((nextPeak - (double)bossPeakBin) / 2.0) + bossPeakBin;
+						else // nextPeak == -1
+							midBoundary = TimeStretcherFFTLength;
+
+						m_BinData[i].localPeakBin = bossPeakBin;
+					}
+				}
+			}
+		}
+	}
+
 	// Assumes to start writing at m_InputHopSize size - num
 	void TimeStretcher::AddZeroPad(float* buffer, unsigned int num)
 	{
-		for (unsigned int i = m_InputHopSize - num; i < m_InputHopSize; i++)
+		for (unsigned int i = TimeStretcherFFTLength - num; i < TimeStretcherFFTLength; i++)
 		{
 			buffer[i] = 0.0f;
 		}

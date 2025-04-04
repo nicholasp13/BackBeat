@@ -1,5 +1,12 @@
 #pragma once
 
+// This processes in audio frames which may cause a problem if this is needed for
+// real time processes like certain audio fx. To fix that this can be implemented
+// with a per sample process instead of audio frames and a circular buffer output
+// For current uses in BackBeat this is fine for now
+
+#include <fftw3.h>
+
 #include "BackBeat/Audio/Audio.h"
 namespace BackBeat {
 
@@ -95,7 +102,7 @@ namespace BackBeat {
 			updatedPhase = other.updatedPhase;
 		}
 
-		BinData(BinData&& rhs)
+		BinData(BinData&& rhs) noexcept
 		{
 			isPeak = rhs.isPeak;
 			magnitude = rhs.magnitude;
@@ -152,10 +159,52 @@ namespace BackBeat {
 		float updatedPhase = 0.0f;     // phase update value
 	};
 
-	// Empty class for now
 	class PhaseVocoder
 	{
-		
+	public:
+		PhaseVocoder();
+		~PhaseVocoder();
+
+		void Init(unsigned int frameLength, unsigned int hopSize, WindowType windowType);
+		void ResetOutput();
+		void ProcessAudioFrame(float* input, unsigned int numSamples);
+		void DoFFTW();
+		void DoIFFT();
+
+		inline unsigned int GetFFTSize() { return m_FrameLength; }
+		inline unsigned int GetHopSize() { return m_HopSize; }
+		inline unsigned int GetOutputSize() { return m_OutputSize; }
+		inline float* GetOutput() { return m_Output; }
+		inline fftwf_complex* GetFFTOutput() { return m_FFTOutput; }
+		inline fftwf_complex* GetIFFTOutput() { return m_IFFTOutput; }
+
+	private:
+		static const unsigned int m_MaxOutputSize = 960000; // 20 seconds in 48k sample rate
+
+		bool m_Init = false;
+		unsigned int m_FrameLength = 0;
+		unsigned int m_HopSize = 0;
+		unsigned int m_OutputSize = 0;
+		unsigned int m_OutputWriteIndex = 0;
+		float m_WindowCorrectionGain = 0.0f;
+
+		float* m_WindowBuffer = nullptr;
+		float* m_TempOutputBuffer = nullptr;
+		float m_Output[m_MaxOutputSize] = { 0.0f };
+
+		// fftw3 members
+		fftwf_complex* m_FFTInput = nullptr;
+		fftwf_complex* m_FFTOutput = nullptr;
+		fftwf_complex* m_IFFTOutput = nullptr;
+		fftwf_plan m_FFTPlan = nullptr;
+		fftwf_plan m_IFFTPlan = nullptr;
+
+		WindowType m_WindowType = WindowType::None;
+
+	private:
+		void DeleteFFTW();
+		void AddZeroPad(float* buffer, unsigned int num);
+		void OverlapAdd(float* buffer, unsigned int num);
 	};
 
 }
