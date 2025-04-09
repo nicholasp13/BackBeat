@@ -1,7 +1,12 @@
 #pragma once
 
+// TODO:
+//     - Add gain/pan
+//     - Add filters
+
 #include "BackBeat/Audio/Instruments/Sampler/SampleBuilder.h"
 #include "BackBeat/Audio/PhaseVocoder/TimeStretcher.h"
+#include "BackBeat/Audio/PhaseVocoder/PitchShifter.h"
 #include "BackBeat/Audio/Instruments/Synth/SynthBase.h"
 #include "SplicerPlayer.h"
 namespace BackBeat {
@@ -10,18 +15,20 @@ namespace BackBeat {
 
 	// Unlike instrument objects these parameters are not shared rather each object will have an
 	// Update(Params params) function to take in. This is because these process are more costly and 
-	// processes a larger data size so Splicer checks every Update() if it needs to process them 
+	// processes a larger data size so Splicer should be called by the user instead of on a loop
 	struct SplicerParameters
 	{
 		float pan = SynthBase::PanDefault;
 
 		// Fx object params
 		TimeStretcherParameters timeStretcherParams = TimeStretcherParameters();
+		PitchShifterParameters pitchShifterParams = PitchShifterParameters();
 
 		SplicerParameters& operator = (const SplicerParameters& rhs)
 		{
 			pan = rhs.pan;
 			timeStretcherParams = rhs.timeStretcherParams;
+			pitchShifterParams = rhs.pitchShifterParams;
 
 			return *this;
 		}
@@ -33,6 +40,7 @@ namespace BackBeat {
 
 			equals = equals && Audio::EqualsFloat(pan, rhs.pan, delta);
 			equals = equals && (timeStretcherParams == rhs.timeStretcherParams);
+			equals = equals && (pitchShifterParams == rhs.pitchShifterParams);
 
 			return equals;
 		}
@@ -86,15 +94,14 @@ namespace BackBeat {
 
 		// Fx objects
 		TimeStretcher m_TimeStretcher;
-		// TimeShrinker
+		PitchShifter m_PitchShifter;
 		// Filters
-
-		// Splicer processor
 
 	private:
 		void SplitInputBuffer();
 		void ProcessFx();
 		void ProcessTimeStretcher();
+		void ProcessPitchShifter();
 		void Pan();
 	};
 

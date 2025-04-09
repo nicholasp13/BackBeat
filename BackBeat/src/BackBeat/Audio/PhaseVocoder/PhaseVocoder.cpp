@@ -1,3 +1,5 @@
+#include "bbpch.h"
+
 #include "PhaseVocoder.h"
 
 namespace BackBeat {
@@ -10,9 +12,12 @@ namespace BackBeat {
 
 	PhaseVocoder::~PhaseVocoder()
 	{
-		delete[m_FrameLength] m_WindowBuffer;
-		delete[m_FrameLength] m_TempOutputBuffer;
-		DeleteFFTW();
+		if (m_Init)
+		{
+			delete[m_FrameLength] m_WindowBuffer;
+			delete[m_FrameLength] m_TempOutputBuffer;
+			DeleteFFTW();
+		}
 	}
 
 

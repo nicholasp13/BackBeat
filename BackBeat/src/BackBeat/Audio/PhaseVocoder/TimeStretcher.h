@@ -28,7 +28,7 @@ namespace BackBeat {
 		bool operator == (const TimeStretcherParameters& rhs)
 		{
 			const float delta = 0.001f; // A thousandth of a second difference
-			return Audio::EqualsFloat(this->ratio, rhs.ratio, delta);
+			return Audio::EqualsFloat(ratio, rhs.ratio, delta);
 		}
 
 		bool operator != (const TimeStretcherParameters& rhs)
@@ -61,12 +61,12 @@ namespace BackBeat {
 		const unsigned int m_WindowSize = TimeStretcherFFTLength;
 		const WindowType m_WindowType = WindowType::Hann;
 
-		bool m_Init;
-		unsigned int m_OutputHopSize;
-		unsigned int m_OutputSize;
-		unsigned int m_OutputIndex;
-		float m_WindowCorrectionGain;
-		float m_Ratio;
+		bool m_Init = false;
+		unsigned int m_OutputHopSize = 0;
+		unsigned int m_OutputSize = 0;
+		unsigned int m_OutputIndex = 0;
+		float m_WindowCorrectionGain = 1.0f;
+		float m_Ratio = 1.0f;
 
 		int m_PeakBins[TimeStretcherFFTLength] = { -1 };         // array of current peak bin index values (-1 = not peak)
 		int m_PeakBinsPrevious[TimeStretcherFFTLength] = { -1 }; // array of previous peak bin index values (-1 = not peak)
@@ -76,15 +76,15 @@ namespace BackBeat {
 		float m_IFFTOutput[TimeStretcherFFTLength] = { 0.0f };
 		float m_Output[m_MaxOutputSize] = { 0.0f };
 
-		complexArray m_FFTOutput;
-		complexArray m_IFFTInput;
-		TimeStretcherParameters m_Params;
+		complexArray m_FFTOutput = complexArray(TimeStretcherFFTLength);
+		complexArray m_IFFTInput = complexArray(TimeStretcherFFTLength);
+		TimeStretcherParameters m_Params = TimeStretcherParameters();
 		BinData m_BinData[TimeStretcherFFTLength] = {};
 		BinData m_BinDataPrevious[TimeStretcherFFTLength] = {};
 
 	private:
-		void FindPeaksAndRegionsOfInfluence();
 		int FindPreviousNearestPeak(unsigned int index);
+		void FindPeaksAndRegionsOfInfluence();
 		void AddZeroPad(float* buffer, unsigned int num);
 		void OverlapAdd(float* buffer, unsigned int num);
 	};

@@ -30,7 +30,7 @@ namespace Exampler {
 		                                         // floating point AudioProps
 
 		const float m_Width = 900.0f;
-		const float m_Height = 500.0f;
+		const float m_Height = 550.0f;
 
 		bool m_Open;
 		bool m_Looping;

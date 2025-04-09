@@ -19,6 +19,7 @@ namespace BackBeat {
 
 	}
 
+	// This should be called by user input NOT on an update loop
 	void Splicer::Update(SplicerParameters params)
 	{
 		if (m_SampleInputSize == 0)
@@ -145,6 +146,8 @@ namespace BackBeat {
 		SplitInputBuffer();
 
 		ProcessTimeStretcher();
+		
+		ProcessPitchShifter();
 
 		Pan();
 
@@ -219,6 +222,76 @@ namespace BackBeat {
 		}
 
 		m_SampleOutputSize = m_TimeStretcher.GetOutputSize();
+	}
+
+	void Splicer::ProcessPitchShifter()
+	{
+		m_PitchShifter.Update(m_Params.pitchShifterParams);
+
+		unsigned int totalInputSize = m_SampleOutputSize;
+		unsigned int hopSize = m_PitchShifter.GetInputHopSize();
+		unsigned int FFTSize = m_PitchShifter.GetFFTSize();
+
+		// Process left side first
+		{
+			unsigned int inputIndex = 0;
+			int samplesLeft = totalInputSize;
+			float* inputPtr = nullptr;
+			Audio::CopyInputToOutput(m_SplicedLeftChannel, m_TempBuffer, m_SampleOutputSize * Audio::FloatByteSize);
+
+			while (samplesLeft >= (int)FFTSize)
+			{
+				inputPtr = m_TempBuffer + inputIndex;
+
+				m_PitchShifter.ProcessAudioFrame(inputPtr, FFTSize);
+
+				inputIndex += hopSize;
+				samplesLeft -= hopSize;
+			}
+
+			if (samplesLeft > 0)
+			{
+				inputPtr = m_TempBuffer + inputIndex;
+				m_PitchShifter.ProcessAudioFrame(inputPtr, samplesLeft);
+			}
+
+			auto output = m_PitchShifter.GetOutput();
+			unsigned int outputSizeBytes = m_PitchShifter.GetOutputSize() * Audio::FloatByteSize;
+			Audio::CopyInputToOutput(output, m_SplicedLeftChannel, outputSizeBytes);
+		}
+
+		// Process right side
+		{
+			m_PitchShifter.ResetOutput();
+
+			unsigned int inputIndex = 0;
+			int samplesLeft = totalInputSize;
+			float* inputPtr = nullptr;
+			Audio::CopyInputToOutput(m_SplicedRightChannel, m_TempBuffer, m_SampleOutputSize * Audio::FloatByteSize);
+
+			while (samplesLeft >= (int)FFTSize)
+			{
+				inputPtr = m_TempBuffer + inputIndex;
+
+				m_PitchShifter.ProcessAudioFrame(inputPtr, FFTSize);
+
+				inputIndex += hopSize;
+				samplesLeft -= hopSize;
+			}
+
+			if (samplesLeft > 0)
+			{
+				inputPtr = m_TempBuffer + inputIndex;
+
+				m_PitchShifter.ProcessAudioFrame(inputPtr, samplesLeft);
+			}
+
+			auto output = m_PitchShifter.GetOutput();
+			unsigned int outputSizeBytes = m_PitchShifter.GetOutputSize() * Audio::FloatByteSize;
+			Audio::CopyInputToOutput(output, m_SplicedRightChannel, outputSizeBytes);
+		}
+
+		m_SampleOutputSize = m_PitchShifter.GetOutputSize();
 	}
 
 	void Splicer::Pan()

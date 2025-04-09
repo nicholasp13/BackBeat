@@ -14,6 +14,11 @@ namespace BackBeat {
 		recordingTemp
 	};
 
+	enum class Interpolation { 
+		linear, 
+		lagrange4
+	};
+
 	struct AudioProps {
 		bool bigEndian;
 		unsigned short format;      // 1 is uncompressed, pcm with 2's complement bit representation / 3 is uncompressed, pcm with floating point bit representation / All other numbers indicate some kind of compression
@@ -158,7 +163,7 @@ namespace BackBeat {
 		constexpr unsigned short DefaultBlockAlign  = 8;
 		constexpr unsigned short DefaultBitDepth    = FloatBitSize;
 		constexpr unsigned long DefaultFileSize     = 0ul;
-		
+
 
 		// ----- HELPER FUNCTIONS ----- //
 
@@ -180,7 +185,7 @@ namespace BackBeat {
 		inline static float Lerp(float a, float b, float fraction) { return ((b - a) * fraction + a); }
 
 		inline static float Bound(float value, float min, float max) { return (value < min) ? min : (value > max) ? max : value; }
-		
+
 		inline static void BoundValueUnipolar(float* value) { *value = Bound(*value, 0.0f, 1.0f); }
 
 		static unsigned short EndianConverterShort(char num1, char num2)
@@ -214,7 +219,7 @@ namespace BackBeat {
 		}
 
 		template<typename T>
-		static float ConvertFloat(T value) 
+		static float ConvertFloat(T value)
 		{
 			return (float)(value);
 		}
@@ -233,7 +238,7 @@ namespace BackBeat {
 
 		static void FlushBuffer(byte* buffer, unsigned int numBytes)
 		{
-			memset(buffer, 0, numBytes); 
+			memset(buffer, 0, numBytes);
 		}
 
 		template<typename T>
@@ -247,7 +252,7 @@ namespace BackBeat {
 		static bool IsBigEndian()
 		{
 			int i = 1;
-			char *p = (char*) & i;
+			char* p = (char*)&i;
 			return !p[0] == 1;
 		}
 
@@ -327,80 +332,80 @@ namespace BackBeat {
 			switch (bitDepth1)
 			{
 
-				case (ByteBitSize):
-				{
-					max1 = INT8_MAX;
-					break;
-				}
+			case (ByteBitSize):
+			{
+				max1 = INT8_MAX;
+				break;
+			}
 
-				case (Int16BitSize):
-				{
-					max1 = INT16_MAX;
-					break;
-				}
+			case (Int16BitSize):
+			{
+				max1 = INT16_MAX;
+				break;
+			}
 
-				case (Int24BitSize):
-				{
-					max1 = Int24Max;
-					break;
-				}
+			case (Int24BitSize):
+			{
+				max1 = Int24Max;
+				break;
+			}
 
-				case (FloatBitSize):
-				{
-					max1 = 1.0f;
-					break;
-				}
+			case (FloatBitSize):
+			{
+				max1 = 1.0f;
+				break;
+			}
 
-				case (DoubleBitSize):
-				{
-					max1 = 1.0f;
-					break;
-				}
+			case (DoubleBitSize):
+			{
+				max1 = 1.0f;
+				break;
+			}
 
-				default:
-				{
-					return 0.0f;
-				}
+			default:
+			{
+				return 0.0f;
+			}
 
 			}
 
 			switch (bitDepth2)
 			{
 
-				case (ByteBitSize):
-				{
-					max2 = INT8_MAX;
-					break;
-				}
+			case (ByteBitSize):
+			{
+				max2 = INT8_MAX;
+				break;
+			}
 
-				case (Int16BitSize):
-				{
-					max2 = INT16_MAX;
-					break;
-				}
+			case (Int16BitSize):
+			{
+				max2 = INT16_MAX;
+				break;
+			}
 
-				case (Int24BitSize):
-				{
-					max2 = Int24Max;
-					break;
-				}
+			case (Int24BitSize):
+			{
+				max2 = Int24Max;
+				break;
+			}
 
-				case (FloatBitSize):
-				{
-					max2 = 1.0f;
-					break;
-				}
+			case (FloatBitSize):
+			{
+				max2 = 1.0f;
+				break;
+			}
 
-				case (DoubleBitSize):
-				{
-					max2 = 1.0f;
-					break;
-				}
+			case (DoubleBitSize):
+			{
+				max2 = 1.0f;
+				break;
+			}
 
-				default:
-				{
-					return 0.0f;
-				}
+			default:
+			{
+				return 0.0f;
+			}
 
 			}
 
@@ -494,63 +499,63 @@ namespace BackBeat {
 			switch (props.bitDepth)
 			{
 
-				case (ByteBitSize):
+			case (ByteBitSize):
+			{
+				for (unsigned int i = 0; i < numSamples; i++)
 				{
-					for (unsigned int i = 0; i < numSamples; i++) 
-					{
-						buffer[i] = (byte)((float)(buffer[i]) * value);
-					}
-					break;
+					buffer[i] = (byte)((float)(buffer[i]) * value);
+				}
+				break;
+			}
+
+			case (Int16BitSize):
+			{
+				auto shortbuffer = reinterpret_cast<signed short*>(buffer);
+				for (unsigned int i = 0; i < numSamples; i++) {
+					shortbuffer[i] = (signed short)((float)(shortbuffer[i]) * value);
+				}
+				break;
+			}
+
+			case (Int24BitSize):
+			{
+				int24* intBuffer = int24::GetInt24Buffer(buffer, numSamples, props.bigEndian);
+				for (unsigned int i = 0; i < numSamples; i++)
+				{
+					intBuffer[i] = int24((float)intBuffer[i] * value);
 				}
 
-				case (Int16BitSize):
-				{
-					auto shortbuffer = reinterpret_cast<signed short*>(buffer);
-					for (unsigned int i = 0; i < numSamples; i++) {
-						shortbuffer[i] = (signed short)((float)(shortbuffer[i]) * value);
-					}
-					break;
-				}
+				byte* byteBuffer = int24::GetByteBuffer(intBuffer, numSamples, props.bigEndian);
+				Audio::CopyInputToOutput(buffer, byteBuffer, numSamples * Audio::Int24ByteSize);
+				delete[] intBuffer;
+				delete[] byteBuffer;
+				break;
+			}
 
-				case (Int24BitSize):
+			case (FloatBitSize):
+			{
+				auto floatBuffer = reinterpret_cast<float*>(buffer);
+				for (unsigned int i = 0; i < numSamples; i++)
 				{
-					int24* intBuffer = int24::GetInt24Buffer(buffer, numSamples, props.bigEndian);
-					for (unsigned int i = 0; i < numSamples; i++) 
-					{
-						intBuffer[i] = int24((float)intBuffer[i] * value);
-					}
-
-					byte* byteBuffer = int24::GetByteBuffer(intBuffer, numSamples, props.bigEndian);
-					Audio::CopyInputToOutput(buffer, byteBuffer, numSamples * Audio::Int24ByteSize);
-					delete[] intBuffer;
-					delete[] byteBuffer;
-					break;
+					floatBuffer[i] = floatBuffer[i] * value;
 				}
+				break;
+			}
 
-				case (FloatBitSize):
+			case (DoubleBitSize):
+			{
+				auto doubleBuffer = reinterpret_cast<double*>(buffer);
+				for (unsigned int i = 0; i < numSamples; i++)
 				{
-					auto floatBuffer = reinterpret_cast<float*>(buffer);
-					for (unsigned int i = 0; i < numSamples; i++) 
-					{
-						floatBuffer[i] = floatBuffer[i] * value;
-					}
-					break;
+					doubleBuffer[i] = (double)(doubleBuffer[i] * value);
 				}
+				break;
+			}
 
-				case (DoubleBitSize):
-				{
-					auto doubleBuffer = reinterpret_cast<double*>(buffer);
-					for (unsigned int i = 0; i < numSamples; i++) 
-					{
-						doubleBuffer[i] = (double)(doubleBuffer[i] * value);
-					}
-					break;
-				}
-
-				default:
-				{
-					return;
-				}
+			default:
+			{
+				return;
+			}
 
 			}
 		}
@@ -560,7 +565,7 @@ namespace BackBeat {
 		static void CalculatePanValues(float pan, float* leftVal, float* rightVal)
 		{
 			const float piOverFour = 3.141592653589793f / 4.0f;
-				
+
 			//leftPanValue = cos((kPiOverFour)*(bipolarModulator + 1.0));
 			//rightPanValue = sin((kPiOverFour)*(bipolarModulator + 1.0));
 			*leftVal = cos(piOverFour * (pan + 1));
@@ -624,7 +629,7 @@ namespace BackBeat {
 		{
 			return mag * cos(phase);
 		}
-		
+
 		inline static float GetImCoef(float mag, float phase)
 		{
 			return mag * sin(phase);
@@ -636,6 +641,127 @@ namespace BackBeat {
 				return std::fmod(radians + Pi, 2.0f * Pi) - Pi;
 			else
 				return std::fmod(radians + Pi, -2.0f * Pi) + Pi;
+		}
+
+		// @params:
+		//     x    - Pointer to array of x coords of input values
+		//     y    - Pointer to array of y coords of input values
+		//     num  - Number of values
+		//     xbar - the interpolation location 
+		// @return
+		//     the interpolated value
+		inline static float LangrangeInterpolation(float* x, float* y, unsigned int num, float xbar)
+		{
+			float fx = 0.0f;
+			float l = 1.0f;
+			for (unsigned int i = 0; i < num; i++)
+			{
+				l = 1.0f;
+				for (unsigned int j = 0; j < num; j++)
+				{
+					if (j != i)
+						l *= (xbar - x[j]) / (x[i] - x[j]);
+				}
+				fx += l * y[i];
+			}
+			return (fx);
+		}
+
+		inline static void Resample(float* input, float* output, unsigned int inLength, unsigned int outLength,
+			Interpolation interType = Interpolation::linear, float scalar = 1.0f, float* outWindow = nullptr)
+		{
+			if (inLength <= 1 || outLength <= 1)
+				return;
+			if (!input || !output)
+				return;
+
+			float x[4] = { 0.0f };
+			float y[4] = { 0.0f };
+
+			float inc = float(inLength - 1) / float(outLength - 1);
+
+
+			if (outWindow)
+				output[0] = outWindow[0] * scalar * input[0];
+			else
+				output[0] = scalar * input[0];
+
+			switch (interType)
+			{
+
+				case (Interpolation::linear):
+
+					for (unsigned int i = 0; i < outLength; i++)
+					{
+						float xInter = i * inc;
+						unsigned int x1 = (unsigned int)xInter;
+						unsigned int x2 = x1 + 1;
+
+						if (x2 >= outLength)
+							x2 = x1;
+
+						float y1 = input[x1];
+						float y2 = input[x2];
+
+						if (outWindow)
+							output[i] = outWindow[i] * scalar * Lerp(y1, y2, xInter - (float)x1);
+						else
+							output[i] = scalar * Lerp(y1, y2, xInter - (float)x1);
+					}
+
+					break;
+
+				case (Interpolation::lagrange4):
+
+					for (unsigned int i = 1; i < outLength; i++)
+					{
+						// --- find interpolation location
+						float xInterp = i * inc;
+						unsigned int x1 = (unsigned int)xInterp;
+
+						if (xInterp > 1.0 && x1 < inLength - 2)
+						{
+							x[0] = float(x1 - 1);
+							y[0] = input[(int)x[0]];
+
+							x[1] = float(x1);
+							y[1] = input[(int)x[1]];
+
+							x[2] = float(x1 + 1);
+							y[2] = input[(int)x[2]];
+
+							x[3] = float(x1 + 2);
+							y[3] = input[(int)x[3]];
+
+							if (outWindow)
+								output[i] = outWindow[i] * scalar * LangrangeInterpolation(x, y, 4, xInterp);
+							else
+								output[i] = scalar * LangrangeInterpolation(x, y, 4, xInterp);
+						}
+						else // --- linear for outer 2 end pts
+						{
+							unsigned int x2 = x1 + 1;
+							if (x2 >= outLength)
+								x2 = x1;
+							float y1 = input[x1];
+							float y2 = input[x2];
+
+							if (outWindow)
+								output[i] = outWindow[i] * scalar * Lerp(y1, y2, xInterp - x1);
+							else
+								output[i] = scalar * Lerp(y1, y2, xInterp - x1);
+						}
+					}
+
+					break;
+
+
+				default:
+					break;
+
+			}
+
+
 		}
 	}
 }

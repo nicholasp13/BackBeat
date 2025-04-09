@@ -1,44 +1,48 @@
 #include "bbpch.h"
 
-#include "TimeStretcher.h"
+#include "PitchShifter.h"
 namespace BackBeat {
 
-	TimeStretcher::TimeStretcher()
+	PitchShifter::PitchShifter()
 	{
 
 	}
 
-	TimeStretcher::~TimeStretcher()
+	PitchShifter::~PitchShifter()
 	{
-
-	} 
+		if (m_ResampleBuffer)
+			delete[m_OutputResampleLength] m_ResampleBuffer;
+		if (m_WindowBuffer)
+			delete[m_OutputResampleLength] m_WindowBuffer;
+	}
 
 	// Must call at least once before calling ProcessAudioFrame and whenever the user updates params
-	void TimeStretcher::Update(TimeStretcherParameters params)
+	void PitchShifter::Update(PitchShifterParameters params)
 	{
-		if (params.ratio < .50f || params.ratio > 2.0f)
+		if (params.shiftSemitones < -12.0f || params.shiftSemitones > 12.0f)
 			return;
+
+		if (m_ResampleBuffer)
+			delete[m_OutputResampleLength] m_ResampleBuffer;
+		if (m_WindowBuffer)
+			delete[m_OutputResampleLength] m_WindowBuffer;
 
 		m_Params = params;
-
-		// Calculate FFT Output hop size
-		unsigned int outputSize = (unsigned int)floorf((float)m_InputHopSize * m_Params.ratio);
-
-		if (outputSize == m_OutputHopSize)
-			return;
-
-		m_Ratio = m_Params.ratio;
-		m_OutputHopSize = outputSize;
+		m_Ratio = pow(2.0f, m_Params.shiftSemitones / 12.0f);
+		m_OutputResampleLength = unsigned int(1.0f / m_Ratio * float(PitchShifterFFTLength));
 		m_OutputSize = 0;
 		m_OutputIndex = 0;
+		m_OutputHopSize = unsigned int ((float)m_InputHopSize / m_Ratio);
+		m_ResampleBuffer = new float[m_OutputResampleLength];
+		m_WindowBuffer = new float[m_OutputResampleLength];
 
-		InitWindow(m_WindowBuffer, m_WindowSize, m_OutputHopSize, m_WindowType, m_WindowCorrectionGain);
+		InitWindow(m_WindowBuffer, m_OutputResampleLength, m_OutputHopSize, m_WindowType, m_WindowCorrectionGain);
 
 		Audio::FlushBuffer((byte*)m_Output, m_MaxOutputSize * Audio::FloatByteSize);
-		Audio::FlushBuffer((byte*)m_Phi, TimeStretcherFFTLength * Audio::FloatByteSize);
-		Audio::FlushBuffer((byte*)m_Psi, TimeStretcherFFTLength * Audio::FloatByteSize);
+		Audio::FlushBuffer((byte*)m_Phi, PitchShifterFFTLength * Audio::FloatByteSize);
+		Audio::FlushBuffer((byte*)m_Psi, PitchShifterFFTLength * Audio::FloatByteSize);
 
-		for (unsigned int i = 0; i < TimeStretcherFFTLength; i++)
+		for (unsigned int i = 0; i < PitchShifterFFTLength; i++)
 		{
 			m_BinData[i].Reset();
 			m_BinDataPrevious[i].Reset();
@@ -50,13 +54,13 @@ namespace BackBeat {
 		m_Init = true;
 	}
 
-	void TimeStretcher::ResetOutput()
+	void PitchShifter::ResetOutput()
 	{
 		m_OutputSize = 0;
 		m_OutputIndex = 0;
 		Audio::FlushBuffer((byte*)m_Output, m_MaxOutputSize * Audio::FloatByteSize);
 
-		for (unsigned int i = 0; i < TimeStretcherFFTLength; i++)
+		for (unsigned int i = 0; i < PitchShifterFFTLength; i++)
 		{
 			m_BinData[i].Reset();
 			m_BinDataPrevious[i].Reset();
@@ -65,21 +69,21 @@ namespace BackBeat {
 
 	// Input bufferSize must at least be TimeStretcherFFTLength to avoid read/write access errors
 	// numSamples can be less than the bufferSize
-	void TimeStretcher::ProcessAudioFrame(float* input, unsigned int numSamples)
+	void PitchShifter::ProcessAudioFrame(float* input, unsigned int numSamples)
 	{
 		if (!m_Init)
 			return;
-		if (numSamples > TimeStretcherFFTLength)
+		if (numSamples > PitchShifterFFTLength)
 			return;
 
-		if (numSamples < TimeStretcherFFTLength)
-			AddZeroPad(input, TimeStretcherFFTLength - numSamples);
+		if (numSamples < PitchShifterFFTLength)
+			AddZeroPad(input, PitchShifterFFTLength - numSamples);
 
 		// Compute fftw3
-		Audio::Algorithms::fftw3(input, &m_FFTOutput, TimeStretcherFFTLength);
+		Audio::Algorithms::fftw3(input, &m_FFTOutput, PitchShifterFFTLength);
 
 		// Get the magnitudes for searching
-		for (unsigned int i = 0; i < TimeStretcherFFTLength; i++)
+		for (unsigned int i = 0; i < PitchShifterFFTLength; i++)
 		{
 			m_BinData[i].Reset();
 			m_PeakBins[i] = -1;
@@ -94,14 +98,14 @@ namespace BackBeat {
 		// Now propagate phases accordingly
 		//
 		// FIRST: set PSI angles of bosses
-		for (unsigned int i = 0; i < TimeStretcherFFTLength; i++)
+		for (unsigned int i = 0; i < PitchShifterFFTLength; i++)
 		{
 			float mag = m_BinData[i].magnitude;
 			float phi = m_BinData[i].phi;
 
 			// horizontal phase propagation
 			// omega = bin frequency(k)
-			float omega = Audio::Pi * 2.0f * i / TimeStretcherFFTLength;
+			float omega = Audio::Pi * 2.0f * i / PitchShifterFFTLength;
 
 			// phase deviation is actual - expected phase
 			//     = phi_k -(phi(last frame) + wk*ha
@@ -131,7 +135,7 @@ namespace BackBeat {
 		}
 
 		// Set non-peaks
-		for (unsigned int i = 0; i < TimeStretcherFFTLength; i++)
+		for (unsigned int i = 0; i < PitchShifterFFTLength; i++)
 		{
 			if (!m_BinData[i].isPeak)
 			{
@@ -146,7 +150,7 @@ namespace BackBeat {
 			}
 		}
 
-		for (unsigned int i = 0; i < TimeStretcherFFTLength; i++)
+		for (unsigned int i = 0; i < PitchShifterFFTLength; i++)
 		{
 			float mag = m_BinData[i].magnitude;
 
@@ -160,14 +164,18 @@ namespace BackBeat {
 		}
 
 		// Compute ifftw3
-		Audio::Algorithms::ifftw3(&m_IFFTInput, m_IFFTOutput, TimeStretcherFFTLength);
+		Audio::Algorithms::ifftw3(&m_IFFTInput, m_IFFTOutput, PitchShifterFFTLength);
+
+		// Resample here
+		Audio::Resample(m_IFFTOutput, m_ResampleBuffer, PitchShifterFFTLength, m_OutputResampleLength,
+			Interpolation::linear);
 
 		// Add overlap
-		OverlapAdd(m_IFFTOutput, TimeStretcherFFTLength);
+		OverlapAdd(m_ResampleBuffer, m_OutputResampleLength);
 	}
 
 	// Find bin index of nearest peak bin in previous FFT frame
-	int TimeStretcher::FindPreviousNearestPeak(unsigned int index)
+	int PitchShifter::FindPreviousNearestPeak(unsigned int index)
 	{
 		// First run there are no peaks
 		if (m_PeakBinsPrevious[0] == -1)
@@ -175,13 +183,13 @@ namespace BackBeat {
 
 		int delta = -1;
 		int previousPeak = -1;
-		for (unsigned int i = 0; i < TimeStretcherFFTLength; i++)
+		for (unsigned int i = 0; i < PitchShifterFFTLength; i++)
 		{
 			if (m_PeakBinsPrevious[i] < 0)
 				break;
 
 			int dist = std::abs((int)index - m_PeakBinsPrevious[i]);
-			if (dist > TimeStretcherFFTLength / 4)
+			if (dist > PitchShifterFFTLength / 4)
 				break;
 
 			if (i == 0)
@@ -199,12 +207,12 @@ namespace BackBeat {
 		return previousPeak;
 	}
 
-	void TimeStretcher::FindPeaksAndRegionsOfInfluence()
+	void PitchShifter::FindPeaksAndRegionsOfInfluence()
 	{
 		// Find local maxima in 4-sample window
 		float localWindow[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 		int m = 0;
-		for (unsigned int i = 0; i < TimeStretcherFFTLength; i++)
+		for (unsigned int i = 0; i < PitchShifterFFTLength; i++)
 		{
 			if (i == 0)
 			{
@@ -220,14 +228,14 @@ namespace BackBeat {
 				localWindow[2] = m_BinData[i + 1].magnitude;
 				localWindow[3] = m_BinData[i + 2].magnitude;
 			}
-			else  if (i == TimeStretcherFFTLength - 1)
+			else  if (i == PitchShifterFFTLength - 1)
 			{
 				localWindow[0] = m_BinData[i - 2].magnitude;
 				localWindow[1] = m_BinData[i - 1].magnitude;
 				localWindow[2] = 0.0f;
 				localWindow[3] = 0.0f;
 			}
-			else  if (i == TimeStretcherFFTLength - 2)
+			else  if (i == PitchShifterFFTLength - 2)
 			{
 				localWindow[0] = m_BinData[i - 2].magnitude;
 				localWindow[1] = m_BinData[i - 1].magnitude;
@@ -267,7 +275,7 @@ namespace BackBeat {
 
 			if (nextPeak >= 0)
 			{
-				for (int i = 0; i < TimeStretcherFFTLength; i++)
+				for (int i = 0; i < PitchShifterFFTLength; i++)
 				{
 					if (i <= bossPeakBin)
 					{
@@ -284,7 +292,7 @@ namespace BackBeat {
 						if (nextPeak > bossPeakBin)
 							midBoundary = int((nextPeak - (double)bossPeakBin) / 2.0) + bossPeakBin;
 						else // nextPeak == -1
-							midBoundary = TimeStretcherFFTLength;
+							midBoundary = PitchShifterFFTLength;
 
 						m_BinData[i].localPeakBin = bossPeakBin;
 					}
@@ -294,15 +302,15 @@ namespace BackBeat {
 	}
 
 	// Assumes to start writing at m_InputHopSize size - num
-	void TimeStretcher::AddZeroPad(float* buffer, unsigned int num)
+	void PitchShifter::AddZeroPad(float* buffer, unsigned int num)
 	{
-		for (unsigned int i = TimeStretcherFFTLength - num; i < TimeStretcherFFTLength; i++)
+		for (unsigned int i = PitchShifterFFTLength - num; i < PitchShifterFFTLength; i++)
 		{
 			buffer[i] = 0.0f;
 		}
 	}
 
-	void TimeStretcher::OverlapAdd(float* buffer, unsigned int num)
+	void PitchShifter::OverlapAdd(float* buffer, unsigned int num)
 	{
 		if (m_OutputIndex + num >= m_MaxOutputSize)
 			return;
@@ -312,12 +320,11 @@ namespace BackBeat {
 			m_Output[m_OutputIndex + i] += (buffer[i] * m_WindowCorrectionGain * m_WindowBuffer[i]);
 		}
 
-		m_OutputIndex += m_OutputHopSize;
+		m_OutputIndex += m_InputHopSize;
 
 		if (m_OutputSize == 0)
-			m_OutputSize = TimeStretcherFFTLength;
+			m_OutputSize = m_OutputResampleLength;
 		else
-			m_OutputSize += m_OutputHopSize;
+			m_OutputSize += m_InputHopSize;
 	}
-
 }

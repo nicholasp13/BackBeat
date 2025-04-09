@@ -415,6 +415,7 @@ namespace Exampler {
 
 		float buttonWidth = 150.0f;
 		float buttonHeight = 30.0f;
+
 		if (ImGui::Button("Load into Splicer", ImVec2(buttonWidth, buttonHeight)))
 		{
 			m_Splicer.SetSampleData(m_Track, m_Start, m_End);
@@ -496,6 +497,14 @@ namespace Exampler {
 				m_Params.timeStretcherParams.ratio = 1.0f + (m_TimeRatio * 0.5f);
 			else
 				m_Params.timeStretcherParams.ratio = 1.0f + (m_TimeRatio * 1.0f);
+
+			ImGui::SameLine();
+
+			ImGuiKnobs::Knob("Pitch ", &m_Params.pitchShifterParams.shiftSemitones, -12.0f, 12.0f,
+				s_KnobSpeed, s_KnobFormatFloat, ImGuiKnobVariant_::ImGuiKnobVariant_WiperDot);
+
+			if (ImGui::IsItemActive() && ImGui::IsMouseDoubleClicked(0))
+				m_Params.pitchShifterParams.shiftSemitones = 0.0f;
 		}
 
 		ImGui::EndDisabled();

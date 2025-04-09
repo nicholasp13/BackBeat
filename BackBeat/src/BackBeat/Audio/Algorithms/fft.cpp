@@ -9,6 +9,13 @@ namespace BackBeat {
 
 		void Algorithms::fftw3(float* input, complexArray* output, unsigned int numSamples)
 		{
+			if (!input)
+				return;
+			if (!output)
+				return;
+			if (!output->realNums || !output->imNums)
+				return;
+
 			fftwf_complex* in = nullptr, 
 				*out = nullptr;
 
@@ -30,12 +37,10 @@ namespace BackBeat {
 			fftwf_execute(plan);
 
 			// Copy out[index][REAL] to output
-			float* outputReal = output->realNums;
-			float* outputIm = output->imNums;
 			for (unsigned int i = 0; i < numSamples; i++)
 			{
-				outputReal[i] = out[i][Real];
-				outputIm[i] = out[i][Imaginary];
+				output->realNums[i] = out[i][Real];
+				output->imNums[i] = out[i][Imaginary];
 			}
 
 			// Free fftw variables
@@ -47,6 +52,13 @@ namespace BackBeat {
 		// NOTE: The output is not normalized and to get the original data divide output by numSamples
 		void Algorithms::ifftw3(complexArray* input, float* output, unsigned int numSamples)
 		{
+			if (!input)
+				return;
+			if (!input->realNums || !input->imNums)
+				return;
+			if (!output)
+				return;
+
 			fftwf_complex* in = nullptr,
 				*out = nullptr;
 
