@@ -151,7 +151,7 @@ namespace BackBeat {
 
 		ProcessFilters();
 
-		Pan();
+		ApplyGain();
 
 		m_Playable = true;
 	}
@@ -341,9 +341,31 @@ namespace BackBeat {
 		}
 	}
 
-	void Splicer::Pan()
+	void Splicer::ApplyGain()
 	{
+		float masterGain = Audio::DecibelsToAmp(m_Params.masterGainDB);
+		float leftGain = Audio::DecibelsToAmp(m_Params.leftGainDB);
+		float rightGain = Audio::DecibelsToAmp(m_Params.rightGainDB);
 
+		// Left channel
+		for (unsigned int i = 0; i < m_SampleOutputSize; i++)
+		{
+			m_SplicedLeftChannel[i] *= masterGain * leftGain;
+			if (m_SplicedLeftChannel[i] > 1.0f)
+				m_SplicedLeftChannel[i] = 1.0f;
+			else if (m_SplicedLeftChannel[i] < -1.0f)
+				m_SplicedLeftChannel[i] = -1.0f;
+		}
+
+		// Right channel
+		for (unsigned int i = 0; i < m_SampleOutputSize; i++)
+		{
+			m_SplicedRightChannel[i] *= masterGain * rightGain;
+			if (m_SplicedRightChannel[i] > 1.0f)
+				m_SplicedRightChannel[i] = 1.0f;
+			else if (m_SplicedRightChannel[i] < -1.0f)
+				m_SplicedRightChannel[i] = -1.0f;
+		}
 	}
 
 }

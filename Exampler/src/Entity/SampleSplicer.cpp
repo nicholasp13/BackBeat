@@ -483,6 +483,32 @@ namespace Exampler {
 
 		// Knobs
 		{
+			// Gain controls
+			const float min = BackBeat::Audio::DBMin;
+			const float max = BackBeat::Audio::DBMax;
+
+			ImGuiKnobs::Knob("Master Gain", &(m_Params.masterGainDB), min, max,
+				s_KnobSpeed, s_KnobFormatFloat, ImGuiKnobVariant_::ImGuiKnobVariant_WiperDot);
+
+			if (ImGui::IsItemActive() && ImGui::IsMouseDoubleClicked(0))
+				m_Params.masterGainDB = BackBeat::Audio::DBDefault;
+
+			ImGui::SameLine();
+
+			ImGuiKnobs::Knob("Left Gain", &(m_Params.leftGainDB), min, max,
+				s_KnobSpeed, s_KnobFormatFloat, ImGuiKnobVariant_::ImGuiKnobVariant_WiperDot);
+
+			if (ImGui::IsItemActive() && ImGui::IsMouseDoubleClicked(0))
+				m_Params.leftGainDB = BackBeat::Audio::DBDefault;
+
+			ImGui::SameLine();
+
+			ImGuiKnobs::Knob("Right Gain", &(m_Params.rightGainDB), min, max,
+				s_KnobSpeed, s_KnobFormatFloat, ImGuiKnobVariant_::ImGuiKnobVariant_WiperDot);
+
+			if (ImGui::IsItemActive() && ImGui::IsMouseDoubleClicked(0))
+				m_Params.rightGainDB = BackBeat::Audio::DBDefault;
+
 			// Time stretcher
 			ImGuiKnobs::Knob("Time", &m_TimeRatio, -1.0f, 1.0f,
 				s_KnobSpeed, s_KnobFormatFloat, ImGuiKnobVariant_::ImGuiKnobVariant_WiperDot);

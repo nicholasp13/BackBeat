@@ -1,9 +1,5 @@
 #pragma once
 
-// TODO:
-//     - Add gain/pan
-//     - Add filters
-
 #include "BackBeat/Audio/Instruments/Sampler/SampleBuilder.h"
 #include "BackBeat/Audio/Fx/TimeStretcher.h"
 #include "BackBeat/Audio/Fx/PitchShifter.h"
@@ -20,7 +16,9 @@ namespace BackBeat {
 	// processes a larger data size so Splicer should be called by the user instead of on a loop
 	struct SplicerParameters
 	{
-		float pan = SynthBase::PanDefault;
+		float masterGainDB = Audio::DBDefault; // in decibel
+		float leftGainDB   = Audio::DBDefault; // in decibel
+		float rightGainDB  = Audio::DBDefault; // in decibel
 
 		// Fx object params
 		TimeStretcherParameters timeStretcherParams = TimeStretcherParameters();
@@ -30,7 +28,9 @@ namespace BackBeat {
 
 		SplicerParameters& operator = (const SplicerParameters& rhs)
 		{
-			pan = rhs.pan;
+			masterGainDB = rhs.masterGainDB;
+			leftGainDB = rhs.leftGainDB;
+			rightGainDB = rhs.rightGainDB;
 			timeStretcherParams = rhs.timeStretcherParams;
 			pitchShifterParams = rhs.pitchShifterParams;
 			lowPassFilterParams = rhs.lowPassFilterParams;
@@ -44,7 +44,9 @@ namespace BackBeat {
 			const float delta = 0.0001f;
 			bool equals = true;
 
-			equals = equals && Audio::EqualsFloat(pan, rhs.pan, delta);
+			equals = equals && Audio::EqualsFloat(masterGainDB, rhs.masterGainDB, delta);
+			equals = equals && Audio::EqualsFloat(leftGainDB, rhs.leftGainDB, delta);
+			equals = equals && Audio::EqualsFloat(rightGainDB, rhs.rightGainDB, delta);
 			equals = equals && (timeStretcherParams == rhs.timeStretcherParams);
 			equals = equals && (pitchShifterParams == rhs.pitchShifterParams);
 			equals = equals && (lowPassFilterParams == rhs.lowPassFilterParams);
@@ -109,7 +111,7 @@ namespace BackBeat {
 		void ProcessTimeStretcher();
 		void ProcessPitchShifter();
 		void ProcessFilters();
-		void Pan();
+		void ApplyGain();
 	};
 
 }

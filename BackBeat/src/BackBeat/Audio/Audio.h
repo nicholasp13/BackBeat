@@ -134,6 +134,9 @@ namespace BackBeat {
 		constexpr unsigned int DoubleByteSize = 8;
 		constexpr float Int24Max              = 8388607.0f;
 		constexpr float CentsPerOctave        = 1200.0f;
+		constexpr float DBMax                 = 96.0f;
+		constexpr float DBMin                 = -96.0f;
+		constexpr float DBDefault             = 0.0f;
 
 		// AUDIOFILE CONSTANTS
 		constexpr unsigned int Mono                  = 1;
@@ -762,6 +765,16 @@ namespace BackBeat {
 			}
 
 
+		}
+
+		inline static float AmpToDecibels(float amp)
+		{
+			return 20.0f * log10(amp);
+		}
+
+		inline static float DecibelsToAmp(float db)
+		{
+			return pow(10.0f, db / 20.0f);
 		}
 	}
 }
