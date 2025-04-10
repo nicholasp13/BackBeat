@@ -149,6 +149,8 @@ namespace BackBeat {
 		
 		ProcessPitchShifter();
 
+		ProcessFilters();
+
 		Pan();
 
 		m_Playable = true;
@@ -292,6 +294,51 @@ namespace BackBeat {
 		}
 
 		m_SampleOutputSize = m_PitchShifter.GetOutputSize();
+	}
+	
+	void Splicer::ProcessFilters()
+	{
+		// Low pass filter
+		if (m_Params.lowPassFilterParams.isOn)
+		{
+			m_LowPassFilter.Update(m_Params.lowPassFilterParams);
+			m_LowPassFilter.Reset();
+
+			// Left channel
+			for (unsigned int i = 0; i < m_SampleOutputSize; i++)
+			{
+				m_SplicedLeftChannel[i] = m_LowPassFilter.ProcessSample(m_SplicedLeftChannel[i]);
+			}
+
+			m_LowPassFilter.Reset();
+
+			// Right channel
+			for (unsigned int i = 0; i < m_SampleOutputSize; i++)
+			{
+				m_SplicedRightChannel[i] = m_LowPassFilter.ProcessSample(m_SplicedRightChannel[i]);
+			}
+		}
+
+		// High pass filter
+		if (m_Params.highPassFilterParams.isOn)
+		{
+			m_HighPassFilter.Update(m_Params.highPassFilterParams);
+			m_HighPassFilter.Reset();
+
+			// Left channel
+			for (unsigned int i = 0; i < m_SampleOutputSize; i++)
+			{
+				m_SplicedLeftChannel[i] = m_HighPassFilter.ProcessSample(m_SplicedLeftChannel[i]);
+			}
+
+			m_HighPassFilter.Reset();
+
+			// Right channel
+			for (unsigned int i = 0; i < m_SampleOutputSize; i++)
+			{
+				m_SplicedRightChannel[i] = m_HighPassFilter.ProcessSample(m_SplicedRightChannel[i]);
+			}
+		}
 	}
 
 	void Splicer::Pan()

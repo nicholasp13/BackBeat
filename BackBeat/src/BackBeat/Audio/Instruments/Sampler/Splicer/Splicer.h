@@ -5,8 +5,10 @@
 //     - Add filters
 
 #include "BackBeat/Audio/Instruments/Sampler/SampleBuilder.h"
-#include "BackBeat/Audio/PhaseVocoder/TimeStretcher.h"
-#include "BackBeat/Audio/PhaseVocoder/PitchShifter.h"
+#include "BackBeat/Audio/Fx/TimeStretcher.h"
+#include "BackBeat/Audio/Fx/PitchShifter.h"
+#include "BackBeat/Audio/Fx/LowPassFilterFx.h"
+#include "BackBeat/Audio/Fx/HighPassFilterFx.h"
 #include "BackBeat/Audio/Instruments/Synth/SynthBase.h"
 #include "SplicerPlayer.h"
 namespace BackBeat {
@@ -23,12 +25,16 @@ namespace BackBeat {
 		// Fx object params
 		TimeStretcherParameters timeStretcherParams = TimeStretcherParameters();
 		PitchShifterParameters pitchShifterParams = PitchShifterParameters();
+		LowPassFilterFxParameters lowPassFilterParams = LowPassFilterFxParameters();
+		HighPassFilterFxParameters highPassFilterParams = HighPassFilterFxParameters();
 
 		SplicerParameters& operator = (const SplicerParameters& rhs)
 		{
 			pan = rhs.pan;
 			timeStretcherParams = rhs.timeStretcherParams;
 			pitchShifterParams = rhs.pitchShifterParams;
+			lowPassFilterParams = rhs.lowPassFilterParams;
+			highPassFilterParams = rhs.highPassFilterParams;
 
 			return *this;
 		}
@@ -41,6 +47,8 @@ namespace BackBeat {
 			equals = equals && Audio::EqualsFloat(pan, rhs.pan, delta);
 			equals = equals && (timeStretcherParams == rhs.timeStretcherParams);
 			equals = equals && (pitchShifterParams == rhs.pitchShifterParams);
+			equals = equals && (lowPassFilterParams == rhs.lowPassFilterParams);
+			equals = equals && (highPassFilterParams == rhs.highPassFilterParams);
 
 			return equals;
 		}
@@ -73,9 +81,6 @@ namespace BackBeat {
 		inline std::shared_ptr<SplicerPlayerProcessor> GetProc() { return m_Player.GetProc(); }
 		inline SplicerPlayer* GetPlayer() { return &m_Player; }
 
-
-		// TESTING TO DELETE
-		inline float* GetWindowBuffer() { return m_TimeStretcher.GetWindowBuffer(); }
 	private:
 		bool m_Playable;
 		unsigned int m_SampleInputSize;  // Total size of input buffer data
@@ -95,13 +100,15 @@ namespace BackBeat {
 		// Fx objects
 		TimeStretcher m_TimeStretcher;
 		PitchShifter m_PitchShifter;
-		// Filters
+		LowPassFilterFx m_LowPassFilter;
+		HighPassFilterFx m_HighPassFilter;
 
 	private:
 		void SplitInputBuffer();
 		void ProcessFx();
 		void ProcessTimeStretcher();
 		void ProcessPitchShifter();
+		void ProcessFilters();
 		void Pan();
 	};
 

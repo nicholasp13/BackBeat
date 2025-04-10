@@ -483,6 +483,7 @@ namespace Exampler {
 
 		// Knobs
 		{
+			// Time stretcher
 			ImGuiKnobs::Knob("Time", &m_TimeRatio, -1.0f, 1.0f,
 				s_KnobSpeed, s_KnobFormatFloat, ImGuiKnobVariant_::ImGuiKnobVariant_WiperDot);
 
@@ -498,6 +499,7 @@ namespace Exampler {
 			else
 				m_Params.timeStretcherParams.ratio = 1.0f + (m_TimeRatio * 1.0f);
 
+			// Pitch shifter
 			ImGui::SameLine();
 
 			ImGuiKnobs::Knob("Pitch ", &m_Params.pitchShifterParams.shiftSemitones, -12.0f, 12.0f,
@@ -505,6 +507,25 @@ namespace Exampler {
 
 			if (ImGui::IsItemActive() && ImGui::IsMouseDoubleClicked(0))
 				m_Params.pitchShifterParams.shiftSemitones = 0.0f;
+
+			// Low pass filter
+			ImGui::Checkbox("Low Pass Filter On", &(m_Params.lowPassFilterParams.isOn));
+
+			ImGuiKnobs::Knob("Cutoff##LowPass", &(m_Params.lowPassFilterParams.cutoff), BackBeat::SynthBase::FilterCutoffMin, BackBeat::SynthBase::FilterCutoffMax,
+				s_KnobSpeed, s_KnobFormatFloatFreq, ImGuiKnobVariant_::ImGuiKnobVariant_WiperDot);
+
+			if (ImGui::IsItemActive() && ImGui::IsMouseDoubleClicked(0))
+				m_Params.lowPassFilterParams.cutoff = BackBeat::SynthBase::FilterCutoffMin;
+
+			// High pass filter
+			ImGui::Checkbox("High Pass Filter On", &(m_Params.highPassFilterParams.isOn));
+
+			ImGuiKnobs::Knob("Cutoff##HighPass", &(m_Params.highPassFilterParams.cutoff), BackBeat::SynthBase::FilterCutoffMin, BackBeat::SynthBase::FilterCutoffMax,
+				s_KnobSpeed, s_KnobFormatFloatFreq, ImGuiKnobVariant_::ImGuiKnobVariant_WiperDot);
+
+			if (ImGui::IsItemActive() && ImGui::IsMouseDoubleClicked(0))
+				m_Params.highPassFilterParams.cutoff = BackBeat::SynthBase::FilterCutoffMin;
+
 		}
 
 		ImGui::EndDisabled();
