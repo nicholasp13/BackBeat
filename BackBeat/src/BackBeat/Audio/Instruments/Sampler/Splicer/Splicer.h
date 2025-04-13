@@ -26,7 +26,7 @@ namespace BackBeat {
 		LowPassFilterFxParameters lowPassFilterParams = LowPassFilterFxParameters();
 		HighPassFilterFxParameters highPassFilterParams = HighPassFilterFxParameters();
 
-		SplicerParameters& operator = (const SplicerParameters& rhs)
+		inline SplicerParameters& operator = (const SplicerParameters& rhs)
 		{
 			masterGainDB = rhs.masterGainDB;
 			leftGainDB = rhs.leftGainDB;
@@ -39,7 +39,7 @@ namespace BackBeat {
 			return *this;
 		}
 
-		bool operator == (const SplicerParameters& rhs)
+		inline bool operator == (const SplicerParameters& rhs)
 		{
 			const float delta = 0.0001f;
 			bool equals = true;
@@ -55,9 +55,21 @@ namespace BackBeat {
 			return equals;
 		}
 
-		bool operator != (const SplicerParameters& rhs)
+		inline bool operator != (const SplicerParameters& rhs)
 		{
 			return !(*this == rhs);
+		}
+
+		inline void Reset()
+		{
+			masterGainDB = Audio::DBDefault;
+			leftGainDB = Audio::DBDefault;
+			rightGainDB = Audio::DBDefault;
+
+			timeStretcherParams = TimeStretcherParameters();
+			pitchShifterParams = PitchShifterParameters();
+			lowPassFilterParams = LowPassFilterFxParameters();
+			highPassFilterParams = HighPassFilterFxParameters();
 		}
 	};
 
@@ -69,6 +81,7 @@ namespace BackBeat {
 
 		void Update(SplicerParameters params); // Processes the whole sample data with the fx objects
 		void Reset(); // Puts original data from m_InputBuffer
+		void Clear(); // Flushes all buffers except m_TempBuffer
 
 		bool SetSampleData(float* sampleData, unsigned int numFrames, AudioProps props);
 		bool SetSampleData(std::shared_ptr<Track> track, unsigned int start, unsigned int end);

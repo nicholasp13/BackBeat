@@ -43,6 +43,16 @@ namespace BackBeat {
 		m_Playable = true;
 	}
 
+	void Splicer::Clear()
+	{
+		m_Playable = false;
+		m_Player.Clear();
+		Audio::FlushBuffer((byte*)m_SplicedLeftChannel, SplicerMaxBufferSize * Audio::FloatByteSize);
+		Audio::FlushBuffer((byte*)m_SplicedRightChannel, SplicerMaxBufferSize * Audio::FloatByteSize);
+		Audio::FlushBuffer((byte*)m_InputBuffer, SplicerMaxBufferSize * Audio::Stereo * Audio::FloatByteSize);
+		m_SampleOutputSize = 0;
+	}
+
 	// This takes at most half of its max buffer size of input since some fx increase the length of the output
 	// @params:
 	// - sampleData - buffer filled with audio data with either a single channel or left channel right channel alternating data

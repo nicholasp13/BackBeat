@@ -1,13 +1,7 @@
 // TODO: Redesign GUI
-//       - Add way to decrease visual max
 //       - Add zero crossing finding tool
-//       - Seperate wave data shower and track player into two separate sections of splicer
-//             - Top part shows the 10 secs buffer of where m_start is
-//             - User can LOCK the sample into place where the player is
-//             - User can play the sample seperately
-//                 - The sample should be played perhaps by a new SampleSplicer BB object that allows for modulation
-//                   including panning, filtering, etc. 
-//             
+//       - Change GUI layout for track
+//       - Change colors (slightly darker or lighter grey for now)
 
 #include "SampleSplicer.h"
 namespace Exampler {
@@ -18,22 +12,6 @@ namespace Exampler {
 	static const char* s_KnobFormatInt = "%i";
 
 	SampleSplicer::SampleSplicer()
-		: 
-		m_Open(false),
-		m_Looping(false),
-		m_Zero(0),
-		m_Start(0),
-		m_End(0),
-		m_Size(0),
-		m_StartMs(0),
-		m_EndMs(0),
-		m_Volume(1.0f),
-		m_TimeRatio(0.0f),
-		m_Buffer(std::make_shared<float[]>(BufferSize)),
-		m_Params(BackBeat::SplicerParameters()),
-		m_Loader(BufferSize * BackBeat::Audio::FloatByteSize* BackBeat::Audio::Stereo),
-		m_Props(BackBeat::AudioProps()),
-		m_Track(nullptr)
 	{
 		
 	}
@@ -41,12 +19,35 @@ namespace Exampler {
 	SampleSplicer::~SampleSplicer()
 	{
 		m_TrackPlayer.Stop();
+		m_Splicer.Clear();
 	}
 
-	// Since Splicer functions take a noticeable amount of time, the user updates splicer by pressing a button
+	// Since Splicer functions take a noticeable amount of time, the user updates BackBeat:Splicer by pressing a button
 	void SampleSplicer::Update()
 	{
-		
+		// Set Start and End values and loop if needed
+		if (m_TrackPlayer.IsLoaded())
+		{
+			m_TrackPlayer.SetStart(m_Start);
+			m_TrackPlayer.SetEnd(m_End);
+			if ((int)m_TrackPlayer.GetPosition() >= m_End)
+			{
+				if (m_LoopingTrack)
+					m_TrackPlayer.SetPosition(m_Start);
+				else
+					m_TrackPlayer.Pause();
+			}
+		}
+
+		// Loop sample
+		auto splicerPlayer = m_Splicer.GetPlayer();
+		if (splicerPlayer->IsLoaded())
+		{
+			if (m_LoopingSample)
+				splicerPlayer->LoopOn();
+			else
+				splicerPlayer->LoopOff();
+		}
 	}
 
 	void SampleSplicer::Render()
@@ -61,19 +62,23 @@ namespace Exampler {
 		ImGui::SetNextWindowSize(ImVec2(m_Width, m_Height), ImGuiCond_Once);
 		// Sampler flags
 		ImGuiWindowFlags splicerWindowFlags = 0;
+		splicerWindowFlags |= ImGuiWindowFlags_MenuBar;
 		splicerWindowFlags |= ImGuiWindowFlags_NoCollapse;
 		splicerWindowFlags |= ImGuiWindowFlags_NoResize;
 
 		ImGui::Begin("Sample Splicer", &m_Open, splicerWindowFlags);
 
-		RenderTrackControls();
+		RenderMenuBar();
 
-		ImGui::Separator();
-
-		RenderSplicerControls();
+		if (m_RenderTrack)
+			RenderTrackControls();
+		else
+			RenderSplicerControls();
 
 		ImGui::End();
 
+		if (!m_Open)
+			Close();
 	}
 
 	void SampleSplicer::Add(BackBeat::Mixer* mixer)
@@ -90,7 +95,9 @@ namespace Exampler {
 
 	void SampleSplicer::Close()
 	{
+		// Track
 		m_Open = false;
+		m_RenderTrack = true;
 		m_TrackPlayer.Stop();
 		m_TrackPlayer.ClearTrack();
 		m_Track = nullptr;
@@ -101,6 +108,29 @@ namespace Exampler {
 		m_StartMs = 0;
 		m_EndMs = 0;
 		m_Volume = 1.0f;
+
+		// Sample
+		m_TimeRatio = 0.0f;
+		m_Splicer.Clear();
+		m_Params.Reset();
+	}
+
+	void SampleSplicer::RenderMenuBar()
+	{
+		if (ImGui::BeginMenuBar())
+		{
+			if (ImGui::MenuItem("Track"))
+			{
+				m_RenderTrack = true;
+			}
+
+			if (ImGui::MenuItem("Sample"))
+			{
+				m_RenderTrack = false;
+			}
+
+			ImGui::EndMenuBar();
+		}
 	}
 
 	void SampleSplicer::RenderTrackControls()
@@ -190,7 +220,7 @@ namespace Exampler {
 		ImGui::Text("Track: "); ImGui::SameLine(); ImGui::Text(trackName);
 
 		// Render actual buffer data
-		RenderBuffer();
+		RenderTrackBuffer();
 
 		// Renders Track Editor
 		{
@@ -247,7 +277,7 @@ namespace Exampler {
 			ImGui::SameLine();
 
 			// Loop
-			ImGui::Checkbox("Loop", &m_Looping);
+			ImGui::Checkbox("Loop", &m_LoopingTrack);
 			ImGui::SameLine();
 
 			// Zoom In
@@ -376,35 +406,29 @@ namespace Exampler {
 			ImGui::Text("Total: %d:%02d (%d ms)", totalTime.minutes, totalTime.seconds, totalTime.milliseconds);
 
 		}
-		ImGui::EndTable();
 
-		// Set Start and End values
-		if (m_TrackPlayer.IsLoaded())
+		// Load splicer
 		{
-			m_TrackPlayer.SetStart(m_Start);
-			m_TrackPlayer.SetEnd(m_End);
-			if ((int)m_TrackPlayer.GetPosition() >= m_End)
+			bool disabled = true;
+			if (m_TrackPlayer.IsLoaded())
 			{
-				if (m_Looping)
-					m_TrackPlayer.SetPosition(m_Start);
-				else
-					m_TrackPlayer.Pause();
+				int tenSeconds = m_TrackPlayer.GetByteRate() * 10;
+				disabled = (tenSeconds < m_End - m_Start);
 			}
+
+			ImGui::BeginDisabled(disabled);
+
+			if (ImGui::Button("Load into Splicer"))
+			{
+				m_Splicer.SetSampleData(m_Track, m_Start, m_End);
+				m_Params.Reset();
+				m_RenderTrack = false;
+			}
+
+			ImGui::EndDisabled();
 		}
 
-		if (!m_Open)
-		{
-			m_TrackPlayer.Stop();
-			m_TrackPlayer.ClearTrack();
-			m_Track = nullptr;
-			m_Zero = 0;
-			m_Start = 0;
-			m_End = 0;
-			m_Size = 0;
-			m_StartMs = 0;
-			m_EndMs = 0;
-			m_Volume = 1.0f;
-		}
+		ImGui::EndTable();
 
 		ImGui::PopID();
 	}
@@ -413,153 +437,43 @@ namespace Exampler {
 	{
 		ImGui::PushID(m_Splicer.GetID().ToString().c_str());
 
-		float buttonWidth = 150.0f;
-		float buttonHeight = 30.0f;
+		RenderSplicerBuffers();
+		RenderButtons();
 
-		if (ImGui::Button("Load into Splicer", ImVec2(buttonWidth, buttonHeight)))
-		{
-			m_Splicer.SetSampleData(m_Track, m_Start, m_End);
+		// Table dimensions
+		const int numColumns = 5;
+		const int numKnobs = 7;
+		const int numGainKnobs = 3;
+		const float padding = 5.0f;
+		const float tableLength = m_Width - padding * 2.0f;
+		const float firstColumnLength = tableLength / (float)numKnobs * (float)numGainKnobs - 150.0f;
 
-			// Reset params for splicer controls
-			m_TimeRatio = 0.0f;
-			m_Params.timeStretcherParams.ratio = 1.0f;
-		}
+		// Table flags
+		ImGuiTableFlags tableFlags = 0;
+		tableFlags |= ImGuiTableFlags_RowBg;
+		tableFlags |= ImGuiTableFlags_Borders;
 
-		bool loaded = m_Splicer.IsLoaded();
+		// Set position of table
+		ImVec2 position = ImVec2(padding, ImGui::GetCursorPos().y);
+		ImGui::SetCursorPos(position);
 
-		ImGui::BeginDisabled(!loaded);
+		ImGui::BeginTable("Splicer Knobs", numColumns, tableFlags, ImVec2(tableLength, 0.0f), 0.0f);
+		ImGui::TableSetupColumn("one", ImGuiTableColumnFlags_WidthFixed, firstColumnLength);
 
-		// Placehold for now
-		// Left Channel
-		{
-			const float visualMax = 1.0f;
-			const float width = m_Width - 50.0f;
-			const float height = 100.0f;
+		RenderGainControls();
 
-			float* buffer = m_Splicer.GetLeftChannel();
-			unsigned int size = m_Splicer.GetOutputSize();
+		RenderPitchControls();
 
-			unsigned int seconds = size / 48000;
-			ImGui::Text("%d Seconds", seconds);
+		RenderTimeControls();
 
-			/*BackBeat::ImGuiWidgets::ImGuiTimeline("", buffer, size, 1, "Left Channel",
-				visualMax * -1, visualMax, ImVec2(width, height),
-				BackBeat::Audio::FloatByteSize, 0.0f);*/
+		RenderFilterControls();
 
-			ImGui::PlotLines("", buffer, size, 1, "Left Channel",
-				visualMax * -1, visualMax, ImVec2(width, height),
-				BackBeat::Audio::FloatByteSize);
-		}
-
-		auto player = m_Splicer.GetPlayer();
-
-		// Buttons
-		{
-			const float width = 60.0f;
-			const float height = 20.0f;
-			const ImVec2 buttonSize = ImVec2(width, height);
-
-			// Play Sample button
-			if (!player->IsOn())
-			{
-				if (ImGui::Button("Play", buttonSize))
-					player->Play();
-			}
-			else
-			{
-				if (ImGui::Button("Pause", buttonSize))
-					player->Stop();
-			}
-
-			// Update Sample button
-			ImGui::SameLine();
-
-			if (ImGui::Button("Update", buttonSize))
-			{
-				m_Splicer.Update(m_Params);
-			}
-
-		}
-
-		// Knobs
-		{
-			// Gain controls
-			const float min = BackBeat::Audio::DBMin;
-			const float max = BackBeat::Audio::DBMax;
-
-			ImGuiKnobs::Knob("Master Gain", &(m_Params.masterGainDB), min, max,
-				s_KnobSpeed, s_KnobFormatFloat, ImGuiKnobVariant_::ImGuiKnobVariant_WiperDot);
-
-			if (ImGui::IsItemActive() && ImGui::IsMouseDoubleClicked(0))
-				m_Params.masterGainDB = BackBeat::Audio::DBDefault;
-
-			ImGui::SameLine();
-
-			ImGuiKnobs::Knob("Left Gain", &(m_Params.leftGainDB), min, max,
-				s_KnobSpeed, s_KnobFormatFloat, ImGuiKnobVariant_::ImGuiKnobVariant_WiperDot);
-
-			if (ImGui::IsItemActive() && ImGui::IsMouseDoubleClicked(0))
-				m_Params.leftGainDB = BackBeat::Audio::DBDefault;
-
-			ImGui::SameLine();
-
-			ImGuiKnobs::Knob("Right Gain", &(m_Params.rightGainDB), min, max,
-				s_KnobSpeed, s_KnobFormatFloat, ImGuiKnobVariant_::ImGuiKnobVariant_WiperDot);
-
-			if (ImGui::IsItemActive() && ImGui::IsMouseDoubleClicked(0))
-				m_Params.rightGainDB = BackBeat::Audio::DBDefault;
-
-			// Time stretcher
-			ImGuiKnobs::Knob("Time", &m_TimeRatio, -1.0f, 1.0f,
-				s_KnobSpeed, s_KnobFormatFloat, ImGuiKnobVariant_::ImGuiKnobVariant_WiperDot);
-
-			if (ImGui::IsItemActive() && ImGui::IsMouseDoubleClicked(0))
-				m_TimeRatio = 0.0f;
-
-			// Changes m_TimeRatio from -1 : 1 to TimeStretcher's 0.5 : 2.0 
-			float delta = 0.001f;
-			if (std::abs(m_TimeRatio) < delta)
-				m_Params.timeStretcherParams.ratio = 1.0f;
-			else if (m_TimeRatio < 0.0f)
-				m_Params.timeStretcherParams.ratio = 1.0f + (m_TimeRatio * 0.5f);
-			else
-				m_Params.timeStretcherParams.ratio = 1.0f + (m_TimeRatio * 1.0f);
-
-			// Pitch shifter
-			ImGui::SameLine();
-
-			ImGuiKnobs::Knob("Pitch ", &m_Params.pitchShifterParams.shiftSemitones, -12.0f, 12.0f,
-				s_KnobSpeed, s_KnobFormatFloat, ImGuiKnobVariant_::ImGuiKnobVariant_WiperDot);
-
-			if (ImGui::IsItemActive() && ImGui::IsMouseDoubleClicked(0))
-				m_Params.pitchShifterParams.shiftSemitones = 0.0f;
-
-			// Low pass filter
-			ImGui::Checkbox("Low Pass Filter On", &(m_Params.lowPassFilterParams.isOn));
-
-			ImGuiKnobs::Knob("Cutoff##LowPass", &(m_Params.lowPassFilterParams.cutoff), BackBeat::SynthBase::FilterCutoffMin, BackBeat::SynthBase::FilterCutoffMax,
-				s_KnobSpeed, s_KnobFormatFloatFreq, ImGuiKnobVariant_::ImGuiKnobVariant_WiperDot);
-
-			if (ImGui::IsItemActive() && ImGui::IsMouseDoubleClicked(0))
-				m_Params.lowPassFilterParams.cutoff = BackBeat::SynthBase::FilterCutoffMin;
-
-			// High pass filter
-			ImGui::Checkbox("High Pass Filter On", &(m_Params.highPassFilterParams.isOn));
-
-			ImGuiKnobs::Knob("Cutoff##HighPass", &(m_Params.highPassFilterParams.cutoff), BackBeat::SynthBase::FilterCutoffMin, BackBeat::SynthBase::FilterCutoffMax,
-				s_KnobSpeed, s_KnobFormatFloatFreq, ImGuiKnobVariant_::ImGuiKnobVariant_WiperDot);
-
-			if (ImGui::IsItemActive() && ImGui::IsMouseDoubleClicked(0))
-				m_Params.highPassFilterParams.cutoff = BackBeat::SynthBase::FilterCutoffMin;
-
-		}
-
-		ImGui::EndDisabled();
+		ImGui::EndTable();
 
 		ImGui::PopID();
 	}
 
-	void SampleSplicer::RenderBuffer()
+	void SampleSplicer::RenderTrackBuffer()
 	{
 		const float visualMax = 1.0f;
 		const float width = m_Width - 50.0f;
@@ -635,6 +549,196 @@ namespace Exampler {
 
 			ImGui::Text("Size: %d:%02d", 0, 0); ImGui::SameLine();
 			ImGui::Text("(%d ms)", 0);
+		}
+	}
+
+	void SampleSplicer::RenderSplicerBuffers()
+	{
+		const float visualMax = 1.0f;
+		const float padding = 5.0f;
+		const float width = m_Width - padding * 2.0f;
+		const float height = 100.0f;
+
+		float* leftBuffer = m_Splicer.GetLeftChannel();
+		float* rightBuffer = m_Splicer.GetRightChannel();
+
+		unsigned int size = m_Splicer.GetOutputSize();
+
+		// Set position of plot
+		ImVec2 leftPosition = ImVec2(padding, ImGui::GetCursorPos().y);
+		ImGui::SetCursorPos(leftPosition);
+
+		ImGui::PlotLines("", leftBuffer, size, 1, "Left Channel",
+			visualMax * -1, visualMax, ImVec2(width, height),
+			BackBeat::Audio::FloatByteSize);
+
+		// Set position of plot
+		ImVec2 rightPosition = ImVec2(padding, ImGui::GetCursorPos().y);
+		ImGui::SetCursorPos(rightPosition);
+
+		ImGui::PlotLines("", rightBuffer, size, 1, "Right Channel",
+			visualMax * -1, visualMax, ImVec2(width, height),
+			BackBeat::Audio::FloatByteSize);
+
+		unsigned int seconds = size / 48000;
+		ImGui::Text("Size: %d Seconds", seconds);
+	}
+
+	void SampleSplicer::RenderButtons()
+	{
+		const float width = 60.0f;
+		const float height = 20.0f;
+		const ImVec2 buttonSize = ImVec2(width, height);
+
+		auto player = m_Splicer.GetPlayer();
+		bool loaded = player->IsLoaded();
+
+		ImGui::BeginDisabled(!loaded);
+
+		// Play Sample button
+		if (!player->IsOn())
+		{
+			if (ImGui::Button("Play", buttonSize))
+				player->Play();
+		}
+		else
+		{
+			if (ImGui::Button("Pause", buttonSize))
+				player->Stop();
+		}
+
+		ImGui::SameLine();
+
+		ImGui::Checkbox("Loop", &m_LoopingSample);
+
+		ImGui::SameLine();
+
+		// Update Sample button
+		if (ImGui::Button("Update", buttonSize))
+		{
+			m_Splicer.Update(m_Params);
+		}
+
+		ImGui::EndDisabled();
+	}
+
+	void SampleSplicer::RenderGainControls()
+	{
+		ImGui::TableNextColumn();
+
+		ImGui::SeparatorText("Gain");
+
+		const float dummyHeight = 19.0f;
+		ImGui::Dummy(ImVec2(0.0f, dummyHeight));
+
+		const float min = BackBeat::Audio::DBMin;
+		const float max = BackBeat::Audio::DBMax;
+
+		ImGuiKnobs::Knob("Master", &(m_Params.masterGainDB), min, max,
+			s_KnobSpeed, s_KnobFormatFloat, ImGuiKnobVariant_::ImGuiKnobVariant_WiperDot);
+
+		if (ImGui::IsItemActive() && ImGui::IsMouseDoubleClicked(0))
+			m_Params.masterGainDB = BackBeat::Audio::DBDefault;
+
+		ImGui::SameLine();
+
+		ImGuiKnobs::Knob("Left", &(m_Params.leftGainDB), min, max,
+			s_KnobSpeed, s_KnobFormatFloat, ImGuiKnobVariant_::ImGuiKnobVariant_WiperDot);
+
+		if (ImGui::IsItemActive() && ImGui::IsMouseDoubleClicked(0))
+			m_Params.leftGainDB = BackBeat::Audio::DBDefault;
+
+		ImGui::SameLine();
+
+		ImGuiKnobs::Knob("Right", &(m_Params.rightGainDB), min, max,
+			s_KnobSpeed, s_KnobFormatFloat, ImGuiKnobVariant_::ImGuiKnobVariant_WiperDot);
+
+		if (ImGui::IsItemActive() && ImGui::IsMouseDoubleClicked(0))
+			m_Params.rightGainDB = BackBeat::Audio::DBDefault;
+	}
+
+	void SampleSplicer::RenderPitchControls()
+	{
+		ImGui::TableNextColumn();
+
+		ImGui::SeparatorText("Pitch");
+
+		const float dummyHeight = 19.0f;
+		ImGui::Dummy(ImVec2(0.0f, dummyHeight));
+
+		// Pitch shifter
+		ImGuiKnobs::Knob("Semitones", &m_Params.pitchShifterParams.shiftSemitones, -12.0f, 12.0f,
+			s_KnobSpeed, s_KnobFormatFloat, ImGuiKnobVariant_::ImGuiKnobVariant_WiperDot);
+
+		if (ImGui::IsItemActive() && ImGui::IsMouseDoubleClicked(0))
+			m_Params.pitchShifterParams.shiftSemitones = 0.0f;
+
+	}
+
+	// TODO: Make sure this follows percent for speed up and slow down
+	void SampleSplicer::RenderTimeControls()
+	{
+		ImGui::TableNextColumn();
+
+		ImGui::SeparatorText("Time");
+
+		const float dummyHeight = 19.0f;
+		ImGui::Dummy(ImVec2(0.0f, dummyHeight));
+
+		ImGuiKnobs::Knob("Percent", &m_TimeRatio, -1.0f, 1.0f,
+			s_KnobSpeed, s_KnobFormatFloat, ImGuiKnobVariant_::ImGuiKnobVariant_WiperDot);
+
+		if (ImGui::IsItemActive() && ImGui::IsMouseDoubleClicked(0))
+			m_TimeRatio = 0.0f;
+
+		// Changes m_TimeRatio from -1 : 1 to TimeStretcher's 0.5 : 2.0 
+		float delta = 0.001f;
+		if (std::abs(m_TimeRatio) < delta)
+			m_Params.timeStretcherParams.ratio = 1.0f;
+		else if (m_TimeRatio < 0.0f)
+			m_Params.timeStretcherParams.ratio = 1.0f + (m_TimeRatio * 0.5f);
+		else
+			m_Params.timeStretcherParams.ratio = 1.0f + (m_TimeRatio * 1.0f);
+	}
+
+	void SampleSplicer::RenderFilterControls()
+	{
+		ImGui::TableNextColumn();
+
+		// Low pass filter
+		{
+			ImGui::PushID("LowPass");
+
+			ImGui::SeparatorText("Low Pass Filter");
+
+			ImGui::Checkbox("On", &(m_Params.lowPassFilterParams.isOn));
+
+			ImGuiKnobs::Knob("Cutoff", &(m_Params.lowPassFilterParams.cutoff), BackBeat::SynthBase::FilterCutoffMin, BackBeat::SynthBase::FilterCutoffMax,
+				s_KnobSpeed, s_KnobFormatFloatFreq, ImGuiKnobVariant_::ImGuiKnobVariant_WiperDot);
+
+			if (ImGui::IsItemActive() && ImGui::IsMouseDoubleClicked(0))
+				m_Params.lowPassFilterParams.cutoff = BackBeat::SynthBase::FilterCutoffMin;
+
+			ImGui::PopID();
+		}
+
+		ImGui::TableNextColumn();
+
+		// High pass filter
+		{
+			ImGui::PushID("HighPass");
+
+			ImGui::SeparatorText("High Pass Filter");
+
+			ImGui::Checkbox("On", &(m_Params.highPassFilterParams.isOn));
+
+			ImGuiKnobs::Knob("Cutoff", &(m_Params.highPassFilterParams.cutoff), BackBeat::SynthBase::FilterCutoffMin, BackBeat::SynthBase::FilterCutoffMax,
+				s_KnobSpeed, s_KnobFormatFloatFreq, ImGuiKnobVariant_::ImGuiKnobVariant_WiperDot);
+
+			if (ImGui::IsItemActive() && ImGui::IsMouseDoubleClicked(0))
+				m_Params.highPassFilterParams.cutoff = BackBeat::SynthBase::FilterCutoffMin;
+
+			ImGui::PopID();
 		}
 	}
 

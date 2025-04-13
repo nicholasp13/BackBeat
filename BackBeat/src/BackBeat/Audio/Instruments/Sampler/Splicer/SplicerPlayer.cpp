@@ -60,4 +60,9 @@ namespace BackBeat {
 		m_TotalFrames = numFrames;
 	}
 
+	void SplicerPlayer::Clear()
+	{
+		m_Proc->Clear();
+		m_TotalFrames = 0;
+	}
 }

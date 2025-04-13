@@ -12,10 +12,10 @@ namespace BackBeat {
 		void Start();
 		void Stop();
 		void Load(float* leftChannel, float* rightChannel, unsigned int numFrames);
+		void Clear();
 		
 		inline void Play() { m_Proc->On(); }
 		inline void Pause() { m_Proc->Off(); }
-		inline void Clear() { m_Proc->Clear(); }
 		inline void On() { m_Proc->On(); }
 		inline void Off() { m_Proc->Off(); }
 		inline bool IsOn() { return m_Proc->IsOn(); }
