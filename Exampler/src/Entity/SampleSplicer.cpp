@@ -1,5 +1,4 @@
 // TODO: Redesign GUI
-//       - Add zero crossing finding tool
 //       - Change GUI layout for track
 //       - Change colors (slightly darker or lighter grey for now)
 
@@ -318,16 +317,16 @@ namespace Exampler {
 			}
 		}
 
-		static ImGuiTableFlags table_flags = 0;
-		ImGui::BeginTable("SampleEditor", 2, table_flags, ImVec2(0.0f, 0.0f), 0.0f);
 		const unsigned int incrementMs = 10;
+		const unsigned int zeroCrossingSeconds = 1;
 		// Renders Start Input
 		{
-			ImGui::TableNextColumn();
+			ImGui::SeparatorText("Start");
 
 			float byteRate = (float)m_TrackPlayer.GetByteRate();
 			BackBeat::TimeMinSec startTime = BackBeat::TimeMinSec();
-			if (m_TrackPlayer.IsLoaded())
+
+			if (trackSet)
 			{
 				startTime = BackBeat::Audio::GetTime((float)m_Start / byteRate);
 			}
@@ -337,13 +336,30 @@ namespace Exampler {
 				startTime.seconds = 0;
 			}
 
-			ImGui::Text("Start: %d:%02d", startTime.minutes, startTime.seconds); ImGui::SameLine();
+			ImGui::Text("%d:%02d", startTime.minutes, startTime.seconds); ImGui::SameLine();
 			if (trackSet)
 			{
 				m_StartMs = (int)((float)m_Start / (float)bytesPerMs);
+
 				if (ImGui::InputInt("(in ms)##StartMs", &m_StartMs, incrementMs, incrementMs * 10, ImGuiInputTextFlags(0)))
 				{
 					m_Start = m_StartMs < (m_EndMs - (int)incrementMs) ? (m_StartMs * bytesPerMs) : (m_EndMs - (int)incrementMs);
+				}
+
+				// Zero crossing finder buttons
+				ImGui::Text("Find zero crossing:");
+				ImGui::SameLine();
+
+				if (ImGui::ArrowButton("Backwards_Start", ImGuiDir_Left))
+				{
+					m_Start = BackBeat::ZeroCrossingFinder::FindZeroCrossing(m_Track, m_Start, false, 1);
+				}
+
+				ImGui::SameLine();
+
+				if (ImGui::ArrowButton("Forwards_Start", ImGuiDir_Right))
+				{
+					m_Start = BackBeat::ZeroCrossingFinder::FindZeroCrossing(m_Track, m_Start, true, 1);
 				}
 			}
 			else
@@ -351,15 +367,22 @@ namespace Exampler {
 				int dummyStartZero = 0;
 				ImGui::InputInt("(in ms)", &dummyStartZero);
 				dummyStartZero = 0;
+
+				ImGui::Text("Find zero crossing:");
+				ImGui::SameLine();
+				ImGui::ArrowButton("", ImGuiDir_Left);
+				ImGui::SameLine();
+				ImGui::ArrowButton("", ImGuiDir_Right);
 			}
 		}
 
 		// Renders End Input
 		{
-			ImGui::TableNextColumn();
+			ImGui::SeparatorText("End");
 
 			BackBeat::TimeMinSec endTime = BackBeat::TimeMinSec();
-			if (m_TrackPlayer.IsLoaded())
+
+			if (trackSet)
 			{
 				endTime = BackBeat::Audio::GetTime((float)m_End / byteRate);
 			}
@@ -369,7 +392,8 @@ namespace Exampler {
 				endTime.seconds = 0;
 			}
 
-			ImGui::Text("End: %d:%02d", endTime.minutes, endTime.seconds); ImGui::SameLine();
+			ImGui::Text("%d:%02d", endTime.minutes, endTime.seconds); ImGui::SameLine();
+
 			if (trackSet)
 			{
 				m_EndMs = (int)((float)m_End / (float)bytesPerMs);
@@ -377,21 +401,42 @@ namespace Exampler {
 				{
 					m_End = m_EndMs > (m_StartMs + (int)incrementMs) ? (m_EndMs * bytesPerMs) : (m_StartMs + (int)incrementMs);
 				}
+
+				// Zero crossing finder buttons
+				ImGui::Text("Find zero crossing:");
+				ImGui::SameLine();
+
+				if (ImGui::ArrowButton("Backwards_End", ImGuiDir_Left))
+				{
+					m_End = BackBeat::ZeroCrossingFinder::FindZeroCrossing(m_Track, m_End, false, 1);
+				}
+
+				ImGui::SameLine();
+
+				if (ImGui::ArrowButton("Forwards_End", ImGuiDir_Right))
+				{
+					m_End = BackBeat::ZeroCrossingFinder::FindZeroCrossing(m_Track, m_End, true, 1);
+				}
 			}
 			else
 			{
 				int dummyEndZero = 0;
 				ImGui::InputInt("(in ms)", &dummyEndZero);
 				dummyEndZero = 0;
+
+				ImGui::Text("Find zero crossing:");
+				ImGui::SameLine();
+				ImGui::ArrowButton("", ImGuiDir_Left);
+				ImGui::SameLine();
+				ImGui::ArrowButton("", ImGuiDir_Right);
 			}
 		}
 
 		// Total Time
 		{
-			ImGui::TableNextColumn();
-
 			BackBeat::TimeMinSec totalTime = BackBeat::TimeMinSec();
-			if (m_TrackPlayer.IsLoaded())
+
+			if (trackSet)
 			{
 				float byteRate = (float)m_TrackPlayer.GetByteRate();
 				totalTime = BackBeat::Audio::GetTime((float)(m_End - m_Start) / byteRate);
@@ -403,6 +448,7 @@ namespace Exampler {
 				totalTime.seconds = 0;
 				totalTime.milliseconds = 0;
 			}
+
 			ImGui::Text("Total: %d:%02d (%d ms)", totalTime.minutes, totalTime.seconds, totalTime.milliseconds);
 
 		}
@@ -427,8 +473,6 @@ namespace Exampler {
 
 			ImGui::EndDisabled();
 		}
-
-		ImGui::EndTable();
 
 		ImGui::PopID();
 	}

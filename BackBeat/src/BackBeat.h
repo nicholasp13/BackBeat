@@ -26,6 +26,7 @@
 #include "BackBeat/Audio/Instruments/Sampler/Splicer/Splicer.h"
 #include "BackBeat/Audio/Instruments/Synth/Synth.h"
 #include "BackBeat/Audio/Visualizers/Spectrogram.h"
+#include "BackBeat/Audio/Helpers/ZeroCrossingFinder.h"
 
 #include "BackBeat/File/FileDialog.h"
 #include "BackBeat/File/FileManager.h"
