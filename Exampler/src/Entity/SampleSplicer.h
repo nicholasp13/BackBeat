@@ -58,7 +58,7 @@ namespace Exampler {
 		void RenderSplicerControls();
 		// Track Controls render functions
 		void RenderTrackBuffer();
-		// Splicer Controls rendder functions
+		// Splicer Controls render functions
 		void RenderSplicerBuffers();
 		void RenderButtons();
 		void RenderGainControls();

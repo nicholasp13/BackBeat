@@ -11,7 +11,8 @@ namespace BackBeat {
 	namespace SampleBuilder
 	{
 		void SaveSample(std::shared_ptr<Track> track, unsigned int start, unsigned int end);
+		void SaveSample(AudioProps props, float* leftBuffer, float* rightBuffer, unsigned int numSamples);
 		std::shared_ptr<Sample> BuildSample(std::string filePath);
 
 	};
-} 
+}

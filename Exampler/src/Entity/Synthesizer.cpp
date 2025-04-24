@@ -1189,7 +1189,7 @@ namespace Exampler {
 		ImGui::TableNextColumn();
 		ImGui::SeparatorText("General Controls");
 
-		HelpMarker("NOTES: \n* This section is KEYBOARD ONLY controls\n* Velocity is the measure of how hard you hit the note this means the higher the velocity the shorter the attack duration");
+		BackBeat::ImGuiWidgets::HelpMarker("Velocity is the measure of how hard you hit the note this means the higher the velocity the shorter the attack duration");
 		ImGui::SameLine();
 
 		int* octave = &(m_SynthParams->eventHandlerParams->octave);
@@ -1239,7 +1239,7 @@ namespace Exampler {
 		ImGui::PushID("LFO1");
 		ImGui::TableNextColumn();
 		ImGui::SeparatorText("LFO");
-		HelpMarker("Connected directly to Oscillator 1");
+		BackBeat::ImGuiWidgets::HelpMarker("Connected directly to Oscillator 1");
 
 		BackBeat::WaveType* wave = &(m_SynthParams->engineParams->voiceParams->LFOParams1->wave);
 
@@ -1591,7 +1591,7 @@ namespace Exampler {
 			ImGui::SetNextItemWidth(comboDutyCycleWidth);
 			ImGui::Combo("##DutyCycle", PWMIndex, s_DutyCycles, s_NumDutyCycles, s_NumDutyCycles);
 			ImGui::SameLine();
-			HelpMarker("Square Wave Pulse Width Modulation (PWM) \nChanges the length of the active duty cycle of the wave by the percentage");
+			BackBeat::ImGuiWidgets::HelpMarker("Square Wave Pulse Width Modulation (PWM) \nChanges the length of the active duty cycle of the wave by the percentage");
 
 			switch (*PWMIndex)
 			{
@@ -1699,16 +1699,4 @@ namespace Exampler {
 		return count;
 	}
 
-	// Helper functiom from ImGui::ShowDemoWindow()
-	void Synthesizer::HelpMarker(const char* desc)
-	{
-		ImGui::TextDisabled("(?)");
-		if (ImGui::BeginItemTooltip())
-		{
-			ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
-			ImGui::TextUnformatted(desc);
-			ImGui::PopTextWrapPos();
-			ImGui::EndTooltip();
-		}
-	}
 }

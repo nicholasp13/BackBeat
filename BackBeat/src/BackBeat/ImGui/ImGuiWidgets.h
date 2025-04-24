@@ -8,6 +8,7 @@ namespace BackBeat {
 
 	namespace ImGuiWidgets
 	{
+		void HelpMarker(const char* desc);
 
 		void ImGuiTimeline(const char* label, const float* values, int valuesCount, int valuesOffset, const char* overlayText, 
 			float scaleMin, float scaleMax, ImVec2 graphSize, int stride, float fraction);

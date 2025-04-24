@@ -1,5 +1,5 @@
 // TODO: Redesign GUI
-//       - Change GUI layout for track
+//       - Add ability to mark start and end while listening to track
 //       - Change colors (slightly darker or lighter grey for now)
 
 #include "SampleSplicer.h"
@@ -434,6 +434,9 @@ namespace Exampler {
 
 		// Total Time
 		{
+			const float thickness = 3.0f;
+			ImGui::SeparatorEx(ImGuiSeparatorFlags_Horizontal, thickness);
+
 			BackBeat::TimeMinSec totalTime = BackBeat::TimeMinSec();
 
 			if (trackSet)
@@ -450,7 +453,6 @@ namespace Exampler {
 			}
 
 			ImGui::Text("Total: %d:%02d (%d ms)", totalTime.minutes, totalTime.seconds, totalTime.milliseconds);
-
 		}
 
 		// Load splicer
@@ -464,7 +466,7 @@ namespace Exampler {
 
 			ImGui::BeginDisabled(disabled);
 
-			if (ImGui::Button("Load into Splicer"))
+			if (ImGui::Button("Load sample"))
 			{
 				m_Splicer.SetSampleData(m_Track, m_Start, m_End);
 				m_Params.Reset();
@@ -472,6 +474,9 @@ namespace Exampler {
 			}
 
 			ImGui::EndDisabled();
+
+			ImGui::SameLine();
+			BackBeat::ImGuiWidgets::HelpMarker("Must be less than 10 seconds to load into splicer");
 		}
 
 		ImGui::PopID();
@@ -661,6 +666,19 @@ namespace Exampler {
 		if (ImGui::Button("Update", buttonSize))
 		{
 			m_Splicer.Update(m_Params);
+		}
+
+		ImGui::SameLine();
+
+		// Save sample button
+		const float saveButtonXOffset = 656.0f;
+		auto pos = ImGui::GetCursorPos();
+		pos.x += saveButtonXOffset;
+		ImGui::SetCursorPos(pos);
+
+		if (ImGui::Button("Save"))
+		{
+			m_Splicer.SaveSample();
 		}
 
 		ImGui::EndDisabled();

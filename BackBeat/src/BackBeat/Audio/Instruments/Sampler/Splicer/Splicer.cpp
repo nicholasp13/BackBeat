@@ -4,12 +4,6 @@
 namespace BackBeat {
 
 	Splicer::Splicer()
-		:
-		m_Playable(false),
-		m_SampleInputSize(0),
-		m_SampleOutputSize(0),
-		m_Params(SplicerParameters()),
-		m_InputProps(AudioProps())
 	{
 		
 	}
@@ -51,6 +45,14 @@ namespace BackBeat {
 		Audio::FlushBuffer((byte*)m_SplicedRightChannel, SplicerMaxBufferSize * Audio::FloatByteSize);
 		Audio::FlushBuffer((byte*)m_InputBuffer, SplicerMaxBufferSize * Audio::Stereo * Audio::FloatByteSize);
 		m_SampleOutputSize = 0;
+	}
+
+	void Splicer::SaveSample()
+	{
+		if (m_SampleOutputSize == 0)
+			return;
+
+		SampleBuilder::SaveSample(m_OutputProps, m_SplicedLeftChannel, m_SplicedRightChannel, m_SampleOutputSize);
 	}
 
 	// This takes at most half of its max buffer size of input since some fx increase the length of the output

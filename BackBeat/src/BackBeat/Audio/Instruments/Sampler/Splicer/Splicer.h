@@ -82,6 +82,7 @@ namespace BackBeat {
 		void Update(SplicerParameters params); // Processes the whole sample data with the fx objects
 		void Reset(); // Puts original data from m_InputBuffer
 		void Clear(); // Flushes all buffers except m_TempBuffer
+		void SaveSample(); // Saves whats currently in the spliced channels as a sample file 
 
 		bool SetSampleData(float* sampleData, unsigned int numFrames, AudioProps props);
 		bool SetSampleData(std::shared_ptr<Track> track, unsigned int start, unsigned int end);
@@ -97,20 +98,21 @@ namespace BackBeat {
 		inline SplicerPlayer* GetPlayer() { return &m_Player; }
 
 	private:
-		bool m_Playable;
-		unsigned int m_SampleInputSize;  // Total size of input buffer data
-		unsigned int m_SampleOutputSize; // Size of one channels buffer
+		bool m_Playable = false;
+		unsigned int m_SampleInputSize = 0;  // Total size of input buffer data
+		unsigned int m_SampleOutputSize = 0; // Size of one channels buffer
 
 		float m_SplicedRightChannel[SplicerMaxBufferSize] = {};         // Spliced buffers are separated as some fx
 		float m_SplicedLeftChannel[SplicerMaxBufferSize] = {};          // need to be calculated by each channel separately
 		float m_InputBuffer[SplicerMaxBufferSize * Audio::Stereo] = {};
 		float m_TempBuffer[SplicerMaxBufferSize] = {};                  // Needed for some fx to make sure input data is not lost/overwritten 
 
-		AudioProps m_InputProps;
+		AudioProps m_InputProps = AudioProps();
+		AudioProps m_OutputProps = Audio::GetDefaultProps();
 
 		SplicerPlayer m_Player;
 
-		SplicerParameters m_Params;
+		SplicerParameters m_Params = SplicerParameters();
 
 		// Fx objects
 		TimeStretcher m_TimeStretcher;

@@ -5,6 +5,19 @@
 #include "ImGuiWidgets.h"
 namespace BackBeat {
 
+	// Helper functiom from ImGui::ShowDemoWindow()
+	void ImGuiWidgets::HelpMarker(const char* desc)
+	{
+		ImGui::TextDisabled("(?)");
+		if (ImGui::BeginItemTooltip())
+		{
+			ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+			ImGui::TextUnformatted(desc);
+			ImGui::PopTextWrapPos();
+			ImGui::EndTooltip();
+		}
+	}
+
 	// NOTE: Only handles int, may implement other data types later
 	//       Flags not used, may remove
 	// COLORS:

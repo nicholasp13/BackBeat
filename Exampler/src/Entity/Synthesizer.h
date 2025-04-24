@@ -97,7 +97,6 @@ namespace Exampler {
 
 		unsigned int SetCanvasColors();
 		unsigned int SetEntityColors();
-		void HelpMarker(const char* desc);
 
 		inline bool OnKeyEvent(BackBeat::KeyPressedEvent& event) { return false; }
 		inline bool OnMouseButtonEvent(BackBeat::MouseButtonPressedEvent& event) { return false; }
