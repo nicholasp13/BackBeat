@@ -23,6 +23,7 @@ namespace BackBeat {
 		inline void LoopOff() { m_Proc->LoopOff(); }
 		inline bool IsLooping() { return m_Proc->IsLooping(); }
 		inline bool IsLoaded() { return m_TotalFrames > 0; }
+		inline unsigned int GetPosition() { return m_Proc->GetPosition(); }
 		inline std::shared_ptr<SplicerPlayerProcessor> GetProc() { return m_Proc; }
 
 	private:

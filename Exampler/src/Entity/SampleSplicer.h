@@ -28,7 +28,8 @@ namespace Exampler {
 		const unsigned long BufferSize = 480000; // This is about 10 secondsd for 1 channel of a stereo 48k sample rate
 		                                         // floating point AudioProps
 		const float m_Width = 900.0f;
-		const float m_Height = 450.0f;
+		const float m_Height = 480.0f;
+		const float m_DummyHeight = 5.0f;
 
 		bool m_Open = false;
 		bool m_RenderTrack = true;
@@ -41,8 +42,8 @@ namespace Exampler {
 		int m_Size = 0;
 		int m_StartMs = 0;
 		int m_EndMs = 0;
+		int m_TimePercent = 0;
 		float m_Volume = 1.0f;
-		float m_TimeRatio = 0.0f;
 		std::shared_ptr<float[]> m_Buffer = std::make_shared<float[]>(BufferSize);
 
 		BackBeat::AudioProps m_Props = BackBeat::AudioProps();
@@ -57,7 +58,9 @@ namespace Exampler {
 		void RenderTrackControls();
 		void RenderSplicerControls();
 		// Track Controls render functions
-		void RenderTrackBuffer();
+		void RenderTrack();
+		void RenderTrackButtons();
+		void RenderTrackStartEndControls();
 		// Splicer Controls render functions
 		void RenderSplicerBuffers();
 		void RenderButtons();
@@ -65,6 +68,8 @@ namespace Exampler {
 		void RenderPitchControls();
 		void RenderTimeControls();
 		void RenderFilterControls();
+
+		unsigned int SetColors();
 	};
 
 

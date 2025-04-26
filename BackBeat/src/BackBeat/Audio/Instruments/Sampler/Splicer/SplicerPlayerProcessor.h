@@ -20,6 +20,7 @@ namespace BackBeat {
 		inline void LoopOff() { m_Looping = false; }
 		inline bool IsLooping() { return m_Looping; }
 		inline bool IsLoaded() { return m_InputBuffer; }
+		inline unsigned int GetPosition() { return m_Position; }
 
 		// AudioProcessor functions
 		virtual void ProcessSamples(unsigned int numSamples, unsigned int sampleRate, unsigned int numChannels) override;

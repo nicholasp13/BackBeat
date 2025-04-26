@@ -731,6 +731,7 @@ namespace Exampler {
 		ImGui::PushStyleColor(ImGuiCol_PlotHistogram, IM_COL32(61, 224, 144, 255)); count++;
 		ImGui::PushStyleColor(ImGuiCol_SliderGrab, IM_COL32(61, 224, 144, 255)); count++;
 		ImGui::PushStyleColor(ImGuiCol_SliderGrabActive, IM_COL32(61, 224, 144, 255)); count++;
+		ImGui::PushStyleColor(ImGuiCol_CheckMark, IM_COL32(0, 224, 0, 255)); count++;
 
 		// Knobs colors
 		// Filled

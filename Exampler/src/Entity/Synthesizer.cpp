@@ -1,4 +1,4 @@
-// TODO: Add noise generator to xml
+// TODO: - Connect LFO to other oscillators
 
 #include "Synthesizer.h"
 namespace Exampler {
