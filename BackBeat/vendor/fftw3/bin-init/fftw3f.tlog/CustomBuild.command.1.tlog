@@ -1,0 +1,10 @@
+^C:\DEV\BACKBEAT\BACKBEAT\VENDOR\FFTW3\FFTW-3.3.10.TAR\FFTW-3.3.10\CMAKELISTS.TXT
+setlocal
+"C:\Program Files\bin\cmake.exe" -SC:/Dev/BackBeat/BackBeat/vendor/fftw3/fftw-3.3.10.tar/fftw-3.3.10 -BC:/Dev/BackBeat/BackBeat/vendor/fftw3/bin --check-stamp-file C:/Dev/BackBeat/BackBeat/vendor/fftw3/bin/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

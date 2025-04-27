@@ -88,8 +88,7 @@ namespace BackBeat {
 		for (unsigned int i = 0; i < m_NumVoices; i++)
 		{
 			auto DCAParams = std::make_shared<DCAParameters>();
-			DCAParams->leftAmp = 1.0f;
-			DCAParams->rightAmp = 1.0f;
+			DCAParams->pan = SynthBase::PanDefault;
 			DCAParams->volume = 1.0f;
 			m_Params->DCAParams.push_back(DCAParams);
 		}

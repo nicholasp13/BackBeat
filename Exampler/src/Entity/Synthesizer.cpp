@@ -1,3 +1,5 @@
+// TODO: - Connect LFO to other oscillators
+
 #include "Synthesizer.h"
 namespace Exampler {
 
@@ -8,10 +10,6 @@ namespace Exampler {
 		s_SawtoothUpIndex = 3,
 		s_SawtoothDownIndex = 4;
 	static const float s_DummyHeight = 19.0f; // About the height of ImGui::Combo
-	static const float s_KnobSpeed = 0.0f;
-	static const char* s_KnobFormatFloat = "%.3f";
-	static const char* s_KnobFormatFloatFreq = "%.0f";
-	static const char* s_KnobFormatInt = "%i";
 	static const char* s_DutyCycles[] = { "10%", "25%", "40%", "50%" };
 	static const int s_NumDutyCycles = 4;
 	static const char* s_WaveTypes[] = { "Sin", "Triangle", "Square", "SawtoothUp", "SawtoothDown" };
@@ -85,12 +83,7 @@ namespace Exampler {
 
 		// Renders Actual Entity
 		const ImGuiViewport* mainViewport = ImGui::GetMainViewport();
-		float x = mainViewport->WorkPos.x;
-		float y = mainViewport->WorkPos.y;
-		const float width = 780.0f;
-		const float height = 550.0f;
-		ImGui::SetNextWindowPos(ImVec2(x, y), ImGuiCond_FirstUseEver);
-		ImGui::SetNextWindowSize(ImVec2(width, height), ImGuiCond_Once);
+		ImGui::SetNextWindowSize(ImVec2(m_Width, m_Height), ImGuiCond_Once);
 
 		count = SetEntityColors();
 
@@ -107,6 +100,10 @@ namespace Exampler {
 
 		RenderMenubar();
 
+		// Table dimensions
+		const float padding = 5.0f;
+		const float tableLength = m_Width - padding * 2.0f;
+
 		// Table flags
 		ImGuiTableFlags tableFlags = 0;
 		tableFlags |= ImGuiTableFlags_RowBg;
@@ -115,7 +112,9 @@ namespace Exampler {
 		// First row
 		{
 			const int numColumns = 4;
-			ImGui::BeginTable("Row1", numColumns, tableFlags, ImVec2(0.0f, 0.0f), 0.0f);
+			ImVec2 position = ImVec2(padding, ImGui::GetCursorPos().y);
+			ImGui::SetCursorPos(position);
+			ImGui::BeginTable("Row1", numColumns, tableFlags, ImVec2(tableLength, 0.0f), 0.0f);
 
 			RenderGeneralControls();
 			RenderVolumePanControls();
@@ -127,10 +126,16 @@ namespace Exampler {
 
 		// Second row
 		{
-			const int numColumns = 2;
-			ImGui::BeginTable("Row2", numColumns, tableFlags, ImVec2(0.0f, 0.0f), 0.0f);
+			const int numColumns = 3;
+			const float columnLength = (tableLength * 0.75f) / 2.0f - 9.0f;
+			ImVec2 position = ImVec2(padding, ImGui::GetCursorPos().y);
+			ImGui::SetCursorPos(position);
+			ImGui::BeginTable("Row2", numColumns, tableFlags, ImVec2(tableLength, 0.0f), 0.0f);
+			ImGui::TableSetupColumn("one", ImGuiTableColumnFlags_WidthFixed, columnLength);
+			ImGui::TableSetupColumn("two", ImGuiTableColumnFlags_WidthFixed, columnLength - 1.0f);
 
 			RenderEGs();
+			RenderNoiseGenerator();
 
 			ImGui::EndTable();
 		}
@@ -138,7 +143,9 @@ namespace Exampler {
 		// Third row
 		{
 			const int numColumns = 4;
-			ImGui::BeginTable("Row3", numColumns, tableFlags, ImVec2(0.0f, 0.0f), 0.0f);
+			ImVec2 position = ImVec2(padding, ImGui::GetCursorPos().y);
+			ImGui::SetCursorPos(position);
+			ImGui::BeginTable("Row3", numColumns, tableFlags, ImVec2(tableLength, 0.0f), 0.0f);
 
 			RenderOscs();
 
@@ -315,6 +322,17 @@ namespace Exampler {
 			filterEGNode.append_child("Decay").append_attribute("Value") = filterEGParams->decayDuration;
 			filterEGNode.append_child("Release").append_attribute("Value") = filterEGParams->releaseDuration;
 			filterEGNode.append_child("Sustain").append_attribute("Value") = filterEGParams->sustainValue;
+		}
+
+		// Noise Generator
+		{
+			std::shared_ptr<BackBeat::NoiseGeneratorParameters> noiseGenParams =
+				m_SynthParams->engineParams->voiceParams->NoiseGenParams;
+
+			auto noiseGenNode = synthNode.append_child("NoiseGenerator");
+
+			noiseGenNode.append_child("On").append_attribute("Value") = noiseGenParams->isOn;
+			noiseGenNode.append_child("Level").append_attribute("Value") = noiseGenParams->level;
 		}
 
 		// Oscillator 1
@@ -687,6 +705,17 @@ namespace Exampler {
 			filterEGParams->decayDuration = filterEGNode.child("Decay").attribute("Value").as_float();
 			filterEGParams->releaseDuration = filterEGNode.child("Release").attribute("Value").as_float();
 			filterEGParams->sustainValue = filterEGNode.child("Sustain").attribute("Value").as_float();
+		}
+
+		// Noise Generator
+		{
+			std::shared_ptr<BackBeat::NoiseGeneratorParameters> noiseGenParams =
+				m_SynthParams->engineParams->voiceParams->NoiseGenParams;
+
+			auto noiseGenNode = node->child("NoiseGenerator");
+
+			noiseGenParams->isOn = noiseGenNode.child("On").attribute("Value").as_bool();
+			noiseGenParams->level = noiseGenNode.child("Level").attribute("Value").as_float();
 		}
 
 		// Oscillator 1
@@ -1160,7 +1189,7 @@ namespace Exampler {
 		ImGui::TableNextColumn();
 		ImGui::SeparatorText("General Controls");
 
-		HelpMarker("NOTES: \n* This section is KEYBOARD ONLY controls\n* Velocity is the measure of how hard you hit the note this means the higher the velocity the shorter the attack duration");
+		BackBeat::ImGuiWidgets::HelpMarker("Velocity is the measure of how hard you hit the note this means the higher the velocity the shorter the attack duration");
 		ImGui::SameLine();
 
 		int* octave = &(m_SynthParams->eventHandlerParams->octave);
@@ -1187,20 +1216,18 @@ namespace Exampler {
 	void Synthesizer::RenderVolumePanControls()
 	{
 		float* volume = &(m_SynthParams->engineParams->volume);
+		float* pan = &(m_SynthParams->engineParams->voiceParams->DCAParams->pan);
 		 
 		ImGui::SameLine();
 		ImGuiKnobs::Knob("Volume", volume, 0.0f, 1.0f, s_KnobSpeed, s_KnobFormatFloat, ImGuiKnobVariant_::ImGuiKnobVariant_Wiper);
 		
 		ImGui::SameLine();
 
-		ImGuiKnobs::Knob("Pan", &m_Pan, BackBeat::SynthBase::PanMin, BackBeat::SynthBase::PanMax,
+		ImGuiKnobs::Knob("Pan", pan, BackBeat::SynthBase::PanMin, BackBeat::SynthBase::PanMax,
 			s_KnobSpeed, s_KnobFormatFloat, ImGuiKnobVariant_::ImGuiKnobVariant_WiperDot);
 
 		if (ImGui::IsItemActive() && ImGui::IsMouseDoubleClicked(0)) 
-			m_Pan = 0.0f;
-
-		BackBeat::Audio::CalculatePanValues(m_Pan, &m_SynthParams->engineParams->voiceParams->DCAParams->leftAmp,
-			&m_SynthParams->engineParams->voiceParams->DCAParams->rightAmp);
+			*pan = 0.0f;
 
 		ImGui::Spacing();
 	}
@@ -1212,7 +1239,7 @@ namespace Exampler {
 		ImGui::PushID("LFO1");
 		ImGui::TableNextColumn();
 		ImGui::SeparatorText("LFO");
-		HelpMarker("Connected directly to Oscillator 1");
+		BackBeat::ImGuiWidgets::HelpMarker("Connected directly to Oscillator 1");
 
 		BackBeat::WaveType* wave = &(m_SynthParams->engineParams->voiceParams->LFOParams1->wave);
 
@@ -1455,6 +1482,28 @@ namespace Exampler {
 		}
 	}
 
+	void Synthesizer::RenderNoiseGenerator()
+	{
+		ImGui::PushID("NoiseGenerator");
+		ImGui::TableNextColumn();
+
+		ImGui::SeparatorText("Noise");
+
+		bool* on = &(m_SynthParams->engineParams->voiceParams->NoiseGenParams->isOn);
+		float* level = &(m_SynthParams->engineParams->voiceParams->NoiseGenParams->level);
+
+		ImGui::Checkbox("On", on);
+
+		ImGuiKnobs::Knob("Level", level, BackBeat::SynthBase::NoiseGenMin, BackBeat::SynthBase::NoiseGenMax,
+			s_KnobSpeed, s_KnobFormatFloat, ImGuiKnobVariant_::ImGuiKnobVariant_Wiper);
+
+		if (ImGui::IsItemActive() && ImGui::IsMouseDoubleClicked(0))
+			*level = BackBeat::SynthBase::NoiseGenDefault;
+
+		ImGui::Spacing();
+		ImGui::PopID();
+	}
+
 	void Synthesizer::RenderOscs()
 	{
 		RenderOsc("Oscillator 1", &m_Octave1, m_SynthParams->engineParams->voiceParams->OscParams1,
@@ -1542,7 +1591,7 @@ namespace Exampler {
 			ImGui::SetNextItemWidth(comboDutyCycleWidth);
 			ImGui::Combo("##DutyCycle", PWMIndex, s_DutyCycles, s_NumDutyCycles, s_NumDutyCycles);
 			ImGui::SameLine();
-			HelpMarker("Square Wave Pulse Width Modulation (PWM) \nChanges the length of the active duty cycle of the wave by the percentage");
+			BackBeat::ImGuiWidgets::HelpMarker("Square Wave Pulse Width Modulation (PWM) \nChanges the length of the active duty cycle of the wave by the percentage");
 
 			switch (*PWMIndex)
 			{
@@ -1641,7 +1690,7 @@ namespace Exampler {
 
 		// Knobs colors
 		// Filled
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive, IM_COL32(41, 105, 232, 255)); count++;
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImGui::GetColorU32(ImGuiCol_SliderGrab)); count++;
 		// Filled (Hovered)
 		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, IM_COL32(0, 80, 255, 255)); count++;
 		// Track
@@ -1650,16 +1699,4 @@ namespace Exampler {
 		return count;
 	}
 
-	// Helper functiom from ImGui::ShowDemoWindow()
-	void Synthesizer::HelpMarker(const char* desc)
-	{
-		ImGui::TextDisabled("(?)");
-		if (ImGui::BeginItemTooltip())
-		{
-			ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
-			ImGui::TextUnformatted(desc);
-			ImGui::PopTextWrapPos();
-			ImGui::EndTooltip();
-		}
-	}
 }

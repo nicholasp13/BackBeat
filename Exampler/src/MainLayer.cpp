@@ -1,9 +1,3 @@
-// TODO: 
-//     - Create panel class for Canvas and sampler pads
-//         - Create sample pads that are programmable through a right click and play with a left click and have a 
-//           simple blank look that might change colors when played
-//     - Create new entity AudioVisualizer and have it pop out and be its own window instead of what it is now
-
 #include "MainLayer.h"
 namespace Exampler {
 
@@ -12,7 +6,6 @@ namespace Exampler {
 		Layer("MainLayer"), 
 		m_NewPopupOpen(false),
 		m_SaveAsPopupOpen(false),
-		m_OpenAudioVisualizer(false),
 		m_NumMIDIDevices(0),
 		m_NumSynths(0),
 		m_NumSamplers(0),
@@ -27,7 +20,7 @@ namespace Exampler {
 		m_RecorderMgr(audio->GetRecorderManager()),
 		m_AudioRenderer(audio->GetRenderer()),
 		m_MIDIDeviceManager(audio->GetMIDIDeviceManager()),
-		m_Visualizer(audio->GetVisualizer()),
+		m_Visualizer((unsigned int)audio->GetProps().sampleRate, audio->GetVisualizer()),
 		m_ActiveProject(nullptr),
 		m_State(AppState::Start)
 	{
@@ -80,7 +73,7 @@ namespace Exampler {
 				{
 					(*itr)->Update();
 				}
-				m_Visualizer->Update();
+				m_Visualizer.Update();
 				break;
 			}
 
@@ -159,8 +152,9 @@ namespace Exampler {
 			RenderMenubar();
 			RenderCanvas();
 			RenderMgrs();
-			RenderAudioVisualizer();
 			RenderMenubarPopups();
+
+			m_Visualizer.Render();
 
 			ImGui::End();
 		}
@@ -480,6 +474,15 @@ namespace Exampler {
 				ImGui::EndMenu();
 			}
 
+			// Audio Visualizers
+			if (ImGui::BeginMenu("Audio Visualizers"))
+			{
+				if (ImGui::MenuItem("Open"))
+					m_Visualizer.Open();
+
+				ImGui::EndMenu();
+			}
+
 			ImGui::EndMenuBar();
 		}
 	}
@@ -492,56 +495,6 @@ namespace Exampler {
 		const unsigned int hBorder = 250;
 
 		m_Canvas.Render((float)(width - wBorder), (float)(height - hBorder), m_State == AppState::Play);
-	}
-
-	// BUG: When spamming the on and off button. It may cause the visuals to glitch (mostly show the data when it should have been flushed)
-	void MainLayer::RenderAudioVisualizer()
-	{
-		ImGui::Spacing();
-
-		if (!m_OpenAudioVisualizer)
-		{
-			if (ImGui::Button("Open Audio Visualizer"))
-			{
-				m_OpenAudioVisualizer = true;
-			}
-
-			return;
-		}
-
-		if (ImGui::Button("Close Audio Visualizer"))
-		{
-			m_OpenAudioVisualizer = false;;
-			m_Visualizer->Off();
-			return;
-		}
-
-		ImGui::Spacing(); ImGui::Separator(); ImGui::Spacing();
-
-		if (!m_Visualizer->IsOn())
-		{
-			if (ImGui::Button("On", ImVec2(100, 20)))
-				m_Visualizer->On();
-		}
-		else
-		{
-			if (ImGui::Button("Off", ImVec2(100, 20)))
-				m_Visualizer->Off();
-		}
-
-		// NOTE: While inuitive to think that the min/max shouldd be near 1.0f, the sound is multiplied by multiple different gain levels
-		//       through the BackBeat workflow making the average peak of a sound wave much lower than you would think.
-		const float visualMax = .15f;
-		auto bufferSize = m_Visualizer->GetChannelBufferSize();
-		for (unsigned int i = 0; i < m_Visualizer->GetNumChannels(); i++)
-		{
-			ImGui::Spacing();
-			std::string name = "Channel " + std::to_string(i + 1);
-			ImGui::PlotLines(name.c_str(), m_Visualizer->GetChannelBuffer(i), bufferSize, 1, "", 
-				visualMax * -1, visualMax, ImVec2(m_Window->GetWidth() - 200.0f, 60.0f));
-		}
-
-		ImGui::Spacing();
 	}
 
 	void MainLayer::RenderMgrs()

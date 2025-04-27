@@ -20,16 +20,16 @@ namespace BackBeat {
 		
 	}
 
-	void SynthProcessor::ProcessSamples(unsigned int numSamples, unsigned int sampleRate, unsigned int numChannels)
+	void SynthProcessor::ProcessSamples(unsigned int numFrames, unsigned int sampleRate, unsigned int numChannels)
 	{
 		if (!m_On)
 			return;
-		if (numSamples == 0)
+		if (numFrames == 0)
 			return;
-		if (numSamples * m_Props.numChannels > m_Bus.GetBufferSize())
+		if (numFrames * m_Props.numChannels > m_Bus.GetBufferSize())
 			return;
 
-		m_Info->SetSamplesToRender(numSamples);
+		m_Info->SetSamplesToRender(numFrames);
 		m_Engine->Render(m_Info);
 
 		// NOTE: Synth's should always be a floating point (or a double) and this is assumed and not checked
@@ -38,7 +38,7 @@ namespace BackBeat {
 		{
 			if (numChannels == Audio::Stereo) 
 			{
-				for (unsigned int i = 0; i < numSamples * m_Props.numChannels; i += m_Props.numChannels) {
+				for (unsigned int i = 0; i < numFrames * m_Props.numChannels; i += m_Props.numChannels) {
 					for (unsigned int j = 0; j < m_Props.numChannels; j++) {
 						int index = i + j; // Added to get rid of error message
 						m_Output[index] = (float)srcBuffer[index];
@@ -48,7 +48,7 @@ namespace BackBeat {
 			else 
 			{
 				unsigned int index = 0;
-				for (unsigned int i = 0; i < numSamples * m_Props.numChannels; i += m_Props.numChannels) {
+				for (unsigned int i = 0; i < numFrames * m_Props.numChannels; i += m_Props.numChannels) {
 					m_Output[i] = srcBuffer[index];
 					index += m_Props.numChannels;
 				}

@@ -1,0 +1,511 @@
+﻿  Building Custom Rule C:/Dev/BackBeat/BackBeat/vendor/fftw3/fftw-3.3.10.tar/fftw-3.3.10/CMakeLists.txt
+  apiplan.c
+  configure.c
+  execute-dft-c2r.c
+  execute-dft-r2c.c
+  execute-dft.c
+  execute-r2r.c
+  execute-split-dft-c2r.c
+  execute-split-dft-r2c.c
+  execute-split-dft.c
+  execute.c
+  export-wisdom-to-file.c
+C:\Dev\BackBeat\BackBeat\vendor\fftw3\fftw-3.3.10.tar\fftw-3.3.10\api\export-wisdom-to-file.c(33,16): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  export-wisdom-to-string.c
+  export-wisdom.c
+  f77api.c
+  flops.c
+  forget-wisdom.c
+  import-system-wisdom.c
+  import-wisdom-from-file.c
+C:\Dev\BackBeat\BackBeat\vendor\fftw3\fftw-3.3.10.tar\fftw-3.3.10\api\import-wisdom-from-file.c(75,16): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  import-wisdom-from-string.c
+  import-wisdom.c
+  Generating Code...
+  Compiling...
+  malloc.c
+  map-r2r-kind.c
+  mapflags.c
+  mkprinter-file.c
+  mkprinter-str.c
+  mktensor-iodims.c
+  mktensor-iodims64.c
+  mktensor-rowmajor.c
+  plan-dft-1d.c
+  plan-dft-2d.c
+  plan-dft-3d.c
+  plan-dft-c2r-1d.c
+  plan-dft-c2r-2d.c
+  plan-dft-c2r-3d.c
+  plan-dft-c2r.c
+  plan-dft-r2c-1d.c
+  plan-dft-r2c-2d.c
+  plan-dft-r2c-3d.c
+  plan-dft-r2c.c
+  plan-dft.c
+  Generating Code...
+  Compiling...
+  plan-guru-dft-c2r.c
+  plan-guru-dft-r2c.c
+  plan-guru-dft.c
+  plan-guru-r2r.c
+  plan-guru-split-dft-c2r.c
+  plan-guru-split-dft-r2c.c
+  plan-guru-split-dft.c
+  plan-guru64-dft-c2r.c
+  plan-guru64-dft-r2c.c
+  plan-guru64-dft.c
+  plan-guru64-r2r.c
+  plan-guru64-split-dft-c2r.c
+  plan-guru64-split-dft-r2c.c
+  plan-guru64-split-dft.c
+  plan-many-dft-c2r.c
+  plan-many-dft-r2c.c
+  plan-many-dft.c
+  plan-many-r2r.c
+  plan-r2r-1d.c
+  plan-r2r-2d.c
+  Generating Code...
+  Compiling...
+  plan-r2r-3d.c
+  plan-r2r.c
+  print-plan.c
+  rdft2-pad.c
+  the-planner.c
+  version.c
+  bluestein.c
+  dftw-direct.c
+  dftw-directsq.c
+  dftw-generic.c
+C:\Dev\BackBeat\BackBeat\vendor\fftw3\fftw-3.3.10.tar\fftw-3.3.10\dft\dftw-generic.c(177,39): warning C4244: 'initializing': conversion from 'INT' to 'double', possible loss of data
+  dftw-genericbuf.c
+C:\Dev\BackBeat\BackBeat\vendor\fftw3\fftw-3.3.10.tar\fftw-3.3.10\dft\dftw-genericbuf.c(195,24): warning C4244: 'initializing': conversion from 'INT' to 'double', possible loss of data
+  direct.c
+  indirect-transpose.c
+  kdft-dif.c
+  kdft-difsq.c
+  kdft-dit.c
+  kdft.c
+  zero.c
+  n.c
+  t.c
+  Generating Code...
+  Compiling...
+  n1_10.c
+  n1_11.c
+  n1_12.c
+  n1_13.c
+  n1_14.c
+  n1_15.c
+  n1_16.c
+  n1_2.c
+  n1_20.c
+  n1_25.c
+  n1_3.c
+  n1_32.c
+  n1_4.c
+  n1_5.c
+  n1_6.c
+  n1_64.c
+  n1_7.c
+  n1_8.c
+  n1_9.c
+  q1_2.c
+  Generating Code...
+  Compiling...
+  q1_3.c
+  q1_4.c
+  q1_5.c
+  q1_6.c
+  q1_8.c
+  t1_10.c
+  t1_12.c
+  t1_15.c
+  t1_16.c
+  t1_2.c
+  t1_20.c
+  t1_25.c
+  t1_3.c
+  t1_32.c
+  t1_4.c
+  t1_5.c
+  t1_6.c
+  t1_64.c
+  t1_7.c
+  t1_8.c
+  Generating Code...
+  Compiling...
+  t1_9.c
+  t2_10.c
+  t2_16.c
+  t2_20.c
+  t2_25.c
+  t2_32.c
+  t2_4.c
+  t2_5.c
+  t2_64.c
+  t2_8.c
+  align.c
+  alloc.c
+  assert.c
+  awake.c
+  cpy1d.c
+  cpy2d-pair.c
+  cpy2d.c
+  debug.c
+  extract-reim.c
+  hash.c
+  Generating Code...
+  Compiling...
+  iabs.c
+  kalloc.c
+  md5-1.c
+  md5.c
+  minmax.c
+  ops.c
+C:\Dev\BackBeat\BackBeat\vendor\fftw3\fftw-3.3.10.tar\fftw-3.3.10\kernel\ops.c(37,19): warning C4244: '=': conversion from 'INT' to 'double', possible loss of data
+  pickdim.c
+  planner.c
+  primes.c
+  print.c
+  scan.c
+  solver.c
+  solvtab.c
+  stride.c
+  tensor.c
+  tensor1.c
+  tensor2.c
+  tensor3.c
+  tensor4.c
+  tensor5.c
+  Generating Code...
+  Compiling...
+  tensor7.c
+  tensor8.c
+  tensor9.c
+  tile2d.c
+  timer.c
+  transpose.c
+  trig.c
+C:\Dev\BackBeat\BackBeat\vendor\fftw3\fftw-3.3.10.tar\fftw-3.3.10\kernel\trig.c(125,21): warning C4244: '=': conversion from 'trigreal' to 'R', possible loss of data
+C:\Dev\BackBeat\BackBeat\vendor\fftw3\fftw-3.3.10.tar\fftw-3.3.10\kernel\trig.c(126,21): warning C4244: '=': conversion from 'trigreal' to 'R', possible loss of data
+C:\Dev\BackBeat\BackBeat\vendor\fftw3\fftw-3.3.10.tar\fftw-3.3.10\kernel\trig.c(165,25): warning C4244: '=': conversion from 'trigreal' to 'R', possible loss of data
+C:\Dev\BackBeat\BackBeat\vendor\fftw3\fftw-3.3.10.tar\fftw-3.3.10\kernel\trig.c(166,25): warning C4244: '=': conversion from 'trigreal' to 'R', possible loss of data
+  twiddle.c
+  buffered2.c
+  ct-hc2c-direct.c
+  ct-hc2c.c
+  dft-r2hc.c
+  dht-r2hc.c
+  dht-rader.c
+C:\Dev\BackBeat\BackBeat\vendor\fftw3\fftw-3.3.10.tar\fftw-3.3.10\rdft\dht-rader.c(171,14): warning C4244: '=': conversion from 'INT' to 'trigreal', possible loss of data
+C:\Dev\BackBeat\BackBeat\vendor\fftw3\fftw-3.3.10.tar\fftw-3.3.10\rdft\dht-rader.c(177,29): warning C4244: '=': conversion from 'trigreal' to 'R', possible loss of data
+  direct-r2c.c
+  direct-r2r.c
+  direct2.c
+  hc2hc-direct.c
+  hc2hc-generic.c
+  hc2hc.c
+  Generating Code...
+  Compiling...
+  khc2c.c
+  khc2hc.c
+  kr2c.c
+  kr2r.c
+  nop2.c
+  plan2.c
+  problem2.c
+  rank-geq2-rdft2.c
+  rank0-rdft2.c
+  rank0.c
+  rdft-dht.c
+  rdft2-inplace-strides.c
+  rdft2-rdft.c
+  rdft2-strides.c
+  rdft2-tensor-max-index.c
+  solve2.c
+  vrank-geq1-rdft2.c
+  vrank3-transpose.c
+  hc2c.c
+  hfb.c
+  Generating Code...
+  Compiling...
+  r2c.c
+  r2r.c
+  hb2_16.c
+  hb2_20.c
+  hb2_25.c
+  hb2_32.c
+  hb2_4.c
+  hb2_5.c
+  hb2_8.c
+  hb_10.c
+  hb_12.c
+  hb_15.c
+  hb_16.c
+  hb_2.c
+  hb_20.c
+  hb_25.c
+  hb_3.c
+  hb_32.c
+  hb_4.c
+  hb_5.c
+  Generating Code...
+  Compiling...
+  hb_6.c
+  hb_64.c
+  hb_7.c
+  hb_8.c
+  hb_9.c
+  hc2cb2_16.c
+  hc2cb2_20.c
+  hc2cb2_32.c
+  hc2cb2_4.c
+  hc2cb2_8.c
+  hc2cb_10.c
+  hc2cb_12.c
+  hc2cb_16.c
+  hc2cb_2.c
+  hc2cb_20.c
+  hc2cb_32.c
+  hc2cb_4.c
+  hc2cb_6.c
+  hc2cb_8.c
+  hc2cbdft2_16.c
+  Generating Code...
+  Compiling...
+  hc2cbdft2_20.c
+  hc2cbdft2_32.c
+  hc2cbdft2_4.c
+  hc2cbdft2_8.c
+  hc2cbdft_10.c
+  hc2cbdft_12.c
+  hc2cbdft_16.c
+  hc2cbdft_2.c
+  hc2cbdft_20.c
+  hc2cbdft_32.c
+  hc2cbdft_4.c
+  hc2cbdft_6.c
+  hc2cbdft_8.c
+  r2cbIII_10.c
+  r2cbIII_12.c
+  r2cbIII_15.c
+  r2cbIII_16.c
+  r2cbIII_2.c
+  r2cbIII_20.c
+  r2cbIII_25.c
+  Generating Code...
+  Compiling...
+  r2cbIII_3.c
+  r2cbIII_32.c
+  r2cbIII_4.c
+  r2cbIII_5.c
+  r2cbIII_6.c
+  r2cbIII_64.c
+  r2cbIII_7.c
+  r2cbIII_8.c
+  r2cbIII_9.c
+  r2cb_10.c
+  r2cb_11.c
+  r2cb_12.c
+  r2cb_128.c
+  r2cb_13.c
+  r2cb_14.c
+  r2cb_15.c
+  r2cb_16.c
+  r2cb_2.c
+  r2cb_20.c
+  r2cb_25.c
+  Generating Code...
+  Compiling...
+  r2cb_3.c
+  r2cb_32.c
+  r2cb_4.c
+  r2cb_5.c
+  r2cb_6.c
+  r2cb_64.c
+  r2cb_7.c
+  r2cb_8.c
+  r2cb_9.c
+  hc2cf2_16.c
+  hc2cf2_20.c
+  hc2cf2_32.c
+  hc2cf2_4.c
+  hc2cf2_8.c
+  hc2cf_10.c
+  hc2cf_12.c
+  hc2cf_16.c
+  hc2cf_2.c
+  hc2cf_20.c
+  hc2cf_32.c
+  Generating Code...
+  Compiling...
+  hc2cf_4.c
+  hc2cf_6.c
+  hc2cf_8.c
+  hc2cfdft2_16.c
+  hc2cfdft2_20.c
+  hc2cfdft2_32.c
+  hc2cfdft2_4.c
+  hc2cfdft2_8.c
+  hc2cfdft_10.c
+  hc2cfdft_12.c
+  hc2cfdft_16.c
+  hc2cfdft_2.c
+  hc2cfdft_20.c
+  hc2cfdft_32.c
+  hc2cfdft_4.c
+  hc2cfdft_6.c
+  hc2cfdft_8.c
+  hf2_16.c
+  hf2_20.c
+  hf2_25.c
+  Generating Code...
+  Compiling...
+  hf2_32.c
+  hf2_4.c
+  hf2_5.c
+  hf2_8.c
+  hf_10.c
+  hf_12.c
+  hf_15.c
+  hf_16.c
+  hf_2.c
+  hf_20.c
+  hf_25.c
+  hf_3.c
+  hf_32.c
+  hf_4.c
+  hf_5.c
+  hf_6.c
+  hf_64.c
+  hf_7.c
+  hf_8.c
+  hf_9.c
+  Generating Code...
+  Compiling...
+  r2cfII_10.c
+  r2cfII_12.c
+  r2cfII_15.c
+  r2cfII_16.c
+  r2cfII_2.c
+  r2cfII_20.c
+  r2cfII_25.c
+  r2cfII_3.c
+  r2cfII_32.c
+  r2cfII_4.c
+  r2cfII_5.c
+  r2cfII_6.c
+  r2cfII_64.c
+  r2cfII_7.c
+  r2cfII_8.c
+  r2cfII_9.c
+  r2cf_10.c
+  r2cf_11.c
+  r2cf_12.c
+  r2cf_128.c
+  Generating Code...
+  Compiling...
+  r2cf_13.c
+  r2cf_14.c
+  r2cf_15.c
+  r2cf_16.c
+  r2cf_2.c
+  r2cf_20.c
+  r2cf_25.c
+  r2cf_3.c
+  r2cf_32.c
+  r2cf_4.c
+  r2cf_5.c
+  r2cf_6.c
+  r2cf_64.c
+  r2cf_7.c
+  r2cf_8.c
+  r2cf_9.c
+  e01_8.c
+  e10_8.c
+  redft00e-r2hc-pad.c
+C:\Dev\BackBeat\BackBeat\vendor\fftw3\fftw-3.3.10.tar\fftw-3.3.10\reodft\redft00e-r2hc-pad.c(170,20): warning C4244: '=': conversion from 'INT' to 'double', possible loss of data
+  redft00e-r2hc.c
+C:\Dev\BackBeat\BackBeat\vendor\fftw3\fftw-3.3.10.tar\fftw-3.3.10\reodft\redft00e-r2hc.c(193,35): warning C4244: '=': conversion from 'INT' to 'double', possible loss of data
+C:\Dev\BackBeat\BackBeat\vendor\fftw3\fftw-3.3.10.tar\fftw-3.3.10\reodft\redft00e-r2hc.c(194,18): warning C4244: '=': conversion from 'INT' to 'double', possible loss of data
+C:\Dev\BackBeat\BackBeat\vendor\fftw3\fftw-3.3.10.tar\fftw-3.3.10\reodft\redft00e-r2hc.c(195,28): warning C4244: '=': conversion from 'INT' to 'double', possible loss of data
+  Generating Code...
+  Compiling...
+  reodft00e-splitradix.c
+C:\Dev\BackBeat\BackBeat\vendor\fftw3\fftw-3.3.10.tar\fftw-3.3.10\reodft\reodft00e-splitradix.c(326,19): warning C4244: '=': conversion from 'INT' to 'double', possible loss of data
+C:\Dev\BackBeat\BackBeat\vendor\fftw3\fftw-3.3.10.tar\fftw-3.3.10\reodft\reodft00e-splitradix.c(328,18): warning C4244: '=': conversion from 'INT' to 'double', possible loss of data
+C:\Dev\BackBeat\BackBeat\vendor\fftw3\fftw-3.3.10.tar\fftw-3.3.10\reodft\reodft00e-splitradix.c(329,34): warning C4244: '=': conversion from 'INT' to 'double', possible loss of data
+  reodft010e-r2hc.c
+C:\Dev\BackBeat\BackBeat\vendor\fftw3\fftw-3.3.10.tar\fftw-3.3.10\reodft\reodft010e-r2hc.c(382,35): warning C4244: '=': conversion from 'INT' to 'double', possible loss of data
+C:\Dev\BackBeat\BackBeat\vendor\fftw3\fftw-3.3.10.tar\fftw-3.3.10\reodft\reodft010e-r2hc.c(384,22): warning C4244: '=': conversion from 'INT' to 'double', possible loss of data
+C:\Dev\BackBeat\BackBeat\vendor\fftw3\fftw-3.3.10.tar\fftw-3.3.10\reodft\reodft010e-r2hc.c(385,26): warning C4244: '=': conversion from 'INT' to 'double', possible loss of data
+C:\Dev\BackBeat\BackBeat\vendor\fftw3\fftw-3.3.10.tar\fftw-3.3.10\reodft\reodft010e-r2hc.c(388,22): warning C4244: '=': conversion from 'INT' to 'double', possible loss of data
+C:\Dev\BackBeat\BackBeat\vendor\fftw3\fftw-3.3.10.tar\fftw-3.3.10\reodft\reodft010e-r2hc.c(389,30): warning C4244: '=': conversion from 'INT' to 'double', possible loss of data
+  reodft11e-r2hc-odd.c
+C:\Dev\BackBeat\BackBeat\vendor\fftw3\fftw-3.3.10.tar\fftw-3.3.10\reodft\reodft11e-r2hc-odd.c(278,18): warning C4244: '=': conversion from 'INT' to 'double', possible loss of data
+C:\Dev\BackBeat\BackBeat\vendor\fftw3\fftw-3.3.10.tar\fftw-3.3.10\reodft\reodft11e-r2hc-odd.c(279,16): warning C4244: '=': conversion from 'INT' to 'double', possible loss of data
+C:\Dev\BackBeat\BackBeat\vendor\fftw3\fftw-3.3.10.tar\fftw-3.3.10\reodft\reodft11e-r2hc-odd.c(280,19): warning C4244: '=': conversion from 'INT' to 'double', possible loss of data
+  reodft11e-r2hc.c
+C:\Dev\BackBeat\BackBeat\vendor\fftw3\fftw-3.3.10.tar\fftw-3.3.10\reodft\reodft11e-r2hc.c(272,47): warning C4244: '=': conversion from 'INT' to 'double', possible loss of data
+C:\Dev\BackBeat\BackBeat\vendor\fftw3\fftw-3.3.10.tar\fftw-3.3.10\reodft\reodft11e-r2hc.c(273,28): warning C4244: '=': conversion from 'INT' to 'double', possible loss of data
+C:\Dev\BackBeat\BackBeat\vendor\fftw3\fftw-3.3.10.tar\fftw-3.3.10\reodft\reodft11e-r2hc.c(274,44): warning C4244: '=': conversion from 'INT' to 'double', possible loss of data
+  reodft11e-radix2.c
+C:\Dev\BackBeat\BackBeat\vendor\fftw3\fftw-3.3.10.tar\fftw-3.3.10\reodft\reodft11e-radix2.c(486,18): warning C4244: '=': conversion from 'INT' to 'double', possible loss of data
+C:\Dev\BackBeat\BackBeat\vendor\fftw3\fftw-3.3.10.tar\fftw-3.3.10\reodft\reodft11e-radix2.c(487,18): warning C4244: '=': conversion from 'INT' to 'double', possible loss of data
+C:\Dev\BackBeat\BackBeat\vendor\fftw3\fftw-3.3.10.tar\fftw-3.3.10\reodft\reodft11e-radix2.c(488,26): warning C4244: '=': conversion from 'INT' to 'double', possible loss of data
+  rodft00e-r2hc-pad.c
+C:\Dev\BackBeat\BackBeat\vendor\fftw3\fftw-3.3.10.tar\fftw-3.3.10\reodft\rodft00e-r2hc-pad.c(168,22): warning C4244: '=': conversion from 'INT' to 'double', possible loss of data
+  rodft00e-r2hc.c
+C:\Dev\BackBeat\BackBeat\vendor\fftw3\fftw-3.3.10.tar\fftw-3.3.10\reodft\rodft00e-r2hc.c(91,18): warning C4244: '=': conversion from 'double' to 'R', possible loss of data
+C:\Dev\BackBeat\BackBeat\vendor\fftw3\fftw-3.3.10.tar\fftw-3.3.10\reodft\rodft00e-r2hc.c(187,34): warning C4244: '=': conversion from 'INT' to 'double', possible loss of data
+C:\Dev\BackBeat\BackBeat\vendor\fftw3\fftw-3.3.10.tar\fftw-3.3.10\reodft\rodft00e-r2hc.c(188,28): warning C4244: '=': conversion from 'INT' to 'double', possible loss of data
+C:\Dev\BackBeat\BackBeat\vendor\fftw3\fftw-3.3.10.tar\fftw-3.3.10\reodft\rodft00e-r2hc.c(189,18): warning C4244: '=': conversion from 'INT' to 'double', possible loss of data
+  altivec.c
+  avx-128-fma.c
+  avx.c
+  avx2.c
+  avx512.c
+  kcvi.c
+  neon.c
+  sse2.c
+  taint.c
+  vsx.c
+  Generating Code...
+  buffered.c
+  conf.c
+  ct.c
+  generic.c
+C:\Dev\BackBeat\BackBeat\vendor\fftw3\fftw-3.3.10.tar\fftw-3.3.10\dft\generic.c(149,39): warning C4244: '=': conversion from 'INT' to 'double', possible loss of data
+C:\Dev\BackBeat\BackBeat\vendor\fftw3\fftw-3.3.10.tar\fftw-3.3.10\dft\generic.c(151,39): warning C4244: '=': conversion from 'INT' to 'double', possible loss of data
+  indirect.c
+  nop.c
+  plan.c
+  problem.c
+  rader.c
+C:\Dev\BackBeat\BackBeat\vendor\fftw3\fftw-3.3.10.tar\fftw-3.3.10\dft\rader.c(64,22): warning C4244: '=': conversion from 'trigreal' to 'R', possible loss of data
+C:\Dev\BackBeat\BackBeat\vendor\fftw3\fftw-3.3.10.tar\fftw-3.3.10\dft\rader.c(65,35): warning C4244: '=': conversion from 'trigreal' to 'R', possible loss of data
+  rank-geq2.c
+  solve.c
+  vrank-geq1.c
+  codlist.c
+  buffered.c
+  ct.c
+  plan.c
+  problem.c
+  rader.c
+  buffered.c
+  conf.c
+  generic.c
+  indirect.c
+  nop.c
+  plan.c
+  problem.c
+  rank-geq2.c
+  solve.c
+  vrank-geq1.c
+  codlist.c
+  codlist.c
+  codlist.c
+  conf.c
+  fftw3f.vcxproj -> C:\Dev\BackBeat\BackBeat\vendor\fftw3\bin\Release\fftw3f.lib

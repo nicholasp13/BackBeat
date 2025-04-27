@@ -28,6 +28,7 @@ namespace BackBeat {
 		inline void ClearSample(unsigned int index) { m_Voices[index]->ClearSample(); }
 		inline void LoopOn(unsigned int index) { m_Voices[index]->LoopOn(); }
 		inline void LoopOff(unsigned int index) { m_Voices[index]->LoopOff(); }
+		inline bool IsActive(unsigned int index) { return m_Voices[index]->IsActive(); }
 		inline bool IsLooping(unsigned int index) { return m_Voices[index]->IsLooping(); }
 		inline std::shared_ptr<SamplerCore> GetSamplerCore(unsigned int index) { return m_Voices[index]->GetCore(); }
 		inline void SetNote(MIDICode code, unsigned int index) { m_Voices[index]->SetMIDINote(code); }

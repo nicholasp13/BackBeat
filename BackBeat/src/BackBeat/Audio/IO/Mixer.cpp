@@ -10,7 +10,8 @@ namespace BackBeat {
 		m_RecordingSink(nullptr),
 		m_VisualizingSink(nullptr),
 		m_Processors(std::vector< std::shared_ptr<AudioProcessor> >()),
-		m_RecordingManager(nullptr)
+		m_RecordingManager(nullptr),
+		m_Visualizer(nullptr)
 	{
 
 	}

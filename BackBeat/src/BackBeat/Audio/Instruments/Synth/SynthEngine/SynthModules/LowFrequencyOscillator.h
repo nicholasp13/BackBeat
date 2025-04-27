@@ -16,7 +16,7 @@ namespace BackBeat {
 		virtual void DoNoteOn(NoteEvent event) override;
 		virtual void DoNoteOff(NoteEvent event) override;
 
-		inline virtual std::shared_ptr<float[]> GetBuffer() override { return std::shared_ptr<float[]>(); }
+		inline virtual std::shared_ptr<float[]> GetBuffer() override { return nullptr; }
 
 	private:
 		std::shared_ptr<LFOCore> m_Core;

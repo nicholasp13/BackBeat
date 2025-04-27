@@ -51,6 +51,9 @@ namespace Exampler {
 		inline void SetRecordingPlayer(std::shared_ptr<BackBeat::Player> player) { m_RecordingPlayer = player; }
 
 	private:
+		const float m_Width = 800.0f;
+		const float m_Height = 540.0f;
+
 		bool m_Open;
 		bool m_KeyboardActive;
 		std::string m_Name;
@@ -87,13 +90,13 @@ namespace Exampler {
 		void RenderLFO();
 		void RenderFilters();
 		void RenderEGs();
+		void RenderNoiseGenerator();
 		void RenderOscs();
 		void RenderOsc(const char* label, int* octave, std::shared_ptr<BackBeat::OscParameters> params,
 			int* waveIndex, int* PWMIndex);
 
 		unsigned int SetCanvasColors();
 		unsigned int SetEntityColors();
-		void HelpMarker(const char* desc);
 
 		inline bool OnKeyEvent(BackBeat::KeyPressedEvent& event) { return false; }
 		inline bool OnMouseButtonEvent(BackBeat::MouseButtonPressedEvent& event) { return false; }

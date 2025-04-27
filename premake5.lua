@@ -49,7 +49,8 @@ project "BackBeat"
 		"%{prj.name}/vendor/imgui",
 		"%{prj.name}/vendor/lodepng",
 		"%{prj.name}/vendor/pugixml",
-		"%{prj.name}/vendor/imgui-knobs"
+		"%{prj.name}/vendor/imgui-knobs",
+		"%{prj.name}/vendor/fftw3/include"
 	}
 
 	links
@@ -60,7 +61,13 @@ project "BackBeat"
 		"lodepng",
 		"pugixml",
 		"imgui-knobs",
-		"opengl32.lib"
+		"opengl32.lib",
+		"fftw3f"
+	}
+
+	libdirs 
+	{ 
+		"%{prj.name}/vendor/fftw3/bin"
 	}
 
 	filter "system:windows"
@@ -113,6 +120,7 @@ project "Exampler"
 		"BackBeat/vendor/lodepng",
 		"BackBeat/vendor/pugixml",
 		"BackBeat/vendor/imgui-knobs",
+		"BackBeat/vendor/fftw3/include",
 		"BackBeat/src"
 	}
 	
@@ -133,6 +141,7 @@ project "Exampler"
 	filter "configurations:Debug"
 		defines "BB_DEBUG"
 		symbols "on"
+		ignoredefaultlibraries  { "LIBCMT" }
 
 	filter "configurations:RELEASE"
 		defines "BB_RELEASE"
@@ -167,6 +176,7 @@ project "UnitTests"
 		"BackBeat/vendor/lodepng",
 		"BackBeat/vendor/pugixml",
 		"BackBeat/vendor/imgui-knobs",
+		"BackBeat/vendor/fftw3/include",
 		"BackBeat/src"
 	}
 	

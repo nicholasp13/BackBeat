@@ -11,7 +11,7 @@ namespace BackBeat {
 			return;
 
 		AudioInfo trackInfo = track->GetInfo();
-		if (trackInfo.type != FileType::wav)
+		if (trackInfo.type != FileType::wav && trackInfo.type != FileType::recordingTemp)
 			return;
 
 		AudioProps trackProps = trackInfo.props;
@@ -132,6 +132,52 @@ namespace BackBeat {
 
 			delete[] trackData;
 			delete[] sampleData;
+		}
+	}
+
+	// NOTE: Used by Splicer which handles translating the audio data its given to BackBeat default props
+	// @params:
+	// - props       - Audio props of the buffer(s)
+	// - leftBuffer  - left buffer
+	// - rightBuffer - right buffer
+	// - numSamples  - number of samples PER BUFFER
+	void SampleBuilder::SaveSample(AudioProps props, float* leftBuffer, float* rightBuffer, unsigned int numSamples)
+	{
+		if (!leftBuffer || !rightBuffer)
+			return;
+		if (props.bitDepth != Audio::FloatBitSize)
+			return;
+		if (props.numChannels != Audio::Stereo)
+			return;
+		if (numSamples == 0)
+			return;
+
+		// Get filePath from user, returns if no path is provided
+		std::string filePath = FileDialog::SaveFile("Sample Files (*.smpl)\0*.smpl\0");
+		if (strcmp(filePath.c_str(), "") == 0)
+			return;
+
+		char* leftPtr = nullptr;
+		char* rightPtr = nullptr;
+		unsigned int dataSize = numSamples * props.blockAlign;
+		AudioProps sampleProps = props;
+		sampleProps.fileSize = dataSize + Audio::SAMPLETotalHeaderSize;
+
+		bool success = AudioFileWriter::WriteSampleFileHeader(filePath, sampleProps, dataSize);
+		if (success)
+		{
+			std::ofstream file;
+			file.open(filePath, std::ios::binary | std::ios::app);
+			if (file.is_open())
+			{
+				for (unsigned int i = 0; i < numSamples; i++)
+				{
+					leftPtr = reinterpret_cast<char*>(leftBuffer + i);
+					rightPtr = reinterpret_cast<char*>(rightBuffer + i);
+					file.write(leftPtr, Audio::FloatByteSize);
+					file.write(rightPtr, Audio::FloatByteSize);
+				}
+			}
 		}
 	}
 

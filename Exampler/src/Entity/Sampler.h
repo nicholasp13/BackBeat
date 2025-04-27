@@ -5,11 +5,12 @@
 #include <backends/imgui_impl_opengl3.h>
 #include <backends/imgui_impl_glfw.h>
 #include <GLFW/glfw3.h>
+#include <imgui-knobs.h>
 
+#include "SampleSplicer.h"
 #include "Entity.h"
 namespace Exampler {
 
-	constexpr auto CreatingSampleID = "CreatingSample";
 	constexpr auto ProgrammingNoteID = "ProgrammingNote";
 
 	class Sampler : public Entity
@@ -49,23 +50,27 @@ namespace Exampler {
 
 		// Sampler functions
 		inline std::shared_ptr<BackBeat::MIDIInputHandler> GetMIDIInput() { return m_Sampler.GetMIDIInput(); }
-		inline std::shared_ptr<BackBeat::PlayerProcessor> GetTrackProcessor() { return m_TrackPlayer.GetProc(); }
 		inline std::shared_ptr<BackBeat::SamplerProcessor> GetSamplerProcessor() { return m_Sampler.GetProcessor(); }
 		inline void SetRecordingPlayer(std::shared_ptr<BackBeat::Player> player) { m_RecordingPlayer = player; }
 
 	private:
+		const float m_Width = 500.0f;
+		const float m_Height = m_Width + 38.0f; // Menu bar height and Window bar height is both 19 hence 38
+
 		bool m_Open;
 		bool m_KeyboardActive;
-		bool m_CreatingSample;
 		bool m_ProgrammingNote;
+		bool m_OpenPadControlsPopup;
 		unsigned int m_DevicesOpen;
 		unsigned int m_NumPads;
 		unsigned int m_PadToProgram; // This is the display Pad # not the actual index number, actual index is this - 1
+		unsigned int m_PadControlsToRender; // This is the display Pad # not the actual index number, actual index is this - 1
 		float m_TrackVolume;
 		std::string m_Name;
 
+		SampleSplicer m_SampleSplicer;
+
 		// BackBeat objects
-		BackBeat::Player m_TrackPlayer;
 		BackBeat::Sampler m_Sampler;
 		std::shared_ptr<BackBeat::Player> m_RecordingPlayer;
 		BackBeat::RecorderManager* m_RecorderMgr;
@@ -75,9 +80,13 @@ namespace Exampler {
 		void RenderCanvasEntity();
 		void RenderMenuBar();
 		void RenderSamplerPads();
-		void RenderSampleCreator();
 		void RenderNoteProgrammer();
-		unsigned int SetSamplerColors();
+		void RenderPadControls();
+		
+		unsigned int SetCanvasColors();
+		unsigned int SetEntityColors();
+		unsigned int SetPadColors();
+		unsigned int SetPadControlsColors();
 
 		inline bool OnKeyEvent(BackBeat::KeyPressedEvent& event) { return false; }
 		inline bool OnMouseButtonEvent(BackBeat::MouseButtonPressedEvent& event) { return false; }

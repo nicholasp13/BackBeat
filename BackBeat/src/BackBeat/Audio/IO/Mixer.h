@@ -6,7 +6,7 @@
 #include "BackBeat/Audio/Audio.h"
 #include "BackBeat/Audio/IO/AudioSink.h"
 #include "BackBeat/Audio/Recorder/RecorderManager.h"
-#include "BackBeat/Audio/Visualizer/Visualizer.h"
+#include "BackBeat/Audio/Visualizers/Visualizer.h"
 #include "AudioProcessor.h"
 namespace BackBeat {
 

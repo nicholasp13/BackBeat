@@ -2,7 +2,7 @@
 
 #include "BackBeat/Audio/IO/Mixer.h"
 #include "BackBeat/Audio/Renderer/Renderer.h"
-#include "BackBeat/Audio/Visualizer/Visualizer.h"
+#include "BackBeat/Audio/Visualizers/Visualizer.h"
 #include "Audio.h"
 namespace BackBeat {
 

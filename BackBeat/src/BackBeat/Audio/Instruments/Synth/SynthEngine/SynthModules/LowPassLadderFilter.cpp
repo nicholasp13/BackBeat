@@ -83,8 +83,11 @@ namespace BackBeat {
 		// Maps Q from 1 -> 10 to 0 -> 4
 		m_K = (4.0f) * (m_Params->Q - 1.0f) / 9.0f;
 
+		float cutoffShiftCents = m_ModInput->GetBuffer()[0] * SynthBase::EG2ToPitchMax;
+		float cutOffShift = powf(2.0f, cutoffShiftCents / Audio::CentsPerOctave);
+
 		// Makes sure cutoff frequencies are all set
-		float cutoff = m_Params->cutoff * m_ModInput->GetBuffer()[0];
+		float cutoff = m_Params->cutoff * cutOffShift;
 		Audio::Bound(cutoff, SynthBase::FilterCutoffMin, SynthBase::FilterCutoffMax);
 
 		m_LowPassFilter1->SetCuttoffFreq(cutoff);

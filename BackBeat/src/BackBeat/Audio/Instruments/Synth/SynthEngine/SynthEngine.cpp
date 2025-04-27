@@ -58,7 +58,7 @@ namespace BackBeat {
 			}
 		}
 
-		for (unsigned int j = 0; j < numSamples * 2; j++) {
+		for (unsigned int j = 0; j < numSamples * Audio::Stereo; j++) {
 			outputBuffer[j] = m_Buffer[j] * m_VoiceFactor * volume;
 		}
 #else
@@ -165,8 +165,7 @@ namespace BackBeat {
 	void SynthEngine::InitParameters() 
 	{
 		auto DCAParams = std::make_shared<DCAParameters>();
-		DCAParams->leftAmp = SynthBase::AmpDefault;
-		DCAParams->rightAmp = SynthBase::AmpDefault;
+		DCAParams->pan = SynthBase::PanDefault;
 		DCAParams->volume = 1.0f;
 
 		auto AmpEGParams = std::make_shared<EGParameters>();
@@ -228,6 +227,10 @@ namespace BackBeat {
 		HPFilterParams->isOn = false;
 		HPFilterParams->cutoff = SynthBase::FilterCutoffMin;
 
+		auto NoiseGenParams = std::make_shared<NoiseGeneratorParameters>();
+		NoiseGenParams->isOn = false;
+		NoiseGenParams->level = SynthBase::NoiseGenDefault;
+
 		auto modMatrixParams = std::make_shared<ModMatrixParameters>();
 
 		auto voiceParams = std::make_shared<VoiceParameters>();
@@ -241,6 +244,7 @@ namespace BackBeat {
 		voiceParams->OscParams4 = OSCParams4;
 		voiceParams->LPLadderFilterParams = LPLadderFilterParams;
 		voiceParams->HPFilterParams = HPFilterParams;
+		voiceParams->NoiseGenParams = NoiseGenParams;
 		voiceParams->ModMatrixParams = modMatrixParams;
 
 		m_Params = std::make_shared<EngineParameters>();
