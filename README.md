@@ -7,24 +7,23 @@ recording audio devices like mics using Windows API, and WAV file playback as sh
 ## Goal
 The goal is to create an open source, simple DAW with the ability to easily customize sounds and interface
 ### Current features:
-- Synthesizer with 4 wave oscillators, bilinear low pass and high pass filters, low frequency oscillator, panning, and volume control
-- Sampler with the ability to cut and program your own samples with control over panning and volume of each individual sample
-- Playback of WAV files of all bit depths and 48k sample rate
+- Synthesizer with 4 wave oscillators, ladder low pass filter with resonance and bass boost, high pass filter, low frequency oscillator, amplitude envelope generator, filter envelope generator, white noise generator, and digitally controlled amplifier with panning and volume control
+- Sample splicer with gain control, pitch shifter, time stretcher, low pass filter, and high pass fitler to fully cut and customize samples from any WAV file
+- Sampler with 16 individual pads to play custom sample files with the ability to loop, pan, and control the volume of each individual pad/sample
+- Importing of WAV files of all bit depths and 48k sample rate for playback, recording, and sampling
 - MIDI input device support for both Synthesizer and Sampler
 - Recording audio from devices such as mics and instruments through Windows API and recording BackBeat objects like Sampler and Synth
 - Audio Visualization to show users the music their making and how their inputs change the sound
 - GUI using ImGui to fully control, add, and delete BackBeat objects during runtime
 - XML serialization to save and load any work done as projects
 ### Upcoming features:
-- Add custom Sampler GUI pads that are clickable
-- Improve sampler splicer with zero crossing finder
-- Other GUI overhauls including for Sampler, AudioVisualizer, etc.
+- Upsampler and downsampler to play and splice samples from WAV files of different sample rates
+- Reverb
 ### Planned features:
 - Add more GUI controls like copy-paste, grabbing, selecting, deleting, etc. to BackBeat::ImGuiTimeline
 - WaveTable oscillators
 - More instruments like drumsets and other synths
 - Modular Matrix for interactive GUI implementation to customize synth sounds
-- Add downsampling and upsampling to support different sample rates (only 48k sample rate supported currently)
 - Other Synth modes including monophonic, legatto, gliding, etc.
 - Add support to play MP3 files
 - 2D Renderer for custom sprites and animations for audio visualization
