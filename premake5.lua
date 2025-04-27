@@ -141,6 +141,7 @@ project "Exampler"
 	filter "configurations:Debug"
 		defines "BB_DEBUG"
 		symbols "on"
+		ignoredefaultlibraries  { "LIBCMT" }
 
 	filter "configurations:RELEASE"
 		defines "BB_RELEASE"
